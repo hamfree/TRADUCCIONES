@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../css/JSP-Styles.css" type="text/css">
+<title>El Lenguaje de Expresión (EL) - La Lección</title>
+</head>
+<body style="background-color: #FDF5E6">
+	<h1>El Lenguaje de Expresión (EL)</h1>
+	<h2>La Lección</h2>
+
+	<h3>Agenda</h3>
+	<ul>
+		<li>Motivating use of the expression language</li>
+		<li>Understanding the basic syntax</li>
+		<li>Understanding the relationship of the expression language to
+			the MVC architecture</li>
+		<li>Referencing scoped variables</li>
+		<li>Accessing bean properties, array elements, List elements, and
+			Map entries</li>
+		<li>Using expression language operators</li>
+		<li>Evaluating expressions conditionally</li>
+	</ul>
+	<hr />
+	<h3>EL Motivation: Simplifying MVC Output Pages</h3>
+
+	<hr />
+	<h3>Servlets and JSP: Possibilities for Handling a Single Request</h3>
+
+	<ul>
+		<li class="n1">Servlet only. Works well when:</li>
+		<li class="n2">Output is a binary type. E.g.: an image</li>
+		<li class="n2">There is no output. E.g.: you are doing forwarding
+			or redirection as in Search Engine example.</li>
+		<li class="n2">Format/layout of page is highly variable. E.g.:
+			portal.</li>
+		<li class="n1">JSP only. Works well when:</li>
+		<li class="n2">Output is mostly character data. E.g.: HTML</li>
+		<li class="n2">Format/layout mostly fixed.</li>
+		<li class="n1">Combination (MVC architecture). Needed when:</li>
+		<li class="n2">A single request will result in multiple
+			substantially different looking results.</li>
+		<li class="n2">You have a large development team with different
+			team members doing the Web development and the business logic.</li>
+		<li class="n2">You perform complicated data processing, but have
+			a relatively fixed layout.</li>
+	</ul>
+	<hr />
+	<h3>Implementing MVC withRequestDispatcher</h3>
+
+	<ul>
+		<li class="n1">1. Define beans to represent result data</li>
+		<li class="n2">Ordinary Java classes with at least one getBlah
+			method</li>
+		<li class="n1">2. Use a servlet to handle requests</li>
+		<li class="n2">Servlet reads request parameters, checks for
+			missing and malformed data, calls business logic, etc.</li>
+		<li class="n1">3. Obtain bean instances</li>
+		<li class="n2">The servlet invokes business logic
+			(application-specific code) or data-access code to obtain the
+			results.</li>
+		<li class="n1">4. Store the bean in the request, session,
+			orservlet context</li>
+		<li class="n2">The servlet calls setAttribute on the request,
+			session, or servlet context objects to store a reference to the beans
+			that represent the results of the request.</li>
+		<li class="n1">5. Forward the request to a JSP page.</li>
+		<li class="n2">The servlet determines which JSP page is
+			appropriate to the situation and uses the forward method of
+			RequestDispatcher to transfer control to that page.</li>
+		<li class="n1">6. Extract the data from the beans.</li>
+		<li class="n2">The JSP page accesses beans with jsp:useBean and a
+			scope matching the location of step 4. The page then uses
+			jsp:getProperty to output the bean properties.</li>
+		<li class="n2">The JSP page does not create or modify the bean;
+			it merely extracts and displays data that the servlet created.</li>
+	</ul>
+	<hr />
+	<h3>Drawback of MVC</h3>
+
+	<ul>
+		<li class="n1">Main drawback is the final step: presentingthe
+			results in the JSP page.</li>
+		<li class="n2">Jsp:useBean and jsp:getProperty</li>
+		<li class="n3">Clumsy and verbose</li>
+		<li class="n3">Cannot access bean subproperties</li>
+		<li class="n2">JSP scripting elements</li>
+		<li class="n3">Result in hard-to-maintain code</li>
+		<li class="n3">Defeat the whole purpose behind MVC.</li>
+		<li class="n1">Goal</li>
+		<li class="n2">More concise, succinct, and readable syntax</li>
+		<li class="n3">Accessible to Web developers</li>
+		<li class="n2">Ability to access subproperties</li>
+		<li class="n2">Ability to access collections</li>
+	</ul>
+	<hr />
+	<h3>Main Point of EL for New MVC Apps</h3>
+
+	<ul>
+		<li class="n1">Bean</li>
+		<li class="n2">public String <em class="azul">getFirstName</em>(...)
+			{ ... }
+		</li>
+		<li class="n1">Servlet</li>
+		<li class="n2">Customer someCust =
+			lookupService.findCustomer(...);</li>
+		<li class="n2">request.setAttribute("customer", someCust);</li>
+		<li class="n2">(Use RequestDispatcher.forward to go to JSP page)</li>
+		<li class="n1">JSP</li>
+		<li class="n2">&lt;h1&gt;First name is
+			${customer.firstName}&lt;/h1&gt;</li>
+	</ul>
+
+	If this is all you
+	<em class="sub">ever</em> know about the Expression Language, you are
+	still in pretty good shape
+
+	<hr />
+	<h3>Main Point of EL for MVC Apps thatare Upgrading from JSP 1.2</h3>
+	<ul>
+		<li class="n1">When in JSP 2.x-compliant server with current
+			web.xml version, change:</li>
+	</ul>
+	<pre>
+    &lt;jsp:useBean id="<em class="cur">someName</em>" 
+                 type="<em class="cur">somePackage.someClass</em>" 
+                 scope="<em class="cur">request, session, or application"</em>/&gt; 
+    &lt;jsp:getProperty name="<em class="rojo">someName</em>" 
+                     property="<em class="rojo">someProperty</em>"/&gt;
+   </pre>
+	<ul>
+		<li class="n1">To:</li>
+	</ul>
+	<pre>
+    <em class="rojo">${someName.someProperty}</em> 
+</pre>
+	<ul>
+		<li class="n1">Bean, servlet, business logic</li>
+		<li class="n2">Remain exactly the same as before</li>
+	</ul>
+	<hr />
+	<h3>Advantages of the ExpressionLanguage</h3>
+
+	<ul>
+		<li class="n1">Concise access to stored objects.</li>
+		<li class="n2">To output a "scoped variable" (object stored with
+			setAttribute in the PageContext, HttpServletRequest, HttpSession, or
+			ServletContext) named saleItem, you use ${saleItem}.</li>
+		<li class="n1">Shorthand notation for bean properties.</li>
+		<li class="n2">To output the companyName property (i.e., result
+			of the getCompanyName method) of a scoped variable named company, you
+			use ${company.companyName}. To access the firstName property of the
+			president property of a scoped variable named company, you use
+			${company.president.firstName}.</li>
+		<li class="n1">Simple access to collection elements.</li>
+		<li class="n2">To access an element of an array, List, or Map,
+			you use ${variable[indexOrKey]}. Provided that the index or key is in
+			a form that is legal for Java variable names, the dot notation for
+			beans is interchangeable with the bracket notation for collections.</li>
+		<li class="n1">Succinct access to request parameters, cookies,
+			and other request data.</li>
+		<li class="n2">To access the standard types of request data, you
+			can use one of several predefined implicit objects.</li>
+		<li class="n1">A small but useful set of simple operators.</li>
+		<li class="n2">To manipulate objects within EL expressions, you
+			can use any of several arithmetic, relational, logical, or
+			empty-testing operators.</li>
+		<li class="n1">Conditional output.</li>
+		<li class="n2">To choose among output options, you do not have to
+			resort to Java scripting elements. Instead, you can use ${test ?
+			option1 : option2}.</li>
+		<li class="n1">Automatic type conversion.</li>
+		<li class="n2">The expression language removes the need for most
+			typecasts and for much of the code that parses strings as numbers.</li>
+		<li class="n1">Empty values instead of error messages.</li>
+		<li class="n2">In most cases, missing values or
+			NullPointerExceptions result in empty strings, not thrown exceptions.</li>
+	</ul>
+	<hr />
+	<h2>Setup</h2>
+
+	<h3>Activating the Expression Language</h3>
+	<ul>
+		<li class="n1">Available only in servers that support JSP 2.0 or
+			2.1 (servlets 2.4 or 2.5)
+		<li class="n2">E.g., Tomcat 5 or later, WebLogic 9 or later, WS
+			6+,
+		<li class="n3">Not Tomcat 4 or WebLogic 8 or WebSphere 5
+		<li class="n2"><em class="rojo">For a full list of compliant
+				servers, see http://theserverside.com/reviews/matrix.tss</em>
+		<li class="n1">You must use the JSP 2.x web.xml file
+		<li class="n2">Download from coreservlets.com, use one from
+			Tomcat 5or 6, or Eclipse/MyEclipse will build one for you
+	</ul>
+	<pre class="rojo">
+&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
+&lt;web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation= 
+           "http://java.sun.com/xml/ns/j2ee web-app_2_4.xsd"
+         version="2.4"&gt; 
+...
+&lt;/web-app&gt;
+</pre>
+	<hr />
+	<h3>Invoking the Expression Language</h3>
+	<ul>
+		<li class="n1">Basic form: <em class="rojo">${</em>expression<em
+			class="rojo">}</em></li>
+		<li class="n2">These EL elements can appear in ordinary text or
+			in JSP tag attributes, provided that those attributes permit regular
+			JSP expressions. For example:</li>
+		<li class="n3">&lt;ul&gt;</li>
+		<li class="n3">&nbsp;&nbsp; &lt;li&gt;Name: <em class="rojo">${expression1}</em>&lt;/li&gt;
+		</li>
+		<li class="n3">&nbsp;&nbsp;&lt;li&gt;Address: <em class="rojo">${expression2}</em>&lt;/li&gt;
+		</li>
+		<li class="n3">&lt;/ul&gt;</li>
+		<li class="n3">&lt;jsp:include page="<em class="rojo">${expression3}</em>"/&gt;
+		</li>
+		<li class="n1">* The EL in tag attributes</li>
+		<li class="n2">* You can use multiple expressions (possibly
+			intermixed with static text) and the results are coerced to strings
+			and concatenated. For example:</li>
+		<li class="n3">* &lt;jsp:include page="<em class="rojo">${expr1}blah${expr2}</em>"/&gt;
+		</li>
+	</ul>
+	<hr />
+	<h3>Rare (but Confusing) EL Problem</h3>
+	<ul>
+		<li class="n1">Scenario</li>
+		<li class="n2">You use ${something} in a JSP page</li>
+		<li class="n2">You literally get "${something}" in the output</li>
+		<li class="n2">You realize you forgot to update an old web.xml
+			file to refer to servlets 2.4 (or 2.5), so you do so</li>
+		<li class="n2">You redeploy your Web app and restart the server</li>
+		<li class="n2">You still literally get "${something}" in the
+			output</li>
+		<li class="n1">Why?</li>
+		<li class="n2">The JSP page was already translated into a servlet</li>
+		<li class="n3">A servlet that ignored the expression language</li>
+		<li class="n1">Solution</li>
+		<li class="n2">Resave the JSP page to update its modification
+			date</li>
+	</ul>
+	<hr />
+	<h3>Preventing Expression Language Evaluation</h3>
+	<ul>
+		<li class="n1">What if JSP page contains ${ ?</li>
+		<li class="n2">Perhaps by accident, perhaps if you make a custom
+			tag library that also uses ${...} notation and evaluates it directly
+			(as with first release of JSTL).</li>
+		<li class="n1">Deactivating the EL in an entire Web application.</li>
+		<li class="n2">Use a web.xml file that refers to servlets 2.3
+			(JSP 1.2) or earlier.</li>
+		<li class="n1">Deactivating the expression language in multiple
+			JSP pages.</li>
+		<li class="n2">Use the jsp-property-group web.xml element</li>
+		<li class="n1">Deactivating the expression language in individual
+			JSP pages.</li>
+		<li class="n2">Use &lt;%@ page isELIgnored="true" %&gt;</li>
+		<li class="n1">Deactivating individual EL statements.</li>
+		<li class="n2">In JSP 1.2 pages that need to be ported unmodified
+			across multiple JSP versions (with no web.xml changes), you can
+			replace $ with &#36;, the HTML character entity for $.</li>
+		<li class="n2">In JSP 2.0 pages that contain both EL statements
+			and literal ${ strings, you can use \${ when you want ${ in the
+			output</li>
+	</ul>
+	<hr />
+	<h3>Preventing Use of Standard Scripting Elements</h3>
+	<ul>
+		<li class="n1">To enforce EL-only with no scripting, use
+			scripting-invalid in web.xml</li>
+	</ul>
+	<pre>
+&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
+&lt;web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi= 
+            "http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation= 
+            "http://java.sun.com/xml/ns/j2ee web-app_2_4.xsd"
+         version="2.4"&gt; 
+  &lt;jsp-property-group&gt;
+    &lt;url-pattern&gt;*.jsp&lt;/url-pattern&gt;
+    <em class="rojo">&lt;scripting-invalid&gt;true&lt;/scripting-invalid&gt;</em>
+  &lt;/jsp-property-group&gt;
+&lt;/web-app&gt; 
+</pre>
+	<hr />
+	<h3>Downsides to Preventing Use of Scripting Elements</h3>
+	<ul>
+		<li class="n1">Harder debugging</li>
+		<li class="n2">&lt;% System.out.println("...."); %></li>
+		<li class="n1">No redirects</li>
+		<li class="n2">&lt;% response.sendRedirect("welcome.jsf"); %></li>
+		<li class="n1">Some techniques hard to do with MVC</li>
+		<li class="n2"><pre> &lt;% 
+ if (outputShouldBeExcel()) { 
+   response.setContentType("application/vnd.ms-excel"); 
+ } 
+ %></pre></li>
+		<li class="n1">Just because scripting is usually bad does not
+			mean it is always bad</li>
+	</ul>
+	<hr />
+	<h2>EL Uses: Scoped vars, Bean properties, collections</h2>
+	<h3>Accessing Scoped Variables</h3>
+	<ul>
+		<li class="n1">${varName}</li>
+		<li class="n2">Searches the PageContext, the HttpServletRequest,
+			the HttpSession, and the ServletContext, in that order, andoutput the
+			object with that attribute name. PageContext does not apply with MVC.</li>
+		<li class="n2">Application: if you just have an error message,
+			you can store the String directly instead of putting it in a bean
+			andstoring the bean</li>
+		<li class="n1">Equivalent forms</li>
+		<li class="n2">${name}</li>
+		<li class="n2">&lt;%= pageContext.findAttribute("name") %></li>
+		<li class="n2">&lt;jsp:useBean id="name"<br> <span
+			style="padding-left: 130px;">type="somePackage.SomeClass"</span><br>
+			<span style="padding-left: 130px;">scope="..."></span><br>
+			&lt;%= name %>
+		</li>
+	</ul>
+	<hr />
+	<h3>Example: Accessing Scoped Variables</h3>
+	<pre>
+@WebServlet("/scoped-vars")
+public class ScopedVars extends HttpServlet {
+  public void doGet(HttpServletRequest request,
+                    HttpServletResponse response)
+      throws ServletException, IOException {
+    <span class="rojo">request.setAttribute("attribute1", "First Value");</span>
+    HttpSession session = request.getSession();
+    <span class="rojo">session.setAttribute("attribute2", "Second Value");</span>
+    ServletContext application = getServletContext();
+    <span class="rojo">application.setAttribute("attribute3",
+                             new java.util.Date());
+    request.setAttribute("repeated", "Request");
+    session.setAttribute("repeated", "Session");
+    application.setAttribute("repeated", "ServletContext");</span>
+    RequestDispatcher dispatcher =
+      request.getRequestDispatcher
+                      ("/WEB-INF/results/scoped-vars.jsp");
+    dispatcher.forward(request, response);
+  }
+} 
+</pre>
+	<hr />
+	<h3>Example: Accessing ScopedVariables (Continued)</h3>
+	<pre>
+&lt;!DOCTYPE ...;&gt; 
+...
+&lt;TABLE BORDER=5 ALIGN="CENTER";&gt; 
+  &lt;TR>&lt;TH CLASS="TITLE";&gt; 
+  Accessing Scoped Variables
+&lt;/TABLE;&gt;
+&lt;P;&gt; 
+&lt;UL;&gt; 
+  &lt;LI&gt;&lt;B&gt;attribute1:&amp;ltB;&gt; <span class="rojo">${attribute1}</span>
+  &lt;LI&gt;&lt;B&gt;attribute2:&lt;/B;&gt; <span class="rojo">${attribute2}</span>
+  &lt;LI&gt;&lt;&gt;>attribute3:&lt;/B&gt; <span class="rojo">${attribute3}</span>
+  &lt;LI&gt;&lt;B&gt;Source of "repeated" attribute:&lt;/B&gt; 
+      <span class="rojo">${repeated}</span>
+&lt;/UL&gt;
+&lt;/BODY>&lt;/HTML&gt; 
+</pre>
+	<hr />
+	<h3>Example: Accessing ScopedVariables (Result)</h3>
+	<div style="text-align: center">
+		<img src="img01.png" alt="Captura del resultado" />
+	</div>
+
+	<hr />
+	<h3>Accessing Bean Properties</h3>
+	<ul>
+		<li class="n1">${varName.propertyName}</li>
+		<li class="n2">Means to find scoped variable of given name and
+			output the specified bean property</li>
+		<li class="n3">Remember from MVC lecture that bean property
+			corresponds to getter method name, not instance var.</li>
+		<li class="n1">Equivalent forms</li>
+		<li class="n2">${customer.firstName}
+		<li class="n2">&lt;%@ page import="coreservlets.NameBean" %&gt; <br>
+			&nbsp;&nbsp;&nbsp;&lt;% <br> &nbsp;&nbsp;&nbsp;NameBean person =<br>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(NameBean)pageContext.findAttribute("customer");<br>
+			&nbsp;&nbsp;&nbsp;%&gt;<br> &nbsp;&nbsp;&nbsp;&lt;%=
+			person.getFirstName() %&gt;
+		</li>
+		<li class="n1">Equivalent forms</li>
+		<li class="n2">${customer.firstName}</li>
+		<li class="n2">&lt;jsp:useBean id="customer"<br /> <span
+			style="padding-left: 130px;">type="coreservlets.NameBean"</span><br>
+			<span style="padding-left: 130px;">scope="request, session, or
+				application" /&gt;</span><br> &lt;jsp:getProperty name="customer" <br>
+			<span style="padding-left: 145px;">property="firstName" /&gt;</span></li>
+		<li class="n1">This is better than script on previous slide.</li>
+		<li class="n2">But, requires you to know the scope</li>
+		<li class="n2">And fails for subproperties.</li>
+		<li class="n3">No non-Java equivalent to
+			${customer.address.zipCode}</li>
+	</ul>
+	<hr />
+	<h3>Example: Accessing BeanProperties</h3>
+	<pre>
+@WebServlet("/bean-properties")
+public class BeanProperties extends HttpServlet {
+  public void doGet(HttpServletRequest request,
+                    HttpServletResponse response)
+      throws ServletException, IOException {
+    <span class="rojo">Name</span> name = new Name("Marty", "Hall");
+    <span class="rojo">Company</span> company =
+      new Company("coreservlets.com", 
+                  "Customized Java EE and Ajax Training"); 
+    <span class="rojo">Employee</span> employee =
+      new Employee(name, company);
+    <span class="rojo">request.setAttribute("employee", employee);</span>
+    RequestDispatcher dispatcher =
+      request.getRequestDispatcher
+        ("/WEB-INF/results/bean-properties.jsp");
+    dispatcher.forward(request, response); 
+  }
+} 
+
+public class Employee {
+  private <span class="rojo">Name</span> name;
+  private <span class="rojo">Company</span> company; 
+
+  public Employee(Name name, Company company) {
+    setName(name);
+    setCompany(company);
+  }
+   
+  public Name getName() { return(name); } 
+
+  public void setName(Name name) {
+    this.name = name;
+  }
+   
+  public CompanyBean getCompany() { return(company); } 
+
+  public void setCompany(Company company) {
+    this.company = company;
+  }
+} 
+
+public class Name {
+  private String firstName;
+  private String lastName;
+   
+  public Name(String firstName, String lastName) {
+    setFirstName(firstName);
+    setLastName(lastName);
+  }
+   
+  public String getFirstName() {
+    return (firstName);
+  }
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
+  public String getLastName() {
+    return (lastName);
+  }
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
+} 
+
+public class Company {
+  private String companyName;
+  private String business;
+   
+  public Company(String companyName, String business) {
+    setCompanyName(companyName);
+    setBusiness(business);
+  }
+   
+  public String getCompanyName() { return(companyName); }
+   
+  public void setCompanyName(String companyName) {
+    this.companyName = companyName;
+  }
+   
+  public String getBusiness() { return(business); }
+   
+  public void setBusiness(String business) {
+    this.business = business;
+  }
+} 
+</pre>
+	<hr />
+	<h3>Example: Accessing BeanProperties (Continued)</h3>
+	<pre>
+&lt;!DOCTYPE ...&gt; 
+...
+&lt;UL&gt; 
+  &lt;LI&gt;&lt;B&gt;First Name:&lt;/B&gt;
+     <span class="rojo">${employee.name.firstName}</span>
+  &lt;LI&gt;&lt;B&gt;Last Name:&lt;/B&gt;
+     <span class="rojo">${employee.name.lastName}</span>
+  &lt;LI&gt;&lt;B&gt;Company Name:&lt;/B&gt;
+     <span class="rojo">${employee.company.companyName}</span>
+  &lt;LI&gt;&lt;B&gt;Company Business:&lt;/B&gt;
+     <span class="rojo">${employee.company.business}</span>
+&lt;/UL&gt;
+&lt;/BODY&gt;&lt;/HTML&gt; 
+</pre>
+	<hr />
+	<h3>Example: Accessing BeanProperties (Result)</h3>
+	<div style="text-align: center;">
+		<img src="img02.png" alt="Captura del resultado" />
+	</div>
+
+	<hr />
+	<h3>Equivalence of Dot and ArrayNotations</h3>
+	<ul>
+		<li class="n1">Equivalent forms</li>
+		<li class="n2">${name.property}</li>
+		<li class="n2">${name["property"]}</li>
+		<li class="n1">Reasons for using array notation</li>
+		<li class="n2"><span class="rojo">To access arrays, lists,
+				and other collections</span></li>
+		<li class="n3">See upcoming slides</li>
+		<li class="n2">To calculate the property name at request time.</li>
+		<li class="n3">{name1[name2]} (no quotes around name2)</li>
+		<li class="n2">To use names that are illegal as Java variable
+			names</li>
+		<li class="n3">{foo["bar-baz"]}</li>
+		<li class="n3">{foo["bar.baz"]}</li>
+	</ul>
+	<hr />
+	<h3>Accessing Collections</h3>
+	<ul>
+		<li class="n1">${attributeName[entryName]}</li>
+		<li class="n1">Works for</li>
+		<li class="n2">Array. Equivalent to</li>
+		<li class="n3">theArray[index]</li>
+		<li class="n2">List. Equivalent to</li>
+		<li class="n3">theList.get(index)</li>
+		<li class="n2">Map. Equivalent to</li>
+		<li class="n3">theMap.get(keyName)</li>
+		<li class="n1">Equivalent forms (for HashMap)</li>
+		<li class="n2">${stateCapitals["maryland"]}</li>
+		<li class="n2">${stateCapitals.maryland}</li>
+		<li class="n2">But the following is illegal since 2 is not a
+			legal var name</li>
+		<li class="n3">${listVar.2}</li>
+	</ul>
+	<hr />
+	<h3>Example: Accessing Collections</h3>
+	<pre>
+public class Collections extends HttpServlet {
+  public void doGet(HttpServletRequest request,
+                    HttpServletResponse response)
+     throws ServletException, IOException {
+   <span class="rojo">String[]</span> firstNames = { "Bill", "Scott", "Larry" }; 
+   <span class="rojo">List</span>&lt;String&gt; lastNames = new ArrayList&lt;String&gt;();
+   lastNames.add("Ellison");
+   lastNames.add("Gates");
+   lastNames.add("McNealy");
+   <span class="rojo">Map</span>&lt;String,String&gt; companyNames = 
+     new HashMap&lt;String,String&gt;();
+   companyNames.put("Ellison", "Sun");
+   companyNames.put("Gates", "Oracle");
+   companyNames.put("McNealy", "Microsoft");
+   request.setAttribute("first", firstNames); 
+   request.setAttribute("last", lastNames);
+   request.setAttribute("company", companyNames);
+   RequestDispatcher dispatcher =
+     request.getRequestDispatcher
+                      ("/WEB-INF/results/collections.jsp");
+   dispatcher.forward(request, response);
+  } 
+}
+</pre>
+	<hr />
+	<h3>Example: Accessing Collections(Continued)</h3>
+	<pre>
+&lt;!DOCTYPE ...&gt; 
+...
+&lt;BODY&gt; 
+&lt;TABLE BORDER=5 ALIGN="CENTER"&gt; 
+  &lt;TR&gt;&lt;TH CLASS="TITLE"&gt; 
+  Accessing Collections&lt;/TABLE&gt;
+&lt;P&gt; 
+&lt;UL&gt; 
+  &lt;LI&gt;<span class="rojo">${first[0]} ${last[0]} </span>(<span
+			class="rojo">${company["Ellison"]}</span>)
+  &lt;LI&gt;<span class="rojo">${first[1]} ${last[1]} </span>(<span
+			class="rojo">${company["Gates"]}</span>)
+  &lt;LI&gt;<span class="rojo">${first[2]} ${last[2]} </span>(<span
+			class="rojo">${company["McNealy"]}</span>)
+&lt;/UL&gt;
+&lt;/BODY&gt;&lt;/HTML&gt; 
+</pre>
+	<hr />
+	<h3>Example: AccessingCollections (Result)</h3>
+	<div style="text-align: center;">
+		<img src="img03.png" alt="Captura del resultado" />
+	</div>
+	<hr />
+	<h2>Implicit Objects and Operators</h2>
+	<h3>Referencing Implicit Objects(Predefined Variable Names)</h3>
+	<ul>
+		<li class="n1">pageContext. The PageContext object.</li>
+		<li class="n2">E.g. ${pageContext.session.id}</li>
+		<li class="n1">param and paramValues. Request params.</li>
+		<li class="n2">E.g. ${param.custID}</li>
+		<li class="n1">header and headerValues. Request headers.</li>
+		<li class="n2">E.g. ${header.Accept} or ${header["Accept"]}</li>
+		<li class="n2">${header["Accept-Encoding"]}</li>
+		<li class="n1">cookie. Cookie object (not cookie value).</li>
+		<li class="n2">E.g. ${cookie.userCookie.value} or
+			${cookie["userCookie"].value}</li>
+		<li class="n1">initParam. Context initialization param.</li>
+		<li class="n1">pageScope, requestScope, sessionScope,
+			applicationScope.</li>
+		<li class="n2">Instead of searching scopes.</li>
+		<li class="n1">Problem</li>
+		<li class="n2">Using implicit objects usually works poorly with
+			MVC model</li>
+	</ul>
+	<hr />
+	<h3>Example: Implicit Objects</h3>
+	<pre>
+&lt;!DOCTYPE ...&gt; 
+...
+&lt;P&gt; 
+&lt;UL&gt; 
+  &lt;LI&gt;&lt;B&gt;test Request Parameter:&lt;/B&gt;
+      ${param.test}
+  &lt;LI&gt;&lt;B&gt;User-Agent Header:&lt;/B&gt;
+      ${header["User-Agent"]}
+  &lt;LI&gt;&lt;B&gt;JSESSIONID Cookie Value:&lt;/B&gt;
+      ${cookie.JSESSIONID.value}
+  &lt;LI&gt;&lt;B&gt;Server:&lt;/B&gt;
+      ${pageContext.servletContext.serverInfo}
+&lt;/UL&gt;
+&lt;/BODY&gt;&lt;/HTML&gt; 
+</pre>
+	<hr />
+	<h3>Example: Implicit Objects(Result)</h3>
+	<div style="text-align: center;">
+		<img src="img04.png" alt="Captura del resultado" />
+	</div>
+	<hr />
+	<h3>Expression Language Operators</h3>
+	<ul>
+		<li class="n1">Arithmetic</li>
+		<li class="n2">+ -* / div % mod</li>
+		<li class="n1">Relational</li>
+		<li class="n2">== eq != ne &lt; lt &gt; gt &lt;= le &gt;= ge</li>
+		<li class="n1">Logical</li>
+		<li class="n2">&amp;&amp; and || or ! Not</li>
+		<li class="n1">Empty</li>
+		<li class="n2">Empty</li>
+		<li class="n2">True for null, empty string, empty array, empty
+			list, empty map. False otherwise.</li>
+		<li class="n1">CAUTION</li>
+		<li class="n2">Use extremely sparingly to preserve MVC model</li>
+	</ul>
+	<hr />
+	<h3>Example: Operators</h3>
+	<pre>
+...
+&lt;TABLE BORDER=1 ALIGN="CENTER"&gt; 
+&lt;TR&gt;&lt;TH CLASS="COLORED" COLSPAN=2&gt;Arithmetic Operators
+    &lt;TH CLASS="COLORED" COLSPAN=2&gt;Relational Operators
+&lt;TR&gt;&lt;TH&gt;Expression&lt;TH&gt;Result&lt;TH&gt;Expression&lt;TH&gt;Result
+&lt;TR ALIGN="CENTER"&gt; 
+  &lt;TD&gt;\${3+2-1}&lt;TD&gt;${3+2-1}
+  &lt;TD&gt;\${1&lt;2}&lt;TD&gt;${1&lt;2}
+&lt;TR ALIGN="CENTER"&gt; 
+  &lt;TD&gt;\${"1"+2}&lt;TD&gt;${"1"+2}
+  &lt;TD&gt;\${"a"&lt;"b"}&lt;TD&gt;${"a"&lt;"b"}
+&lt;TR ALIGN="CENTER"&gt; 
+  &lt;TD&gt;\${1 + 2*3 + 3/4}&lt;TD&gt;${1 + 2*3 + 3/4}
+  &lt;TD&gt;\${2/3 &gt;= 3/2}&lt;TD&gt;${2/3 &gt;= 3/2}
+&lt;TR ALIGN="CENTER"&gt; 
+  &lt;TD&gt;\${3%2}&lt;TD&gt;${3%2}
+  &lt;TD&gt;\${3/4 == 0.75}&lt;TD>${3/4 == 0.75} 
+</pre>
+	<hr />
+	<h3>Example: Operators (Result)</h3>
+	<div style="text-align: center;">
+		<img src="img05.png" alt="Captura del resultado" />
+	</div>
+	<hr />
+	<h3>Evaluating Expressions Conditionally</h3>
+	<ul>
+		<li class="n1">${ test ? expression1 : expression2 }</li>
+		<li class="n2">Evaluates test and outputs either expression1 or
+			expression2</li>
+		<li class="n1">Problems</li>
+		<li class="n2">Relatively weak</li>
+		<li class="n3">c:if and c:choose from JSTL are much better</li>
+		<li class="n1">Tempts you to put business/processing logic in JSP
+			page.</li>
+		<li class="n2">Should only be used for presentation logic.</li>
+		<li class="n3">Even then, consider alternatives</li>
+	</ul>
+	<hr />
+	<h3>Example: ConditionalExpressions</h3>
+	<pre>
+@WebServlet("/conditionals")
+public class Conditionals extends HttpServlet {
+  public void doGet(HttpServletRequest request,
+                    HttpServletResponse response)
+      throws ServletException, IOException {
+    SalesBean apples =
+      new SalesBean(150.25, -75.25, 22.25, -33.57);
+    SalesBean oranges =
+      new SalesBean(-220.25, -49.57, 138.25, 12.25);
+    request.setAttribute("apples", apples);
+    request.setAttribute("oranges", oranges);
+    RequestDispatcher dispatcher =
+      request.getRequestDispatcher
+        ("/WEB-INF/results/conditionals.jsp");
+    dispatcher.forward(request, response);
+  }
+}
+ 
+public class SalesBean {
+  private double q1, q2, q3, q4;
+   
+  public SalesBean(double q1Sales,
+                   double q2Sales,
+                   double q3Sales,
+                   double q4Sales) {
+    q1 = q1Sales; q2 = q2Sales;
+    q3 = q3Sales; q4 = q4Sales;
+  }
+   
+  public double getQ1() { return(q1); }
+  public double getQ2() { return(q2); }
+  public double getQ3() { return(q3); }
+  public double getQ4() { return(q4); }
+  public double getTotal() {
+    return(q1 + q2 + q3 + q4); }
+}
+</pre>
+	<hr />
+	<h3>Example: ConditionalExpressions (Continued)</h3>
+	<pre>
+...
+&lt;TABLE BORDER=1 ALIGN="CENTER"&gt; 
+&lt;TR&gt;&lt;TH&gt; 
+    &lt;TH CLASS="COLORED"&gt;Apples
+    &lt;TH CLASS="COLORED"&gt;Oranges
+&lt;TR&gt;&lt;TH CLASS="COLORED"&gt;First Quarter
+    &lt;TD ALIGN="RIGHT"&gt;${apples.q1}
+    &lt;TD ALIGN="RIGHT"&gt;${oranges.q1}
+&lt;TR&gt;&lt;TH CLASS="COLORED"&gt;Second Quarter
+    &lt;TD ALIGN="RIGHT"&gt;${apples.q2}
+    &lt;TD ALIGN="RIGHT"&gt;${oranges.q2} 
+...
+&lt;TR&gt;&lt;TH CLASS="COLORED"&gt;Total 
+    &lt;TD ALIGN="RIGHT" 
+        BGCOLOR="${(apples.total &lt; 0) ? "RED" : "WHITE" }"&gt; 
+    ${apples.total}
+    &lt;TD ALIGN="RIGHT" 
+        BGCOLOR="${(oranges.total &lt; 0) ? "RED" : "WHITE" }"&gt; 
+    ${oranges.total}
+&lt;/TABLE&gt;...
+</pre>
+	<hr />
+	<h3>Example: ConditionalExpressions (Continued)</h3>
+	<div style="text-align: center;">
+		<img src="img06.png" alt="Captura del resultado" />
+	</div>
+	<hr />
+	<h3>Redoing JSP 1.2 MVCExamples in JSP 2</h3>
+
+	<hr />
+	<h3>Request-Based Sharing: JSP 1.2</h3>
+	<pre>
+ ...
+&lt;BODY&gt; 
+&lt;jsp:useBean id="randomNum"
+             type="coreservlets.NumberBean"
+             scope="request" /&gt;
+&lt;H2&gt;Random Number: 
+&lt;jsp:getProperty name="randomNum"
+                 property="number" /&gt;
+&lt;/H2&gt;
+&lt;/BODY&gt;&lt;/HTML&gt; 
+</pre>
+	<hr />
+	<h3>Request-Based Sharing: JSP 2.x</h3>
+	<pre>
+...
+&lt;BODY&gt; 
+&lt;H2&gt;Random Number: 
+${randomNum.number}
+&lt;/H2&gt;
+&lt;/BODY&gt;&lt;/HTML&gt; 
+</pre>
+
+	<hr />
+	<h3>Session-Based Sharing: JSP 1.2</h3>
+	<pre>
+...
+&lt;BODY&gt; 
+&lt;H1&gt;Thanks for Registering&lt;/H1&gt;
+&lt;jsp:useBean id="nameBean"
+             type="coreservlets.NameBean"
+             scope="session" /&gt;
+&lt;H2&gt;First Name: 
+&lt;jsp:getProperty name="nameBean"
+                 property="firstName" /&gt;&lt;/H2&gt;
+&lt;H2&gt;Last Name: 
+&lt;jsp:getProperty name="nameBean"
+                 property="lastName" /&gt;&lt;/H2&gt;
+&lt;/BODY&gt;&lt;/HTML&gt; 
+</pre>
+	<hr />
+	<h3>Session-Based Sharing: JSP 2.x</h3>
+	<pre>
+...
+&lt;BODY&gt; 
+&lt;H1&gt;Thanks for Registering&lt;/H1&gt;
+&lt;H2&gt;First Name: 
+${nameBean.firstName}&lt;/H2&gt;
+&lt;H2&gt;Last Name: 
+${nameBean.lastName}&lt;/H2&gt;
+&lt;/BODY&gt;&lt;/HTML&gt; 
+</pre>
+	<hr />
+	<h3>ServletContext-Based Sharing: JSP 1.2</h3>
+	<pre>
+...
+&lt;BODY&gt; 
+&lt;H1&gt;A Prime Number&lt;/H1&gt;
+&lt;jsp:useBean id="primeBean"
+             type="coreservlets.PrimeBean"
+             scope="application" /&gt;
+&lt;jsp:getProperty name="primeBean"
+                 property="prime" /&gt;
+&lt;/BODY&gt;&lt;/HTML&gt; 
+</pre>
+	<hr />
+	<h3>ServletContext-Based Sharing: JSP 2.x</h3>
+	<pre>
+...
+&lt;BODY&gt; 
+&lt;H1&gt;A Prime Number&lt;/H1&gt;
+${primeBean.prime}
+&lt;/BODY&gt;&lt;/HTML&gt; 
+</pre>
+	<hr />
+	<h3>Wrap-Up</h3>
+
+	<hr />
+	<h3>Summary</h3>
+	<ul>
+		<li class="n1">The JSP 2 EL provides concise, easy-to-read access
+			to</li>
+		<li class="n2">Scoped variables</li>
+		<li class="n2">Bean properties</li>
+		<li class="n2">Collection elements</li>
+		<li class="n2">Standard HTTP elements such as request
+			parameters,request headers, and cookies</li>
+		<li class="n1">The JSP 2 EL works best with MVC</li>
+		<li class="n2">Use only to output values created by separate Java
+			code</li>
+		<li class="n1">Resist use of EL for business logic</li>
+		<li class="n2">Use EL operators and conditionals sparingly, if at
+			all</li>
+	</ul>
+
+
+
+	<p style="text-align: center;">
+		<a href="index.html">Volver al Inicio de la Sección</a>
+	</p>
+	<p style="font-size: small;">
+		Todo el código de los <a
+			href="http://courses.coreservlets.com/Course-Materials/">
+			tutoriales J2EE de coreservlets.com (servlets, JSP, Struts, JSF 1,
+			JSF 2, PrimeFaces, Ajax [con jQuery], GWT 2, Spring, Hibernate, JPA,
+			basado en SOAP y Servicios Web RESTful, Hadoop, &amp; programación
+			Java 7) </a>. Hay también cursos de formación con un instructor en vivo <a
+			href="http://courses.coreservlets.com/"> sobre los mismos tópicos
+			J2EE (servlets, JSP, Struts, JSF 1, JSF 2, PrimeFaces, Ajax [con
+			jQuery], GWT 0, Spring, Hibernate, JPA, basado en SOAP y Servicios
+			Web RESTful, Hadoop, &amp; programación Java 7) </a>.
+	</p>
+</body>
+</html>

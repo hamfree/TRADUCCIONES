@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../css/JSP-Styles.css" type="text/css">
+<title>Crear Librerías de Etiquetas JSP Personalizadas: Temas
+	Avanzados - La lección</title>
+</head>
+<body>
+	<h1>Crear Librerías de Etiquetas JSP Personalizadas: Temas
+		Avanzados</h1>
+	<h2>La Lección</h2>
+	<h3>Agenda</h3>
+	<ul>
+		<li>Manipulating the tag body</li>
+		<li>Tags with dynamic attribute values</li>
+		<li>Tags with complex objects for attributes</li>
+		<li>Looping tags</li>
+		<li>Nested tags</li>
+		<li>Using TagLibraryValidator to validate tag library syntax</li>
+	</ul>
+	<hr />
+	<h3>Tags that Manipulate Their Body Content Idea</h3>
+	<ul>
+		<li class="n1">Earlier, we had tags with bodies. But:</li>
+		<li class="n2">Tags did not modify the body content</li>
+		<li class="n2">Tag behavior did not change based on the body
+			content</li>
+		<li class="n1">To manipulate the body, pass a custom Writer to
+			the invoke method</li>
+		<li class="n2">The Writer should buffer the results</li>
+		<li class="n3">StringWriter is simplest</li>
+		<li class="n3">Very similar to approach of output-modifying
+			filters</li>
+		<li class="n2">The tag can then modify or examine the buffer</li>
+		<li class="n2">The tag is responsible for outputting the buffer</li>
+		<li class="n3">Using getJspContext().getOut() as in normal tags</li>
+	</ul>
+	<hr />
+	<h3>Manipulating Tag Body: Summary</h3>
+	<ul>
+		<li class="n1">Including tag bodies (unchanged) <br /> <span
+			style="font-size: 14px; padding-left: 30px;">getJspBody().invoke(<span
+				class="rojo">null</span>)
+		</span></li>
+		<li class="n1">Modifying tag body
+			<p style="font-size: 14px; padding-left: 30px;">
+				StringWriter stringWriter = new StringWriter();<br />
+				getJspBody().invoke(<span class="rojo">stringWriter</span>);<br />
+				String modifiedBody = modifyString(stringWriter.toString());<br />
+				getJspContext().getOut().print(modifiedBody);
+			</p>
+		</li>
+		<li class="n1">Changing behavior based on tag body
+			<p style="font-size: 14px; padding-left: 30px;">
+				StringWriter stringWriter = new StringWriter();<br />
+				getJspBody().invoke(<span class="rojo">stringWriter</span>);<br />
+				String body = stringWriter.toString();<br /> if
+				(hasCertainProperties(body)) {<br />
+				&nbsp;&nbsp;&nbsp;&nbsp;doThis(body);<br /> } else {<br />
+				&nbsp;&nbsp;&nbsp;&nbsp;doThat(body);<br /> }<br />
+			</p>
+		</li>
+	</ul>
+	<hr />
+	<h3>An HTML-Filtering Tag (Java Code)</h3>
+	<pre>
+public class HtmlFilterTag extends SimpleTagSupport {
+    public void doTag() throws JspException, IOException {
+        // Buffer tag body's output
+        <span class="rojo">StringWriter stringWriter = new StringWriter();
+        getJspBody().invoke(stringWriter);</span>
+        
+        // Filter out any special HTML characters
+        // (e.g., "&lt;" becomes "&amp;lt;")
+        String output = ServletUtilities.filter(stringWriter.toString());
+        
+        // Send output to the client
+        JspWriter out = getJspContext().getOut();
+        out.print(output);
+    }
+}
+</pre>
+	<hr />
+	<h3>HTML-Filtering Tag (TLD File)</h3>
+	<pre>
+...
+&lt;tag&gt;
+    &lt;description&gt;
+      Converts special HTML characters such as less than
+      and greater than signs to their corresponding HTML
+      character entities such as &lt; and &gt;.
+    &lt;/description&gt;
+    &lt;name&gt;filterhtml&lt;/name&gt;
+    &lt;tag-class&gt;coreservlets.tags.HtmlFilterTag&lt;/tag-class&gt;
+    &lt;body-content&gt;scriptless&lt;/body-content&gt;
+&lt;tag&gt;
+</pre>
+	<hr />
+	<h3>HTML-Filtering Tag (JSP Page)</h3>
+	<pre>
+	&lt;TABLE BORDER=1 ALIGN="CENTER"&gt; 
+	&lt;TR CLASS="COLORED"&gt;&lt;TH&gt;Example&lt;TH&gt;Result 
+	<span class="rojo">&lt;%@ taglib uri="/WEB-INF/tlds/csajsp-taglib-adv.tld" 
+	           prefix="csajsp" %&gt;</span>
+	&lt;TR&gt;
+	&lt;TD&gt;&lt;PRE&gt;<span class="rojo">&lt;csajsp:filterhtml&gt;</span>
+	&lt;EM&gt;Some emphasized text.&lt;/EM&gt;&lt;BR&gt;
+	&lt;STRONG&gt;Some strongly emphasized text.&lt;/STRONG&gt;&lt;BR&gt;
+	&lt;CODE&gt;Some code.&lt;/CODE&gt;&lt;BR&gt;
+	&lt;SAMP&gt;Some sample text.&lt;/SAMP&gt;&lt;BR&gt;
+	&lt;KBD&gt;Some keyboard text.&lt;/KBD&gt;&lt;BR&gt;
+	&lt;DFN&gt;A term being defined.&lt;/DFN&gt;&lt;BR&gt;
+	&lt;VAR&gt;A variable.&lt;/VAR&gt;&lt;BR&gt;
+	&lt;CITE&gt;A citation or reference.&lt;/CITE&gt;
+	<span class="rojo">&lt;/csajsp:filterhtml&gt;</span>&lt;/PRE&gt;
+	&lt;TD&gt; 
+	&lt;EM&gt;Some emphasized text.&lt;/EM&gt;&lt;BR&gt;
+	 ...
+	&lt;/TABLE&gt;
+	</pre>
+	<hr>
+	<h3>HTML-Filtering Tag (Result)</h3>
+	<img src="img01.png" alt="captura del resultado" />
+	<hr>
+	<h2>Dynamic Attributes and Looping Tags</h2>
+	<h3>Tags with Dynamic Attribute Values</h3>
+	<ul>
+		<li class="n1">Problem</li>
+		<li class="n2">You need request time values for your custom tags</li>
+		<li class="n3">&lt;mytags:if test="<span class="rojo">${myBean.missingValue}</span>"&gt;<br />
+			<span style="padding-left: 30px;">${myBean.errorMessage}</span><br />
+			<span style="padding-left: 15px;"></span>&lt;/mytags:if&gt;
+		</li>
+		<li class="n3">&lt;mytags:prime <br /> <span
+			style="padding-left: 50px;">length="<span class="rojo">&lt;%=
+					(int)(Math.random()*100000) %&gt;</span></span>"/&gt;
+		</li>
+		<li class="n3">&lt;mytags:showCalendar month="<span class="rojo">&lt;%=
+				new Date() %&gt;</span>"/&gt;
+		</li>
+		<li class="n1">Solution</li>
+		<li class="n2">Use true for rtexprvalue in attribute declaration
+			in TLD</li>
+		<li class="n3">&lt;attribute&gt;<br /><span
+			style="padding-left: 30px;">...</span><br /> <span
+			style="padding-left: 30px;" class="rojo">&lt;rtexprvalue&gt;true&lt;/rtexprvalue&gt;</span>
+			<br /><span style="padding-left: 15px;">&lt;/attribute&gt;</span>
+		</li>
+	</ul>
+	<hr>
+	<h3>Simple Looping Tag (Java Code)</h3>
+	<pre>
+public class ForTag extends SimpleTagSupport {
+    private int count;
+    public void setCount(int count) {
+       this.count = count;
+    }
+    public void doTag() throws JspException, IOException {
+       for(int i=0; i &lt; count; i++) {
+           getJspBody().invoke(null);
+       }
+    }
+}
+</pre>
+	<hr>
+	<h3>Simple Looping Tag (TLD File)</h3>
+	<pre>
+...
+&lt;tag&gt;
+    &lt;description&gt;
+      Loops specified number of times.
+    &lt;/description&gt;
+    &lt;name&gt;for&lt;/name&gt;
+    &lt;tag-class&gt;coreservlets.tags.ForTag&lt;/tag-class&gt;
+    &lt;body-content&gt;scriptless&lt;/body-content&gt;
+    &lt;attribute&gt;
+        &lt;description&gt;
+          Number of times to repeat body.
+        &lt;/description&gt;
+        &lt;name&gt;count&lt;/name&gt;
+        &lt;required&gt;true&lt;/required&gt;
+        <span class="rojo">&lt;rtexprvalue&gt;true&lt;/rtexprvalue&gt;</span>
+    &lt;/attribute&gt;
+&gt;/tag&gt;
+</pre>
+	<hr>
+	<h3>Simple Looping Tag (Servlet)</h3>
+	<pre>
+@WebServlet("/simple-loop-test")
+public class SimpleLoopTest extends HttpServlet {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+       CoinBean coin = new CoinBean();
+       request.setAttribute("coin", coin);
+       String address = "/WEB-INF/results/simple-loop-test.jsp";
+       RequestDispatcher dispatcher = request.getRequestDispatcher(address);
+       dispatcher.forward(request, response);
+    }
+}
+</pre>
+	<hr>
+	<h3>Simple Looping Tag (Bean)</h3>
+	<pre>
+public class CoinBean {
+    public String getFlip() {
+        if (Math.random() &lt; 0.5) {
+            return("Heads");
+        } else {
+            return("Tails");
+        }
+    }
+}
+</pre>
+	<hr>
+	<h3>Simple Looping Tag (Results Page)</h3>
+	<pre>
+&lt;H1&gt;Simple Loop Test&lt;/H1&gt;
+&lt;P&gt;
+&lt;%@ taglib uri="/WEB-INF/tlds/csajsp-taglib-adv.tld"
+prefix="csajsp" %&gt;
+&lt;H2&gt;A Very Important List&lt;/H2&gt;
+&lt;UL&gt;
+&lt;csajsp:for count="&lt;%=(int)(Math.random()*10)%&gt;"&gt;
+&lt;LI&gt;Blah
+&lt;/csajsp:for&gt;
+&lt;/UL&gt;
+&lt;H2&gt;Some Coin Flips&lt;/H2&gt;
+&lt;UL&gt;
+&lt;csajsp:for count="&lt;%=(int)(Math.random()*10)%&gt;"&gt;
+&lt;LI&gt;${coin.flip}
+&lt;/csajsp:for&gt;
+&lt;/UL&gt;
+</pre>
+	<hr>
+	<h3>Simple Looping Tag (Result)</h3>
+	<img src="img03.png" alt="captura del resultado" />
+	<hr>
+	<h3>Complex (Dynamic) Attributes</h3>
+	<p>Tags with Complex Objects for Attributes</p>
+	<ul>
+		<li class="n1">What if you want type other than String or a
+			primitive type for a tag attribute value? <pre>
+&lt;TABLE BORDER=1>");
+    Object[] headingRow = rowItems[0]; 
+    printOneRow(headingRow, getStyle(headerClass), out); 
+    for(Object[] bodyRow: rowItems) {
+        printOneRow(bodyRow, getStyle(bodyClass), out); 
+    }
+out.println("&lt;/TABLE>"); 
+} 
+} 
+			</pre>
+		<li class="n2">E.g., to access values stored by a servlet in the
+			results page of an MVC response</li>
+		<li class="n1">Issues</li>
+		<li class="n2">Must declare setter to accept the high-level type</li>
+		<li class="n2">Must declare attribute with rtexprvalue as true</li>
+		<li class="n2">Usually supply value with the JSP EL</li>
+		<li class="n1">Although JSP expression is technically legal</li>
+		<li class="n2">Harder to do error checking than with String
+			values</li>
+		<li class="n1">If value is incorrect type, it never gets passed
+			to your method, and you get a runtime error</li>
+	</ul>
+	<hr>
+	<h3>Table Formatting Tag (Java Code)</h3>
+	<pre>
+public class MakeTableTag extends SimpleTagSupport {
+    private Object[][] rowItems;
+    private String headerClass;
+    private String bodyClass;
+
+    public void setRowItems(Object[][] rowItems) {
+        this.rowItems = rowItems;
+    }
+    public void setHeaderClass(String headerClass) {
+        this.headerClass = headerClass;
+    }
+    public void setBodyClass(String bodyClass) {
+        this.bodyClass = bodyClass;
+    }
+}
+
+public void doTag() throws JspException, IOException {
+    if (rowItems.length > 0) {
+        JspContext context = getJspContext();
+        JspWriter out = context.getOut();
+        out.println("
+</pre>
+	<hr>
+	<h3>Table Formatting Tag (Java Code, Continued)</h3>
+	<pre>
+private void printOneRow(Object[] columnEntries, String style, JspWriter out) throws IOException {
+    out.println("&lt;TR&gt;" + style + "");
+    for(Object columnEntry: columnEntries) {
+        out.println(" &lt;TD&gt;" + columnEntry + "&lt;/TD&gt;");
+    }
+    out.println(" &lt;/TR&gt;");
+}
+
+private String getStyle(String className) {
+    if (className == null) {
+        return("");
+    } else {
+        return(" CLASS=\"" + headerClass + "\"");
+    }
+}
+</pre>
+	<hr>
+	<h3>Table Formatting Tag (TLD File)</h3>
+	<pre>
+...
+&lt;tag&gt;
+&lt;description&gt;
+Given an array of arrays, puts values into a table
+&lt;/description&gt;
+&lt;name&gt;makeTable&lt;/name&gt;
+&lt;tag-class&gt;coreservlets.tags.MakeTableTag&lt;/tag-class&gt;
+&lt;body-content&gt;scriptless&lt;/body-content&gt;
+&lt;attribute&gt;
+&lt;description&gt;
+An array of arrays. The top-level arrays
+represents the rows, the sub-arrays represent
+the column entries.
+&lt;/description&gt;
+&lt;name&gt;rowItems&lt;/name&gt;
+&lt;required&gt;true&lt;/required&gt;
+&lt;rtexprvalue&gt;true&lt;/rtexprvalue&gt;
+ &lt;/attribute&gt;
+</pre>
+	<hr>
+	<h3>Table Formatting Tag (TLD File, Continued)</h3>
+	<pre>
+&lt;attribute&gt;
+&lt;description&gt;
+Style sheet class name for table header.
+&lt;/description&gt;
+&lt;name&gt;headerClass&lt;/name&gt;
+&lt;required&gt;false&lt;/required&gt;
+&lt;/attribute&gt;
+&lt;attribute&gt;
+&lt;description&gt;
+Style sheet class name for table body.
+&lt;/description&gt;
+&lt;name&gt;bodyClass&lt;/name&gt;
+&lt;required&gt;false&lt;/required&gt;
+&lt;/attribute&gt;
+&lt;/tag&gt;
+...
+</pre>
+	<hr>
+	<h3>Table Formatting Tag (Servlet)</h3>
+	<pre>
+@WebServlet("/show-records")
+public class ShowRecords extends HttpServlet {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Object[][] records = WorldRecords.recentRecords();
+        request.setAttribute("records", records);
+        String address = "/WEB-INF/results/show-records.jsp";
+        RequestDispatcher dispatcher = request.getRequestDispatcher(address);
+        dispatcher.forward(request, response);
+    }
+}
+</pre>
+	<hr>
+	<h3>Table Formatting Tag (Supporting Class)</h3>
+	<pre>
+public class WorldRecords {
+    public static Object[][] recentRecords() {
+        Object[][] records = {
+            { "Event", "Name", "Time" },
+            { "400 IM", "Michael Phelps", "4:03.84"},
+            { "100 Br", "Lindsay Hall", "1:04.08"},
+            { "200 IM", "Ariana Kukors", "2:06.15"}};
+        return(records);
+   }
+}
+</pre>
+	<hr>
+	<h3>Table Formatting Tag (Results Page)</h3>
+	<pre>
+&lt;H1&gt;Recent World Records&lt;/H1&gt;
+Following are the three most recent swimming
+world records, as listed in the FINA database.
+&lt;P&gt;
+&lt;%@ taglib uri="/WEB-INF/tlds/csajsp-taglib-adv.tld"
+prefix="csajsp" %&gt;
+&lt;CENTER&gt;
+&lt;csajsp:makeTable rowItems="${records}"
+headerClass="COLORED" /&gt;
+&lt;/CENTER&gt;
+</pre>
+	<hr>
+	<h3>Table Formatting Tag (Result)</h3>
+	<img src="img04.png" alt="imagen de la captura" />
+	<hr>
+	<h3>General-Purpose Looping Tags</h3>
+	Problems with makeTable
+	<ul>
+		<li class="n1">HTML in tag</li>
+		<li class="n2">HTML written by Java author, not Web designer</li>
+		<li class="n1">Always makes a table</li>
+		<li class="n2">Can't change to bulleted list, or headings, or
+			plain text</li>
+		<li class="n1">Limited customization</li>
+		<li class="n2">If tag designer didn't build in option, you can't
+			do it</li>
+		<li class="n1">Since no HTML exposed to page author</li>
+		<li class="n1">Requires very specific data format</li>
+		<li class="n2">Array of arrays. What about lists? What about
+			arrays where data is in different order?</li>
+		<li class="n1">Only for displaying fixed results</li>
+		<li class="n2">No ability to operate on cell values</li>
+	</ul>
+	<hr>
+	<h3>Looping Tags</h3>
+	<ul>
+		<li class="n1">What if you want a tag that outputs its body more
+			than once?
+		<li class="n2">Of course, the body should give different values
+			each time
+		<li class="n1">Issues
+		<li class="n2">Attribute should accept a collection
+		<li class="n1">Covered in previous section
+		<li class="n2">Attribute should be defined with rtexprvalue as
+			true
+		<li class="n1">Covered in section before that
+		<li class="n2">Body should have access to each item in collection
+
+
+
+
+
+
+		
+		<li class="n1">New feature needed: tag should call Use
+			getJspContext().setAttribute(key, object) to place a bean that is
+			accessible only within the body of the tag, i.e., in tag scope
+	</ul>
+	<hr>
+	<h3>ForEach Tag (Java Code)</h3>
+	<pre>
+public class ForEachTag extends SimpleTagSupport {
+    private Object[] items;
+    private String attributeName;
+
+    public void setItems(Object[] items) {
+        this.items = items;
+    }
+    public void setVar(String attributeName) {
+        this.attributeName = attributeName;
+    }
+    public void doTag() throws JspException, IOException {
+        for(Object item: items) {
+            getJspContext().setAttribute(attributeName, item);
+            getJspBody().invoke(null);
+        }
+    }
+ }
+</pre>
+	<hr>
+	<h3>ForEach Tag (TLD File)</h3>
+	<pre>
+...
+&lt;tag&gt;
+&lt;description&gt;
+Loops down each element in an array
+&lt;/description&gt;
+&lt;name&gt;forEach&lt;/name&gt;
+&lt;tag-class&gt;coreservlets.tags.ForEachTag&lt;/tag-class&gt;
+&lt;body-content&gt;scriptless&lt;/body-content&gt;
+&lt;attribute&gt;
+&lt;description&gt;
+The array of elements.
+&lt;/description&gt;
+&lt;name&gt;items&lt;/name&gt;
+&lt;required&gt;true&lt;/required&gt;
+&lt;rtexprvalue&gt;true&lt;/rtexprvalue&gt;
+&lt;/attribute&gt;
+&lt;attribute&gt;
+&lt;description&gt;
+The name of the local variable that
+each entry will be assigned to.
+&lt;/description&gt;
+&lt;name&gt;var&lt;/name&gt;
+&lt;required&gt;true&lt;/required&gt;
+&lt;/attribute&gt;
+&lt;/tag&gt; ...
+</pre>
+	<hr>
+	<h3>ForEach Tag (Servlet)</h3>
+	<pre>
+@WebServlet("/loop-test")
+public class LoopTest extends HttpServlet {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String[] servers = {"Tomcat", "Resin", "Jetty", "WebLogic","WebSphere", "JBoss", "Glassfish" };
+        request.setAttribute("servers", servers);
+        Object[][] records = WorldRecords.recentRecords();
+        request.setAttribute("records", records);
+        String address = "/WEB-INF/results/loop-test.jsp";
+        RequestDispatcher dispatcher = request.getRequestDispatcher(address);
+        dispatcher.forward(request, response);
+    }
+}
+</pre>
+	<hr>
+	<h3>ForEach Tag (Results Page)</h3>
+	<pre>
+&lt;%@ taglib uri="/WEB-INF/tlds/csajsp-taglib-adv.tld"
+prefix="csajsp" %&gt;
+&lt;H2&gt;Some Java-Based Servers&lt;/H2&gt;
+&lt;UL&gt;
+&lt;csajsp:forEach items="${servers}" var="server"&gt;
+&lt;LI&gt;${server}
+&lt;/csajsp:forEach&gt;
+&lt;/UL&gt;
+</pre>
+	<hr>
+	<h3>ForEach Tag (Results Page, Continued)</h3>
+	<pre>
+&lt;H2&gt;Recent World Records&lt;/H2&gt;
+&lt;TABLE BORDER=1&gt;
+&lt;csajsp:forEach items="${records}" var="row"&gt;
+&lt;TR&gt;
+&lt;csajsp:forEach items="${row}" var="col"&gt;
+&lt;TD&gt;${col}&lt;/TD&gt;
+&lt;/csajsp:forEach&gt;
+&lt;/TR&gt;
+&lt;/csajsp:forEach&gt;
+&lt;/TABLE&gt;
+</pre>
+	<hr>
+	<h3>ForEach Tag (Result)</h3>
+	<img src="img05.png" alt="captura del resultado" />
+	<pre>
+Note that JSTL (covered in later lecture) already has an even better
+version of the forEach tag already builtin. The point is not to use this
+forEach tag, but to illustrate the types of powerful tags that can be
+built with a combination of looping and accepting complex runtime
+types as attribute values.
+</pre>
+	<hr>
+	<h3>Nested Tags</h3>
+	<ul>
+		<li class="n1">What if tag behavior depends on surrounding tag or
+			earlier tag?</li>
+		<li class="n2"><pre>
+&lt;mytags:if test="&lt;%= Math.random() &lt; 0.5 %&gt;"&gt; &lt;mytags:then&gt;Heads&lt;/mytags:then&gt;
+	&lt;mytags:else&gt;Tails&lt;/mytags:else&gt; 
+&lt;/mytags:if&gt;
+			
+			</pre></li>
+		<li class="n1">Communicating with surrounding tag</li>
+		<li class="n2">getParent returns directly surrounding tag</li>
+		<li class="n1">Returns null if there is no surrounding custom tag</li>
+		<li class="n2">findAncestorWithClass(this, OuterTag.class) finds
+			possibly indirectly surrounding tag of given type</li>
+		<li class="n1">Returns null if no surrounding tag of given type
+			is found</li>
+		<li class="n1">Communicating with earlier tag</li>
+		<li class="n2">Earlier tag finds surrounding tag and stores
+			result</li>
+		<li class="n2">Later tag finds surrounding tag and retrieves
+			result</li>
+	</ul>
+	<hr>
+	<h3>If Tag (Java Code)</h3>
+	<pre>
+public class IfTag extends SimpleTagSupport {
+private boolean test;
+public void setTest(boolean test) {
+this.test = test;
+}
+public boolean getTest() {
+return(test);
+}
+public void doTag() throws JspException, IOException {
+getJspBody().invoke(null);
+}
+}
+</pre>
+	<hr>
+	<h3>Then Tag (Java Code)</h3>
+	<pre>
+public class ThenTag extends SimpleTagSupport {
+public void doTag() throws JspException, IOException {
+try {
+IfTag ifTag = (IfTag)getParent();
+if (ifTag.getTest()) {
+getJspBody().invoke(null);
+}
+} catch(Exception e) {
+String msg =
+"Error: 'then' must be inside 'if'.";
+throw new JspTagException(msg);
+}
+}
+}
+</pre>
+	<hr>
+	<h3>Else Tag (Java Code)</h3>
+	<pre>
+public class ElseTag extends SimpleTagSupport {
+public void doTag() throws JspException, IOException {
+try {
+IfTag ifTag = (IfTag)getParent();
+if (!ifTag.getTest()) {
+getJspBody().invoke(null);
+}
+} catch(Exception e) {
+String msg =
+"Error: 'else' must be inside 'if'.";
+throw new JspTagException(msg);
+}
+}
+}
+</pre>
+	<hr>
+	<h3>If Tag (TLD File)</h3>
+	<pre>
+...
+&lt;tag&gt;
+&lt;description&gt;If tag&lt;/description&gt;
+&lt;name&gt;if&lt;/name&gt;
+&lt;tag-class&gt;coreservlets.tags.IfTag&lt;/tag-class&gt;
+&lt;body-content&gt;scriptless&lt;/body-content&gt;
+&lt;attribute&gt;
+&lt;description&gt;Condition of the if&lt;/description&gt;
+&lt;name&gt;test&lt;/name&gt;
+&lt;required&gt;true&lt;/required&gt;
+&lt;rtexprvalue&gt;true&lt;/rtexprvalue&gt;
+&lt;/attribute&gt;
+&lt;/tag&gt;
+</pre>
+	<hr>
+	<h3>Then/Else Tags (TLD File)</h3>
+	<pre>
+...
+&lt;tag&gt;
+&lt;description&gt;Then tag (goes with If tag)&lt;/description&gt;
+&lt;name&gt;then&lt;/name&gt;
+&lt;tag-class&gt;coreservlets.tags.ThenTag&lt;/tag-class&gt;
+&lt;body-content&gt;scriptless&lt;/body-content&gt;
+&lt;/tag&gt;
+&lt;tag&gt;
+&lt;description&gt;Else tag (goes with If tag)&lt;/description&gt;
+&lt;name&gt;else&lt;/name&gt;
+&lt;tag-class&gt;coreservlets.tags.ElseTag&lt;/tag-class&gt;
+&lt;body-content&gt;scriptless&lt;/body-content&gt;
+&lt;/tag&gt;
+</pre>
+	<hr>
+	<h3>If Tag (JSP Page)</h3>
+	<pre>
+&lt;%@ taglib uri="/WEB-INF/tlds/csajsp-taglib-adv.tld"
+prefix="csajsp" %&gt;
+&lt;H2&gt;SSL Usage&lt;/H2&gt;
+&lt;csajsp:if
+test="${pageContext.request.protocol==https}"&gt;
+&lt;csajsp:then&gt;Using SSL.&lt;/csajsp:then&gt;
+&lt;csajsp:else&gt;Not using SSL.&lt;/csajsp:else&gt;
+&lt;/csajsp:if&gt;
+&lt;H2&gt;Coin Tosses&lt;/H2&gt;
+&lt;UL&gt;
+&lt;csajsp:for count="5"&gt;
+&lt;LI&gt;&lt;csajsp:if test="&lt;%=Math.random()&lt;0.5%&gt;"&gt;
+&lt;csajsp:then&gt;Heads&lt;/csajsp:then&gt;
+&lt;csajsp:else&gt;Tails&lt;/csajsp:else&gt;
+&lt;/csajsp:if&gt;
+&lt;/csajsp:for&gt;
+&lt;/UL&gt;
+</pre>
+	<hr>
+	<h3>If Tag (Result)</h3>
+	<img src="img06.png" alt="Captura del resultado" />
+	<hr>
+	<h3>Page Translation Time Syntax Checking</h3>
+	Semantics of Custom Tag Usage
+	<ul>
+		<li class="n1">System already uses the JSP DTD to verify that the
+			standard tags are used properly.</li>
+		<li class="n1">System will already verify basic custom tag syntax</li>
+		<li class="n2">Tags are well formed</li>
+		<li class="n2">All tag and attribute names spelled properly</li>
+		<li class="n2">Required attributes supplied</li>
+		<li class="n2">No undeclared attributes used</li>
+		<li class="n1">But, what about deeper issues?</li>
+		<li class="n2">Certain custom tags must be nested in certain
+			patterns</li>
+		<li class="n2">A custom tag has two attributes: both must appear
+			or neither must appear.</li>
+	</ul>
+	<hr>
+	<h3>Big Ideas</h3>
+	<ul>
+		<li class="n1">All JSP pages are turned into XML</li>
+		<li class="n2">Before they are turned into servlets, they are
+			turned into XML documents.</li>
+		<li class="n1">You can get at the XML version</li>
+		<li class="n2">After the JSP page is turned into XML document,
+			you can run arbitrary checks on it. If you throw an exception, page
+			translation fails.</li>
+		<li class="n1">Examples</li>
+		<li class="n2">Certain tags must be nested inside others</li>
+		<li class="n2">If tag uses the foo attribute, it cannot use the
+			bar attribute</li>
+		<li class="n2">The baz tag can appear no more than three times in
+			page</li>
+		<li class="n2">Almost anything you want to enforce</li>
+	</ul>
+	<hr>
+	<h3>Example: XML Version of JSP</h3>
+	NOTA: Esto va como una tabla de dos columnas y dos filas) Original Page
+	<pre>
+&lt;DOCTYPE …&gt;
+…
+&lt;%= Math.random() %&gt;
+&lt;myTags:doSomething&gt;
+Blah
+&lt;/myTags:doSomething&gt;
+&lt;/BODY&gt;&lt;/HTML&gt;
+Internal Representation
+&lt;?xml version="1.0" ?&gt;
+&lt;jsp:root …&gt;
+&lt;jsp:text&gt;
+&lt;![CDATA[ &lt;DOCTYPE…&gt;… ]]&gt;
+&lt;/jsp:text&gt;
+&lt;jsp:expression&gt;
+Math.random()
+&lt;/jsp:expression&gt;
+&lt;myTags:doSomething&gt;
+Blah
+&lt;/myTags:doSomething&gt;
+&lt;jsp:text&gt;
+&lt;![CDATA[ &lt;/BODY&gt;… ]]&gt;
+&lt;/jsp:text&gt;
+&lt;/jsp:root&gt;
+</pre>
+
+	<hr>
+	<h3>Checking Tag Library Syntax with TagLibraryValidator</h3>
+	<ul>
+		<li class="n1">Create a subclass of TagLibraryValidator.</li>
+		<li class="n1">Override the validate method. <pre>
+public ValidationMessage[] validate(String prefix,
+String uri,
+PageData page) {
+InputStream stream = page.getInputStream();
+// Pass stream to SAX parser; return null if valid</pre>
+		</li>
+		<li class="n1">The InputStream reads a pure-XML version of the
+			JSP page. E.g, &lt;%= foo %&gt; will be read as
+			&lt;jsp:expression&gt;foo&lt;/jsp:expression&gt;.</li>
+		<li class="n1">Declare the validator in the TLD file. <pre>
+&lt;taglib&gt;…
+&lt;validator&gt;
+&lt;validator-class&gt;
+somePackage.SomeValidatorClass
+&lt;/validator-class&gt;
+&lt;/validator&gt;
+… &lt;/taglib&gt;</pre>
+		</li>
+	</ul>
+	<hr>
+	<h3>Example: Enforcing Nesting Order</h3>
+	<ul>
+		<li class="n1">outerTag cannot be nested</li>
+		<li class="n1">innerTag can only appear within outerTag</li>
+		<li class="n2">Directly or indirectly</li>
+		<li class="n1">innerTag can be nested arbitrarily</li>
+	</ul>
+	(Tabla de dos columnas)
+	<table>
+		<thead>
+			<tr>
+				<th>Legal:</th>
+				<th>Illegal:</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>&lt;test:outerTag&gt; &lt;test:innerTag&gt;
+					&lt;test:innerTag/&gt; &lt;/test:innerTag&gt; &lt;test:innerTag&gt;
+					&lt;test:innerTag&gt; &lt;test:innerTag/&gt; &lt;/test:innerTag&gt;
+					&lt;/test:innerTag&gt; &lt;/test:outerTag&gt;
+					&lt;test:outerTag/&gt;</td>
+				<td>&lt;test:innerTag/&gt; Also Illegal: &lt;test:outerTag&gt;
+					&lt;test:outerTag/&gt; &lt;/test:outerTag&gt;</td>
+			</tr>
+		</tbody>
+	</table>
+	<hr>
+	<h3>Enforcing Nesting Order: SAX Handler</h3>
+	<pre>
+public void startElement(String namespaceUri,
+String localName,
+String qualifiedName,
+Attributes attributes)
+throws SAXException {
+String tagName = mainTagName(qualifiedName);
+if (tagName.equals(outerTagName)) {
+if (inOuterTag) {
+throw new SAXException("\nCannot nest "
++ outerTagName);
+}
+inOuterTag = true;
+} else if (tagName.equals(innerTagName)
+&amp;&amp; !inOuterTag) {
+throw new SAXException("\n" + innerTagName +
+" can only appear within " +
+outerTagName);
+}
+}
+</pre>
+	<hr>
+	<h3>Enforcing Nesting Order: SAX Handler (Continued)</h3>
+	<pre>
+public void endElement(String namespaceUri,
+String localName,
+String qualifiedName)
+throws SAXException {
+String tagName = mainTagName(qualifiedName);
+if (tagName.equals(outerTagName)) {
+inOuterTag = false;
+}
+}
+</pre>
+
+	<hr>
+	<h3>Summary</h3>
+	<ul>
+		<li class="n1">Manipulating or checking the tag body</li>
+		<li class="n2">Pass custom writer (esp. StringWriter) to invoke</li>
+		<li class="n1">Tags with dynamic attribute values</li>
+		<li class="n2">Specify true for rtexprvalue</li>
+		<li class="n1">Tags with complex objects for attributes</li>
+		<li class="n2">Have setter accept complex type, use true for
+			rtexprvalue</li>
+		<li class="n1">Looping tags</li>
+		<li class="n2">Call jspContext.setAttribute; read it via EL in
+			tag body</li>
+		<li class="n1">Nested tags</li>
+		<li class="n2">Call getParent or findAncestorWithClass, cast to
+			tag type, check for null</li>
+		<li class="n1">Using TagLibraryValidator (rare!)</li>
+		<li class="n2">Extend TagLibraryValidator, override validate</li>
+		<li class="n2">Get InputStream to read XML representation of page</li>
+	</ul>
+	<p style="text-align: center;">
+		<a href="index.html">Volver al inicio de la sección</a>
+	</p>
+	<p style="font-size: small;">
+		Todo el código de los <a
+			href="http://courses.coreservlets.com/Course-Materials/">
+			tutoriales J2EE de coreservlets.com (servlets, JSP, Struts, JSF 1,
+			JSF 2, PrimeFaces, Ajax [con jQuery], GWT 2, Spring, Hibernate, JPA,
+			basado en SOAP y Servicios Web RESTful, Hadoop, &amp; programación
+			Java 7) </a>. Hay también cursos de formación con un instructor en vivo <a
+			href="http://courses.coreservlets.com/"> sobre los mismos tópicos
+			J2EE (servlets, JSP, Struts, JSF 1, JSF 2, PrimeFaces, Ajax [con
+			jQuery], GWT 0, Spring, Hibernate, JPA, basado en SOAP y Servicios
+			Web RESTful, Hadoop, &amp; programación Java 7) </a>.
+	</p>
+
+</body>
+</html>
