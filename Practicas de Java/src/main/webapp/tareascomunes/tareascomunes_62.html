@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+    content="Prácticas y técnicas de programación en Java.">
+<meta name="keywords"
+    content="java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas de Java-&gt;Generar números aleatorios</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+	href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png"
+	href="../img/favicon.png">
+</head>
+<body>
+	<nav class="menu-bar" id="menu-bar">
+		<a href="../index.html"
+			title="Table of Contents" style="float: left;">Inicio</a> &nbsp;&nbsp;
+		<form method="GET" action="https://www.google.com/search"
+			class="search-form" style="float: right;">
+			<input name="q" size="15" maxlength="255" placeholder="" type="text">
+			<input name="btnG" value="Search" type="submit"> <input
+				name="sitesearch" value="www.javapractices.com" type="hidden">
+		</form>
+	</nav>
+	<div class="page-title">Generar números aleatorios</div>
+
+
+	There are two principal means of generating random (really
+	pseudo-random) numbers:
+	<ul>
+		<li>the <code>
+				<a
+					href="https://docs.oracle.com/javase/10/docs/api/java/util/Random.html">Random</a>
+			</code> class generates random integers, doubles, longs and so on, in
+			various ranges.
+		</li>
+		<li>the static method <code>
+				Math.<a
+					href="https://docs.oracle.com/javase/10/docs/api/java/lang/Math.html#random()">random</a>
+			</code> generates <em>doubles</em> between 0 (inclusive) and 1 (exclusive).
+		</li>
+	</ul>
+
+
+	To generate random
+	<em>integers</em>:
+	<ul>
+		<li>do not use <code>
+				Math.<a
+					href="https://docs.oracle.com/javase/10/docs/api/java/lang/Math.html#random()">random</a>
+			</code> (it produces doubles, not integers)
+		</li>
+
+		<li>use the <code>
+				<a
+					href="https://docs.oracle.com/javase/10/docs/api/java/util/Random.html">Random</a>
+			</code> class to generate random integers between 0 and N.
+
+		</li>
+	</ul>
+
+	<p>
+		To generate a series of random numbers as a unit, you need to use a <em>single</em>
+		<code>Random</code>
+		object - do <em>not</em> create a new
+		<code>Random</code>
+		object for each new random number.
+
+	</p>
+	<p>Other alternatives are:</p>
+	<ul>
+		<li><code>
+				<a
+					href="https://docs.oracle.com/javase/10/docs/api/java/security/SecureRandom.html">SecureRandom</a>
+			</code>, a cryptographically strong subclass of <code>Random</code></li>
+		<li><code>
+				<a
+					href="https://docs.oracle.com/javase/10/docs/api/java/util/concurrent/ThreadLocalRandom.html">ThreadLocalRandom</a>
+			</code>, intended for multi-threaded cases</li>
+	</ul>
+
+	Here are some examples using
+	<code>Random</code>
+	.
+	<p>
+		<b>Example 1</b> <br>
+	</p>
+	<pre>
+		<span class="keyword">import</span> java.util.Random;
+
+<span class="comment">/** Generate 10 random integers in the range 0..99. */</span>
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+			class="keyword">class</span> RandomInteger {
+  
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+			class="keyword">final</span> <span class="keyword">void</span> main(String... aArgs){
+    log(<span class="literal">"Generating 10 random integers in range 0..99."</span>);
+    
+    <span class="comment">//note a single Random object is reused here
+</span>    Random randomGenerator = <span class="keyword">new</span> Random();
+    <span class="keyword">for</span> (<span class="keyword">int</span> idx = <span
+			class="literal">1</span>; idx &lt;= <span class="literal">10</span>; ++idx){
+      <span class="keyword">int</span> randomInt = randomGenerator.nextInt(<span
+			class="literal">100</span>);
+      log(<span class="literal">"Generated : "</span> + randomInt);
+    }
+    
+    log(<span class="literal">"Done."</span>);
+  }
+  
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> log(String aMessage){
+    System.out.println(aMessage);
+  }
+}
+ 
+</pre>
+
+	Example run of this class:
+	<p></p>
+	<pre>Generating 10 random integers in range 0..99.
+Generated : 44
+Generated : 81
+Generated : 69
+Generated : 31
+Generated : 10
+Generated : 64
+Generated : 74
+Generated : 57
+Generated : 56
+Generated : 93
+Done.
+</pre>
+
+	<p>
+		<b>Example 2</b>
+	</p>
+	<p>
+		This example generates random integers in a specific range. <br>
+	</p>
+	<pre>
+		<span class="keyword">import</span> java.util.Random;
+
+<span class="comment">/** Generate random integers in a certain range. */</span>
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+			class="keyword">class</span> RandomRange {
+  
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+			class="keyword">final</span> <span class="keyword">void</span> main(String... aArgs){
+    log(<span class="literal">"Generating random integers in the range 1..10."</span>);
+    
+    <span class="keyword">int</span> START = <span class="literal">1</span>;
+    <span class="keyword">int</span> END = <span class="literal">10</span>;
+    Random random = <span class="keyword">new</span> Random();
+    <span class="keyword">for</span> (<span class="keyword">int</span> idx = <span
+			class="literal">1</span>; idx &lt;= <span class="literal">10</span>; ++idx){
+      showRandomInteger(START, END, random);
+    }
+    
+    log(<span class="literal">"Done."</span>);
+  }
+  
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> showRandomInteger(<span class="keyword">int</span> aStart, <span
+			class="keyword">int</span> aEnd, Random aRandom){
+    <span class="keyword">if</span> (aStart &gt; aEnd) {
+      <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
+			class="literal">"Start cannot exceed End."</span>);
+    }
+    <span class="comment">//get the range, casting to long to avoid overflow problems
+</span>    <span class="keyword">long</span> range = (<span class="keyword">long</span>)aEnd - (<span
+			class="keyword">long</span>)aStart + <span class="literal">1</span>;
+    <span class="comment">// compute a fraction of the range, 0 &lt;= frac &lt; range
+</span>    <span class="keyword">long</span> fraction = (<span class="keyword">long</span>)(range * aRandom.nextDouble());
+    <span class="keyword">int</span> randomNumber =  (<span
+			class="keyword">int</span>)(fraction + aStart);    
+    log(<span class="literal">"Generated : "</span> + randomNumber);
+  }
+  
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> log(String aMessage){
+    System.out.println(aMessage);
+  }
+} 
+</pre>
+
+	<br>An example run of this class:
+	<p></p>
+	<pre>Generating random integers in the range 1..10.
+Generated : 9
+Generated : 3
+Generated : 3
+Generated : 9
+Generated : 4
+Generated : 1
+Generated : 3
+Generated : 9
+Generated : 10
+Generated : 10
+Done.
+</pre>
+
+
+	<p>
+		<b>Example 3</b>
+	</p>
+	<p>
+		This example generates random floating point numbers in a Gaussian
+		(normal) distribution. <br>
+	</p>
+	<pre>
+		<span class="keyword">import</span> java.util.Random;
+
+<span class="comment">/** 
+ Generate pseudo-random floating point values, with an 
+ approximately Gaussian (normal) distribution.
+
+ Many physical measurements have an approximately Gaussian 
+ distribution; this provides a way of simulating such values. 
+*/</span>
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+			class="keyword">class</span> RandomGaussian {
+  
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> main(String... aArgs){
+    RandomGaussian gaussian = <span class="keyword">new</span> RandomGaussian();
+    <span class="keyword">double</span> MEAN = <span class="literal">100.0f</span>; 
+    <span class="keyword">double</span> VARIANCE = <span class="literal">5.0f</span>;
+    <span class="keyword">for</span> (<span class="keyword">int</span> idx = <span
+			class="literal">1</span>; idx &lt;= <span class="literal">10</span>; ++idx){
+      log(<span class="literal">"Generated : "</span> + gaussian.getGaussian(MEAN, VARIANCE));
+    }
+  }
+    
+  <span class="keyword">private</span> Random fRandom = <span
+			class="keyword">new</span> Random();
+  
+  <span class="keyword">private</span> <span class="keyword">double</span> getGaussian(<span
+			class="keyword">double</span> aMean, <span class="keyword">double</span> aVariance){
+    <span class="keyword">return</span> aMean + fRandom.nextGaussian() * aVariance;
+  }
+
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> log(Object aMsg){
+    System.out.println(String.valueOf(aMsg));
+  }
+} 
+</pre>
+
+	<br>An example run of this class:
+	<p></p>
+	<pre>Generated : 99.38221153454624
+Generated : 100.95717075067498
+Generated : 106.78740794978813
+Generated : 105.57315286730545
+Generated : 97.35077643206589
+Generated : 92.56233774920052
+Generated : 98.29311772993057
+Generated : 102.04954815575822
+Generated : 104.88458607780176
+Generated : 97.11126014402141</pre>
+
+
+	<br>
+	<p></p>
+	<footer id="footer" class="legalese">
+        <span id="app_name">Prácticas de Java</span> <span
+            id="app_version_number">3.001</span><br> © <span id="copyright">2018
+            Hirondelle Systems</span><br> <a
+            href="http://www.javapractices.com/source/SourceAction.do">Código
+            Fuente</a> | <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a>
+        | <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+            rel="license">Licencia</a> | <a
+            href="http://www.javapractices.com/apps/cjp.rss" rel="alternate"
+            type="application/rss+xml">RSS</a>
+        <!-- ukey="2AC36CD2" -->
+        <!-- ckey="16DF3D87" -->
+        <br> Los trozos de código individual tienen una <a
+            href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia
+            BSD</a><br> Sobre 1,000,000 de IPs únicas el último año<br>
+        Última actualización
+        <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+        <br> - In Memoriam : Bill Dirani -
+    </footer>
+
+</body>
+</html>

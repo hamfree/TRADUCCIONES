@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+    content="Prácticas y técnicas de programación en Java.">
+<meta name="keywords"
+    content="java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas de Java-&gt;Factoría Abstracta</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+	href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png"
+	href="../img/favicon.png">
+</head>
+<body>
+	<nav class="menu-bar" id="menu-bar">
+		<a href="../index.html"
+			title="Table of Contents" style="float: left;">Inicio</a> &nbsp;&nbsp;
+		<form method="GET" action="https://www.google.com/search"
+			class="search-form" style="float: right;">
+			<input name="q" size="15" maxlength="255" placeholder="" type="text">
+			<input name="btnG" value="Search" type="submit"> <input
+				name="sitesearch" value="www.javapractices.com" type="hidden">
+		</form>
+	</nav>
+	<div class="page-title">Factoría Abstracta</div>
+
+	<br>Using references to interfaces instead of references to
+	concrete classes is an important way of
+	<a href="http://www.javapractices.com/topic/TopicAction.do?Id=123">minimizing
+		ripple effects</a>. The user of an interface reference is always protected
+	from changes to the underlying implementation.
+	<p>
+		The Abstract Factory pattern is one example of this technique. Users
+		of an Abstract Factory can create families of related objects without
+		any knowledge of their concrete classes. (<em>A typical business
+			application would usually not need to use this technique, at least as
+			applied to Data Access Objects.</em>)
+
+	</p>
+	<p>
+		<b>Example</b>
+	</p>
+	<p>
+		An Abstract Factory is a major part of the <em>full</em> <a
+			href="http://www.javapractices.com/topic/TopicAction.do?Id=66">Data
+			Access Object</a> (DAO) scheme. Here, the idea is to allow the business
+		layer to interact with the data layer almost entirely through
+		interface references. The business layer remains ignorant of the
+		concrete classes which implement the datastore.
+
+	</p>
+	<p>There are two distinct families of items here:</p>
+	<ul>
+		<li>the various datastore implementations (in this case, text
+			files, or a relational database)</li>
+		<li>the various business objects which need persistence (in this
+			case, <code>User</code> and <code>Device</code>)
+		</li>
+	</ul>
+
+	Let's take the example of storing
+	<code>Device</code>
+	objects. They may be stored in either a text file or a relational
+	database. Since the calling code needs to remain ignorant of which is
+	being used, it's natural, of course, to define an interface that
+	reflects this, along with two corresponding concrete implementations:
+	<br>
+	<pre>
+		<span class="keyword">package</span> myapp;
+
+<span class="keyword">public</span> <span class="keyword">interface</span> DeviceDAO {
+
+  Device fetch(String aId) <span class="keyword">throws</span> DataAccessException;
+  
+  <span class="keyword">void</span> add(Device aDevice) <span
+			class="keyword">throws</span> DataAccessException;
+  
+  <span class="keyword">void</span> change(Device aDevice) <span
+			class="keyword">throws</span> DataAccessException;
+  
+  <span class="keyword">void</span> delete(Device aDevice) <span
+			class="keyword">throws</span> DataAccessException;
+} 
+</pre>
+
+	...with an implementation for a file system:
+	<br>
+	<pre>
+		<span class="keyword">package</span> myapp;
+
+<span class="keyword">final</span> <span class="keyword">class</span> DeviceDAOFileSys <span
+			class="keyword">implements</span> DeviceDAO {
+  
+  <span class="comment">/*
+   * The constructor will usually be passed any required config data.
+   */</span>
+  
+  <span class="keyword">@Override</span> <span class="keyword">public</span> <span
+			class="keyword">void</span> add(Device aDevice) <span class="keyword">throws</span> DataAccessException {
+    <span class="comment">//elided...
+</span>  }
+  
+  <span class="keyword">@Override</span> <span class="keyword">public</span> <span
+			class="keyword">void</span> change(Device aDevice) <span
+			class="keyword">throws</span> DataAccessException {
+    <span class="comment">//elided...
+</span>  }
+  
+  <span class="keyword">@Override</span> <span class="keyword">public</span> <span
+			class="keyword">void</span> delete(Device aDevice) <span
+			class="keyword">throws</span> DataAccessException {
+    <span class="comment">//elided...
+</span>  }
+  
+  <span class="keyword">@Override</span> <span class="keyword">public</span> Device fetch(String aId) <span
+			class="keyword">throws</span> DataAccessException {
+    <span class="comment">//elided...
+</span>    <span class="keyword">return</span> <span class="keyword">null</span>;
+  }
+
+} 
+</pre>
+
+	...and an implementation for a relational database:
+	<br>
+	<pre>
+		<span class="keyword">package</span> myapp;
+
+<span class="keyword">final</span> <span class="keyword">class</span> DeviceDAORelational <span
+			class="keyword">implements</span> DeviceDAO {
+  
+  <span class="comment">/*
+   * The constructor will usually be passed any required config data.
+   */</span>
+  
+  <span class="keyword">@Override</span> <span class="keyword">public</span> <span
+			class="keyword">void</span> add(Device aDevice) <span class="keyword">throws</span> DataAccessException {
+    <span class="comment">//elided...
+</span>  }
+  
+  <span class="keyword">@Override</span> <span class="keyword">public</span> <span
+			class="keyword">void</span> change(Device aDevice) <span
+			class="keyword">throws</span> DataAccessException {
+    <span class="comment">//elided...
+</span>  }
+  
+  <span class="keyword">@Override</span> <span class="keyword">public</span> <span
+			class="keyword">void</span> delete(Device aDevice) <span
+			class="keyword">throws</span> DataAccessException {
+    <span class="comment">//elided...
+</span>  }
+  
+  <span class="keyword">@Override</span> <span class="keyword">public</span> Device fetch(String aId) <span
+			class="keyword">throws</span> DataAccessException {
+    <span class="comment">//elided...
+</span>    <span class="keyword">return</span> <span class="keyword">null</span>;
+  }
+  
+} 
+</pre>
+
+	(The details of these classes are left out, so that you can see the
+	structure better.)
+
+	<p>
+		Next, the calling application needs a way to interact with the
+		database, without knowing about the concrete implementations. This is
+		done using a factory class: <br>
+	</p>
+	<pre>
+		<span class="keyword">package</span> myapp;
+
+<span class="comment">/**
+ Returns all DAO instances.
+  
+ Reads a configuration item (defined by your program) to decide 
+ which family of DAO objects it should be returning, for the currently 
+ running program, either file-based or relational-based.
+  
+ The configuration mechanism may be a System property, a properties file, an
+ XML file, and so on. The config is often read when the system initializes,
+ perhaps using a static initializer.
+*/</span>
+<span class="keyword">final</span> <span class="keyword">class</span> DAOFactory {
+  
+  <span class="comment">/* some would implement all of the methods here as static methods */</span>
+  
+  DeviceDAO getDeviceDAO(){
+    <span class="comment">//elided:
+</span>    <span class="keyword">return</span> <span class="keyword">null</span>;
+  }
+
+  UserDAO getUserDAO(){
+    <span class="comment">//elided:
+</span>    <span class="keyword">return</span> <span class="keyword">null</span>;
+  }
+  
+} 
+</pre>
+
+	<br>
+	<pre>
+		<span class="keyword">package</span> myapp;
+
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+			class="keyword">class</span> Application {
+  
+  <span class="comment">/**
+   This calling code is completely unaware of the underlying datastore.
+   It could be a text file, or a relational database.
+  */</span>
+  <span class="keyword">void</span> addNewDevice(Device aDevice){
+    DAOFactory factory = <span class="keyword">new</span> DAOFactory();
+    <span class="keyword">try</span> {
+      factory.getDeviceDAO().add(aDevice);
+    }
+    <span class="keyword">catch</span> (DataAccessException ex) {
+      ex.printStackTrace();
+    }
+  }
+
+}
+ 
+</pre>
+
+	To pile on even more interfaces, one variation on the above is to make
+	an abstraction or the factory itself: the factory is defined as an
+	interface, with methods similar to the above. Then, two concrete
+	implementations of the factory interface are defined, one for each kind
+	of datastore.
+	<br>
+	<pre>
+		<span class="keyword">package</span> myapp;
+
+<span class="keyword">public</span> <span class="keyword">interface</span> Factory {
+  
+  DeviceDAO getDeviceDAO();
+  
+  UserDAO getUserDAO();
+}
+ 
+</pre>
+
+	<br>
+	<pre>
+		<span class="keyword">package</span> myapp;
+
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+			class="keyword">class</span> FactoryBuilder {
+  
+  <span class="comment">/** returns a specific implementation of Factory */</span>
+  Factory getFactory(){
+    <span class="comment">//elided
+</span>    <span class="keyword">return</span> <span class="keyword">null</span>;
+  }
+
+}
+ 
+</pre>
+
+	<br>
+	<p></p>
+	<p></p>
+	<div class="topic-section" id="see-also-title">See Also :</div>
+	<div id="see-also" class="main-body">
+		<a href="..\patrones\patrones_21.html">Métodos de la Factoría</a> <br> <a
+			href="..\bbdd\bbdd_66.html">Objetos de acceso a Datos</a> <br> <a
+			href="..\bbdd\bbdd_77.html">Encapsulado de la excepción de Datos</a> <br> <a
+			href="..\constructores\constructors_113.html">Construir un Objeto usando el nombre de la clase</a> <br> <a
+			href="..\practicascomunes\practicascomunes_123.html">Minimizar los efectos dominantes</a> <br> <a
+			href="..\servlets\servlets_138.html">Analizar parámetros en objetos de dominio</a> <br>
+	</div>
+
+	<footer id="footer" class="legalese">
+        <span id="app_name">Prácticas de Java</span> <span
+            id="app_version_number">3.001</span><br> © <span id="copyright">2018
+            Hirondelle Systems</span><br> <a
+            href="http://www.javapractices.com/source/SourceAction.do">Código
+            Fuente</a> | <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a>
+        | <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+            rel="license">Licencia</a> | <a
+            href="http://www.javapractices.com/apps/cjp.rss" rel="alternate"
+            type="application/rss+xml">RSS</a>
+        <!-- ukey="2AC36CD2" -->
+        <!-- ckey="16DF3D87" -->
+        <br> Los trozos de código individual tienen una <a
+            href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia
+            BSD</a><br> Sobre 1,000,000 de IPs únicas el último año<br>
+        Última actualización
+        <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+        <br> - In Memoriam : Bill Dirani -
+    </footer>
+
+</body>
+</html>

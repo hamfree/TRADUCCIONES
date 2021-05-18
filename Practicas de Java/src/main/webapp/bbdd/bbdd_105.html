@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+	content="Prácticas y técnicas de programación en Java.">
+<meta name="keywords"
+	content="java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas Java-&gt;Mantenga el SQL fuera del código</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+    href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png"
+    href="../img/favicon.png">
+</head>
+<body>
+    <nav class="menu-bar" id="menu-bar">
+        <a href="../index.html"
+            title="Table of Contents" style="float: left;">Inicio</a>
+        &nbsp;&nbsp;
+        <form method="GET" action="https://www.google.com/search"
+            class="search-form" style="float: right;">
+            <input name="q" size="15" maxlength="255" placeholder=""
+                type="text"> <input name="btnG" value="Search"
+                type="submit"> <input name="sitesearch"
+                value="www.javapractices.com" type="hidden">
+        </form>
+    </nav>
+    <div class="page-title">Mantenga el SQL fuera del código</div>
+    <br>
+    <a href="http://en.wikipedia.org/wiki/SQL">Structured Query
+        Language (SQL)</a> is text. Its natural home is a text file of some
+    sort. Storing SQL as text, outside of compiled code, eases
+    maintenance significantly:
+    <ul>
+        <li>it lets those who know SQL to contribute directly to a
+            project, without having to know anything else about all the
+            other tools used in the project.</li>
+        <li>for developers new to a project, having SQL separate
+            from code makes it significantly easier to browse through
+            SQL statements and learn the database structure.</li>
+        <li>it minimizes the ripple effects caused by changes to
+            the database. For example, if a table name or column name
+            changes, the fix is usually an easy search and replace in a
+            single text file.</li>
+        <li>if an older application needs to be migrated to a new
+            framework, then the SQL is readily available for porting to
+            the new application.</li>
+        <li>if necessary, changes to SQL can even be made after
+            deployment, by changing the text file and doing a restart or
+            a refresh. This can occasionally be useful. For example, if
+            users ask for a change in the sort order of some data, then
+            the developer very likely <em>has the option</em> of
+            implementing that change without a redeployment (and maybe
+            even without a restart, if the tools support a refresh).
+            However, some organizations would object to performing such
+            changes directly in production.
+        </li>
+        <li>adding support for a new relational database may become
+            simply a matter of translating only those statements that
+            happen to be non-portable.</li>
+    </ul>
+    <i>The Pragmatic Programmer</i>, by Hunt and Thomas, emphasizes this
+    type of metadata:
+    <p>
+        "<i>It forces you to create a more robust, abstract design
+            by deferring details - deferring them all the way out of the
+            program.</i>"
+    </p>
+    <p>There's a possible objection to keeping SQL as text in a
+        production environment: it can be examined for vulnerabilities
+        by a malicious user with access to the machine where it resides.
+        In that case, there is the option of translating the SQL-as-text
+        (used in development) into some binary form (used in
+        production).</p>
+    <p>Many SQL statements come in these three forms, all of which
+        may be removed from compiled code and stored outside the program
+        as text:</p>
+    <p>
+        <b>Fixed text:</b>
+    </p>
+    <p>
+        <code>SELECT * FROM Board ORDER BY Id;</code>
+    </p>
+    <p>
+        Here, simply fetch a
+        <code>String</code>
+        from some textual source (such as a properties file), and pass
+        it to the constructor of a
+        <code>
+            <a
+                href="https://docs.oracle.com/javase/10/docs/api/java/sql/Statement.html">Statement</a>
+        </code>
+        or
+        <code>
+            <a
+                href="https://docs.oracle.com/javase/10/docs/api/java/sql/PreparedStatement.html">PreparedStatement</a>
+        </code>
+        . This form is likely relatively rare, since most SQL statements
+        seem to have at least one parameter.
+    </p>
+    <p>
+        <b>Parameterized, with a single set of values :</b>
+    </p>
+    <p>
+        <code>INSERT INTO Board</code>
+        <br>
+        <code>(Id, Title, TimeZone, Language, CreationDate)</code>
+        <br>
+        <code>VALUES ('quark','High Energy
+            Physics','GMT','english',NOW());</code>
+    </p>
+    <p>
+        Here, fetch a
+        <code>String</code>
+        having '?' as place holders from some textual source :
+    </p>
+    <p>
+        <code>INSERT INTO Board</code>
+        <br>
+        <code>(Id, Title, TimeZone, Language, CreationDate)</code>
+        <br>
+        <code>VALUES (?,?,?,?,NOW());</code>
+    </p>
+    <p>
+        This
+        <code>String</code>
+        is then passed to the constructor of a
+        <code>PreparedStatement</code>
+        , and parameters are inserted using the methods of the
+        <code>PreparedStatement</code>
+        class. Note that
+        <code>
+            <a
+                href="https://docs.oracle.com/javase/10/docs/api/java/sql/PreparedStatement.html">PreparedStatement</a>
+        </code>
+        has <a
+            href="http://www.javapractices.com/topic/TopicAction.do?Id=212">significant
+            advantages</a> over an ordinary
+        <code>
+            <a
+                href="https://docs.oracle.com/javase/10/docs/api/java/sql/Statement.html">Statement</a>
+        </code>
+        .
+    </p>
+    <p>
+        <b>Parameterized, with multiple sets of parameters :</b>
+    </p>
+    <p>
+        <code>INSERT INTO Vote</code>
+        <br>
+        <code>VALUES</code>
+        <br>
+        <code>('RASB', 3, 'Y', NOW()),</code>
+        <br>
+        <code>('RASB', 2, 'Y', NOW()),</code>
+        <br>
+        <code>('RASB', 1, 'Y', NOW()),</code>
+        <br>
+        <code>('RASB', 4, '?', NOW());</code>
+    </p>
+    <p>
+        Using such a statement to add many records is advantageous,
+        since it involves only one trip to the database. However, the
+        <code>
+            <a
+                href="https://docs.oracle.com/javase/10/docs/api/java/sql/PreparedStatement.html">PreparedStatement</a>
+        </code>
+        parameter mechanism cannot do this in one statement, since the
+        number of added records is arbitrary. The usual style in this
+        case is to use batched statements, in which a number of
+        individual INSERT statements are collected together in a batch,
+        and then executed as a unit.
+    </p>
+    <p>
+        <b>Search Operations</b>
+    </p>
+    <p>
+        There are cases in which it remains preferable to construct an
+        SQL statement (or at least parts of it) in code. This is
+        particularly true for many search operations, where the end user
+        enters various search criteria into a form used to construct
+        <code>WHERE</code>
+        and
+        <code>ORDER BY</code>
+        clauses. It's often the case that a very large number of
+        possible
+        <code>WHERE</code>
+        and
+        <code>ORDER BY</code>
+        clauses can be built from such user input. Manually enumerating
+        <em>all</em> such possibilities is often undesirable. In such
+        cases, building the SQL statement dynamically from user input
+        seems preferable.
+    </p>
+    <p>
+        When constructing statements dynamically, however, you must
+        guard against <a
+            href="http://en.wikipedia.org/wiki/SQL_Injection">SQL
+            injection attacks</a>. Here's a simple technique for doing so:
+    </p>
+    <ul>
+        <li>start with a base SQL statement defined in a text file,
+            as above.</li>
+        <li>build the dynamic parts of the SQL statement in code
+            (usually the <code>WHERE</code> and <code>ORDER BY</code>
+            clauses), but, at this stage, <em>do not insert the
+                data parameter values yet</em>. That is, build a String
+            containing '?' placeholders for data, in the usual form
+            expected by a <code>PreparedStatement</code>.
+        </li>
+        <li>next, create a <code>PreparedStatement</code> with the
+            given SQL string. This will verify that the SQL statement is
+            of valid form. As always, using <code>PreparedStatement</code>
+            in this way will <a
+            href="http://www.javapractices.com/topic/TopicAction.do?Id=212">protect
+                against SQL injection attacks</a>.
+        </li>
+        <li>finally, inject the data for the '?' placeholders in
+            the usual way.</li>
+    </ul>
+    With the above technique, user input of search criteria is used for
+    <em>two</em> distinct purposes:
+    <em>first</em> dynamically building the core SQL with the desired
+    <code>WHERE</code>
+    and
+    <code>ORDER BY</code>
+    clauses (containing '?' placeholders), and
+    <em>secondly</em> populating the '?' placeholders with data in the
+    usual way.
+    <p>
+        <b>Example</b>
+    </p>
+    <p>
+        Here's an example of a
+        <code>.sql</code>
+        file which contains the SQL statements related to a single
+        feature. All parameterized statements are expressed in a style
+        suitable for a
+        <code>
+            <a
+                href="https://docs.oracle.com/javase/10/docs/api/java/sql/PreparedStatement.html">PreparedStatement</a>
+        </code>
+        , to avoid using any quoting conventions. It's taken from one of
+        the <a
+            href="http://www.javapractices.com/topic/TopicAction.do?Id=188">WEB4J</a>
+        example applications.
+    </p>
+    <pre>LIST_RESTOS {
+ SELECT Id, Name, Location, Price, Comment
+ FROM Resto
+ ORDER BY Name
+}
+
+FETCH_RESTO {
+ SELECT Id, Name, Location, Price, Comment
+ FROM Resto
+ WHERE Id =? 
+}
+
+ADD_RESTO  {
+  -- Id is an autoincrement field, populated automagically by the database.
+ INSERT INTO Resto (Name, Location, Price, Comment) VALUES (?,?,?,?)
+}
+
+CHANGE_RESTO {
+  UPDATE Resto SET Name=?, Location=?, Price=?, Comment=? WHERE Id=?
+}
+
+DELETE_RESTO {
+  DELETE FROM RESTO WHERE Id=?
+}</pre>
+    <p>
+        In the case of web applications, such files are safely placed in
+        the
+        <code>WEB-INF</code>
+        directory, where they are not accessible to the user, and can be
+        retrieved using
+        <code>
+            <a
+                href="http://docs.oracle.com/javaee/1.4/api/javax/servlet/ServletContext.html#getResourceAsStream%28java.lang.String%29">ServletContext.getResourceAsStream</a>
+        </code>
+        .
+    </p>
+    <p>
+        The <a
+            href="http://www.javapractices.com/topic/TopicAction.do?Id=188">WEB4J</a>
+        framework places all SQL statements in one or more such
+        <code>.sql </code>
+        files, located anywhere under the
+        <code>WEB-INF</code>
+        directory. (Please see the javadoc for its data layer for more
+        information.) <br>
+    </p>
+    <p></p>
+    <div class="topic-section" id="see-also-title">See Also :</div>
+    <div id="see-also" class="main-body">
+        <a
+            href="..\bbdd\bbdd_66.html">Objetos de acceso a Datos</a> <br> <a
+            href="..\bbdd\bbdd_76.html">Reduzca la duplicación de código de la base de datos
+            </a> <br> <a
+            href="..\bbdd\bbdd_172.html">Considere usar SQL estándar</a> <br> <a
+            href="..\servlets\servlets_188.html">WEB4J, Un Marco de trabajo de Aplicaciones WEB
+            </a> <br> <a
+            href="..\bbdd\bbdd_212.html">Prefiera PreparedStatement
+            </a> <br>
+    </div>
+    <footer id="footer" class="legalese">
+		<span id="app_name">Prácticas de Java</span> <span
+			id="app_version_number">3.001</span><br> © <span id="copyright">2018
+			Hirondelle Systems</span><br> <a
+			href="http://www.javapractices.com/source/SourceAction.do">Código
+			Fuente</a> | <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a>
+		| <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+			rel="license">Licencia</a> | <a
+			href="http://www.javapractices.com/apps/cjp.rss" rel="alternate"
+			type="application/rss+xml">RSS</a>
+		<!-- ukey="2AC36CD2" -->
+		<!-- ckey="16DF3D87" -->
+		<br> Los trozos de código individual tienen una <a
+			href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia
+			BSD</a><br> Sobre 1,000,000 de IPs únicas el último año<br>
+		Última actualización
+		<time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+		<br> - In Memoriam : Bill Dirani -
+	</footer>
+</body>
+</html>

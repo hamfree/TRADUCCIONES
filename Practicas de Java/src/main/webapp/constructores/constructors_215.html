@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<!-- saved from url=(0056)http://www.javapractices.com/topic/TopicAction.do?Id=215 -->
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+    content="Presentaciones concisas de prácticas de programación en 
+        java, tareas, y convenciones, ampliamente ilustrado con ejemplos de código con resaltado de 
+        sintaxis.">
+<meta name="keywords"
+    content="constructor,java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas de Java-&gt;Los constructores no deben llamar a los sobreescribibles</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+    href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png" href="../img/favicon.png">
+</head>
+<body>
+    <nav class="menu-bar" id="menu-bar">
+        <a href="../index.html" title="Table of Contents"
+            style="float: left;">Inicio</a> &nbsp;&nbsp;
+        <form method="GET" action="https://www.google.com/search"
+            class="search-form" style="float: right;">
+            <input type="text" name="q" size="15" maxlength="255"
+                value="" placeholder=""> <input type="submit"
+                name="btnG" value="Search"> <input type="hidden"
+                name="sitesearch" value="www.javapractices.com">
+        </form>
+    </nav>
+    <div class="page-title">Los constructores no deben llamar a
+        los sobreescribibles</div>
+    <br> Los constructores no llamarán a un método sobreescribible
+    - esto es, deberían llamar sólo a los métodos que son
+    <code>private</code>
+    ,
+    <code>static</code>
+    , or
+    <code>final</code>
+    .
+    <p>
+        La razón por la cual se ilustra mejor con un poco de código: <br>
+    </p>
+    <pre>
+<span class="keyword">import</span> java.util.Objects;
+
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">class</span> ConstructorOverridable {
+
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> main(String... aArgs){
+    log(<span class="literal">"CONSTRUIR UN ANIMAL :"</span>);
+    Animal animal = <span class="keyword">new</span> Animal();
+    log(<span class="literal">" "</span>);
+    log(<span class="literal">"CONSTRUIR UN PESCADO :"</span>);
+    Animal fish = <span class="keyword">new</span> Fish();
+  }
+  
+  <span class="comment">// PRIVADO
+</span>  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> log(Object aObject){
+    System.out.println(Objects.toString(aObject));
+  }
+  
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">class</span> Animal{
+    Animal(){
+      log(<span class="literal">"Animal ctor"</span>);
+      <span class="comment">//llamar a un método sobreescribible desde ctor - peligros
+</span>      perform();
+    }
+    <span class="keyword">void</span> perform(){
+      log(<span class="literal">"Animal perform."</span>);
+    }
+  }
+  
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">class</span> Fish <span class="keyword">extends</span> Animal {
+    Fish(){
+      <span class="comment">//cada constructor tiene una llamada implícita a super(); en la primera línea 
+</span>      <span class="keyword">super</span>();
+      log(<span class="literal">"Fish ctor. Esta es la forma de cola más antigua que se puede inicializar."</span>);
+    }
+    <span class="keyword">void</span> perform(){
+      <span class="comment">//en general, este método puede depender de los datos de Fish
+</span>      log(<span class="literal">"Fish perform. Puede fallar desde que la Forma de Cola es : "</span> + fTailShape);
+    }
+    <span class="keyword">private</span> String fTailShape;
+  }
+}
+ 
+</pre>
+    Un ejemplo de ejecución de esta clase demuestra el problema:
+    <p></p>
+    <pre>CONSTRUIR UN ANIMAL :
+Animal ctor
+Animal perform.
+ 
+CONSTRUIR UN PESCADO :
+Animal ctor
+Fish perform. Puede fallar desde que la Forma de Cola es : null
+Fish ctor. Esta es la forma de cola más antigua que se puede inicializar.
+</pre>
+    <p></p>
+    <div class="topic-section" id="see-also-title">Vea También :</div>
+    <div id="see-also" class="main-body">
+        <a href="constructors_11.html">Constructores en general</a> <br>
+        <a href="../herencia/inheritance_69.html">Diseñando para
+            subclases</a> <br> <a
+            href="../herencia/inheritance_89.html">Los métodos
+            sobreescribibles necesitan cuidados especiales</a> <br>
+    </div>
+    <footer id="footer" class="legalese">
+        <span id="app_name">Prácticas de Java</span> <span
+            id="app_version_number">3.001</span><br> © <span
+            id="copyright">2018 Hirondelle Systems</span><br> <a
+            href="http://www.javapractices.com/source/SourceAction.do">Código
+            Fuente</a> | <a href="mailto:webmaster@javapractices.com"
+            rel="author">Contacto</a> | <a
+            href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+            rel="license">Licencia</a> | <a
+            href="http://www.javapractices.com/apps/cjp.rss"
+            rel="alternate" type="application/rss+xml">RSS</a>
+        <!-- ukey="2AC36CD2" -->
+        <!-- ckey="16DF3D87" -->
+        <br> Los trozos de código individual tienen una <a
+            href="http://www.javapractices.com/LICENSE.txt"
+            rel="license">licencia BSD</a><br> Sobre 1,000,000 de
+        IPs únicas el último año<br> Última actualización
+        <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+        <br> - In Memoriam : Bill Dirani -
+    </footer>
+</body>
+</html>

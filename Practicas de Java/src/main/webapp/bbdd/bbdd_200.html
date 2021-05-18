@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+    content="Prácticas y técnicas de programación en Java.">
+<meta name="keywords"
+    content="java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas Java-&gt;Intente la pseudo persistencia para las simulaciones</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+    href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png"
+    href="../img/favicon.png">
+</head>
+<body>
+    <nav class="menu-bar" id="menu-bar">
+        <a href="../index.html"
+            title="Table of Contents" style="float: left;">Inicio</a>
+        &nbsp;&nbsp;
+        <form method="GET" action="https://www.google.com/search"
+            class="search-form" style="float: right;">
+            <input name="q" size="15" maxlength="255" placeholder=""
+                type="text"> <input name="btnG" value="Search"
+                type="submit"> <input name="sitesearch"
+                value="www.javapractices.com" type="hidden">
+        </form>
+    </nav>
+    <div class="page-title">Intente la pseudo persistencia para las simulaciones</div>
+    <br>It's possible to build
+    <a href="http://www.javapractices.com/topic/TopicAction.do?Id=66">Data
+        Access Objects</a> which mimic persistance, but whose data lasts
+    only until the application shuts down. One might call this
+    "pseudo-persistance", and such objects "pseudo-DAOs".
+    <p>These stub classes are easy to construct, and can be useful
+        for quick mock ups. They usually require less effort than
+        providing true persistance. By following the style shown below,
+        for example, a pseudo-DAO could be constructed in 10 minutes.</p>
+    <p>
+        This example pseudo-DAO implements pseudo-persistence for
+        <code>Person</code>
+        objects. The intent is to create a pseudo-DAO whose methods will
+        match the final, true DAO. Thus, the same class can evolve from
+        a mock up into a final implementation, without affecting the
+        caller in any way. From the caller's point of view, there should
+        be little or no difference between the pseudo-DAO and the real
+        DAO, including the checked exceptions thrown by its methods.
+    </p>
+    <p>
+        The underlying technique is simply to store objects in a static
+        member of the pseudo-DAO. In this case, a
+        <code>Map</code>
+        is used. <br>
+    </p>
+    <pre>
+        <span class="keyword">package</span> myapp.data;
+
+<span class="keyword">import</span> java.util.*;
+
+<span class="keyword">import</span> myapp.business.Person;
+
+<span class="comment">/**
+* Provides "pseudo-persistance", by storing objects as static data attached to this
+* class. Such data is lost when the application is shut down, but is retained
+* as long as the application is running.
+*
+* &lt;P&gt;The important thing is to match the desired style of the true DAO 
+* into which this pseudo-DAO may evolve.
+*
+* &lt;P&gt;Note that &lt;tt&gt;DataAccessException&lt;/tt&gt; (a checked exception) can and should
+* be declared in the throws clause, even when the underlying implementation for
+* this pseudo-DAO never throws such an exception. Again, the idea is to provide
+* a stub which, from the point of view of the caller, is as realistic as possible.
+*/</span>
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">class</span> PersonDAO {
+
+  <span class="comment">/**
+  * Add &lt;tt&gt;aPerson&lt;/tt&gt; to the datastore, returning an indicator of
+  * success or failure.
+  *
+  * If &lt;tt&gt;aPerson&lt;/tt&gt; already exists in the datastore, then return false.
+  */</span>
+  <span class="keyword">public</span> <span class="keyword">boolean</span> add(Person aPerson) <span
+            class="keyword">throws</span> DataAccessException {
+    <span class="keyword">boolean</span> result = <span class="keyword">false</span>;
+    <span class="keyword">synchronized</span>(fPersons) {
+      <span class="keyword">if</span> (! fPersons.containsKey(aPerson.getName())) {
+        fPersons.put(aPerson.getName(), aPerson);
+        result = <span class="keyword">true</span>;
+        log(<span class="literal">"Persons after add: "</span> + fPersons);
+      }
+    }
+    <span class="keyword">return</span> result;
+  }
+
+  <span class="comment">/**
+  * Fetch a person from the datastore, using &lt;tt&gt;aName&lt;/tt&gt; as a unique
+  * identifier.
+  *
+  * &lt;P&gt;If no &lt;tt&gt;Person&lt;/tt&gt; is found, return null.
+  */</span>
+  <span class="keyword">public</span> Person fetch(String aName) <span
+            class="keyword">throws</span> DataAccessException {
+    Person result = <span class="keyword">null</span>;
+    <span class="keyword">synchronized</span>(fPersons){
+      <span class="keyword">if</span>(fPersons.containsKey(aName)){
+        result = fPersons.get(aName);
+      }
+      log(<span class="literal">"Persons during fetch: "</span> + fPersons);
+    }
+    <span class="keyword">return</span> result;
+  }
+
+  <span class="comment">/**
+  * Update the data associated with &lt;tt&gt;aPersons&lt;/tt&gt;, returning an
+  * indicator of success or failure.
+  *
+  * &lt;P&gt;If &lt;tt&gt;aPerson&lt;/tt&gt; is not found in the datastore, then return false.
+  */</span>
+  <span class="keyword">public</span> <span class="keyword">boolean</span> change(Person aPerson) <span
+            class="keyword">throws</span> DataAccessException {
+    <span class="keyword">boolean</span> result = <span class="keyword">false</span>;
+    <span class="keyword">synchronized</span>(fPersons){
+      <span class="keyword">if</span> (fPersons.containsKey(aPerson.getName())) {
+        fPersons.put(aPerson.getName(), aPerson); <span class="comment">//replaces old entry
+</span>        result = <span class="keyword">true</span>;
+        log(<span class="literal">"Persons after change: "</span> + fPersons);
+      }
+    }
+    <span class="keyword">return</span> result;
+  }
+
+  <span class="comment">/**
+  * Delete the &lt;tt&gt;Person&lt;/tt&gt; identified uniquely by &lt;tt&gt;aName&lt;/tt&gt;,
+  * returning an indicator of success or failure.
+  *
+  * &lt;P&gt;If &lt;tt&gt;aName&lt;/tt&gt; is not found in the datastore, then return false.
+  */</span>
+  <span class="keyword">public</span> <span class="keyword">boolean</span> delete(String aName) <span
+            class="keyword">throws</span> DataAccessException {
+    <span class="keyword">boolean</span> result = <span class="keyword">false</span>;
+    <span class="keyword">synchronized</span>(fPersons){
+      <span class="keyword">if</span> (fPersons.containsKey(aName)) {
+        fPersons.remove(aName);
+        result = <span class="keyword">true</span>;
+        log(<span class="literal">"Persons after delete: "</span> + fPersons);
+      }
+    }
+    <span class="keyword">return</span> result;
+  }
+
+  <span class="comment">// PRIVATE 
+</span>
+  <span class="comment">/**
+  * Stores Person objects in a static field, attached to this class, which will
+  * remain available as long as this class remains loaded.
+  */</span>
+  <span class="keyword">private</span> <span class="keyword">static</span> Map&lt;String, Person&gt; fPersons = <span
+            class="keyword">new</span> LinkedHashMap&lt;&gt;();
+
+  <span class="keyword">private</span> <span class="keyword">void</span> log(String aText){
+    System.out.println(aText);
+  }
+} 
+</pre>
+    <br>
+    <p></p>
+    <p></p>
+    <div class="topic-section" id="see-also-title">See Also :</div>
+    <div id="see-also" class="main-body">
+        <a
+            href="..\bbdd\bbdd_66.html">Objetos de acceso a Datos</a> <br>
+    </div>
+    <footer id="footer" class="legalese">
+		<span id="app_name">Prácticas de Java</span> <span
+			id="app_version_number">3.001</span><br> © <span id="copyright">2018
+			Hirondelle Systems</span><br> <a
+			href="http://www.javapractices.com/source/SourceAction.do">Código
+			Fuente</a> | <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a>
+		| <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+			rel="license">Licencia</a> | <a
+			href="http://www.javapractices.com/apps/cjp.rss" rel="alternate"
+			type="application/rss+xml">RSS</a>
+		<!-- ukey="2AC36CD2" -->
+		<!-- ckey="16DF3D87" -->
+		<br> Los trozos de código individual tienen una <a
+			href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia
+			BSD</a><br> Sobre 1,000,000 de IPs únicas el último año<br>
+		Última actualización
+		<time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+		<br> - In Memoriam : Bill Dirani -
+	</footer>
+</body>
+</html>

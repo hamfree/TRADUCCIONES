@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<!-- saved from url=(0055)http://www.javapractices.com/topic/TopicAction.do?Id=10 -->
+<html lang="es">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="Prácticas y técnicas de programación en Java." />
+    <meta name="keywords" content="java,programación java,Prácticas de Java,idioma java,estilo java,patrones de diseño java,convenciones de 
+      codigo java" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prácticas en Java-&gt;Implementar compareTo</title>
+    <link id="stylesheet" rel="stylesheet" type="text/css" href="../css/stylesheet9.css" media="all" />
+    <link rel="icon" type="image/png" href="../img/favicon.png" />
+  </head>
+  <body>
+	<nav class="menu-bar" id="menu-bar">
+  	  <a href="../index.html" title="Tabla de Contenido" style="float: left;">Inicio</a>&nbsp;&nbsp;
+  	  <form method="GET" action="https://www.google.com/search" class="search-form" style="float: right;">
+  		<input type="text" name="q" size="15" maxlength="255" value="" placeholder="" />
+        <input type="submit" name="btnG" value="Buscar" /> 
+        <input type="hidden" name="sitesearch" value="www.javapractices.com" />
+  	  </form>
+	</nav>
+	<div class="page-title">
+      Implementando compareTo
+    </div>
+	  <br>El método <code>compareTo</code> es el único miembro de la interfaz
+	  <code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Comparable.html">Comparable</a></code>, y no es un miembro de 
+      <code>Object</code>. Sin embargo, es bastante similiar en naturaleza a <code>equals</code> y <code>hashCode</code>. Proporciona un 
+      medio para ordenar completamente los objetos.
+  	  <p>
+  		Implementar <code>Comparable</code> permite:
+  	  </p>
+	  <ul>
+		<li>
+          llamar <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/Collections.html">Collections</a>.sort</code> y 
+          <code>Collections.binarySearch</code>
+        </li>
+		<li>
+          llamar <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/Arrays.html">Arrays</a>.sort</code> y 
+          <code>Arrays.binarySearch</code>
+        </li>
+		<li>
+          usar objetos como claves en un <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/TreeMap.html">TreeMap</a></code>
+        </li>
+		<li>
+          usar objetos como elementos en un 
+          <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/TreeSet.html">TreeSet</a></code>
+        </li>
+	  </ul>
+      El método <code>compareTo</code> necesita satisfacer las siguientes condiciones. Estas condiciones tienen el objetivo de permitir que 
+      los objetos sean completamente ordenados,al igual que la ordenación de un conjunto de resultados de base de datos en todos los campos.
+	  <ul>
+		<li>
+          anticomutación :&nbsp; <code>x.compareTo(y)</code> es el signo opuesto de <code>y.compareTo(x)</code>
+        </li>
+		<li>
+          simetría de excepción : <code>x.compareTo(y)</code> lanza exactamente las mismas excepciones que <code>y.compareTo(x)</code>
+        </li>
+		<li>
+          transitividad :&nbsp; <code>si x.compareTo(y)&gt;0</code> y <code>y.compareTo(z)&gt;0</code>, entonces 
+          <code>x.compareTo(z)&gt;0</code>&nbsp; (y lo mismo para menor que)
+		</li>
+		<li>
+          &nbsp;si <code>x.compareTo(y)==0</code>, entonces <code>x.compareTo(z)</code> tiene el mismo signo como <code>y.compareTo(z)</code>
+        </li>
+		<li>
+          la consistencia con <code>equals</code> es altamente recomendada, pero no se requiere :<code> x.compareTo(y)==0</code>, si y sólo 
+          si <code>x.equals(y)</code> ; la consistencia con <code>equals</code> es requerida para asegurar que las colecciones ordenadas 
+          (como <code>TreeSet</code>) se comporten bien.
+		</li>
+	  </ul>
+	  Uno puede aumentar considerablemente el rendimiento de <code>compareTo</code> comparando primero los elementos que tienen más 
+      probabilidades de diferir.
+	  <p>
+		Cuando una clase extiende una clase <i>concreta</i> <code>Comparable</code> y agrega un campo significativo, una implementación 
+        correcta de <code>compareTo</code> no puede ser construida. La única alternativa es usar la composición en vez de la herencia. 
+        (Vea <i><a href="http://www.amazon.com/exec/obidos/ASIN/0134685997/ref=nosim/javapractices-20">Java Efectivo</a></i> para más 
+        información).
+	  </p>
+	  <p>
+        Compare los distintos tipos de campos como sigue:
+      </p>
+	  <ul>
+		<li>
+          tipo primitivo numérico: use <code>&lt;</code> y <code>&gt;</code>. Hay una excepción a esta regla: los tipos primitivos 
+          <code>float</code> y <code>double</code> deben ser comparados usando 
+          <code>
+            Float.<a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Float.html#compare(float,float)">compare(float,float)</a>
+		  </code> y 
+          <code>
+			Double.<a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Double.html#compare(double,double)">compare(double,double)</a>
+		  </code>. Esto evita problemas asociados con los valores de borde especiales. (Gracias a Roger Orr de GB por señalar esto).
+		</li>
+		<li>
+          tipo primitivo <code>boolean</code> :&nbsp; use tests de la forma <code>(x &amp;&amp; !y)</code>
+        </li>
+		<li>
+          <code>Object</code> : use <code>compareTo</code>. (Note que los campos posiblemente nulos presentan un problema: mientras 
+          <code>x.equals(null)</code> devuelve <code>false</code>, <code>x.compareTo(null)</code> siempre lanzará una 
+          <code>NullPointerException</code>)
+        </li>
+		<li>
+          enumeración de tipo-seguro: use <code>compareTo</code>, como con cualquier <code>Object</code>
+        </li>
+		<li>
+          Colección o matriz : <code>Comparable</code> no parece estar destinado a este tipo de campos. Por ejemplo, <code>List</code>, 
+          <code>Map</code> y <code>Set</code> no implementan <code>Comparable</code>. Además, algunas colecciones no tienen un orden 
+          definido de iteración, así que hacer una comparación elemento-por-elemento puede no tener sentido en estos casos.
+		</li>
+	  </ul>
+      Si la tarea es realizar una ordenación de elementos que son almacenados en una base de datos relacional, entonces por lo general, es 
+      preferible que la base de datos realice la ordenación utilizando la cláusula ORDER BY, en lugar de en el código. 
+	  <p>
+	    Una alternativa a implementar <code>Comparable</code> es pasar objetos 
+		<code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/Comparator.html">Comparator</a></code> como parámetros. Tenga en 
+        cuenta que si un <code>Comparator</code> compara sólo uno de varios campos significativos, entonces el <code>Comparator</code> es 
+        muy probable que no esté sincronizado con <code>equals</code>.
+	  </p>
+	  <p>
+	    Todas las clases envoltorio de tipos primitivos implementan <code>Comparable</code>. Sin embargo, note que 
+		<code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Boolean.html#compareTo(java.lang.Boolean)">Boolean</a></code>
+		no implementaron <code>Comparable</code> hasta la version 1.5.
+	  </p>
+	  <p>
+		<b>Ejemplo</b>
+	  </p>
+	  <pre>
+<span class="keyword">import</span> java.util.*;
+<span class="keyword">import</span> java.io.*;
+
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+			class="keyword">class</span> Account <span class="keyword">implements</span> Comparable&lt;Account&gt; {
+  
+  <span class="keyword">enum</span> AccountType {CASH, MARGIN, RRSP};
+
+   <span class="keyword">public</span> Account (
+      String aFirstName,
+      String aLastName,
+      <span class="keyword">int</span> aAccountNumber,
+      <span class="keyword">int</span> aBalance,
+      <span class="keyword">boolean</span> aIsNewAccount,
+      AccountType aAccountType
+  ) {
+      <span class="comment">//..validaciones de parametro no incluidas
+</span>      fFirstName = aFirstName;
+      fLastName = aLastName;
+      fAccountNumber = aAccountNumber;
+      fBalance = aBalance;
+      fIsNewAccount = aIsNewAccount;
+      fAccountType = aAccountType;
+   }
+
+  <span class="comment">/**
+  * @param aThat es una Cuenta no-nula.
+  *
+  * @throws NullPointerException si aThat es nulo.
+  */</span>
+  <span class="keyword">@Override</span> <span class="keyword">public</span> <span
+			class="keyword">int</span> compareTo(Account aThat) {
+    <span class="keyword">final</span> <span class="keyword">int</span> BEFORE = -<span
+			class="literal">1</span>;
+    <span class="keyword">final</span> <span class="keyword">int</span> EQUAL = <span
+			class="literal">0</span>;
+    <span class="keyword">final</span> <span class="keyword">int</span> AFTER = <span
+			class="literal">1</span>;
+
+    <span class="comment">//esta optimización generalmente vale la pena, y puede
+</span>    <span class="comment">//siempre ser agregada
+</span>    <span class="keyword">if</span> (<span class="keyword">this</span> == aThat) <span
+			class="keyword">return</span> EQUAL;
+
+    <span class="comment">//los números primitivos siguen esta forma
+</span>    <span class="keyword">if</span> (<span class="keyword">this</span>.fAccountNumber &lt; aThat.fAccountNumber) <span
+			class="keyword">return</span> BEFORE;
+    <span class="keyword">if</span> (<span class="keyword">this</span>.fAccountNumber &gt; aThat.fAccountNumber) <span
+			class="keyword">return</span> AFTER;
+
+    <span class="comment">//los booleanos siguen esta forma
+</span>    <span class="keyword">if</span> (!<span class="keyword">this</span>.fIsNewAccount &amp;&amp; aThat.fIsNewAccount) <span
+			class="keyword">return</span> BEFORE;
+    <span class="keyword">if</span> (<span class="keyword">this</span>.fIsNewAccount &amp;&amp; !aThat.fIsNewAccount) <span
+			class="keyword">return</span> AFTER;
+
+    <span class="comment">//los objetos, incluyendo las enumeracion de tipo-seguro, siguen esta forma
+</span>    <span class="comment">//tenga en cuenta que los objetos nulos arrojarán una excepción aquí
+</span>    <span class="keyword">int</span> comparison = <span class="keyword">this</span>.fAccountType.compareTo(aThat.fAccountType);
+    <span class="keyword">if</span> (comparison != EQUAL) <span
+			class="keyword">return</span> comparison;
+
+    comparison = <span class="keyword">this</span>.fLastName.compareTo(aThat.fLastName);
+    <span class="keyword">if</span> (comparison != EQUAL) <span
+			class="keyword">return</span> comparison;
+
+    comparison = <span class="keyword">this</span>.fFirstName.compareTo(aThat.fFirstName);
+    <span class="keyword">if</span> (comparison != EQUAL) <span
+			class="keyword">return</span> comparison;
+
+    <span class="keyword">if</span> (<span class="keyword">this</span>.fBalance &lt; aThat.fBalance) <span
+			class="keyword">return</span> BEFORE;
+    <span class="keyword">if</span> (<span class="keyword">this</span>.fBalance &gt; aThat.fBalance) <span
+			class="keyword">return</span> AFTER;
+
+    <span class="comment">//todas las comparaciones han dado igualdad
+</span>    <span class="comment">//verificar que compareTo sea consistente con equals (opcional)
+</span>    assert <span class="keyword">this</span>.equals(aThat) : <span
+			class="literal">"compareTo es inconsistente con equals."</span>;
+
+    <span class="keyword">return</span> EQUAL;
+  }
+
+   <span class="comment">/**
+   * Define la igualdad de estado.
+   */</span>
+   <span class="keyword">@Override</span> <span class="keyword">public</span> <span
+			class="keyword">boolean</span> equals(Object aThat) {
+     <span class="keyword">if</span> (<span class="keyword">this</span> == aThat) <span
+			class="keyword">return</span> <span class="keyword">true</span>;
+     <span class="keyword">if</span> (!(aThat <span class="keyword">instanceof</span> Account)) <span
+			class="keyword">return</span> <span class="keyword">false</span>;
+
+     Account that = (Account)aThat;
+     <span class="keyword">return</span>
+       ( <span class="keyword">this</span>.fAccountNumber == that.fAccountNumber ) &amp;&amp;
+       ( <span class="keyword">this</span>.fAccountType == that.fAccountType ) &amp;&amp;
+       ( <span class="keyword">this</span>.fBalance == that.fBalance ) &amp;&amp;
+       ( <span class="keyword">this</span>.fIsNewAccount == that.fIsNewAccount ) &amp;&amp;
+       ( <span class="keyword">this</span>.fFirstName.equals(that.fFirstName) ) &amp;&amp;
+       ( <span class="keyword">this</span>.fLastName.equals(that.fLastName) )
+     ;
+   }
+
+   <span class="comment">/**
+   * Una clase que sobreescribe equals también debe sobreescribir hashCode.
+   */</span>
+   <span class="keyword">@Override</span> <span class="keyword">public</span> <span
+			class="keyword">int</span> hashCode() {
+     <span class="keyword">int</span> result = HashCodeUtil.SEED;
+     result = HashCodeUtil.hash( result, fAccountNumber );
+     result = HashCodeUtil.hash( result, fAccountType );
+     result = HashCodeUtil.hash( result, fBalance );
+     result = HashCodeUtil.hash( result, fIsNewAccount );
+     result = HashCodeUtil.hash( result, fFirstName );
+     result = HashCodeUtil.hash( result, fLastName );
+     <span class="keyword">return</span> result;
+   }
+
+   <span class="comment">//PRIVADO
+</span>
+   <span class="keyword">private</span> String fFirstName; <span
+			class="comment">//no nulo
+</span>   <span class="keyword">private</span> String fLastName;  <span
+			class="comment">//no nulo
+</span>   <span class="keyword">private</span> <span class="keyword">int</span> fAccountNumber;
+   <span class="keyword">private</span> <span class="keyword">int</span> fBalance;
+   <span class="keyword">private</span> <span class="keyword">boolean</span> fIsNewAccount;
+
+   <span class="comment">/**
+   * Tipo de la cuenta, expresado como una enumeración de tipo seguro (no nulo).
+   */</span>
+   <span class="keyword">private</span> AccountType fAccountType;
+
+   <span class="comment">/**
+   * Exercise compareTo.
+   */</span>
+   <span class="keyword">public</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> main (String[] aArguments) {
+     <span class="comment">//Tenga en cuenta la diferencia en comportamiento entre equals y compareTo, para los nulos:
+</span>     String text = <span class="literal">"blah"</span>;
+     Integer number = <span class="keyword">new</span> Integer(<span
+			class="literal">10</span>);
+     <span class="comment">//x.equals(null) siempre devuelve falso:
+</span>     System.out.println(<span class="literal">"false: "</span> + text.equals(<span
+			class="keyword">null</span>));
+     System.out.println(<span class="literal">"false: "</span> + number.equals(<span
+			class="keyword">null</span>) );
+     <span class="comment">//x.compareTo(null) siempre lanza NullPointerException:
+</span>     <span class="comment">//System.out.println( text.compareTo(null) );
+</span>     <span class="comment">//System.out.println( number.compareTo(null) );
+</span>
+     Account flaubert = <span class="keyword">new</span> Account(
+      <span class="literal">"Gustave"</span>, <span class="literal">"Flaubert"</span>, <span
+			class="literal">1003</span>, <span class="literal">0</span>,<span
+			class="keyword">true</span>, AccountType.MARGIN
+     );
+
+     <span class="comment">//Todas estas otras versiones de "flaubert" difieren 
+</span>     <span class="comment">//del original en un solo campo
+</span>     Account flaubert2 = <span class="keyword">new</span> Account(
+       <span class="literal">"Guy"</span>, <span class="literal">"Flaubert"</span>, <span
+			class="literal">1003</span>, <span class="literal">0</span>, <span
+			class="keyword">true</span>, AccountType.MARGIN
+     );
+     Account flaubert3 = <span class="keyword">new</span> Account(
+       <span class="literal">"Gustave"</span>, <span class="literal">"de Maupassant"</span>, <span
+			class="literal">1003</span>, <span class="literal">0</span>, <span
+			class="keyword">true</span>, AccountType.MARGIN
+     );
+     Account flaubert4 = <span class="keyword">new</span> Account(
+       <span class="literal">"Gustave"</span>, <span class="literal">"Flaubert"</span>, <span
+			class="literal">2004</span>, <span class="literal">0</span>, <span
+			class="keyword">true</span>, AccountType.MARGIN
+     );
+     Account flaubert5 = <span class="keyword">new</span> Account(
+       <span class="literal">"Gustave"</span>, <span class="literal">"Flaubert"</span>, <span
+			class="literal">1003</span>, <span class="literal">1</span>, <span
+			class="keyword">true</span>, AccountType.MARGIN
+     );
+     Account flaubert6 = <span class="keyword">new</span> Account(
+       <span class="literal">"Gustave"</span>, <span class="literal">"Flaubert"</span>, <span
+			class="literal">1003</span>, <span class="literal">0</span>, <span
+			class="keyword">false</span>, AccountType.MARGIN
+     );
+     Account flaubert7 = <span class="keyword">new</span> Account(
+       <span class="literal">"Gustave"</span>, <span class="literal">"Flaubert"</span>, <span
+			class="literal">1003</span>, <span class="literal">0</span>, <span
+			class="keyword">true</span>, AccountType.CASH
+     );
+
+     System.out.println( <span class="literal">"0: "</span> +  flaubert.compareTo(flaubert) );
+     System.out.println( <span class="literal">"first name +: "</span> +  flaubert2.compareTo(flaubert) );
+     <span class="comment">//Nota: las mayúsculas preceden a las minúsculas
+</span>     System.out.println( <span class="literal">"last name +: "</span> +  flaubert3.compareTo(flaubert) );
+     System.out.println( <span class="literal">"acct number +: "</span> +  flaubert4.compareTo(flaubert) );
+     System.out.println( <span class="literal">"balance +: "</span> +  flaubert5.compareTo(flaubert) );
+     System.out.println( <span class="literal">"is new -: "</span> +  flaubert6.compareTo(flaubert) );
+     System.out.println( <span class="literal">"account type -: "</span> +  flaubert7.compareTo(flaubert) );
+   }
+} 
+      </pre>
+	  <br>Una muestra de ejecución de esta clase da:
+	  <br>
+	  <code>&gt;java -cp . Account</code>
+	  <br>
+	  <code>false: false</code>
+	  <br>
+	  <code>false: false</code>
+	  <br>
+	  <code>0: 0</code>
+	  <br>
+	  <code>first name +: 6</code>
+	  <br>
+	  <code>last name +: 30</code>
+	  <br>
+	  <code>acct number +: 1</code>
+	  <br>
+	  <code>balance +: 1</code>
+	  <br>
+	  <code>is new -: -1</code>
+	  <br>
+	  <code>account type -: -1</code>
+	  <p></p>
+	  <p>
+        En el viejo JDK 1.4, hay dos diferencias:
+      </p>
+	  <ul>
+		<li>
+          la versión segura-para-tipos de la interfaz &nbsp;<code>Comparable</code>&nbsp; no puede ser usada. En vez de eso,&nbsp;
+          <code>Object</code> aparece, junto con una operación de casteo
+		</li>
+		<li>
+          los objetos <code>Boolean</code> deben ser tratados de forma diferente de otras clases envolventes, ya que &nbsp;
+          <code>Boolean</code> no implementó &nbsp;<code>Comparable</code> hasta el JDK 1.5.
+        </li>
+	  </ul>
+	  <b>Ejemplo</b>:
+	  <br>
+	  <pre>
+<span class="keyword">import</span> java.util.*;
+<span class="keyword">import</span> java.io.*;
+
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+			class="keyword">class</span> AccountOld <span class="keyword">implements</span> Comparable {
+
+   <span class="keyword">public</span> AccountOld (
+      String aFirstName,
+      String aLastName,
+      <span class="keyword">int</span> aAccountNumber,
+      <span class="keyword">int</span> aBalance,
+      <span class="keyword">boolean</span> aIsNewAccount,
+      AccountType aAccountType
+   ) {
+      <span class="comment">//..validaciones de parametro no incluidas
+</span>      fFirstName = aFirstName;
+      fLastName = aLastName;
+      fAccountNumber = aAccountNumber;
+      fBalance = aBalance;
+      fIsNewAccount = aIsNewAccount;
+      fAccountType = aAccountType;
+   }
+
+  <span class="comment">/**
+  * @param aThat es una AccountOld no nula.
+  *
+  * @throws NullPointerException si aThat es nulo.
+  * @throws ClassCastException si aThat no es un objeto AccountOld.
+  */</span>
+  <span class="keyword">public</span> <span class="keyword">int</span> compareTo(Object aThat) {
+    <span class="keyword">final</span> <span class="keyword">int</span> BEFORE = -<span
+			class="literal">1</span>;
+    <span class="keyword">final</span> <span class="keyword">int</span> EQUAL = <span
+			class="literal">0</span>;
+    <span class="keyword">final</span> <span class="keyword">int</span> AFTER = <span
+			class="literal">1</span>;
+
+    <span class="comment">//esta optimización generalmente vale la pena, y puede
+</span>    <span class="comment">//siempre ser agregada
+</span>    <span class="keyword">if</span> ( <span class="keyword">this</span> == aThat ) <span
+			class="keyword">return</span> EQUAL;
+
+    <span class="keyword">final</span> AccountOld that = (AccountOld)aThat;
+
+    <span class="comment">//los números primitivos siguen esta forma
+</span>    <span class="keyword">if</span> (<span class="keyword">this</span>.fAccountNumber &lt; that.fAccountNumber) <span
+			class="keyword">return</span> BEFORE;
+    <span class="keyword">if</span> (<span class="keyword">this</span>.fAccountNumber &gt; that.fAccountNumber) <span
+			class="keyword">return</span> AFTER;
+
+    <span class="comment">//los booleanos siguen esta forma
+</span>    <span class="keyword">if</span> (!<span class="keyword">this</span>.fIsNewAccount &amp;&amp; that.fIsNewAccount) <span
+			class="keyword">return</span> BEFORE;
+    <span class="keyword">if</span> (<span class="keyword">this</span>.fIsNewAccount &amp;&amp; !that.fIsNewAccount) <span
+			class="keyword">return</span> AFTER;
+
+    <span class="comment">//los objetos, incluyendo las enumeraciones de tipo seguro, siguen esta forma.
+</span>    <span class="comment">//Excepción : Boolean implementa Comparable en JDK 1.5, pero no en 1.4
+</span>    <span class="comment">//Dese cuenta de que los objetos nulos lanzan una excepción aquí.
+</span>    <span class="keyword">int</span> comparison = <span class="keyword">this</span>.fAccountType.compareTo(that.fAccountType);
+    <span class="keyword">if</span> ( comparison != EQUAL ) <span
+			class="keyword">return</span> comparison;
+
+    comparison = <span class="keyword">this</span>.fLastName.compareTo(that.fLastName);
+    <span class="keyword">if</span> ( comparison != EQUAL ) <span
+			class="keyword">return</span> comparison;
+
+    comparison = <span class="keyword">this</span>.fFirstName.compareTo(that.fFirstName);
+    <span class="keyword">if</span> ( comparison != EQUAL ) <span
+			class="keyword">return</span> comparison;
+
+    <span class="keyword">if</span> (<span class="keyword">this</span>.fBalance &lt; that.fBalance) <span
+			class="keyword">return</span> BEFORE;
+    <span class="keyword">if</span> (<span class="keyword">this</span>.fBalance &gt; that.fBalance) <span
+			class="keyword">return</span> AFTER;
+
+    <span class="comment">//todas las comparaciones han dado igualdad
+</span>    <span class="comment">//verifique que compareTo es consistente con equals (opcional)
+</span>    assert <span class="keyword">this</span>.equals(that) : <span
+			class="literal">"compareTo es inconsistente con equals."</span>;
+
+    <span class="keyword">return</span> EQUAL;
+  }
+
+   <span class="comment">/**
+   * Define la igualdad de estado.
+   */</span>
+   <span class="keyword">public</span> <span class="keyword">boolean</span> equals(Object aThat) {
+     <span class="keyword">if</span> ( <span class="keyword">this</span> == aThat ) <span
+			class="keyword">return</span> <span class="keyword">true</span>;
+     <span class="keyword">if</span> ( !(aThat <span class="keyword">instanceof</span> Account) ) <span
+			class="keyword">return</span> <span class="keyword">false</span>;
+
+     AccountOld that = (AccountOld)aThat;
+     <span class="keyword">return</span>
+       ( <span class="keyword">this</span>.fAccountNumber == that.fAccountNumber ) &amp;&amp;
+       ( <span class="keyword">this</span>.fAccountType == that.fAccountType ) &amp;&amp;
+       ( <span class="keyword">this</span>.fBalance == that.fBalance ) &amp;&amp;
+       ( <span class="keyword">this</span>.fIsNewAccount == that.fIsNewAccount ) &amp;&amp;
+       ( <span class="keyword">this</span>.fFirstName.equals(that.fFirstName) ) &amp;&amp;
+       ( <span class="keyword">this</span>.fLastName.equals(that.fLastName) );
+   }
+
+   <span class="comment">/**
+   * Una clase que sobreescribe equals también debe sobreescribir hashCode.
+   */</span>
+   <span class="keyword">public</span> <span class="keyword">int</span> hashCode() {
+     <span class="keyword">int</span> result = HashCodeUtil.SEED;
+     result = HashCodeUtil.hash( result, fAccountNumber );
+     result = HashCodeUtil.hash( result, fAccountType );
+     result = HashCodeUtil.hash( result, fBalance );
+     result = HashCodeUtil.hash( result, fIsNewAccount );
+     result = HashCodeUtil.hash( result, fFirstName );
+     result = HashCodeUtil.hash( result, fLastName );
+     <span class="keyword">return</span> result;
+   }
+
+   <span class="comment">//PRIVADO
+</span>
+   <span class="keyword">private</span> String fFirstName; <span
+			class="comment">//no nulo
+</span>   <span class="keyword">private</span> String fLastName;  <span
+			class="comment">//no nulo
+</span>   <span class="keyword">private</span> <span class="keyword">int</span> fAccountNumber;
+   <span class="keyword">private</span> <span class="keyword">int</span> fBalance;
+   <span class="keyword">private</span> <span class="keyword">boolean</span> fIsNewAccount;
+
+   <span class="comment">/**
+   * Tipo de la cuenta, expresado como una enumeración de tipo seguro (no nulo).
+   */</span>
+   <span class="keyword">private</span> AccountType fAccountType;
+
+   <span class="comment">/**
+   * Ejercicio compareTo.
+   */</span>
+   <span class="keyword">public</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> main (String[] aArguments) {
+     <span class="comment">//Note la diferencia en comportamiento entre equals y compareTo, para los nulos:
+</span>     String text = <span class="literal">"blah"</span>;
+     Integer number = <span class="keyword">new</span> Integer(<span
+			class="literal">10</span>);
+     <span class="comment">//x.equals(null) siempre devuelve falso:
+</span>     System.out.println(<span class="literal">"false: "</span> + text.equals(<span
+			class="keyword">null</span>));
+     System.out.println(<span class="literal">"false: "</span> + number.equals(<span
+			class="keyword">null</span>) );
+     <span class="comment">//x.compareTo(null) siempre lanza NullPointerException:
+</span>     <span class="comment">//System.out.println( text.compareTo(null) );
+</span>     <span class="comment">//System.out.println( number.compareTo(null) );
+</span>
+     AccountOld flaubert = <span class="keyword">new</span> AccountOld(
+       <span class="literal">"Gustave"</span>, <span class="literal">"Flaubert"</span>, <span
+			class="literal">1003</span>, <span class="literal">0</span>, <span
+			class="keyword">true</span>, AccountType.MARGIN
+     );
+
+     <span class="comment">//Todas estas otras versiones de "flaubert" difieren
+</span>     <span class="comment">//del original en un solo campo
+</span>     AccountOld flaubert2 = <span class="keyword">new</span> AccountOld(
+       <span class="literal">"Guy"</span>, <span class="literal">"Flaubert"</span>, <span
+			class="literal">1003</span>, <span class="literal">0</span>, <span
+			class="keyword">true</span>, AccountType.MARGIN
+     );
+     AccountOld flaubert3 = <span class="keyword">new</span> AccountOld(
+       <span class="literal">"Gustave"</span>, <span class="literal">"de Maupassant"</span>, <span
+			class="literal">1003</span>, <span class="literal">0</span>, <span
+			class="keyword">true</span>, AccountType.MARGIN
+     );
+     AccountOld flaubert4 = <span class="keyword">new</span> AccountOld(
+       <span class="literal">"Gustave"</span>, <span class="literal">"Flaubert"</span>, <span
+			class="literal">2004</span>, <span class="literal">0</span>, <span
+			class="keyword">true</span>, AccountType.MARGIN
+     );
+     AccountOld flaubert5 = <span class="keyword">new</span> AccountOld(
+       <span class="literal">"Gustave"</span>, <span class="literal">"Flaubert"</span>, <span
+			class="literal">1003</span>, <span class="literal">1</span>, <span
+			class="keyword">true</span>, AccountType.MARGIN
+     );
+     AccountOld flaubert6 = <span class="keyword">new</span> AccountOld(
+       <span class="literal">"Gustave"</span>, <span class="literal">"Flaubert"</span>, <span
+			class="literal">1003</span>, <span class="literal">0</span>, <span
+			class="keyword">false</span>, AccountType.MARGIN
+     );
+     AccountOld flaubert7 = <span class="keyword">new</span> AccountOld(
+       <span class="literal">"Gustave"</span>, <span class="literal">"Flaubert"</span>, <span
+			class="literal">1003</span>, <span class="literal">0</span>, <span
+			class="keyword">true</span>, AccountType.CASH
+     );
+
+     System.out.println( <span class="literal">"0: "</span> +  flaubert.compareTo(flaubert) );
+     System.out.println( <span class="literal">"first name +: "</span> +  flaubert2.compareTo(flaubert) );
+     <span class="comment">//Note capital letters precede small letters
+</span>     System.out.println( <span class="literal">"last name +: "</span> +  flaubert3.compareTo(flaubert) );
+     System.out.println( <span class="literal">"acct number +: "</span> +  flaubert4.compareTo(flaubert) );
+     System.out.println( <span class="literal">"balance +: "</span> +  flaubert5.compareTo(flaubert) );
+     System.out.println( <span class="literal">"is new -: "</span> +  flaubert6.compareTo(flaubert) );
+     System.out.println( <span class="literal">"account type -: "</span> +  flaubert7.compareTo(flaubert) );
+   }
+} 
+      </pre>
+	  <br>
+	  <p></p>
+	  <div class="topic-section" id="see-also-title">
+        Vea también :
+      </div>
+	  <div id="see-also" class="main-body">
+		<a href="..\patrones\patrones_1.html">Enumeraciones seguras</a><br>
+		<a href="..\objetos\objects_17.html">Implementar equals</a><br>
+		<a href="..\objetos\objects_28.html">Implementar hashCode</a><br>
+		<a href="..\bbdd\bbdd_106.html">No ejecute tareas básicas de SQL mediante código</a><br>
+        <a href="..\tareascomunes\tareascomunes_225.html">Modernizar código viejo</a><br>
+	  </div>
+	  <footer id="footer" class="legalese">
+		<span id="app_name">Prácticas de Java</span> 
+        <span id="app_version_number">3.001</span><br>
+        © <span id="copyright">2018Hirondelle Systems</span><br> 
+        <a href="http://www.javapractices.com/source/SourceAction.do">Código Fuente</a> | 
+        <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a> | 
+        <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/" rel="license">Licencia</a> | 
+        <a href="http://www.javapractices.com/apps/cjp.rss" rel="alternate" type="application/rss+xml">RSS</a>
+		<!-- ukey="2AC36CD2" -->
+		<!-- ckey="16DF3D87" -->
+		<br> Los trozos de código individual tienen una 
+        <a href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia BSD</a><br>
+        Sobre 1,000,000 de IPs únicas el último año<br>
+		Última actualización <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+		<br> - In Memoriam : Bill Dirani -
+	  </footer>
+  </body>
+</html>

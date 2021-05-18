@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<!-- saved from url=(0056)http://www.javapractices.com/topic/TopicAction.do?Id=104 -->
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+    content="Prácticas y técnicas de programación en Java.">
+<meta name="keywords"
+    content="java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas de Java-&gt;Compile las expresiones regulares
+    una vez</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+    href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png" href="../img/favicon.png">
+</head>
+<body>
+    <nav class="menu-bar" id="menu-bar">
+        <a href="../index.html" title="Table of Contents"
+            style="float: left;">Inicio</a> &nbsp;&nbsp;
+        <form method="GET" action="https://www.google.com/search"
+            class="search-form" style="float: right;">
+            <input type="text" name="q" size="15" maxlength="255"
+                value="" placeholder=""> <input type="submit"
+                name="btnG" value="Search"> <input type="hidden"
+                name="sitesearch" value="www.javapractices.com">
+        </form>
+    </nav>
+    <div class="page-title">Compile las expresiones regulares una
+        vez</div>
+    <br>
+    <code>
+        <a
+            href="https://docs.oracle.com/javase/10/docs/api/java/util/regex/Pattern.html">Pattern</a>
+    </code>
+    objects compile the regular expressions which are passed to them.
+    (The compilation happens in memory.) If a regular expression is used
+    many times, then this compilation should be performed only once.
+    <p>Be wary of the these convenience methods, which compile a
+        regular expression each time they are called:</p>
+    <ul>
+        <li><code>Pattern.matches</code></li>
+        <li><code>
+                <a
+                    href="https://docs.oracle.com/javase/10/docs/api/java/lang/String.html">String</a>.matches
+            </code></li>
+        <li><code>String.replaceAll</code></li>
+        <li><code>String.replaceFirst</code></li>
+        <li><code>String.split</code></li>
+    </ul>
+    <b>Example</b>
+    <p>
+        Here's a comparison of the performance of
+        <code>String.matches</code>
+        versus the use of
+        <code>Pattern</code>
+        and
+        <code>
+            <a
+                href="https://docs.oracle.com/javase/10/docs/api/java/util/regex/Matcher.html">Matcher</a>
+        </code>
+        .
+    </p>
+    <p>An example run (with the HotSpot compiler turned off) gives:</p>
+    <pre>Time for String: 67.693 ms
+Time for Pattern: 12.178 ms</pre>
+    <br>
+    <pre>
+		<span class="keyword">import</span> java.io.IOException;
+<span class="keyword">import</span> java.nio.charset.Charset;
+<span class="keyword">import</span> java.nio.charset.StandardCharsets;
+<span class="keyword">import</span> java.nio.file.Path;
+<span class="keyword">import</span> java.nio.file.Paths;
+<span class="keyword">import</span> java.util.Scanner;
+<span class="keyword">import</span> java.util.regex.Matcher;
+<span class="keyword">import</span> java.util.regex.Pattern;
+
+<span class="comment">/** JDK 7+. */</span>
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">class</span> FindMatch {
+
+  <span class="comment">/**
+   Count the number of times the word "assert" occurs in a file.
+  
+   Compare the execution times of two techniques.
+  */</span>
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> main (String... aArguments) <span
+            class="keyword">throws</span> IOException{
+    FindMatch findMatch = <span class="keyword">new</span> FindMatch(<span
+            class="literal">"assert"</span>);
+    Path path = Paths.get(<span class="literal">"C:\\Temp\\InheritanceInterpreter.java"</span>);
+
+    Stopwatch stopwatch = <span class="keyword">new</span> Stopwatch();
+    stopwatch.start();
+    findMatch.countMatchesUsingString(path);
+    stopwatch.stop();
+    log(<span class="literal">"Time for String: "</span> + stopwatch);
+
+    stopwatch.start();
+    findMatch.countMatchesUsingPattern(path);
+    stopwatch.stop();
+    log(<span class="literal">"Time for Pattern: "</span> + stopwatch);
+  }
+
+  <span class="keyword">public</span> FindMatch(String aTarget){
+    fTargetWord = aTarget;
+    fPattern = Pattern.compile(fTargetWord);
+  }
+
+  <span class="keyword">int</span> countMatchesUsingString(Path aPath) <span
+            class="keyword">throws</span> IOException {
+    <span class="keyword">int</span> result = <span class="literal">0</span>;
+    <span class="keyword">try</span> (Scanner scanner =  <span
+            class="keyword">new</span> Scanner(aPath, ENCODING.name())){
+      <span class="keyword">while</span> (scanner.hasNextLine()){
+        String line = scanner.nextLine();
+        <span class="keyword">if</span>( line.matches(fTargetWord) ){
+          ++ result;
+        }
+      }      
+    }
+    <span class="keyword">return</span> result;
+  }
+  
+  <span class="keyword">int</span> countMatchesUsingPattern(Path aPath) <span
+            class="keyword">throws</span> IOException {
+    <span class="keyword">int</span> result = <span class="literal">0</span>;
+    Matcher matcher = fPattern.matcher(<span class="literal">""</span>);
+    <span class="keyword">try</span> (Scanner scanner =  <span
+            class="keyword">new</span> Scanner(aPath, ENCODING.name())){
+      <span class="keyword">while</span> (scanner.hasNextLine()){
+        String line = scanner.nextLine();
+        matcher.reset(line); <span class="comment">//reset the input each time
+</span>        <span class="keyword">if</span> (! matcher.find()) {
+          ++result;
+        }
+      }      
+    }
+    <span class="keyword">return</span> result;
+  }
+  
+  <span class="comment">// PRIVATE 
+</span>  <span class="keyword">private</span> <span class="keyword">final</span> String fTargetWord;
+  <span class="keyword">private</span> <span class="keyword">final</span> Pattern fPattern;
+  <span class="keyword">private</span> <span class="keyword">final</span> <span
+            class="keyword">static</span> Charset ENCODING = StandardCharsets.UTF_8;
+
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> log(Object aObject){
+    System.out.println(aObject);
+  }
+} 
+</pre>
+    <br>
+    <p></p>
+    <div class="topic-section" id="see-also-title">See Also :</div>
+    <div id="see-also" class="main-body">
+        <a href="..\tareascomunes\tareascomunes_85.html">Velocidad
+            de tiempo de ejecución</a> <br>
+    </div>
+    <footer id="footer" class="legalese">
+        <span id="app_name">Prácticas de Java</span> <span
+            id="app_version_number">3.001</span><br> © <span
+            id="copyright">2018 Hirondelle Systems</span><br> <a
+            href="http://www.javapractices.com/source/SourceAction.do">Código
+            Fuente</a> | <a href="mailto:webmaster@javapractices.com"
+            rel="author">Contacto</a> | <a
+            href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+            rel="license">Licencia</a> | <a
+            href="http://www.javapractices.com/apps/cjp.rss"
+            rel="alternate" type="application/rss+xml">RSS</a>
+        <!-- ukey="2AC36CD2" -->
+        <!-- ckey="16DF3D87" -->
+        <br> Los trozos de código individual tienen una <a
+            href="http://www.javapractices.com/LICENSE.txt"
+            rel="license">licencia BSD</a><br> Sobre 1,000,000 de
+        IPs únicas el último año<br> Última actualización
+        <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+        <br> - In Memoriam : Bill Dirani -
+    </footer>
+</body>
+</html>

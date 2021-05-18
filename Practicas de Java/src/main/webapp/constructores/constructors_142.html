@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<!-- saved from url=(0056)http://www.javapractices.com/topic/TopicAction.do?Id=142 -->
+<html lang="es">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="description" content="Presentaciones concisas de prácticas de programación en 
+        java, tareas, y convenciones, ampliamente ilustrado con ejemplos de código con resaltado de 
+        sintaxis.">
+        <meta name="keywords" content="constructor,java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+<title>Prácticas de Java-&gt;Cuidado con las redeclaraciones de campo equivocadas</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+	href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png" href="../img/favicon.png">
+</head>
+<body>
+	<nav class="menu-bar" id="menu-bar">
+		<a href="../index.html"
+			title="Table of Contents" style="float: left;">Inicio</a> &nbsp;&nbsp;
+		<form method="GET" action="https://www.google.com/search"
+			class="search-form" style="float: right;">
+			<input type="text" name="q" size="15" maxlength="255" value=""
+				placeholder=""> <input type="submit" name="btnG"
+				value="Search"> <input type="hidden" name="sitesearch"
+				value="www.javapractices.com">
+		</form>
+	</nav>
+	<div class="page-title">Cuidado con las redeclaraciones de campo equivocadas</div>
+
+	<br>Tenga en cuidado de este simple error, lo cual puede ser dificil de rastrear:
+    si un campo es redeclarado erróneamente dentro del cuerpo de un método, entonces el 
+    campo no está siendo referenciado, sino más bien una variable local temporal con 
+    el mismo nombre. 
+	<p>
+        Un síntoma común de este problema es que el rastro de pila indica que un campo
+        es <code>null</code>, pero un examen superficial del código hace que parezca 
+        que el campo se ha inicializado correctamente.
+	</p>
+	<p>
+		Las <a href="../practicascomunes/practicascomunes_58.html">Convenciones 
+        de nombrado</a> pueden reducir la frecuencia de este error, pero no 
+        puede eliminarlo.
+
+	</p>
+	<p>
+		<b>Ejemplo</b> <br>
+	</p>
+	<pre>
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+			class="keyword">class</span> MistakenRedeclare {
+
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> main(String... aArguments ) {
+    MistakenRedeclare mistake = <span class="keyword">new</span> MistakenRedeclare(<span
+			class="literal">"blah"</span>);
+    <span class="comment">//Lanza NullPointerException, ya que el valor devuelto de 
+</span>    <span class="comment">//getName es nulo.
+</span>    System.out.println(<span class="literal">"Longitud del nombre: "</span> + mistake.getName().length());
+  }
+
+  <span class="keyword">public</span> MistakenRedeclare(String aName) {
+    <span class="comment">//¡Oops! ¡Estableciendo una variable local, no el campo!
+</span>    String fName = aName;
+    <span class="comment">//este estilo puede ayudar a eliminar tales errores:
+</span>    <span class="comment">//this.fName = aName;
+</span>  }
+
+  <span class="keyword">public</span> String getName(){
+    <span class="keyword">return</span> fName;
+  }
+
+  <span class="comment">//..omitido
+</span>
+  <span class="comment">// PRIVADO
+</span>  <span class="keyword">private</span> String fName;
+} 
+</pre>
+
+	<br>Ejemplo de ejecución de esta clase:
+	<p></p>
+	<p>
+		<code>&gt;java -cp . MistakenRedeclare</code>
+		<br>
+		<code>Exception in thread "main" java.lang.NullPointerException</code>
+		<br>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at
+			MistakenRedeclare.main(MistakenRedeclare.java:7)</code>
+		<br>
+	</p>
+	<p></p>
+	<div class="topic-section" id="see-also-title">Vea También :</div>
+	<div id="see-also" class="main-body">
+		<a href="../practicascomunes/practicascomunes_58.html">Convenciones de Nombre</a> <br>
+	</div>
+    <footer id="footer" class="legalese">
+		<span id="app_name">Prácticas de Java</span> <span
+			id="app_version_number">3.001</span><br> © <span id="copyright">2018
+			Hirondelle Systems</span><br> <a
+			href="http://www.javapractices.com/source/SourceAction.do">Código
+			Fuente</a> | <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a>
+		| <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+			rel="license">Licencia</a> | <a
+			href="http://www.javapractices.com/apps/cjp.rss" rel="alternate"
+			type="application/rss+xml">RSS</a>
+		<!-- ukey="2AC36CD2" -->
+		<!-- ckey="16DF3D87" -->
+		<br> Los trozos de código individual tienen una <a
+			href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia
+			BSD</a><br> Sobre 1,000,000 de IPs únicas el último año<br>
+		Última actualización
+		<time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+		<br> - In Memoriam : Bill Dirani -
+	</footer>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<!-- saved from url=(0055)http://www.javapractices.com/topic/TopicAction.do?Id=92 -->
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+    content="Prácticas y técnicas de programación en Java.">
+<meta name="keywords"
+    content="java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas de Java-&gt;Campos autoencapsulados</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+    href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png" href="../img/favicon.png">
+</head>
+<body>
+    <nav class="menu-bar" id="menu-bar">
+        <a href="../index.html" title="Table of Contents"
+            style="float: left;">Inicio</a> &nbsp;&nbsp;
+        <form method="GET" action="https://www.google.com/search"
+            class="search-form" style="float: right;">
+            <input type="text" name="q" size="15" maxlength="255"
+                value="" placeholder=""> <input type="submit"
+                name="btnG" value="Search"> <input type="hidden"
+                name="sitesearch" value="www.javapractices.com">
+        </form>
+    </nav>
+    <div class="page-title">Campos autoencapsulados</div>
+    <br>Within the implementation of a class, it's common to refer
+    <em>directly</em> to private fields. There is another style, in
+    which all internal references to fields are
+    <em>indirect</em>, and proceed through the appropriate
+    <code>get</code>
+    and
+    <code>set</code>
+    methods. This is called self-encapsulation.
+    <p>Self-encapsulation:</p>
+    <ul>
+        <li>is needed for <a
+            href="http://www.javapractices.com/topic/TopicAction.do?Id=34">lazy
+                initialization</a></li>
+        <li>is slightly more difficult to read than direct field
+            access</li>
+        <li>can establish a synchronization policy for the field</li>
+        <li>allows subclasses to override the <code>get</code> and
+            <code>set</code> methods, and provide their own definition
+            of how fields behave
+        </li>
+    </ul>
+    <b>Example</b>
+    <br>
+    <pre>
+		<span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">class</span> Infant {
+
+  <span class="keyword">public</span> Infant (<span class="keyword">final</span> String aName, <span
+            class="keyword">final</span> <span class="keyword">int</span> aWeight, <span
+            class="keyword">final</span> String aMood){
+    setName(aName);
+    setWeight(aWeight);
+    setMood(aMood);
+  }
+
+  <span class="keyword">public</span> <span class="keyword">void</span> becomeHungry(){
+    <span class="comment">//instead of fMood = "Cranky", use:
+</span>    setMood(<span class="literal">"Cranky"</span>);
+  }
+
+  <span class="keyword">public</span> String toString(){
+    <span class="comment">//use get methods instead of direct access
+</span>    <span class="keyword">final</span> StringBuilder result = <span
+            class="keyword">new</span> StringBuilder();
+    result.append(<span class="literal">"Infant - Name: + "</span>);
+    result.append(getName());
+    result.append(<span class="literal">" Weight: "</span>);
+    result.append(getWeight());
+    result.append(<span class="literal">" Mood: "</span>);
+    result.append(getMood());
+    <span class="keyword">return</span> result.toString();
+  }
+
+  <span class="keyword">public</span> String getName(){
+    <span class="keyword">return</span> fName;
+  }
+  <span class="keyword">public</span> <span class="keyword">void</span> setName(String aName){
+    fName = aName;
+  }
+
+  <span class="keyword">public</span> <span class="keyword">int</span> getWeight(){
+    <span class="keyword">return</span> fWeight;
+  }
+  <span class="keyword">public</span> <span class="keyword">void</span> setWeight(<span
+            class="keyword">final</span> <span class="keyword">int</span> aWeight){
+    fWeight = aWeight;
+  }
+
+  <span class="keyword">public</span> String getMood(){
+    <span class="keyword">return</span> fMood;
+  }
+  <span class="keyword">public</span> <span class="keyword">void</span> setMood(<span
+            class="keyword">final</span> String aMood){
+    fMood = aMood;
+  }
+
+  <span class="comment">//..other methods elided
+</span>
+  <span class="comment">// PRIVATE
+</span>  <span class="keyword">private</span> String fName;
+  <span class="keyword">private</span> <span class="keyword">int</span> fWeight;
+  <span class="keyword">private</span> String fMood;
+} 
+</pre>
+    <br>
+    <p></p>
+    <div class="topic-section" id="see-also-title">See Also :</div>
+    <div id="see-also" class="main-body">
+        <a href="..\patrones\patrones_34.html">Inicialización
+            perezosa</a> <br>
+    </div>
+    <footer id="footer" class="legalese">
+        <span id="app_name">Prácticas de Java</span> <span
+            id="app_version_number">3.001</span><br> © <span
+            id="copyright">2018 Hirondelle Systems</span><br> <a
+            href="http://www.javapractices.com/source/SourceAction.do">Código
+            Fuente</a> | <a href="mailto:webmaster@javapractices.com"
+            rel="author">Contacto</a> | <a
+            href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+            rel="license">Licencia</a> | <a
+            href="http://www.javapractices.com/apps/cjp.rss"
+            rel="alternate" type="application/rss+xml">RSS</a>
+        <!-- ukey="2AC36CD2" -->
+        <!-- ckey="16DF3D87" -->
+        <br> Los trozos de código individual tienen una <a
+            href="http://www.javapractices.com/LICENSE.txt"
+            rel="license">licencia BSD</a><br> Sobre 1,000,000 de
+        IPs únicas el último año<br> Última actualización
+        <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+        <br> - In Memoriam : Bill Dirani -
+    </footer>
+</body>
+</html>

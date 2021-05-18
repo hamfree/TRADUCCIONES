@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<!-- saved from url=(0055)http://www.javapractices.com/topic/TopicAction.do?Id=55 -->
+<html lang="es">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="Prácticas y técnicas de programación en Java." />
+    <meta name="keywords" content="java,programación java,Prácticas de Java,idioma java,estilo java,patrones de diseño java,convenciones de 
+      codigo java" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prácticas en Java-&gt;Implementar toString</title>
+    <link id="stylesheet" rel="stylesheet" type="text/css" href="../css/stylesheet9.css" media="all" />
+    <link rel="icon" type="image/png" href="../img/favicon.png" />
+  </head>
+  <body>
+	<nav class="menu-bar" id="menu-bar">
+      <a href="../index.html" title="Tabla de Contenido" style="float: left;">Inicio</a> &nbsp;&nbsp;
+      <form method="GET" action="https://www.google.com/search" class="search-form" style="float: right;">
+        <input type="text" name="q" size="15" maxlength="255" value="" placeholder=""/>
+        <input type="submit" name="btnG" value="Buscar" />
+        <input type="hidden" name="sitesearch" value="www.javapractices.com" />
+      </form>
+    </nav>
+	<div class="page-title">
+      Implementar toString
+    </div>
+	<br />
+    El método <code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Object.html#toString()">toString</a></code> está 
+    ampliamente implementado. Ofrece un mecanismo simple y conveniente para depurar las clases durante el desarrollo. Es también usado 
+    ampliamente para el trazado, y para pasar mensajes de error informativos a los constructores <code>Exception</code> y las aserciones. 
+    Cuando se usa de estas formas <em>informales</em>, el formato exacto de <code>toString</code> no es parte del  
+    <a href="..\practicascomunes\practicascomunes_194.html">contrato</a> del método, y los códigos llamantes no deben confiar en el formato 
+    exacto de la <code>String</code> devuelta.
+	<p>
+      El método <code>toString</code> puede <em>ocasionalmente</em> ser usado más formalmente, sin embargo. Un ejemplo es un mecanismo 
+      simple para traducir un objeto a una forma textual bien definida (<code>toString</code>) y de regreso (<code>valueOf</code>). En este 
+      caso, es particularmente importante especificar la forma exacta de dicho texto en javadoc.
+	</p>
+	<p>
+      Cuando implementa <code>toString</code>,<code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/StringBuilder.html">
+      StringBuilder</a></code> puede ser usado en vez del operador de concatenación +, ya que la operación <code>StringBuilder.append</code> 
+      es un poco más rápida.
+	</p>
+	<p>
+	  <b>Ejemplo 1</b> <br />
+	</p>
+    <pre>
+<span class="keyword">import</span> java.util.*;
+
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+			class="keyword">class</span> Truck {
+
+  <span class="comment">/** Prueba simple.  */</span>
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> main(String... aArgs){
+    Truck planetKiller = <span class="keyword">new</span> Truck();
+    System.out.println(planetKiller);
+  }
+
+  <span class="comment">/**
+  * Destinado solo para depuración.
+  *
+  * &lt;P&gt;Aquí, los contenidos de cada campo son colocados en el resultado, con
+  * un campo por línea.
+  */</span>
+  <span class="keyword">@Override</span> <span class="keyword">public</span> String toString() {
+    StringBuilder result = <span class="keyword">new</span> StringBuilder();
+    String NEW_LINE = System.getProperty(<span class="literal">"line.separator"</span>);
+
+    result.append(<span class="keyword">this</span>.getClass().getName() + <span
+			class="literal">" Object {"</span> + NEW_LINE);
+    result.append(<span class="literal">" Nombre: "</span> + fName + NEW_LINE);
+    result.append(<span class="literal">" Número de puertas: "</span> + fNumDoors + NEW_LINE);
+    result.append(<span class="literal">" Año de manufacturación: "</span> + fYearManufactured + NEW_LINE );
+    result.append(<span class="literal">" Color: "</span> + fColor + NEW_LINE);
+    <span class="comment">//Dese cuenta de que Collections y Maps también sobreescriben toString
+</span>    result.append(<span class="literal">" Opciones: "</span> + fOptions + NEW_LINE);
+    result.append(<span class="literal">"}"</span>);
+
+    <span class="keyword">return</span> result.toString();
+  }
+
+  <span class="comment">//..otros métodos no indicados
+</span>  
+  <span class="comment">// PRIVADO //
+</span>
+  <span class="keyword">private</span> String fName = <span
+			class="literal">"Dodge"</span>;
+  <span class="keyword">private</span> <span class="keyword">int</span> fNumDoors = <span
+			class="literal">2</span>;
+  <span class="keyword">private</span> Date fYearManufactured = <span
+			class="keyword">new</span> Date();
+  <span class="keyword">private</span> String fColor = <span
+			class="literal">"Fuchsia"</span>;
+  <span class="keyword">private</span> List&lt;String&gt; fOptions = Arrays.asList(<span
+			class="literal">"Aire Acondicionado"</span>);
+}  
+    </pre>
+	<br />
+    Salida de Ejemplo:
+	<p></p>
+	<pre>
+ Truck Object {
+ Nombre: Dodge
+ Número de puertas: 2
+ Año de manufacturación: Wed Aug 29 15:49:10 ADT 2007
+ Color: Fuchsia
+ Opciones: [Aire Acondicionado]
+}
+    </pre>
+	<p>
+      <b>Ejemplo 2</b>
+	</p>
+	<p>
+      Esta implementación usa reflexión para inspeccionar tanto los nombres de los campos como los valores de los campos. Dese cuenta de que 
+      los campos de la superclase no se agregan a esta implementación.<br />
+	</p>
+	<pre>
+<span class="keyword">import</span> java.util.*;
+<span class="keyword">import</span> java.lang.reflect.Field;
+
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+			class="keyword">class</span> Van {
+
+  <span class="comment">/**
+  * Construye un objeto Van y visualiza su representación textual.
+  *
+  * Dese cuenta de que las clases Collection tienen
+  * su propia implementación de &lt;code&gt;toString&lt;/code&gt;, como se ejemplifica aquí 
+  * por el campo List que contiene las Opciones.
+  */</span>
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> main (String... arguments) {
+    List&lt;String&gt; options = <span class="keyword">new</span> ArrayList&lt;&gt;();
+    options.add(<span class="literal">"Aire Acondicionado"</span>);
+    options.add(<span class="literal">"Interior en Cuero"</span>);
+
+    Van van = <span class="keyword">new</span> Van( <span
+			class="literal">"Dodge"</span>, <span class="literal">4</span>, <span
+			class="keyword">new</span> Date(), <span class="literal">"Azul"</span>, options);
+    System.out.println(van);
+  }
+
+  <span class="keyword">public</span> Van(
+    String aName,
+    <span class="keyword">int</span> aNumDoors,
+    Date aYearManufactured,
+    String aColor,
+    List&lt;String&gt; aOptions
+  ){
+    fName = aName;
+    fNumDoors = aNumDoors;
+    fYearManufactured = aYearManufactured;
+    fColor = aColor;
+    fOptions = aOptions;
+  }
+
+  <span class="comment">//..otros métodos no indicados
+</span>
+  <span class="comment">/**
+  * Destinado solo para depuración.
+  *
+  * &lt;P&gt;Aquí, una implementación genérica usa reflexión para imprimir  
+  * los nombres de todos los campos &lt;em&gt;declarados en esta clase&lt;/em&gt;. Dese cuenta de que 
+  * los campos de la superclase quedan fuera de esta implementación.
+  *
+  * &lt;p&gt;El formato de la presentación podría ser estandarizado usando 
+  * un objeto MessageFormat con un patrón estándar.
+  */</span>
+  <span class="keyword">@Override</span> <span class="keyword">public</span> String toString() {
+    StringBuilder result = <span class="keyword">new</span> StringBuilder();
+    String newLine = System.getProperty(<span class="literal">"line.separator"</span>);
+
+    result.append(<span class="keyword">this</span>.getClass().getName());
+    result.append(<span class="literal">" Object {"</span>);
+    result.append(newLine);
+
+    <span class="comment">//determina los campos declarados en esta clase sólo (no hay campos de la superclase)
+</span>    Field[] fields = <span class="keyword">this</span>.getClass().getDeclaredFields();
+
+    <span class="comment">//imprime los nombres de los campos pareados con sus valores
+</span>    <span class="keyword">for</span> (Field field : fields) {
+      result.append(<span class="literal">"  "</span>);
+      <span class="keyword">try</span> {
+        result.append(field.getName());
+        result.append(<span class="literal">": "</span>);
+        <span class="comment">//requiere el acceso a campo privado:
+</span>        result.append(field.get(<span class="keyword">this</span>));
+      }
+      <span class="keyword">catch</span> (IllegalAccessException ex) {
+        System.out.println(ex);
+      }
+      result.append(newLine);
+    }
+    result.append(<span class="literal">"}"</span>);
+
+    <span class="keyword">return</span> result.toString();
+  }
+
+  <span class="comment">// PRIVADO
+</span>  <span class="keyword">private</span> String fName;
+  <span class="keyword">private</span> <span class="keyword">int</span> fNumDoors;
+  <span class="keyword">private</span> Date fYearManufactured;
+  <span class="keyword">private</span> String fColor;
+  <span class="keyword">private</span> List&lt;String&gt; fOptions;
+} 
+    </pre>
+	<br />
+    Salida del Ejemplo:
+	<p></p>
+	<p>
+	  <code>Van Object {</code><br />
+	  <code>&nbsp; fName: Dodge</code><br />
+	  <code>&nbsp; fNumDoors: 4</code><br />
+	  <code>&nbsp; fYearManufactured: Thu Sep 30 19:16:14 EDT 2004</code><br />
+	  <code>&nbsp; fColor: Azul</code><br />
+	  <code>&nbsp; fOptions: [Aire Condicionado, Interior en cuero]</code><br />
+	  <code>}</code>
+	</p>
+	<p>
+	  <b>Example 4</b>
+	</p>
+	<p>
+	  La herramienta <a href="..\servlets\servlets_188.html">WEB4J</a> ofrece un método de utilidad para implementar <code>toString</code> 
+      en una única línea de código. Su implementación usa reflexión. <br />
+	</p>
+	<pre>
+<span class="keyword">import</span> java.math.BigDecimal;
+<span class="keyword">import</span> hirondelle.web4j.model.ModelCtorException;
+<span class="keyword">import</span> hirondelle.web4j.model.ModelUtil;
+<span class="keyword">import</span> hirondelle.web4j.model.Id;
+<span class="keyword">import</span> hirondelle.web4j.model.Check;
+<span class="keyword">import</span> hirondelle.web4j.util.Util;
+<span class="keyword">import</span> hirondelle.web4j.model.Validator;
+
+<span class="comment">/**  Objeto Modelo para un Restaurante. */</span>
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+			class="keyword">class</span> Resto {
+
+  <span class="comment">/**
+  * Constructor completo.
+  *  
+  * @param aId identificador interno de la base de datos subyacente (opcional) 1..50 caracteres
+  * @param aName nombre del restaurante (requerido), 2..50 caracteres
+  * @param aLocation dirección de la calle del restaurante (opcional), 2..50 caracteres
+  * @param aPrice precio del plato pescado y patatas fritas (opcional) $0.00..$100.00
+  * @param aComment comentarios sobre el restaurante en general (opcional) 2..50 caracteres
+  */</span>
+  <span class="keyword">public</span> Resto(
+    Id aId, String aName, String aLocation, BigDecimal aPrice, String aComment
+  ) <span class="keyword">throws</span> ModelCtorException {
+    fId = aId;
+    fName = Util.trimPossiblyNull(aName);
+    fLocation = Util.trimPossiblyNull(aLocation);
+    fPrice = aPrice;
+    fComment = Util.trimPossiblyNull(aComment);
+    validateState();
+  }
+  
+  <span class="keyword">public</span> Id getId() { <span class="keyword">return</span> fId; }
+  <span class="keyword">public</span> String getName() {  <span
+			class="keyword">return</span> fName; }
+  <span class="keyword">public</span> String getLocation() {  <span
+			class="keyword">return</span> fLocation;  }
+  <span class="keyword">public</span> BigDecimal getPrice() { <span
+			class="keyword">return</span> fPrice; }
+  <span class="keyword">public</span> String getComment() {  <span
+			class="keyword">return</span> fComment; }
+
+  <span class="comment">/** Destinado solo a depuración.  */</span>
+  <span class="keyword">@Override</span> <span class="keyword">public</span> String toString() {
+    <span class="keyword">return</span> ModelUtil.toStringFor(<span
+			class="keyword">this</span>);
+  }
+
+  <span class="comment">//..no incluido
+</span>
+  <span class="comment">//PRIVADO//
+</span>  <span class="keyword">private</span> <span class="keyword">final</span> Id fId;
+  <span class="keyword">private</span> <span class="keyword">final</span> String fName;
+  <span class="keyword">private</span> <span class="keyword">final</span> String fLocation;
+  <span class="keyword">private</span> <span class="keyword">final</span> BigDecimal fPrice;
+  <span class="keyword">private</span> <span class="keyword">final</span> String fComment;
+ 
+  <span class="comment">//..no incluido
+</span>
+}
+ 
+    </pre>
+	<br />
+    Salida del ejemplo:
+	<p></p>
+	<pre>
+hirondelle.fish.main.resto.Resto {
+Name: Cedars Eatery
+Location: Water and Prince
+Id: 6
+Comment: Big portions
+Price: 7.89
+}
+    </pre>
+	<br />
+	<b>Ejemplo 4</b>
+	<p>
+	  <code>QuoteField</code> es una <a href="..\patrones\patrones_1.html">enumeración segura</a>. El valor de vuelta de 
+      <code>toString</code> es usado en la operación normal del programa - no sólo para trazas. Tenga en cuenta que forma un par con el 
+      método <code>valueFrom(String)</code>, ya que uno formatea el objeto en una <code>String</code>, y el otro analiza una 
+      <code>String</code> en un objeto. <br />
+	</p>
+	<pre>
+<span class="keyword">package</span> hirondelle.stocks.table;
+
+<span class="comment">/**
+* Enumeración para los campos de la clase  
+* {@link hirondelle.stocks.quotes.Quote}.
+* 
+* Ventajas de usar esta clase como parte de un modelo de tabla:
+* &lt;ul&gt;
+* &lt;li&gt; puede analizar texto que mapea columnas de tablas a campos
+* &lt;li&gt; puede ser usado para nombres de columnas
+* &lt;li&gt; la longitud de &lt;tt&gt;QuoteField.values()&lt;/tt&gt; da el contador de columnas
+* &lt;/ul&gt;
+*/</span>
+<span class="keyword">public</span> <span class="keyword">enum</span> QuoteField { 
+
+  Stock(<span class="literal">"Stock"</span>),
+  Price(<span class="literal">"Price"</span>),
+  Change(<span class="literal">"Change"</span>),
+  PercentChange(<span class="literal">"%Change"</span>),
+  Profit(<span class="literal">"Profit"</span>),
+  PercentProfit(<span class="literal">"%Profit"</span>);
+
+  <span class="comment">/**
+  * Devuelve una representación textual de &lt;tt&gt;QuoteField&lt;/tt&gt;.
+  *
+  * Valores devueltos : &lt;tt&gt;Stock, Price, Change, %Change, Profit, %Profit&lt;/tt&gt;.
+  * @return un valor que contiene sólo letras, y posiblemente un signo de porcentaje.
+  */</span>
+  <span class="keyword">@Override</span> <span class="keyword">public</span> String toString() { 
+    <span class="keyword">return</span> fName;  
+  }
+
+  <span class="comment">/** 
+  * Analiza el texto dentro de un &lt;tt&gt;QuoteField&lt;/tt&gt;.
+  * 
+  * &lt;P&gt;El texto coincide con el valor de {@link #toString()}, 
+  * no del nombre simbólico del elemento enumerado.
+  */</span>
+  <span class="keyword">public</span> <span class="keyword">static</span> QuoteField valueFrom(String aText){
+    <span class="keyword">for</span> (QuoteField quoteField: values()){
+      <span class="keyword">if</span>(quoteField.toString().equals(aText)) {
+        <span class="keyword">return</span> quoteField;
+      }
+    }
+    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
+			class="literal">"No se puede analizar en un QuoteField: "</span> + aText);
+  }
+  
+  <span class="keyword">private</span> <span class="keyword">final</span> String fName;
+
+  <span class="comment">/**
+  * @param aName sólo las letras y el signo del porcentaje son caracteres válidos.
+  */</span>
+  <span class="keyword">private</span> QuoteField(String aName) { 
+    fName = aName;
+  }
+} 
+    </pre>
+	<br />
+	<p></p>
+	<p></p>
+	<div class="topic-section" id="see-also-title">
+      Vea también:
+    </div>
+	<div id="see-also" class="main-body">
+	  <a href="..\practicascomunes\practicascomunes_4.html">La concatenación de String no escala</a><br />
+      <a href="..\patrones\patrones_21.html">Métodos de la Factoría</a><br />
+      <a href="..\tareascomunes\tareascomunes_131.html">Matrices como Cadenas</a><br />
+	</div>
+    <footer id="footer" class="legalese">
+      <span id="app_name">Prácticas de Java</span> 
+      <span id="app_version_number">3.001</span><br>
+      © <span id="copyright">2018Hirondelle Systems</span><br> 
+      <a href="http://www.javapractices.com/source/SourceAction.do">Código Fuente</a> | 
+      <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a> | 
+      <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/" rel="license">Licencia</a> | 
+      <a href="http://www.javapractices.com/apps/cjp.rss" rel="alternate" type="application/rss+xml">RSS</a>
+      <!-- ukey="2AC36CD2" -->
+      <!-- ckey="16DF3D87" -->
+      <br> Los trozos de código individual tienen una 
+      <a href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia BSD</a><br>
+      Sobre 1,000,000 de IPs únicas el último año<br>
+      Última actualización <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+      <br> - In Memoriam : Bill Dirani -
+	</footer>
+  </body>
+</html>

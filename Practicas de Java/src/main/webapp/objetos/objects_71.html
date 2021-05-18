@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<!-- saved from url=(0055)http://www.javapractices.com/topic/TopicAction.do?Id=71 -->
+<html lang="es">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="Prácticas y técnicas de programación en Java." />
+    <meta name="keywords" content="java,programación java,Prácticas de Java,idioma java,estilo java,patrones de diseño java,convenciones de 
+      codigo java" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prácticas en Java-&gt;Evite clone</title>
+    <link id="stylesheet" rel="stylesheet" type="text/css" href="../css/stylesheet9.css" media="all" />
+    <link rel="icon" type="image/png" href="../img/favicon.png" />
+  </head>
+  <body>
+    <nav class="menu-bar" id="menu-bar">
+      <a href="../index.html" title="Tabla de Contenido" style="float: left;">Inicio</a> &nbsp;&nbsp;
+      <form method="GET" action="https://www.google.com/search" class="search-form" style="float: right;">
+        <input type="text" name="q" size="15" maxlength="255" value="" placeholder=""/>
+        <input type="submit" name="btnG" value="Buscar" />
+        <input type="hidden" name="sitesearch" value="www.javapractices.com" />
+      </form>
+    </nav>
+	<div class="page-title">
+      Evite clone
+    </div>
+	<br />
+    Evite implementar <code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Object.html#clone()">clone</a></code>.
+	<ul>
+	  <li>
+        <code>clone</code> es muy difícil de implementar correctamente en todas las circunstancias, casi hasta el punto de ser patológico
+      </li>
+	  <li>
+        la importancia de copiar objetos siempre permanecerá, ya que los campos de los objetos a menudo necesitan ser  
+        <a href="..\practicascomunes\practicascomunes_15.html">copiados defensivamente</a>
+	  </li>
+	  <li>
+        los <a href="..\constructores\constructors_12.html">constructores de copia</a> y los <a href="..\patrones\patrones_21.html">métodos 
+        de factoría estática</a> ofrecen una alternativa a <code>clone</code>, y son <i>mucho</i> más fáciles de implementar
+      </li>
+	</ul>
+	<em>Si necesita extender una superclase que implementa <code>clone</code></em>, entonces su subclase debe implementar <code>clone</code>
+	también. La solución más rápida para su subclase es simplemente lanzar una excepción.
+	<p>
+	  <b>Ejemplo</b>
+	</p>
+	<p>
+      Este ejemplo muestra una superclase con una implementación típica de <code>clone</code>, y una subclase la cual ha deshabilitado su 
+	  método <code>clone</code>. <br />
+	</p>
+	<pre>
+<span class="keyword">import</span> java.util.Date;
+
+<span class="keyword">public</span> <span class="keyword">abstract</span> <span
+			class="keyword">class</span> Fruit <span class="keyword">implements</span> Cloneable {
+
+  <span class="keyword">public</span> Fruit(String aColour, Date aBestBeforeDate) {
+    <span class="keyword">super</span>();
+    fColour = aColour;
+    <span class="comment">//copia defensiva necesitada para este objeto mutable
+</span>    fBestBeforeDate = <span class="keyword">new</span> Date(aBestBeforeDate.getTime());
+  }
+
+  <span class="keyword">public</span> <span class="keyword">abstract</span> <span
+			class="keyword">void</span> ripen();
+
+  <span class="keyword">public</span> String getColour() {
+    <span class="keyword">return</span> fColour;
+  }
+
+  <span class="keyword">public</span> Date getBestBeforeDate() {
+    <span class="comment">//devuelve la copia defensiva de este objeto mutable
+</span>    <span class="keyword">return</span> <span class="keyword">new</span> Date(fBestBeforeDate.getTime());
+  }
+
+  <span class="comment">/**
+  * Implementa clone como sigue
+  * &lt;ul&gt;
+  * &lt;li&gt;la declaración de la clase "implements Cloneable" (no necesitada si ya está
+  * declarada en la superclase)
+  * &lt;li&gt;declara al método clone como público
+  * &lt;li&gt;si la clase es final, clone no necesita lanzar CloneNotSupportedException
+  * &lt;li&gt;llama a super.clone y moldea a esta clase
+  * &lt;li&gt;como en la copia defensiva, se asegura que cada campo mutable tenga construida 
+  * una copia independiente, para evitar compartir el estado interno entre objetos
+  * &lt;/ul&gt;
+  */</span>
+  <span class="keyword">@Override</span> <span class="keyword">public</span> Object clone() <span
+			class="keyword">throws</span> CloneNotSupportedException {
+    <span class="comment">//obtiene una copia inicial bit-por-bit, la cual maneja todos los campos inmutables
+</span>    Fruit result = (Fruit)<span class="keyword">super</span>.clone();
+
+    <span class="comment">//los campos mutables deben hacerse independientes de este objeto, por razones
+</span>    <span class="comment">//similares a esas por copias defensivas - para prevenir  accesos no queridos al 
+</span>    <span class="comment">//estado interno de este objeto
+</span>    result.fBestBeforeDate = <span class="keyword">new</span> Date(<span
+			class="keyword">this</span>.fBestBeforeDate.getTime());
+
+    <span class="keyword">return</span> result;
+  }
+
+  <span class="comment">// PRIVADO
+</span>
+  <span class="comment">/** Los Strings son siempre inmutables. */</span>
+  <span class="keyword">private</span> String fColour;
+
+  <span class="comment">/**
+  * En código nuevo, debería usar LocalDate, no java.util.Date. 
+  * Aquí, java.util.Date se usa solo para hacer un punto con respecto a los campos mutables.
+  * 
+  * Date es un objeto mutable. En esta clase, este campo del objeto va ser tratado 
+  * como perteneciente enteramente a esta clase, y ningún usuario de esta clase es 
+  * capaz de acceder directamente y cambiar el estado de este campo.
+  */</span>
+  <span class="keyword">private</span> Date fBestBeforeDate;
+} 
+    </pre>
+	Aquí está la subclase, con su método <code>clone</code> deshabilitado.
+	<br />
+	<pre>
+<span class="keyword">import</span> java.util.Date;
+
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+			class="keyword">class</span> Apple <span class="keyword">extends</span> Fruit {
+
+  <span class="keyword">public</span> Apple(String aColour, Date aBestBeforeDate) {
+    <span class="keyword">super</span>(aColour, aBestBeforeDate);
+  }
+
+  <span class="keyword">public</span> <span class="keyword">void</span> ripen() {
+    <span class="comment">//implementación vacía del método abstracto
+</span>  }
+
+  <span class="comment">/**
+  * La subclase Apple no soporta clone.
+  */</span>
+  <span class="keyword">@Override</span> <span class="keyword">public</span> <span
+			class="keyword">final</span> Object clone() <span class="keyword">throws</span> CloneNotSupportedException {
+    <span class="keyword">throw</span> <span class="keyword">new</span> CloneNotSupportedException();
+  }
+} 
+    </pre>
+	<br />
+	<p></p>
+	<p></p>
+	<div class="topic-section" id="see-also-title">
+      Vea también:
+    </div>
+	<div id="see-also" class="main-body">
+	  <a href="..\constructores\constructors_12.html">Constructores de Copia</a><br />
+      <a href="..\practicascomunes\practicascomunes_15.html">Copia defensiva</a><br />
+      <a href="..\patrones\patrones_21.html">Métodos de la Factoría</a><br />
+	</div>
+	<footer id="footer" class="legalese">
+      <span id="app_name">Prácticas de Java</span> 
+      <span id="app_version_number">3.001</span><br>
+      © <span id="copyright">2018Hirondelle Systems</span><br> 
+      <a href="http://www.javapractices.com/source/SourceAction.do">Código Fuente</a> | 
+      <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a> | 
+      <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/" rel="license">Licencia</a> | 
+      <a href="http://www.javapractices.com/apps/cjp.rss" rel="alternate" type="application/rss+xml">RSS</a>
+      <!-- ukey="2AC36CD2" -->
+      <!-- ckey="16DF3D87" -->
+      <br> Los trozos de código individual tienen una 
+      <a href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia BSD</a><br>
+      Sobre 1,000,000 de IPs únicas el último año<br>
+      Última actualización <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+      <br> - In Memoriam : Bill Dirani -
+	</footer>
+  </body>
+</html>

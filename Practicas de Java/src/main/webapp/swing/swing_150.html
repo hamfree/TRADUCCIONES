@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+    content="Prácticas y técnicas de programación en Java.">
+<meta name="keywords"
+    content="java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas Java-&gt;Diálogos Estandarizados</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+    href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png" href="../img/favicon.png">
+</head>
+<body>
+    <nav class="menu-bar" id="menu-bar">
+        <a href="../index.html" title="Table of Contents"
+            style="float: left;">Inicio</a> &nbsp;&nbsp;
+        <form method="GET" action="https://www.google.com/search"
+            class="search-form" style="float: right;">
+            <input name="q" size="15" maxlength="255" placeholder=""
+                type="text"> <input name="btnG" value="Search"
+                type="submit"> <input name="sitesearch"
+                value="www.javapractices.com" type="hidden">
+        </form>
+    </nav>
+    <div class="page-title">Diálogos Estandarizados</div>
+    <br>Inconsistencies in a user interface usually decrease the
+    perceived quality of an application. So, it's probably a good idea
+    to standardize the layout, appearance, and behavior of all the
+    dialogs in your application.
+    <p>
+        <b>Example</b>
+    </p>
+    <p>
+        Here's a class which acts as a template for all dialogs
+        having&nbsp;
+        <code>OK</code>
+        and&nbsp;
+        <code>Cancel</code>
+        buttons. It standardizes these items:
+    </p>
+    <ul>
+        <li>the form of the dialog title</li>
+        <li>the dialog icon</li>
+        <li>the layout and spacing of principal elements</li>
+        <li>the centering behavior</li>
+        <li>the resizing behavior</li>
+    </ul>
+    Note the two abstract methods that must be implemented by its
+    subclasses:
+    <code>getEditorUI</code>
+    and
+    <code>okAction</code>
+    . The other methods are
+    <a href="http://www.javapractices.com/topic/TopicAction.do?Id=89">declared
+        as final</a>.
+    <p>
+        The callers of this class don't usually need to subclass it
+        directly, at the top level. Rather, a private, nested class <a
+            href="http://www.javapractices.com/topic/TopicAction.do?Id=228">can
+            be used instead</a>. <br>
+    </p>
+    <pre>
+		<span class="keyword">package</span> hirondelle.stocks.util.ui;
+
+<span class="keyword">import</span> java.util.*;
+<span class="keyword">import</span> javax.swing.*;
+<span class="keyword">import</span> java.awt.event.*;
+
+<span class="keyword">import</span> hirondelle.stocks.util.Args;
+
+<span class="comment">/**
+* Abstract Base Class for a dialog with standard layout, buttons, and behavior.
+* (The name &lt;tt&gt;StandardEditor&lt;/tt&gt; was chosen since almost all non-trivial 
+* dialogs allow the user to edit data in some way.)
+*
+* &lt;P&gt;Use of this class will apply a standard appearance to 
+* dialogs in the application.
+*
+* &lt;P&gt; Subclasses implement the body of the dialog (wherein business objects 
+* are manipulated), and the action taken by the &lt;tt&gt;OK&lt;/tt&gt; button. 
+*
+* &lt;P&gt;Services of a &lt;tt&gt;StandardEditor&lt;/tt&gt; include: 
+*&lt;ul&gt;
+* &lt;li&gt;centering on the parent frame
+* &lt;li&gt;reusing the parent's icon
+* &lt;li&gt;standard layout and border spacing, based on Java Look and Feel guidelines.
+* &lt;li&gt;uniform naming style for dialog title, with the application name appearing first
+* &lt;li&gt;&lt;tt&gt;OK&lt;/tt&gt; and &lt;tt&gt;Cancel&lt;/tt&gt; buttons at the bottom of the dialog - 
+* &lt;tt&gt;OK&lt;/tt&gt; is the default, and the &lt;tt&gt;Escape&lt;/tt&gt; key activates 
+* &lt;tt&gt;Cancel&lt;/tt&gt; (the latter works only if the dialog receives the escape 
+* keystroke, and not one of its components)
+* &lt;li&gt;disabling of resizing
+*&lt;/ul&gt;
+*
+* &lt;P&gt;The &lt;tt&gt;Escape&lt;/tt&gt; key does not always work (for example, when a 
+* &lt;tt&gt;JTable&lt;/tt&gt; row has the focus)
+*/</span>
+<span class="keyword">public</span> <span class="keyword">abstract</span> <span
+            class="keyword">class</span> StandardEditor {
+  
+  <span class="comment">/**
+  * Constructor.
+  * @param aTitle text which appears in the title bar after the name of 
+  * the application; must have content.
+  * @param aParent window to which this dialog is attached.
+  * @param aCloseAction sets the behaviour of the dialog upon close.
+  */</span>
+  <span class="keyword">protected</span> StandardEditor (String aTitle, JFrame aParent, CloseAction aCloseAction) {
+    Args.checkForContent(aTitle);
+    Args.checkForNull(aParent);
+    fTitle = aTitle;
+    fParent = aParent;
+    fCloseAction = aCloseAction.getValue();
+  }
+  
+  <span class="comment">/**
+  * Forces calls to constructor to have greater clarity, by using an
+  * enumeration instead of integers.
+  */</span>
+  <span class="keyword">protected</span> <span class="keyword">enum</span> CloseAction {
+    DISPOSE(JDialog.DISPOSE_ON_CLOSE),
+    HIDE(JDialog.HIDE_ON_CLOSE);
+    <span class="keyword">int</span> getValue(){
+      <span class="keyword">return</span> fAction;
+    }
+    <span class="keyword">private</span> <span class="keyword">final</span> <span
+            class="keyword">int</span> fAction;
+    <span class="keyword">private</span> CloseAction(<span
+            class="keyword">int</span> aAction){
+      fAction = aAction;
+    }
+  }
+  
+  <span class="comment">/**
+  * Display this &lt;tt&gt;StandardEditor&lt;/tt&gt; to the user.
+  *
+  * &lt;P&gt;Follows the Java Look and Feel guidelines for spacing elements.
+  */</span>
+  <span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">void</span> showDialog(){
+    <span class="keyword">boolean</span> isModal = <span class="keyword">true</span>;
+    fDialog = <span class="keyword">new</span> JDialog(fParent, UiUtil.getDialogTitle(fTitle), isModal);
+    fDialog.setDefaultCloseOperation(fCloseAction);
+    fDialog.setResizable(<span class="keyword">false</span>);
+    addCancelByEscapeKey();
+    
+    JPanel standardLayout = <span class="keyword">new</span> JPanel();
+    standardLayout.setLayout(<span class="keyword">new</span> BoxLayout(standardLayout, BoxLayout.Y_AXIS));
+    standardLayout.setBorder(UiUtil.getStandardBorder());
+    standardLayout.add(getEditorUI());
+    standardLayout.add(getCommandRow());
+    
+    fDialog.getContentPane().add(standardLayout);
+    
+    UiUtil.centerOnParentAndShow(fDialog);
+  }
+
+  <span class="comment">/** Close the editor dialog.  */</span>
+  <span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">void</span> dispose(){
+    fDialog.dispose();
+  }
+  
+  <span class="comment">/**
+  * Return the GUI which allows the user to manipulate the business 
+  * objects related to this dialog; this GUI will be placed above the 
+  * &lt;tt&gt;OK&lt;/tt&gt; and &lt;tt&gt;Cancel&lt;/tt&gt; buttons, in a standard manner.
+  */</span>
+  <span class="keyword">protected</span> <span class="keyword">abstract</span> JComponent getEditorUI();
+  
+  <span class="comment">/**
+  * The action taken when the user hits the &lt;tt&gt;OK&lt;/tt&gt; button.
+  */</span>
+  <span class="keyword">protected</span> <span class="keyword">abstract</span> <span
+            class="keyword">void</span> okAction();
+  
+  <span class="comment">// PRIVATE
+</span>  <span class="keyword">private</span> <span class="keyword">final</span> String fTitle;
+  <span class="keyword">private</span> <span class="keyword">final</span> JFrame fParent;
+  <span class="keyword">private</span> JDialog fDialog;
+  <span class="keyword">private</span> <span class="keyword">final</span> <span
+            class="keyword">int</span> fCloseAction;
+  
+  <span class="comment">/**
+  * Return a standardized row of command buttons, right-justified and 
+  * all of the same size, with OK as the default button, and no mnemonics used, 
+  * as per the Java Look and Feel guidelines. 
+  */</span>
+  <span class="keyword">private</span> JComponent getCommandRow() {
+    JButton ok = <span class="keyword">new</span> JButton(<span
+            class="literal">"OK"</span>);
+    ok.addActionListener( <span class="keyword">new</span> ActionListener() {
+      <span class="keyword">@Override</span> <span class="keyword">public</span> <span
+            class="keyword">void</span> actionPerformed(ActionEvent event) {
+        okAction();
+      }
+    });
+    fDialog.getRootPane().setDefaultButton( ok );
+    JButton cancel = <span class="keyword">new</span> JButton(<span
+            class="literal">"Cancel"</span>);
+    cancel.addActionListener( <span class="keyword">new</span> ActionListener() {
+      <span class="keyword">public</span> <span class="keyword">void</span> actionPerformed(ActionEvent event) {
+        closeDialog();
+      }
+    });
+    List&lt;JComponent&gt; buttons = <span class="keyword">new</span> ArrayList&lt;&gt;();
+    buttons.add(ok);
+    buttons.add(cancel);
+    <span class="keyword">return</span> UiUtil.getCommandRow(buttons);
+  }
+
+  <span class="comment">/**
+  * Force the escape key to call the same action as pressing the Cancel button.
+  *
+  * &lt;P&gt;This does not always work. See class comment.
+  */</span>
+  <span class="keyword">private</span> <span class="keyword">void</span> addCancelByEscapeKey(){
+    String CANCEL_ACTION_KEY = <span class="literal">"CANCEL_ACTION_KEY"</span>;
+    <span class="keyword">int</span> noModifiers = <span class="literal">0</span>;
+    KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, noModifiers, <span
+            class="keyword">false</span>);
+    InputMap inputMap = 
+      fDialog.getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+    ;
+    inputMap.put(escapeKey, CANCEL_ACTION_KEY);
+    AbstractAction cancelAction = <span class="keyword">new</span> AbstractAction(){
+      <span class="keyword">@Override</span> <span class="keyword">public</span> <span
+            class="keyword">void</span> actionPerformed(ActionEvent e){
+        closeDialog();
+      }
+    }; 
+    fDialog.getRootPane().getActionMap().put(CANCEL_ACTION_KEY, cancelAction);
+  }
+  
+  <span class="keyword">private</span> <span class="keyword">void</span> closeDialog(){
+    fDialog.dispose();
+  }
+}
+ 
+</pre>
+    <br>
+    <p></p>
+    <p></p>
+    <div class="topic-section" id="see-also-title">See Also :</div>
+    <div id="see-also" class="main-body">
+        <a href="..\herencia\inheritance_89.html">Los métodos
+            sobreescribibles necesitan cuidados especiales</a> <br> <a
+            href="..\swing\swing_148.html">Pautas para la Apariencia</a>
+        <br> <a href="..\swing\swing_152.html">Tareas de
+            utilidad de Swing</a> <br> <a
+            href="..\swing\swing_167.html">Diálogo de entrada</a> <br>
+        <a href="..\swing\swing_228.html">No hacer subclases de
+            JDialog o JFrame</a> <br>
+    </div>
+    <footer id="footer" class="legalese">
+        <span id="app_name">Prácticas de Java</span> <span
+            id="app_version_number">3.001</span><br> © <span
+            id="copyright">2018 Hirondelle Systems</span><br> <a
+            href="http://www.javapractices.com/source/SourceAction.do">Código
+            Fuente</a> | <a href="mailto:webmaster@javapractices.com"
+            rel="author">Contacto</a> | <a
+            href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+            rel="license">Licencia</a> | <a
+            href="http://www.javapractices.com/apps/cjp.rss"
+            rel="alternate" type="application/rss+xml">RSS</a>
+        <!-- ukey="2AC36CD2" -->
+        <!-- ckey="16DF3D87" -->
+        <br> Los trozos de código individual tienen una <a
+            href="http://www.javapractices.com/LICENSE.txt"
+            rel="license">licencia BSD</a><br> Sobre 1,000,000 de
+        IPs únicas el último año<br> Última actualización
+        <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+        <br> - In Memoriam : Bill Dirani -
+    </footer>
+</body>
+</html>

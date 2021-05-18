@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+	content="Prácticas y técnicas de programación en Java.">
+<meta name="keywords"
+	content="java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas de Java-&gt;Servir contenido binario</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+    href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png"
+    href="../img/favicon.png">
+</head>
+<body>
+    <nav class="menu-bar" id="menu-bar">
+        <a href="../index.html"
+            title="Table of Contents" style="float: left;">Inicio</a>
+        &nbsp;&nbsp;
+        <form method="GET" action="https://www.google.com/search"
+            class="search-form" style="float: right;">
+            <input name="q" size="15" maxlength="255" placeholder=""
+                type="text"> <input name="btnG" value="Search"
+                type="submit"> <input name="sitesearch"
+                value="www.javapractices.com" type="hidden">
+        </form>
+    </nav>
+    <div class="page-title">Servir contenido binario</div>
+    <br>Servlets usually serve some form of text - HTML, XML, JSON
+    data, plain text, and so on. Servlets can also serve binary content,
+    such as images or .pdf files.
+    <p>
+        Here's an example of a simple servlet that serves binary
+        content. It serves a .pdf file of a fixed name, located in the
+        web application's root directory. <br>
+    </p>
+    <pre>
+        <span class="keyword">import</span> java.io.*;
+
+<span class="keyword">import</span> javax.servlet.ServletException;
+<span class="keyword">import</span> javax.servlet.ServletOutputStream;
+<span class="keyword">import</span> javax.servlet.http.HttpServlet;
+<span class="keyword">import</span> javax.servlet.http.HttpServletRequest;
+<span class="keyword">import</span> javax.servlet.http.HttpServletResponse;
+
+<span class="comment">/**
+ Servlet that serves binary data, not text.
+  
+ &lt;P&gt;This servlet serves a static .pdf file, but the idea is the same with other 
+ forms of data.
+*/</span>
+<span class="keyword">public</span> <span class="keyword">class</span> ServeBinary <span
+            class="keyword">extends</span> HttpServlet {
+
+  <span class="keyword">@Override</span> <span class="keyword">protected</span> <span
+            class="keyword">void</span> doGet(
+    HttpServletRequest aRequest, HttpServletResponse aResponse
+  ) <span class="keyword">throws</span> ServletException, IOException {
+    serveBinary(aRequest, aResponse);
+  }
+   
+  <span class="keyword">@Override</span> <span class="keyword">protected</span> <span
+            class="keyword">void</span> doPost(
+    HttpServletRequest aRequest, HttpServletResponse aResponse
+  ) <span class="keyword">throws</span> ServletException, IOException {
+    serveBinary(aRequest, aResponse);
+  }
+  
+  <span class="comment">// PRIVATE
+</span>
+  <span class="comment">//elided...
+</span>  
+  <span class="keyword">private</span> <span class="keyword">void</span> serveBinary(
+    HttpServletRequest aRequest, HttpServletResponse aResponse
+  ) <span class="keyword">throws</span> IOException {
+    log(<span class="literal">"ServeBinary servlet."</span>);
+   
+    <span class="comment">//IMPORTANT: set the MIME type of the response stream
+</span>    aResponse.setContentType(<span class="literal">"application/pdf"</span>);
+    
+    <span class="comment">//serve a fixed file, located in the root folder of this web app 
+</span>    <span class="keyword">try</span> (
+      ServletOutputStream output = aResponse.getOutputStream();
+      InputStream input = getServletContext().getResourceAsStream(<span
+            class="literal">"test.pdf"</span>);
+    ){ 
+      <span class="comment">//transfer input stream to output stream, via a buffer
+</span>      <span class="keyword">byte</span>[] buffer = <span class="keyword">new</span> <span
+            class="keyword">byte</span>[<span class="literal">2048</span>];
+      <span class="keyword">int</span> bytesRead;    
+      <span class="keyword">while</span> ((bytesRead = input.read(buffer)) != -<span
+            class="literal">1</span>) {
+         output.write(buffer, <span class="literal">0</span>, bytesRead);
+      }
+    }
+    
+    log(<span class="literal">"Done."</span>);
+  }
+}
+ 
+</pre>
+    <br>
+    <p></p>
+    <p></p>
+    <footer id="footer" class="legalese">
+		<span id="app_name">Prácticas de Java</span> <span
+			id="app_version_number">3.001</span><br> © <span id="copyright">2018
+			Hirondelle Systems</span><br> <a
+			href="http://www.javapractices.com/source/SourceAction.do">Código
+			Fuente</a> | <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a>
+		| <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+			rel="license">Licencia</a> | <a
+			href="http://www.javapractices.com/apps/cjp.rss" rel="alternate"
+			type="application/rss+xml">RSS</a>
+		<!-- ukey="2AC36CD2" -->
+		<!-- ckey="16DF3D87" -->
+		<br> Los trozos de código individual tienen una <a
+			href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia
+			BSD</a><br> Sobre 1,000,000 de IPs únicas el último año<br>
+		Última actualización
+		<time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+		<br> - In Memoriam : Bill Dirani -
+	</footer>
+</body>
+</html>

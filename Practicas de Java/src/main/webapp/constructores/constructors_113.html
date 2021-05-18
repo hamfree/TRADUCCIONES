@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<!-- saved from url=(0056)http://www.javapractices.com/topic/TopicAction.do?Id=113 -->
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+    content="Presentaciones concisas de prácticas de programación en 
+        java, tareas, y convenciones, ampliamente ilustrado con ejemplos de código con resaltado de 
+        sintaxis.">
+<meta name="keywords"
+    content="constructor,java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Practices-&gt;Construir un Objeto usando el nombre de la clase</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+    href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png" href="../img/favicon.png">
+</head>
+<body>
+    <nav class="menu-bar" id="menu-bar">
+        <a href="../index.html" title="Table of Contents"
+            style="float: left;">Inicio</a> &nbsp;&nbsp;
+        <form method="GET" action="https://www.google.com/search"
+            class="search-form" style="float: right;">
+            <input type="text" name="q" size="15" maxlength="255"
+                value="" placeholder=""> <input type="submit"
+                name="btnG" value="Search"> <input type="hidden"
+                name="sitesearch" value="www.javapractices.com">
+        </form>
+    </nav>
+    <div class="page-title">Construir un Objeto usando el nombre
+        de la clase</div>
+    <br>Puede crear un objeto dinámicamente en tiempo de ejecución
+    usando sólo el nombre de la clase, la entrada es una cadena simple.
+    Esto está hecho usando una parte del lenguaje Java llamado
+    <i>reflexión</i>.
+    <p>
+        <b>La reflexión permite al viejo código llamar al nuevo
+            código, sin necesitar recompilar.</b>
+    </p>
+    <p>
+        Si una clase no tiene un constructor sin argumento, entonces
+        crear un objeto desde su nombre de clase completamente
+        cualificado (por ejemplo, "
+        <code>java.lang.Integer</code>
+        ") es usualmente realizado usando estos métodos:
+    </p>
+    <ul>
+        <li><code>
+                Class.<a
+                    href="https://docs.oracle.com/javase/10/docs/api/java/lang/Class.html#forName(java.lang.String)">forName</a>
+            </code></li>
+        <li><code>
+                Class.<a
+                    href="https://docs.oracle.com/javase/10/docs/api/java/lang/Class.html#newInstance()">newInstance</a>
+            </code></li>
+    </ul>
+    <p>Si los argumentos necesitan ser pasados al constructor,
+        entonces estas otras opciones pueden ser usadas en su lugar:</p>
+    <ul>
+        <li><code>
+                Class.<a
+                    href="https://docs.oracle.com/javase/10/docs/api/java/lang/Class.html#getConstructor(java.lang.Class...)">getConstructor</a>
+            </code></li>
+        <li><code>
+                Constructor.<a
+                    href="https://docs.oracle.com/javase/10/docs/api/java/lang/reflect/Constructor.html#newInstance(java.lang.Object...)">newInstance</a>
+            </code></li>
+    </ul>
+    <p>
+        El uso más común de la reflexión es instanciar una clase cuyo
+        tipo genérico es conocido en tiempo de diseño, pero cuya clase
+        de implementación específica no lo es. Vea el tema <a
+            href="../patrones/patrones_237.html">Factoría de
+            Complemento</a> para un ejemplo. Otros usos de reflexión son
+        bastante raros, y aparecen principalmente en programas de
+        proposito especial.
+    </p>
+    <p>
+        <b>Ejemplo</b>
+    </p>
+    <p>
+        <code>Interpreter</code>
+        es una interfaz usada por un aplicación de línea de comando
+        simple para interpretar la entrada de usuario:<br>
+    </p>
+    <pre>
+<span class="keyword">import</span> java.util.*;
+
+<span class="comment">/**
+* Analiza una línea de texto y devuelve un resultado.
+*/</span>
+<span class="keyword">public</span> <span class="keyword">interface</span> Interpreter {
+
+  <span class="comment">/**
+  * @param aLine es no null.
+  * @param aResult es una lista vacia, no nula la cual actúa como un parametro "salida";
+  * cuando es devuelto, aResult debe contener una Lista no nula, no vacía de elementos 
+  * los cuales todos tienen un método &lt;code&gt;toString&lt;/code&gt;, para ser usado 
+  * para visualizar un resultado al usuario.
+  *
+  * @return true si el usuario ha pedido salir del Interpreter.
+  * @exception IllegalArgumentException si un parámetro no cumple.
+  */</span>
+  <span class="keyword">boolean</span> parseInput(String aLine, List&lt;Object&gt; aResult);
+
+  <span class="comment">/**
+  * Devuelve el texto a ser visualizado al inicio del Intérpreter.
+  */</span>
+  String getHelloPrompt();
+} 
+</pre>
+    La tarea es crear una implementación concreta de esta interfaz en
+    ejecución, usando sólo el nombre de la clase como entrada. En este
+    ejemplo, el usuario introduce un nombre de clase completamente
+    cualificado directamente
+    <a href="../entradasalida/entradasalida_79.html">en la línea de
+        comandos</a>. Después, el
+    <code>Object</code>
+    correspondiente es creado y moldeado al tipo esperado (aquí,
+    <code>Interpreter</code>
+    ). El objeto puede ser usado de la misma forma como cualquier otro
+    objeto.
+    <br>
+    <pre>
+<span class="keyword">import</span> java.io.BufferedReader;
+<span class="keyword">import</span> java.io.IOException;
+<span class="keyword">import</span> java.io.InputStreamReader;
+<span class="keyword">import</span> java.io.Reader;
+<span class="keyword">import</span> java.util.ArrayList;
+<span class="keyword">import</span> java.util.List;
+
+<span class="comment">/**
+* Envía texto de ida y vuelta entre la línea de comando y un
+* Interpreter. JDK menor que 6.
+*/</span>
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">class</span> Console {
+
+  <span class="comment">/**
+  * Construye y lanzan un &lt;code&gt;Interpreter&lt;/code&gt; específico, cuyo 
+  * nombre completamente cualificado es pasado en la línea de comandos.
+  */</span>
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> main(String... aArguments) {
+    <span class="keyword">try</span> {
+      Class theClass = Class.forName(aArguments[<span class="literal">0</span>]);
+      Interpreter interpreter = (Interpreter)theClass.newInstance();
+      Console console = <span class="keyword">new</span> Console(interpreter);
+      console.run();
+    }
+    <span class="keyword">catch</span> (ClassNotFoundException ex){
+      System.err.println(ex + <span class="literal">" La clase Interpreter debe estar en el class path."</span>);
+    }
+    <span class="keyword">catch</span>(InstantiationException ex){
+      System.err.println(ex + <span class="literal">" La clase Interpreter debe ser concreta."</span>);
+    }
+    <span class="keyword">catch</span>(IllegalAccessException ex){
+      System.err.println(ex + <span class="literal">" La clase Interpreter debe tener un constructor sin argumento."</span>);
+    }
+  }
+
+  <span class="keyword">public</span> Console(Interpreter aInterpreter) {
+    <span class="keyword">if</span> (aInterpreter == <span
+            class="keyword">null</span>) {
+      <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
+            class="literal">"No puede ser nulo."</span>);
+    }
+    fInterpreter = aInterpreter;
+  }
+
+  <span class="comment">/**
+  * Muestra un mensaje, espera una línea completa de entrada y luego analiza
+  * la entrada usando un Interpreter.
+  *
+  * Termina cuando&lt;code&gt;Interpreter.parseInput&lt;/code&gt; devuelve verdadero.
+  */</span>
+  <span class="keyword">public</span> <span class="keyword">void</span> run() {
+    display(fInterpreter.getHelloPrompt());
+
+    <span class="comment">//pasa cada línea de entrada a fInterpreter, y visualiza
+</span>    <span class="comment">//el resultado de fInterpreter
+</span>    InputStreamReader inputStreamReader = <span class="keyword">new</span> InputStreamReader(System.in);
+    BufferedReader stdin = <span class="keyword">new</span> BufferedReader(inputStreamReader);
+    <span class="keyword">boolean</span> hasRequestedQuit = <span
+            class="keyword">false</span>;
+    String line = <span class="keyword">null</span>;
+    List&lt;Object&gt; result = <span class="keyword">new</span> ArrayList&lt;Object&gt;();
+    <span class="keyword">try</span> {
+      <span class="keyword">while</span>(!hasRequestedQuit){
+        line = stdin.readLine();
+        <span class="comment">//tenga en cuenta que el "resultado" se pasa como un parámetro de "salida"
+</span>        hasRequestedQuit = fInterpreter.parseInput(line, result);
+        display(result);
+        result.clear();
+      }
+    }
+    <span class="keyword">catch</span> (IOException ex) {
+      System.err.println(ex);
+    }
+    <span class="keyword">finally</span> {
+      display(fBYE);
+      shutdown(stdin);
+    }
+  }
+
+  <span class="comment">// PRIVADO
+</span>  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> String fBYE = <span
+            class="literal">"Bye."</span>;
+  <span class="keyword">private</span> Interpreter fInterpreter;
+
+  <span class="comment">/**
+  * Visualiza algún texto en stdout.
+  * El resultado de toString() es usado.
+  */</span>
+  <span class="keyword">private</span> <span class="keyword">void</span> display(Object aText){
+    System.out.print(aText.toString());
+    System.out.flush();
+  }
+
+  <span class="comment">/**
+  * Visualiza una Lista de objetos como texto en la stdout, en el orden devuelto por el 
+  * iterador de aText.
+  */</span>
+  <span class="keyword">private</span> <span class="keyword">void</span> display(List&lt;Object&gt; aText) {
+    <span class="keyword">for</span>(Object item : aText){
+      display(item);
+    }
+  }
+
+  <span class="keyword">private</span> <span class="keyword">void</span> shutdown(Reader aStdin){
+    <span class="keyword">try</span> {
+      aStdin.close();
+    }
+    <span class="keyword">catch</span> (IOException ex){
+      System.err.println(ex);
+    }
+  }
+} 
+</pre>
+    <br>
+    <p></p>
+    <p></p>
+    <div class="topic-section" id="see-also-title">Vea También :</div>
+    <div id="see-also" class="main-body">
+        <a href="../entradasalida/entradasalida_79.html">Entrada en la
+            Consola</a> <br> <a href="../patrones/patrones_128.html">Factoría
+            Abstracta</a> <br> <a href="../patrones/patrones_237.html">Factoría
+            de Complemento</a> <br>
+    </div>
+    <footer id="footer" class="legalese">
+        <span id="app_name">Prácticas de Java</span> <span
+            id="app_version_number">3.001</span><br> © <span
+            id="copyright">2018 Hirondelle Systems</span><br> <a
+            href="http://www.javapractices.com/source/SourceAction.do">Código
+            Fuente</a> | <a href="mailto:webmaster@javapractices.com"
+            rel="author">Contacto</a> | <a
+            href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+            rel="license">Licencia</a> | <a
+            href="http://www.javapractices.com/apps/cjp.rss"
+            rel="alternate" type="application/rss+xml">RSS</a>
+        <!-- ukey="2AC36CD2" -->
+        <!-- ckey="16DF3D87" -->
+        <br> Los trozos de código individual tienen una <a
+            href="http://www.javapractices.com/LICENSE.txt"
+            rel="license">licencia BSD</a><br> Sobre 1,000,000 de
+        IPs únicas el último año<br> Última actualización
+        <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+        <br> - In Memoriam : Bill Dirani -
+    </footer>
+</body>
+</html>

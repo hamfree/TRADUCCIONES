@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="Prácticas y técnicas de programación en Java." />
+    <meta name="keywords" content="java,programación java,Prácticas de Java,idioma java,estilo java,patrones de diseño java,convenciones de 
+      codigo java" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prácticas de Java-&gt;Utilice referencias a interfaces en vez de Colecciones</title>
+    <link id="stylesheet" rel="stylesheet" type="text/css" href="../css/stylesheet9.css" media="all" />
+    <link rel="icon" type="image/png" href="../img/favicon.png" />
+  </head>
+  <body>
+    <nav class="menu-bar" id="menu-bar">
+      <a href="../index.html" title="Tabla de Contenidos" style="float: left;">Inicio</a>
+      &nbsp;&nbsp;
+      <form method="GET" action="https://www.google.com/search" class="search-form" style="float: right;">
+        <input name="q" size="15" maxlength="255" placeholder="" type="text" />
+        <input name="btnG" value="Buscar" type="submit" />
+        <input name="sitesearch" value="www.javapractices.com" type="hidden" />
+      </form>
+    </nav>  
+    <div class="page-title">
+      Utilice referencias a interfaces en vez de Colecciones
+    </div>
+    <br />
+    En general, las referencias a objetos deben ser lo más genéricas posible. El usuario de dicha referencia estará protegido de posibles 
+    cambios en la clase de implementación subyacente. Los efectos de ondulación de dicho cambio se limitan a la única línea de código que 
+    crea el objeto, y no se propagarán más.  
+    <p>
+      En el caso de las colecciones, esto significa referirse habitualmente a objetos de colección usando las referencias de interfaz de 
+        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/List.html">List</a></code>,
+        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/Map.html">Map</a></code>,
+        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/Set.html">Set</a></code>,
+        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/Queue.html">Queue</a></code>, y
+        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/Deque.html">Deque</a></code>.
+    </p>
+    <p>
+      Tenga en cuenta también que se puede hacer referencia a todos estos, excepto <code>Map</code>, utilizando el aún más genérico 
+      <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/Collection.html">Collection</a></code>.
+    </p>
+    <p>
+      <b>Ejemplo</b><br />
+    </p>
+    <pre>
+<span class="keyword">import</span> java.util.*;
+
+<span class="keyword">public</span> <span class="keyword">class</span> Nucleus {
+
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> main (String... arguments) {
+    Nucleus lithium = <span class="keyword">new</span> Nucleus (<span
+            class="literal">3</span>,<span class="literal">4</span>);
+    <span class="comment">//tenga en cuenta que aquí se usa la referencia de Map genérica, no LinkedHashMap
+</span>    Map&lt;String, Integer&gt; quarks = lithium.getQuarkSummary();
+    log(<span class="literal">"Número de quarks arriba en el núcleo de litio: "</span> + quarks.get(<span
+            class="literal">"Up"</span>));
+    log(<span class="literal">"Número de quarks abajo en el núcleo de litio: "</span> + quarks.get(<span
+            class="literal">"Down"</span>));
+  }
+
+  <span class="keyword">public</span> Nucleus(<span class="keyword">int</span> aNumProtons, <span
+            class="keyword">int</span> aNumNeutrons) {
+    fNumProtons = aNumProtons;
+    fNumNeutrons = aNumNeutrons;
+  }
+
+  <span class="comment">/** Tenga en cuenta que el método get es final. */</span>
+  <span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">int</span> getNumProtons() {
+     <span class="keyword">return</span> fNumProtons;
+  }
+
+  <span class="comment">/** Tenga en cuenta que el método get es final. */</span>
+  <span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">int</span> getNumNeutrons() {
+     <span class="keyword">return</span> fNumNeutrons;
+  }
+
+  <span class="comment">/**
+  * Este método devuelve un Map el cual sumariza cuantos quarks de cada 
+  * sabor existe en el núcleo.
+  *
+  * @return una referencia genérica Map, en vez de un LinkedHashMap; el 
+  * usuario será protegido del detalle de qué implementación de Map
+  * ha sido seleccionada aquí.
+  */</span>
+  <span class="keyword">public</span> <span class="keyword">final</span> Map&lt;String, Integer&gt; getQuarkSummary() {
+    LinkedHashMap&lt;String, Integer&gt; result = <span class="keyword">new</span> LinkedHashMap&lt;&gt;();
+    <span class="keyword">int</span> numUp =
+      fNumProtons * fUP_QUARKS_PER_PROTON +
+      fNumNeutrons * fUP_QUARKS_PER_NEUTRON
+    ;
+    <span class="keyword">int</span> numDown =
+      fNumProtons * fDOWN_QUARKS_PER_PROTON +
+      fNumNeutrons * fDOWN_QUARKS_PER_NEUTRON
+    ;
+    <span class="comment">//esto hace uso de la autoconversión de enteros en Integers:
+</span>    result.put(<span class="literal">"Up"</span>, numUp);
+    result.put(<span class="literal">"Down"</span>, numDown);
+    <span class="keyword">return</span> result;
+  }
+
+  <span class="comment">//PRIVADO
+</span>  <span class="keyword">private</span> <span class="keyword">final</span> <span
+            class="keyword">int</span> fNumProtons;
+  <span class="keyword">private</span> <span class="keyword">final</span> <span
+            class="keyword">int</span> fNumNeutrons;
+
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> <span class="keyword">int</span> fUP_QUARKS_PER_PROTON = <span
+            class="literal">2</span>;
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> <span class="keyword">int</span> fDOWN_QUARKS_PER_PROTON = <span
+            class="literal">1</span>;
+
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> <span class="keyword">int</span> fUP_QUARKS_PER_NEUTRON = <span
+            class="literal">1</span>;
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> <span class="keyword">int</span> fDOWN_QUARKS_PER_NEUTRON = <span
+            class="literal">2</span>;
+
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> log(String aMessage){
+    System.out.println(aMessage);
+  }
+} 
+    </pre>
+    <br />
+    <p></p>
+    <p></p>
+    <div class="topic-section" id="see-also-title">
+      Vea también:
+    </div>
+    <div id="see-also" class="main-body">
+        <a href="..\practicascomunes\practicascomunes_123.html">Minimizar los efectos dominantes</a><br />
+    </div>
+    <footer id="footer" class="legalese">
+      <span id="app_name">Prácticas de Java</span> 
+      <span id="app_version_number">3.001</span><br />
+      © <span id="copyright">2018Hirondelle Systems</span><br /> 
+      <a href="http://www.javapractices.com/source/SourceAction.do">Código Fuente</a> | 
+      <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a> | 
+      <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/" rel="license">Licencia</a> | 
+      <a href="http://www.javapractices.com/apps/cjp.rss" rel="alternate" type="application/rss+xml">RSS</a>
+      <!-- ukey="2AC36CD2" -->
+      <!-- ckey="16DF3D87" -->
+      <br /> Los trozos de código individual tienen una 
+      <a href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia BSD</a><br />
+      Sobre 1,000,000 de IPs únicas el último año<br />
+      Última actualización <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+      <br /> - In Memoriam : Bill Dirani -
+    </footer>
+  </body>
+</html>

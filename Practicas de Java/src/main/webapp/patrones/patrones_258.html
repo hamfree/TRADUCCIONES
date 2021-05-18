@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+    content="Prácticas y técnicas de programación en Java.">
+<meta name="keywords"
+    content="java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas de Java-&gt;Envoltorio (Decorador)</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+    href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png" href="../img/favicon.png">
+</head>
+<body>
+    <nav class="menu-bar" id="menu-bar">
+        <a href="../index.html" title="Table of Contents"
+            style="float: left;">Inicio</a> &nbsp;&nbsp;
+        <form method="GET" action="https://www.google.com/search"
+            class="search-form" style="float: right;">
+            <input name="q" size="15" maxlength="255" placeholder=""
+                type="text"> <input name="btnG" value="Search"
+                type="submit"> <input name="sitesearch"
+                value="www.javapractices.com" type="hidden">
+        </form>
+    </nav>
+    <div class="page-title">Envoltorio (Decorador)</div>
+    <br>Wrapper (or Decorator) is one of the most important design
+    patterns.
+    <p>Wrappers are commonly used in:</p>
+    <ul>
+        <li>input-output stream APIs</li>
+        <li>servlet filters</li>
+        <li>GUI toolkits (when adding scrollbars or other
+            decorations to components, for example)</li>
+    </ul>
+    <p>
+        The basic idea of a wrapper is to <em>call-forward</em> to an
+        underlying object, while simultaneously allowing for new code to
+        be executed <em>just before and/or just after</em> the call.
+        Wrappers can be chained together, one after another. In this
+        way, you can mix-and-match behaviors in various ways.
+    </p>
+    <p>
+        Note that this changes the behavior of an <em>object</em>,
+        without needing to alter the implementation of a <em>class</em>,
+        and also without needing to <em>extend</em> a class.
+    </p>
+    <p>
+        Here's an example implementation of a wrapper design pattern
+        (other variations are also possible): <br>
+    </p>
+    <pre>
+		<span class="keyword">public</span> <span class="keyword">interface</span> TransformText {
+  String render(String aInputText);
+} 
+</pre>
+    <br>
+    <pre>
+		<span class="comment">/** Wrapper (Decorator) design pattern. */</span>
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">class</span> WrapperDemo {
+  
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> main(String... aArgs){
+    TransformText transformer = <span class="keyword">new</span> BaseWrapper(<span
+            class="keyword">new</span> Echo());
+    show(transformer.render(<span class="literal">"blah."</span>)); <span
+            class="comment">// 'blah.'
+</span>    
+    transformer = <span class="keyword">new</span> Capitalize(<span
+            class="keyword">new</span> Echo());
+    show(transformer.render(<span class="literal">"blah."</span>)); <span
+            class="comment">// 'BLAH.'
+</span>    
+    transformer = <span class="keyword">new</span> RemovePeriods(<span
+            class="keyword">new</span> Capitalize(<span class="keyword">new</span> Echo()));
+    show(transformer.render(<span class="literal">"blah."</span>)); <span
+            class="comment">// 'BLAH'
+</span>    
+    transformer = <span class="keyword">new</span> RemovePeriods(<span
+            class="keyword">new</span> Echo());
+    show(transformer.render(<span class="literal">"blah."</span>)); <span
+            class="comment">// 'blah'
+</span>  }
+  
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> show(String aText){
+    System.out.println(aText);
+  }
+  
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> <span class="keyword">class</span> Echo <span
+            class="keyword">implements</span> TransformText{
+    <span class="keyword">public</span> String render(String aText) {
+      <span class="keyword">return</span> aText;
+    }
+  }
+  
+  <span class="comment">/**
+   This class both implements the interface AND is constructed 
+   with an implementation of the same interface.
+  */</span>
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">class</span> BaseWrapper <span
+            class="keyword">implements</span> TransformText {
+    BaseWrapper(TransformText aTransformText){
+      fShowText = aTransformText;
+    }
+    <span class="comment">/** Template method, calls 'before' and 'after' methods. */</span>
+    <span class="keyword">public</span> <span class="keyword">final</span> String render(String aText) {
+      String text = before(aText);
+      text = fShowText.render(text); <span class="comment">//call-forward
+</span>      <span class="keyword">return</span> after(text);
+    }
+    <span class="comment">/** This default implementation does nothing.*/</span>
+    String before(String aText){
+      <span class="keyword">return</span> aText;
+    }
+    <span class="comment">/** This default implementation does nothing.*/</span>
+    String after(String aText){
+      <span class="keyword">return</span> aText;
+    }
+    <span class="keyword">private</span> TransformText fShowText;
+  }
+  
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> <span class="keyword">class</span> Capitalize <span
+            class="keyword">extends</span> BaseWrapper {
+    Capitalize(TransformText aTransformText){
+      <span class="keyword">super</span>(aTransformText);
+    }
+    <span class="keyword">@Override</span> String before(String aText) {
+      String result = aText;
+       <span class="keyword">if</span> (aText != <span class="keyword">null</span>){
+         result = result.toUpperCase();
+       }
+       <span class="keyword">return</span> result;
+    }
+  }
+
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> <span class="keyword">class</span> RemovePeriods <span
+            class="keyword">extends</span> BaseWrapper {
+    RemovePeriods(TransformText aTransformText){
+      <span class="keyword">super</span>(aTransformText);
+    }
+    <span class="keyword">@Override</span> String after(String aText) {
+      String result = aText;
+       <span class="keyword">if</span> (aText != <span class="keyword">null</span>){
+         result = result.replace(<span class="literal">"."</span>, <span
+            class="literal">""</span>);
+       }
+       <span class="keyword">return</span> result;
+    }
+  }
+} 
+</pre>
+    The output of this class is:
+    <p></p>
+    <pre>
+blah.
+BLAH.
+BLAH
+blah</pre>
+    <br>
+    <p></p>
+    <div class="topic-section" id="see-also-title">See Also :</div>
+    <div id="see-also" class="main-body">
+        <a href="..\patrones\patrones_164.html">Método Template </a> <br>
+    </div>
+    <footer id="footer" class="legalese">
+        <span id="app_name">Prácticas de Java</span> <span
+            id="app_version_number">3.001</span><br> © <span
+            id="copyright">2018 Hirondelle Systems</span><br> <a
+            href="http://www.javapractices.com/source/SourceAction.do">Código
+            Fuente</a> | <a href="mailto:webmaster@javapractices.com"
+            rel="author">Contacto</a> | <a
+            href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+            rel="license">Licencia</a> | <a
+            href="http://www.javapractices.com/apps/cjp.rss"
+            rel="alternate" type="application/rss+xml">RSS</a>
+        <!-- ukey="2AC36CD2" -->
+        <!-- ckey="16DF3D87" -->
+        <br> Los trozos de código individual tienen una <a
+            href="http://www.javapractices.com/LICENSE.txt"
+            rel="license">licencia BSD</a><br> Sobre 1,000,000 de
+        IPs únicas el último año<br> Última actualización
+        <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+        <br> - In Memoriam : Bill Dirani -
+    </footer>
+</body>
+</html>

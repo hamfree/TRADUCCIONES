@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+    content="Prácticas y técnicas de programación en Java.">
+<meta name="keywords"
+    content="java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas de Java-&gt;Factoría de Complemento</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+    href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png" href="../img/favicon.png">
+</head>
+<body>
+    <nav class="menu-bar" id="menu-bar">
+        <a href="../index.html" title="Table of Contents"
+            style="float: left;">Inicio</a> &nbsp;&nbsp;
+        <form method="GET" action="https://www.google.com/search"
+            class="search-form" style="float: right;">
+            <input name="q" size="15" maxlength="255" placeholder=""
+                type="text"> <input name="btnG" value="Search"
+                type="submit"> <input name="sitesearch"
+                value="www.javapractices.com" type="hidden">
+        </form>
+    </nav>
+    <div class="page-title">Factoría de Complemento</div>
+    <br> It's often useful to be able to quickly and easily switch
+    one implementation of a given feature with another. This is
+    especially useful when writing unit tests for your code, but the
+    technique isn't strictly limited to unit tests.
+    <p>
+        A <em>plugin factory</em> is one way of quickly swapping
+        implementations. The general idea is to:
+    </p>
+    <ul>
+        <li>define a Java interface for the methods whose
+            implementation you want to be able to swap.</li>
+        <li>define 2 or more concrete implementations of that
+            interface.</li>
+        <li>create a corresponding method in a plugin factory class
+            to return one of those implementations, as defined by some
+            configuration setting.</li>
+    </ul>
+    <p>Using configuration of some kind (often simply a text file),
+        the plugin factory knows which concrete implementation it's
+        supposed to return to its caller.</p>
+    <p>
+        It's important for your application to treat the Plugin Factory
+        as the <i>sole source</i> for implementations of the
+        corresponding interfaces. That is, the rest of your app is not
+        supposed to have <i>direct</i> knowledge of the concrete
+        implementations. The Plugin Factory is meant to keep that
+        knowledge secret.
+    </p>
+    <p>A plugin factory can have a number of methods defined, each
+        returning an implementation of a specific interface.</p>
+    <p>
+        A recurring theme in object programming is <b>allowing old
+            code to call new code</b>. A Plugin Factory is simply another
+        variation on that important theme.
+    </p>
+    <p>
+        <b>Example</b>
+    </p>
+    <p>
+        As an example, let's take the idea of a <a
+            href="http://www.javapractices.com/topic/TopicAction.do?Id=234">fake
+            system clock</a>. In this case, you want the current time to be
+        defined centrally, in one place. You also want to be able to
+        swap in various ways of defining the current time, either for
+        testing or for other reasons.
+    </p>
+    <p>
+        Here's the interface: <br>
+    </p>
+    <pre>
+		<span class="keyword">package</span> myapp;
+
+<span class="comment">/**
+ Return the time in milliseconds from the Java epoch.
+ When combined with a TimeZone, such a millisecond value can be 
+ used to create a date-time value.
+ 
+ Variation: one might decide to return a date-time object directly, 
+ instead of a millisecond value.
+*/</span>
+<span class="keyword">public</span> <span class="keyword">interface</span> TimeSource {
+  
+  <span class="keyword">long</span> currentTimeMillis();
+  
+}
+ 
+</pre>
+    <p></p>
+    <p>
+        Here's an example of a particular concrete implementation of the
+        above interface: <br>
+    </p>
+    <pre>
+		<span class="keyword">package</span> hirondelle.jp.util;
+
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">class</span> TimeSourceOneDayAdvance <span
+            class="keyword">implements</span> TimeSource {
+  
+  <span class="keyword">public</span> <span class="keyword">long</span> currentTimeMillis() {
+    <span class="keyword">return</span> System.currentTimeMillis() + MILLISECS_PER_DAY;
+  }
+  
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> <span class="keyword">int</span> MILLISECS_PER_DAY = <span
+            class="literal">1000</span>*<span class="literal">60</span>*<span
+            class="literal">60</span>*<span class="literal">24</span>;
+}
+ 
+</pre>
+    Here's a caller that uses a concrete implementation, without knowing
+    its underlying class:
+    <br>
+    <pre>
+		<span class="keyword">package</span> myapp;
+
+<span class="comment">/**
+Use a concrete implementation of an interface, without being linked directly to the 
+the implementing class.
+
+The concrete implementation is known only to the PluginFactory class.
+*/</span>
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">class</span> UseFakeSystemClock {
+  
+  <span class="keyword">public</span> <span class="keyword">void</span> doSomethingThatDependsOnTime(){
+    TimeSource timesource = PluginFactory.getTimeSource();
+    <span class="keyword">long</span> currentTime = timesource.currentTimeMillis();
+    System.out.println(<span class="literal">"Current millisecond value: "</span> + currentTime);
+  }
+
+}
+ 
+</pre>
+    Finally, here's a sketch of the Plugin Factory itself. Note that you
+    can add more methods to this class, each corresponding to a
+    different interface.
+    <br>
+    <pre>
+		<span class="keyword">package</span> myapp;
+
+<span class="keyword">import</span> java.util.LinkedHashMap;
+<span class="keyword">import</span> java.util.Map;
+
+<span class="comment">/** Return concrete implementations for specific, known interfaces. */</span>
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">class</span> PluginFactory {
+  
+  <span class="comment">/**
+   Read in configuration data that maps names of interfaces to names of 
+   corresponding concrete implementation classes. Called early upon startup, 
+   before any implementations are needed by the rest of the program.
+   
+   &lt;P&gt;Example of a possible entry in such a config file :
+   myapp.TimeSource = myapp.TimeSourceOneDayAdvance
+  */</span>
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> init(){
+    <span class="comment">//elided
+</span>    <span class="comment">//perhaps a properties file is read, perhaps some other source is used
+</span>  }
+  
+  <span class="comment">/*
+  * Another variation: allow the caller to swap in different implementation classes
+  * at runtime, after calling init. This allows testing code to swap in various 
+  * implementations.
+  */</span>
+  
+  <span class="comment">/**
+   Return the concrete implementation of the TimeSource interface.
+  */</span>
+  <span class="keyword">public</span> <span class="keyword">static</span> TimeSource getTimeSource() {
+    String implClassName = fImplementations.get(<span class="literal">"myapp.TimeSource"</span>);
+    TimeSource result = (TimeSource)buildObject(implClassName);
+    <span class="keyword">return</span> result;
+  }
+  
+  <span class="comment">// PRIVATE
+</span>  
+  <span class="comment">/**
+   Map the name of an interface to the name of a corresponding concrete 
+   implementation class. 
+  */</span>
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> Map&lt;String, String&gt; fImplementations = <span
+            class="keyword">new</span> LinkedHashMap&lt;&gt;();
+  
+  <span class="keyword">private</span> <span class="keyword">static</span> Object buildObject(String aClassName){
+    Object result = <span class="keyword">null</span>;
+    <span class="keyword">try</span> {
+      <span class="comment">//note that, with this style, the implementation needs to have a
+</span>      <span class="comment">//no-argument constructor!
+</span>      Class implClass = Class.forName(aClassName);
+      result = implClass.newInstance();
+    }
+    <span class="keyword">catch</span> (ClassNotFoundException ex) {
+      <span class="comment">//elided
+</span>    }
+    <span class="keyword">catch</span> (InstantiationException ex) {
+      <span class="comment">//elided
+</span>    }
+    <span class="keyword">catch</span> (IllegalAccessException ex) {
+      <span class="comment">//elided
+</span>    }
+    <span class="keyword">return</span> result;
+  }
+}
+ 
+</pre>
+    <br>
+    <p></p>
+    <p></p>
+    <div class="topic-section" id="see-also-title">See Also :</div>
+    <div id="see-also" class="main-body">
+        <a href="..\constructores\constructors_113.html">Construir
+            un Objeto usando el nombre de la clase</a> <br> <a
+            href="..\practicascomunes\practicascomunes_234.html">Usar
+            un reloj de sistema falso</a> <br>
+    </div>
+    <footer id="footer" class="legalese">
+        <span id="app_name">Prácticas de Java</span> <span
+            id="app_version_number">3.001</span><br> © <span
+            id="copyright">2018 Hirondelle Systems</span><br> <a
+            href="http://www.javapractices.com/source/SourceAction.do">Código
+            Fuente</a> | <a href="mailto:webmaster@javapractices.com"
+            rel="author">Contacto</a> | <a
+            href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+            rel="license">Licencia</a> | <a
+            href="http://www.javapractices.com/apps/cjp.rss"
+            rel="alternate" type="application/rss+xml">RSS</a>
+        <!-- ukey="2AC36CD2" -->
+        <!-- ckey="16DF3D87" -->
+        <br> Los trozos de código individual tienen una <a
+            href="http://www.javapractices.com/LICENSE.txt"
+            rel="license">licencia BSD</a><br> Sobre 1,000,000 de
+        IPs únicas el último año<br> Última actualización
+        <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+        <br> - In Memoriam : Bill Dirani -
+    </footer>
+</body>
+</html>

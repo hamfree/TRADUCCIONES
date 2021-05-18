@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="Prácticas y técnicas de programación en Java." />
+    <meta name="keywords" content="java,programación java,Prácticas de Java,idioma java,estilo java,patrones de diseño java,convenciones de 
+      codigo java" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prácticas de Java-&gt;La aserción es sólo para argumentos privados</title>
+    <link id="stylesheet" rel="stylesheet" type="text/css" href="../css/stylesheet9.css" media="all" />
+    <link rel="icon" type="image/png" href="../img/favicon.png" />
+  </head>
+  <body>
+  	<nav class="menu-bar" id="menu-bar">
+      <a href="../index.html" title="Tabla de Contenidos" style="float: left;">Inicio</a>
+		  &nbsp;&nbsp;
+		  <form method="GET" action="https://www.google.com/search" class="search-form" style="float: right;">
+  			<input name="q" size="15" maxlength="255" placeholder="" type="text" />
+  			<input name="btnG" value="Buscar" type="submit" />
+        <input name="sitesearch" value="www.javapractices.com" type="hidden" />
+		  </form>
+  	</nav>
+  	<div class="page-title">
+      La aserción es sólo para argumentos privados
+    </div>
+  	<br />
+    La mayoría de las verificaciones de validez en un programa son verificaciones de parámetros pasados a métodos no privados.
+  	<i>La palabra clave </i><code>assert</code><i> no está destinada a este tipo de validaciones</i>. (Algunos pueden encontrar 
+    esto sorprendente. Aquí está la <a href="http://www.oracle.com/us/technologies/java/assertions-139853.html">guía</a> de Oracle).
+  	<p>
+      Las aserciones pueden ser deshabilitadas. Dado que las verificaciones de los parámetros de los métodos no privados 
+      implementan los requisitos exigidos por la persona que llama, la desactivación de dichas verificaciones en tiempo de 
+      ejecución significaría que parte del <a href="..\practicascomunes\practicascomunes_194.html">diseño por contrato</a> ya no se 
+      aplica. 
+   	</p>
+  	<p>
+      A la inversa, comprobar argumentos en métodos privados pueden usar <code>assert</code>. Estas comprobaciones son realizadas 
+      para verificar suposiciones sobre los detalles internos de la implementación, y no para comprobar que la persona que llama ha 
+      seguido los requerimientos de un contrato del méetodo no privado.
+    </p>
+  	<p>
+      Además, si una <code>AssertionError</code> puede ser lanzada por un método, entonces este hecho <i>no</i> debería aparecer en 
+      el comentario javadoc del método. La especificación del comportamiento de un método nunca debería mencionar las aserciones, 
+      ya que las aserciones pueden ser deshabilitadas.
+   	</p>
+  	<p>
+  		<b>Ejemplo</b><br />
+  	</p>
+  	<pre>
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+  			class="keyword">class</span> SpaceShuttle {
+  
+    <span class="comment">/**
+    * La no nulidad de aName es parte del contrato del 
+    * constructor.
+    *
+    * @param aName es no nulo.
+    */</span>
+    <span class="keyword">public</span> SpaceShuttle(String aName) {
+      <span class="comment">//forma INCORRECTA:
+  </span>    assert aName != <span class="keyword">null</span> : <span
+  			class="literal">"Name no debe ser nulo"</span>;
+      <span class="comment">//forma CORRECTA:
+  </span>    <span class="keyword">if</span> (aName == <span class="keyword">null</span>) {
+        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
+  			class="literal">"Name no debe ser nulo."</span>);
+      }
+      fName = aName;
+    }
+  
+    <span class="keyword">public</span> String getName() {
+      <span class="keyword">return</span> fName;
+    }
+  
+    <span class="comment">// PRIVADO 
+  </span>  <span class="keyword">private</span> <span class="keyword">final</span> String fName;
+  }
+   
+    </pre>
+  	<br />
+  	<p></p>
+  	<p></p>
+  	<div class="topic-section" id="see-also-title">
+      Vea también:
+    </div>
+  	<div id="see-also" class="main-body">
+  		<a href="../practicascomunes/practicascomunes_5.html">Valide los argumentos del método</a><br />
+      <a href="../practicascomunes/practicascomunes_194.html">Diseño por Contrato</a><br />
+  	</div>
+  	<footer id="footer" class="legalese">
+      <span id="app_name">Prácticas de Java</span> 
+      <span id="app_version_number">3.001</span><br />
+      © <span id="copyright">2018Hirondelle Systems</span><br /> 
+      <a href="http://www.javapractices.com/source/SourceAction.do">Código Fuente</a> | 
+      <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a> | 
+      <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/" rel="license">Licencia</a> | 
+      <a href="http://www.javapractices.com/apps/cjp.rss" rel="alternate" type="application/rss+xml">RSS</a>
+      <!-- ukey="2AC36CD2" -->
+      <!-- ckey="16DF3D87" -->
+      <br /> Los trozos de código individual tienen una 
+      <a href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia BSD</a><br />
+      Sobre 1,000,000 de IPs únicas el último año<br />
+      Última actualización <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+      <br /> - In Memoriam : Bill Dirani -
+  	</footer>
+  </body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="Prácticas y técnicas de programación en Java." />
+    <meta name="keywords" content="java,programación java,Prácticas de Java,idioma java,estilo java,patrones de diseño java,convenciones de 
+      codigo java" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />  
+    <title>Prácticas de Java-&gt;Formas de iterar</title>
+    <link id="stylesheet" rel="stylesheet" type="text/css" href="../css/stylesheet9.css" media="all" />
+    <link rel="icon" type="image/png" href="../img/favicon.png" />
+  </head>
+  <body>
+    <nav class="menu-bar" id="menu-bar">
+      <a href="../index.html" title="Tabla de Contenidos" style="float: left;">Inicio</a>
+      &nbsp;&nbsp;
+      <form method="GET" action="https://www.google.com/search" class="search-form" style="float: right;">
+        <input name="q" size="15" maxlength="255" placeholder="" type="text" />
+        <input name="btnG" value="Buscar" type="submit" />
+        <input name="sitesearch" value="www.javapractices.com" type="hidden" />
+      </form>
+    </nav>
+    <div class="page-title">
+      Formas de iterar
+    </div>
+	  <br />
+    A medida que el lenguaje Java ha crecido, también lo ha hecho la cantidad de formas en que puede iterar sobre los elementos. Aquí hay 
+    algunos códigos de ejemplo como recordatorios.
+  	<br />
+	 <pre>
+<span class="keyword">import</span> java.util.ArrayList;
+<span class="keyword">import</span> java.util.Arrays;
+<span class="keyword">import</span> java.util.Enumeration;
+<span class="keyword">import</span> java.util.Iterator;
+<span class="keyword">import</span> java.util.LinkedHashSet;
+<span class="keyword">import</span> java.util.List;
+<span class="keyword">import</span> java.util.ListIterator;
+<span class="keyword">import</span> java.util.Set;
+<span class="keyword">import</span> java.util.Vector;
+
+<span class="keyword">public</span> <span class="keyword">class</span> IterationExamples {
+  
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> main(String... args) {
+    IterationExamples examples = <span class="keyword">new</span> IterationExamples();
+    examples.forLoopWithIntegerIndex();
+    examples.enhancedFor();
+    examples.explicitIterator();
+    examples.listIterator();
+    examples.overAnEnumeration();
+    examples.simpleDoWhileLoop();
+    examples.streamsAndLambdas();
+  }
+  
+  <span class="comment">/** Error común: fuera-por-uno en el valor del índice. */</span>
+  <span class="keyword">void</span> forLoopWithIntegerIndex(){
+    logTitle(<span class="literal">"Bucle normal for."</span>);
+    <span class="keyword">for</span>(<span class="keyword">int</span> idx=<span
+			class="literal">0</span>; idx &lt; NAMES.size(); ++idx){
+      log(NAMES.get(idx));
+    }
+  }
+
+  <span class="comment">/** Más compacto, menos propenso a errores que el bucle for con un índice int. */</span>
+  <span class="keyword">void</span> enhancedFor(){
+    logTitle(<span class="literal">"Bucle for mejorado. JDK 1.5+."</span>);
+    <span class="keyword">for</span>(String name : NAMES){
+      log(name);
+    }
+  }
+  
+  <span class="comment">/** 
+   Una razón común para unsar un Iterator es eliminar elementos de una colección.
+   Con un bucle for mejorado, no puede modificar la colección subyaciente mientras está iterando sobre ella.
+  */</span>
+  <span class="keyword">void</span> explicitIterator(){
+    logTitle(<span class="literal">"Iterador explícito. JDK 1.5+."</span>);
+    Set&lt;String&gt; letters = <span class="keyword">new</span> LinkedHashSet&lt;&gt;();
+    letters.add(<span class="literal">"alpha"</span>); 
+    letters.add(<span class="literal">"beta"</span>); 
+    letters.add(<span class="literal">""</span>); <span class="comment">// una cadena vacía 
+</span>    letters.add(<span class="literal">"gamma"</span>);
+    log(<span class="literal">"Antes: "</span> + letters);
+    
+    <span class="comment">//ahora eliminamos las cadenas vacías de la colección
+</span>    Iterator&lt;String&gt; iter = letters.iterator();
+    <span class="keyword">while</span>(iter.hasNext()){
+      <span class="keyword">if</span> (iter.next().trim().length() == <span
+			class="literal">0</span>){
+        <span class="comment">//esto solo funciona si la colección soporta 'remove'
+</span>        iter.remove();
+      }
+    }
+    log(<span class="literal">"Después: "</span> + letters);
+    
+    <span class="comment">/*
+     Este estilo segundo tiene la ventaja de que el objeto iterador está 
+     confinado en el bucle for; sin embargo, no es tan legible como el 
+     estilo previo.
+    */</span>
+    logTitle(<span class="literal">"Iterador explícito dentro de un bucle for."</span>);
+    <span class="keyword">for</span> (Iterator&lt;String&gt; iter2 = letters.iterator(); iter2.hasNext();){
+      log(iter2.next());
+    }
+  }
+
+  <span class="comment">/** ListIterator es sólo para Listas. */</span>
+  <span class="keyword">void</span> listIterator(){
+    logTitle(<span class="literal">"ListIterator puede agregar-eliminar-cambiar. JDK1.5+."</span>);
+    List&lt;Integer&gt; years = <span class="keyword">new</span> ArrayList&lt;&gt;();
+    years.add(<span class="literal">1775</span>); 
+    years.add(<span class="literal">1925</span>);
+    years.add(<span class="literal">1929</span>);
+    log(<span class="literal">"Antes: "</span> + years);
+    ListIterator&lt;Integer&gt; iter = years.listIterator();
+    <span class="keyword">while</span> (iter.hasNext()){
+      Integer value = iter.next();
+      <span class="keyword">if</span> (value &gt;= <span class="literal">1900</span>){
+        iter.set(value - <span class="literal">1</span>);
+      }
+      <span class="keyword">else</span> <span class="keyword">if</span> (value &lt; <span
+			class="literal">1800</span>){
+        iter.remove();
+      }
+    }
+    log(<span class="literal">"Después: "</span> + years);
+  }
+  
+  <span class="comment">/** 
+   Las enumeraciones son usadas por las IPAs más viejas.
+   Cuando defina código nuevo, casi siempre debería usar Collections y Maps en su lugar. 
+  */</span>
+  <span class="keyword">void</span> overAnEnumeration(){
+    <span class="comment">//Vector es una clase más vieja, generalmente evitada en código nuevo
+</span>    Vector&lt;String&gt; v = <span class="keyword">new</span> Vector&lt;&gt;(); 
+    v.add(<span class="literal">"alpha"</span>);
+    v.add(<span class="literal">"beta"</span>);
+    v.add(<span class="literal">"gamma"</span>);
+    Enumeration&lt;String&gt; e = v.elements();
+    logTitle(<span class="literal">"Enumeración, con un bucle while."</span>);
+    <span class="keyword">while</span> (e.hasMoreElements()){
+      log(e.nextElement());
+    }
+  }
+  
+  <span class="comment">/**
+   do-while no es usado tan a menudo.
+   Difiere del bucle while en la colocación del test booleano.
+   En un bucle do-while, el cuerpo del bucle es ejecutado al menos una vez.
+  */</span>
+  <span class="keyword">void</span> simpleDoWhileLoop(){
+    logTitle(<span class="literal">"Do-while."</span>);
+    <span class="keyword">int</span> countDown = <span class="literal">5</span>;
+    <span class="keyword">do</span> {
+      log(countDown);
+      --countDown;
+    }
+    <span class="keyword">while</span>(countDown &gt; -<span
+			class="literal">1</span>);
+  }
+
+  <span class="keyword">void</span> streamsAndLambdas(){
+    logTitle(<span class="literal">"Usando un flujo (stream). JDK 8+."</span>);
+    NAMES.stream().forEach(name -&gt; log(name));
+    
+    <span class="comment">//una referencia a método también funciona: 
+</span>    <span class="comment">//NAMES.stream().forEach(System.out::println);
+</span>    
+    logTitle(<span class="literal">"Usando un stream en un segundo estilo, para métodos de N-lineas"</span>);
+    NAMES.stream().forEach(name -&gt; {
+      log(name.toLowerCase());
+      log(name.toUpperCase());
+    });
+  }
+  
+  <span class="keyword">private</span> List&lt;String&gt; NAMES = Arrays.asList(<span
+			class="literal">"Ann"</span>, <span class="literal">"Bob"</span>, <span
+			class="literal">"Charles"</span>, <span class="literal">"Diane"</span>);
+  
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+			class="keyword">final</span> <span class="keyword">void</span> log(Object thing){
+    System.out.println(<span class="literal">"  "</span> + thing.toString());
+  }
+  
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+			class="keyword">final</span> <span class="keyword">void</span> logTitle(Object thing){
+    System.out.println(thing.toString());
+  }
+}
+ 
+    </pre>
+
+	<p>Una ejecución de ejemplo de esta clase:</p>
+	<pre>
+Bucle normal for.
+  Ann
+  Bob
+  Charles
+  Diane
+Bucle for mejorado. JDK 1.5+.
+  Ann
+  Bob
+  Charles
+  Diane
+Iterador explícito. JDK 1.5+.
+  Antes: [alpha, beta, , gamma]
+  Después: [alpha, beta, gamma]
+Iterador explícito dentro de un bucle for.
+  alpha
+  beta
+  gamma
+ListIterator puede agregar-eliminar-cambiar. JDK1.5+.
+  Antes: [1775, 1925, 1929]
+  Después: [1924, 1928]
+Enumeración, con un bucle while.
+  alpha
+  beta
+  gamma
+Do-while.
+  5
+  4
+  3
+  2
+  1
+  0
+Usando un flujo (stream). JDK 8+.
+  Ann
+  Bob
+  Charles
+  Diane
+Usando un stream en un segundo estilo, para métodos de N-lineas
+  ann
+  ANN
+  bob
+  BOB
+  charles
+  CHARLES
+  diane
+  DIANE
+    </pre>
+    <p></p>
+    <div class="topic-section" id="see-also-title">
+      Vea también :
+    </div>
+	  <div id="see-also" class="main-body">
+		  <a href="..\colecciones\colecciones_88.html">Iterar sin un índice</a><br />
+      <a href="..\colecciones\colecciones_196.html">Utilice for each generosamente</a><br />
+    </div>
+    <footer id="footer" class="legalese">
+      <span id="app_name">Prácticas de Java</span> 
+      <span id="app_version_number">3.001</span><br />
+      © <span id="copyright">2018Hirondelle Systems</span><br /> 
+      <a href="http://www.javapractices.com/source/SourceAction.do">Código Fuente</a> | 
+      <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a> | 
+      <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/" rel="license">Licencia</a> | 
+      <a href="http://www.javapractices.com/apps/cjp.rss" rel="alternate" type="application/rss+xml">RSS</a>
+      <!-- ukey="2AC36CD2" -->
+      <!-- ckey="16DF3D87" -->
+      <br /> Los trozos de código individual tienen una 
+      <a href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia BSD</a><br />
+      Sobre 1,000,000 de IPs únicas el último año<br />
+      Última actualización <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+      <br /> - In Memoriam : Bill Dirani -
+    </footer>
+  </body>
+</html>

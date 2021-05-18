@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+    content="Prácticas y técnicas de programación en Java.">
+<meta name="keywords"
+    content="java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas de Java-&gt;Matrices como Cadenas</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+    href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png" href="../img/favicon.png">
+</head>
+<body>
+    <nav class="menu-bar" id="menu-bar">
+        <a href="../index.html" title="Table of Contents"
+            style="float: left;">Inicio</a> &nbsp;&nbsp;
+        <form method="GET" action="https://www.google.com/search"
+            class="search-form" style="float: right;">
+            <input name="q" size="15" maxlength="255" placeholder=""
+                type="text"> <input name="btnG" value="Search"
+                type="submit"> <input name="sitesearch"
+                value="www.javapractices.com" type="hidden">
+        </form>
+    </nav>
+    <div class="page-title">Matrices como Cadenas</div>
+    <br>Logging the contents of a&nbsp;
+    <code>Collection</code>
+    is simple, since&nbsp;
+    <code>
+        <a
+            href="https://docs.oracle.com/javase/10/docs/api/java/util/AbstractCollection.html#toString()">AbstractCollection.toString</a>
+    </code>
+    is always available. For an array, however, the default
+    <code>toString</code>
+    method is not very informative, and doesn't include the array
+    contents.
+    <p>
+        To provide more useful representations of arrays, various
+        <code>toString</code>
+        methods (and the <a
+            href="https://docs.oracle.com/javase/10/docs/api/java/util/Arrays.html#deepToString(java.lang.Object[])"><code>deepToString</code></a>
+        method) were added to the <a
+            href="https://docs.oracle.com/javase/10/docs/api/java/util/Arrays.html"><code>Arrays</code></a>
+        class in JDK 1.5. Those methods can be used when available, as
+        in:
+    </p>
+    <pre>Arrays.<a
+            href="https://docs.oracle.com/javase/10/docs/api/java/util/Arrays.html#toString(java.lang.Object:A)">toString</a>(myArray); 
+Arrays.<a
+            href="https://docs.oracle.com/javase/10/docs/api/java/util/Arrays.html#deepToString(java.lang.Object:A)">deepToString</a>(myObjectArray); //recursive
+</pre>
+    <p>If you need an alternative, you can simply convert the array
+        to a collection, as in</p>
+    <pre>Arrays.<a
+            href="https://docs.oracle.com/javase/10/docs/api/java/util/Arrays.html#asList(T...)">asList</a>(myArray).toString();
+</pre>
+    <p>Finally, here's a third option, using a utility class which:</p>
+    <ul>
+        <li>uses a slightly different style from that used in <a
+            href="https://docs.oracle.com/javase/10/docs/api/java/util/Arrays.html"><code>Arrays</code></a>
+        </li>
+        <li>works with versions of the JDK prior to 1.5</li>
+        <li>returns text in the same format as <a
+            href="https://docs.oracle.com/javase/10/docs/api/java/util/AbstractCollection.html#toString()"><code>AbstractCollection.toString</code></a>
+        </li>
+        <li>handles arrays of all primitive types, and arrays of <code>Object</code>s
+            as well
+        </li>
+        <li>handles arrays of arrays by using recursion</li>
+    </ul>
+    <br>
+    <pre>
+		<span class="keyword">package</span> myapp.business;
+
+<span class="keyword">import</span> java.lang.reflect.Array;
+
+<span class="comment">/**
+* Convenience method for producing a simple textual
+* representation of an array.
+*
+* &lt;P&gt;The format of the returned &lt;code&gt;String&lt;/code&gt; is the same as
+* &lt;code&gt;AbstractCollection.toString&lt;/code&gt;:
+* &lt;ul&gt;
+* &lt;li&gt;non-empty array: [blah, blah]
+* &lt;li&gt;empty array: []
+* &lt;li&gt;null array: null
+* &lt;/ul&gt;
+*
+* @author Jerome Lacoste
+* @author www.javapractices.com
+*/</span>
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">class</span> ArrayToString {
+
+  <span class="comment">/**
+  * &lt;code&gt;aArray&lt;/code&gt; is a possibly-null array whose elements are
+  * primitives or objects; arrays of arrays are also valid, in which case
+  * &lt;code&gt;aArray&lt;/code&gt; is rendered in a nested, recursive fashion.
+  */</span>
+  <span class="keyword">public</span> <span class="keyword">static</span> String get(Object aArray){
+    <span class="keyword">if</span> (aArray == <span class="keyword">null</span>) <span
+            class="keyword">return</span> fNULL;
+    checkObjectIsArray(aArray);
+
+    StringBuilder result = <span class="keyword">new</span> StringBuilder(fSTART_CHAR);
+    <span class="keyword">int</span> length = Array.getLength(aArray);
+    <span class="keyword">for</span> (<span class="keyword">int</span> idx = <span
+            class="literal">0</span> ; idx &lt; length ; ++idx) {
+      Object item = Array.get(aArray, idx);
+      <span class="keyword">if</span> (isNonNullArray(item)){
+        <span class="comment">//recursive call!
+</span>        result.append(get(item));
+      }
+      <span class="keyword">else</span>{
+        result.append(item);
+      }
+      <span class="keyword">if</span> (! isLastItem(idx, length)) {
+        result.append(fSEPARATOR);
+      }
+    }
+    result.append(fEND_CHAR);
+    <span class="keyword">return</span> result.toString();
+  }
+
+  <span class="comment">// PRIVATE
+</span>  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> String fSTART_CHAR = <span
+            class="literal">"["</span>;
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> String fEND_CHAR = <span
+            class="literal">"]"</span>;
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> String fSEPARATOR = <span
+            class="literal">", "</span>;
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> String fNULL = <span
+            class="literal">"null"</span>;
+
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> checkObjectIsArray(Object aArray){
+    <span class="keyword">if</span> (! aArray.getClass().isArray()) {
+      <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
+            class="literal">"Object is not an array."</span>);
+    }
+  }
+
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">boolean</span> isNonNullArray(Object aItem){
+    <span class="keyword">return</span> aItem != <span class="keyword">null</span> &amp;&amp; aItem.getClass().isArray();
+  }
+
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">boolean</span> isLastItem(<span
+            class="keyword">int</span> aIdx, <span class="keyword">int</span> aLength){
+    <span class="keyword">return</span> (aIdx == aLength - <span
+            class="literal">1</span>);
+  }
+
+  <span class="comment">/** Test harness.  */</span>
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> main(String... args) {
+
+    <span class="keyword">boolean</span>[] booleans = {<span
+            class="keyword">true</span>, <span class="keyword">false</span>, <span
+            class="keyword">false</span>};
+    <span class="keyword">char</span>[] chars = {<span class="literal">'B'</span>, <span
+            class="literal">'P'</span>, <span class="literal">'H'</span>};
+    <span class="keyword">byte</span>[] bytes = {<span class="literal">3</span>};
+    <span class="keyword">short</span>[] shorts = {<span class="literal">5</span>,<span
+            class="literal">6</span>};
+    <span class="keyword">int</span>[] ints = {<span class="literal">7</span>,<span
+            class="literal">8</span>,<span class="literal">9</span>,<span
+            class="literal">10</span>};
+    <span class="keyword">long</span>[] longs = {<span class="literal">100</span>,<span
+            class="literal">101</span>,<span class="literal">102</span>};
+    <span class="keyword">float</span>[] floats = { <span
+            class="literal">99.9f</span>, <span class="literal">63.2f</span>};
+    <span class="keyword">double</span>[] doubles = { <span
+            class="literal">212.2</span>, <span class="literal">16.236</span>, <span
+            class="literal">42.2</span>};
+    String[] strings = {<span class="literal">"blah"</span>, <span
+            class="literal">"blah"</span>, <span class="literal">"blah"</span>};
+    java.util.Date[] dates = { <span class="keyword">new</span> java.util.Date(), <span
+            class="keyword">new</span> java.util.Date() };
+    System.out.println(<span class="literal">"booleans: "</span> + get(booleans));
+    System.out.println(<span class="literal">"chars: "</span> + get(chars));
+    System.out.println(<span class="literal">"bytes: "</span> + get(bytes));
+    System.out.println(<span class="literal">"shorts: "</span> + get(shorts));
+    System.out.println(<span class="literal">"ints: "</span> + get(ints));
+    System.out.println(<span class="literal">"longs: "</span> + get(longs));
+    System.out.println(<span class="literal">"floats: "</span> + get(floats));
+    System.out.println(<span class="literal">"double: "</span> + get(doubles));
+    System.out.println(<span class="literal">"strings: "</span> + get(strings));
+    System.out.println(<span class="literal">"dates: "</span> + get(dates));
+
+    <span class="keyword">int</span>[] nullInts = <span class="keyword">null</span>;
+    <span class="keyword">int</span>[] emptyInts = {};
+    String[] emptyStrings = {<span class="literal">""</span>, <span
+            class="literal">""</span>};
+    String[] nullStrings = {<span class="keyword">null</span>, <span
+            class="keyword">null</span>};
+    System.out.println(<span class="literal">"null ints: "</span> + get(nullInts));
+    System.out.println(<span class="literal">"empty ints: "</span> + get(emptyInts));
+    System.out.println(<span class="literal">"empty Strings: "</span> + get(emptyStrings));
+    System.out.println(<span class="literal">"null Strings: "</span> + get(nullStrings));
+
+    String[] arrayA = {<span class="literal">"A"</span>, <span
+            class="literal">"a"</span>};
+    String[] arrayB = {<span class="literal">"B"</span>, <span
+            class="literal">"b"</span>};
+    String[][] arrayOfArrays = {arrayA, arrayB};
+    System.out.println(<span class="literal">"array Of Arrays: "</span> + get(arrayOfArrays));
+  }
+} 
+</pre>
+    <br>An example run of this class:
+    <p>
+        <code>&gt;java -cp . myapp.business.ArrayToString</code>
+        <br>
+        <code>booleans: [true, false, false]</code>
+        <br>
+        <code>chars: [B, P, H]</code>
+        <br>
+        <code>bytes: [3]</code>
+        <br>
+        <code>shorts: [5, 6]</code>
+        <br>
+        <code>ints: [7, 8, 9, 10]</code>
+        <br>
+        <code>longs: [100, 101, 102]</code>
+        <br>
+        <code>floats: [99.9, 63.2]</code>
+        <br>
+        <code>double: [212.2, 16.236, 42.2]</code>
+        <br>
+        <code>strings: [blah, blah, blah]</code>
+        <br>
+        <code>dates: [Wed Jun 18 09:55:08 EDT 2003, Wed Jun 18
+            09:55:08 EDT 2003]</code>
+        <br>
+        <code>null ints: null</code>
+        <br>
+        <code>empty ints: []</code>
+        <br>
+        <code>empty Strings: [, ]</code>
+        <br>
+        <code>null Strings: [null, null]</code>
+        <br>
+        <code>array Of Arrays: [[A, a], [B, b]]</code>
+        <br>
+    </p>
+    <p></p>
+    <div class="topic-section" id="see-also-title">See Also :</div>
+    <div id="see-also" class="main-body">
+        <a href="..\objetos\objects_55.html">Implementar toString</a> <br>
+    </div>
+    <footer id="footer" class="legalese">
+        <span id="app_name">Prácticas de Java</span> <span
+            id="app_version_number">3.001</span><br> © <span
+            id="copyright">2018 Hirondelle Systems</span><br> <a
+            href="http://www.javapractices.com/source/SourceAction.do">Código
+            Fuente</a> | <a href="mailto:webmaster@javapractices.com"
+            rel="author">Contacto</a> | <a
+            href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+            rel="license">Licencia</a> | <a
+            href="http://www.javapractices.com/apps/cjp.rss"
+            rel="alternate" type="application/rss+xml">RSS</a>
+        <!-- ukey="2AC36CD2" -->
+        <!-- ckey="16DF3D87" -->
+        <br> Los trozos de código individual tienen una <a
+            href="http://www.javapractices.com/LICENSE.txt"
+            rel="license">licencia BSD</a><br> Sobre 1,000,000 de
+        IPs únicas el último año<br> Última actualización
+        <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+        <br> - In Memoriam : Bill Dirani -
+    </footer>
+</body>
+</html>

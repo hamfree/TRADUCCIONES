@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<!-- saved from url=(0056)http://www.javapractices.com/topic/TopicAction.do?Id=197 -->
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+	content="Prácticas y técnicas de programación en Java.">
+<meta name="keywords"
+	content="java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas de Java-&gt;Use la conversión automática de tipos con cuidado</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+	href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png" href="../img/favicon.png">
+</head>
+<body>
+	<nav class="menu-bar" id="menu-bar">
+		<a href="../index.html" title="Table of Contents" style="float: left;">Inicio</a>
+		&nbsp;&nbsp;
+		<form method="GET" action="https://www.google.com/search"
+			class="search-form" style="float: right;">
+			<input type="text" name="q" size="15" maxlength="255" value=""
+				placeholder=""> <input type="submit" name="btnG"
+				value="Search"> <input type="hidden" name="sitesearch"
+				value="www.javapractices.com">
+		</form>
+	</nav>
+	<div class="page-title">Use la conversión automática de tipos con
+		cuidado</div>
+
+	<a
+		href="http://docs.oracle.com/javase/1.5.0/docs/guide/language/autoboxing.html">Boxing</a>
+	was introduced in JDK 1.5 to eliminate trivial conversions between
+	primitives (
+	<code>int</code>
+	,
+	<code>boolean</code>
+	, and so on) and corresponding wrapper objects (
+	<code>Integer</code>
+	,
+	<code>Boolean</code>
+	, and so on). Boxing allows some code to be a bit more concise and
+	legible. It's also useful when using collections (which only take
+	objects, not primitives).
+
+	<p>There are two complimentary aspects of boxing:</p>
+	<ul>
+		<li>auto-boxing, which refers to automatic conversion of an <code>int</code>
+			to an <code>Integer</code>, for example
+		</li>
+		<li>auto-unboxing, which refers to automatic conversion of a <code>Boolean</code>
+			to a <code>boolean</code>, for example
+		</li>
+	</ul>
+
+	<p>
+		Boxing <em>partially hides</em> the distinction between primitives and
+		corresponding wrapper objects, but it doesn't remove it. There are two
+		distinctions which are not changed by boxing:
+	</p>
+	<ul>
+		<li>objects can be <code>null</code>, while primitives cannot
+		</li>
+		<li>objects have both state and identity, while primitives have
+			only state (the value)</li>
+	</ul>
+
+	Occasionally, these differences can cause problems when using boxing.
+
+	<p>Some points to remember:</p>
+	<ul>
+		<li>be careful with <code>null</code>s. Auto-unboxing a <code>null</code>
+			object will cause a <code>NullPointerException</code>.
+		</li>
+		<li>comparing items with <code>==</code> and <code>equals</code>
+			must be done with care.
+		</li>
+	</ul>
+
+	The rules for comparison of primitives and wrapper objects are as
+	follows.
+
+	<p>
+		If
+		<code>x</code>
+		and
+		<code>y</code>
+		are either both primitives, or both objects, then no boxing occurs: <br>&nbsp;
+	</p>
+	<table style="width:75%">
+        <colgroup>
+            <col width="33%">
+            <col width="33%">
+            <col width="33%">
+        </colgroup>
+		<tbody>
+			<tr valign="TOP">
+				<td><b>Operation</b></td>
+				<td><b><code>Two primitives</code></b></td>
+				<td><b><code>Two objects</code></b></td>
+			</tr>
+			<tr>
+				<td><code>x == y</code></td>
+				<td>compare value</td>
+				<td>compare identity</td>
+			</tr>
+			<tr>
+				<td><code>x.equals(y)</code></td>
+				<td>does not compile</td>
+				<td>compare value</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<p>
+		If one item is a primitive, and the other item is a <em>corresponding</em>
+		wrapper object, then boxing can occur: <br>&nbsp;
+	</p>
+	<table style="width:75%">
+		<tbody>
+			<tr valign="top">
+				<td><b>Operation</b></td>
+				<td><b>Behavior</b></td>
+			</tr>
+			<tr>
+				<td width="40%"><code>x == y</code></td>
+				<td>treat as two primitives, and compare value</td>
+			</tr>
+			<tr>
+				<td valign="top" nowrap="nowrap">
+                    <code>x.equals(y)</code>
+                   </td>
+				<td>does not compile if <code>x</code> is a primitive;
+					otherwise treat as two objects, and compare value
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<p>
+		<b>Example</b> <br>
+	</p>
+	<pre>
+		<span class="keyword">import</span> java.util.*;
+
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+			class="keyword">class</span> BoxingExamples {
+
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+			class="keyword">final</span> <span class="keyword">void</span> main(String... aArgs){
+    <span class="comment">//pass Integer where int expected
+</span>    explode(<span class="keyword">new</span> Integer(<span
+			class="literal">3</span>));
+
+    <span class="comment">//pass literal where Boolean expected
+</span>    tellTruth(<span class="keyword">true</span>);
+
+    <span class="comment">//calculate "int-erchangably" with int and Integer
+</span>    Integer integerYear = <span class="keyword">new</span> Integer(<span
+			class="literal">1989</span>);
+    Integer otherIntegerYear = integerYear + <span class="literal">10</span>;
+    <span class="keyword">int</span> intYear = integerYear + <span
+			class="keyword">new</span> Integer(<span class="literal">15</span>);
+    log(integerYear.toString());
+    log(otherIntegerYear.toString());
+    System.out.println(intYear);
+
+    <span class="comment">/*
+    * Comparison of primitives and wrapper objects using == and equals.
+    *
+    * When both items are of the same type :
+    *             2 primitives          2 objects
+    * ----------------------------------------------------------
+    * ==       :  value                 identity
+    * equals() :  not applicable        value
+    *
+    *
+    * When one item is a primitive, and the other is an object :
+    * ==          :  treat as two primitives
+    * x.equals(y) :  treat as two objects; do not compile if x is primitive
+    */</span>
+    intYear = <span class="literal">1880</span>;
+    integerYear = <span class="keyword">new</span> Integer(<span
+			class="literal">1880</span>);
+    <span class="keyword">if</span> (intYear == integerYear){
+      log(<span class="literal">"intYear == integerYear: TRUE"</span>); <span
+			class="comment">// yes
+</span>    }
+    <span class="keyword">else</span> {
+      log(<span class="literal">"intYear == integerYear : FALSE"</span>);
+    }
+    <span class="keyword">if</span> (integerYear.equals(intYear)){
+      log(<span class="literal">"integerYear.equals(intYear): TRUE"</span>); <span
+			class="comment">//yes
+</span>    }
+    <span class="keyword">else</span> {
+      log(<span class="literal">"integerYear.equals(intYear): FALSE"</span>);
+    }
+    <span class="comment">//does not compile "int cannot be dereferenced" :
+</span>    <span class="comment">//intYear.equals(integerYear);
+</span>
+    intYear = <span class="literal">1881</span>; <span class="comment">//new value
+</span>    <span class="keyword">if</span> (intYear == integerYear){
+      log(<span class="literal">"intYear == integerYear: TRUE"</span>);
+    }
+    <span class="keyword">else</span> {
+      log(<span class="literal">"intYear == integerYear : FALSE"</span>); <span
+			class="comment">// yes
+</span>    }
+    <span class="keyword">if</span> (integerYear.equals(intYear)){
+      log(<span class="literal">"integerYear.equals(intYear): TRUE"</span>);
+    }
+    <span class="keyword">else</span> {
+      log(<span class="literal">"integerYear.equals(intYear): FALSE"</span>); <span
+			class="comment">//yes
+</span>    }
+  }
+
+  <span class="comment">// PRIVATE
+</span>  <span class="keyword">private</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> explode(<span class="keyword">int</span> aNumTimes){
+    log(<span class="literal">"Exploding "</span> + aNumTimes + <span
+			class="literal">" times."</span>);
+  }
+
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> tellTruth(Boolean aChoice){
+    <span class="comment">//instead of if ( aChoice.booleanValue() ) {
+</span>    <span class="keyword">if</span> (aChoice) {
+      log(<span class="literal">"Telling truth."</span>);
+    }
+    <span class="keyword">else</span> {
+      log(<span class="literal">"Lying like a rug."</span>);
+    }
+  }
+
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> log(String aText){
+    System.out.println(aText);
+  }
+} 
+</pre>
+
+	<br>An example run of this class:
+	<p></p>
+	<p>
+		<code>&gt;java -classpath . BoxingExamples</code>
+		<br>
+		<code>Exploding 3 times.</code>
+		<br>
+		<code>Telling truth.</code>
+		<br>
+		<code>1989</code>
+		<br>
+		<code>1999</code>
+		<br>
+		<code>2004</code>
+		<br>
+		<code>intYear == integerYear: TRUE</code>
+		<br>
+		<code>integerYear.equals(intYear): TRUE</code>
+		<br>
+		<code>intYear == integerYear : FALSE</code>
+		<br>
+		<code>integerYear.equals(intYear): FALSE</code>
+		<br>
+	</p>
+	<p></p>
+	<div class="topic-section" id="see-also-title">See Also :</div>
+	<div id="see-also" class="main-body">
+		<a href="..\objetos\objects_17.html">Implementar equals</a> <br>
+	</div>
+
+	<footer id="footer" class="legalese">
+		<span id="app_name">Prácticas de Java</span> <span
+			id="app_version_number">3.001</span><br> © <span id="copyright">2018
+			Hirondelle Systems</span><br> <a
+			href="http://www.javapractices.com/source/SourceAction.do">Código
+			Fuente</a> | <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a>
+		| <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+			rel="license">Licencia</a> | <a
+			href="http://www.javapractices.com/apps/cjp.rss" rel="alternate"
+			type="application/rss+xml">RSS</a>
+		<!-- ukey="2AC36CD2" -->
+		<!-- ckey="16DF3D87" -->
+		<br> Los trozos de código individual tienen una <a
+			href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia
+			BSD</a><br> Sobre 1,000,000 de IPs únicas el último año<br>
+		Última actualización
+		<time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+		<br> - In Memoriam : Bill Dirani -
+	</footer>
+
+</body>
+</html>

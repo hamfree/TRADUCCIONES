@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="Prácticas y técnicas de programación en Java." />
+    <meta name="keywords" content="java,programación java,Prácticas de Java,idioma java,estilo java,patrones de diseño java,convenciones de 
+      codigo java" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prácticas de Java-&gt;Casos de uso de las aserciones</title>
+    <link id="stylesheet" rel="stylesheet" type="text/css" href="../css/stylesheet9.css" media="all" />
+    <link rel="icon" type="image/png" href="../img/favicon.png" />
+  </head>
+  <body>
+    <nav class="menu-bar" id="menu-bar">
+      <a href="../index.html" title="Tabla de Contenidos" style="float: left;">Inicio</a>
+      &nbsp;&nbsp;
+      <form method="GET" action="https://www.google.com/search"
+        class="search-form" style="float: right;">
+        <input name="q" size="15" maxlength="255" placeholder="" type="text">
+        <input name="btnG" value="Search" type="submit"> <input
+          name="sitesearch" value="www.javapractices.com" type="hidden">
+      </form>
+    </nav>
+	  <div class="page-title">
+      Casos de uso de las aserciones
+    </div>
+	  <br />
+    Aquí tiene algunos ejemplos comunes de uso de la palabra clave <code>assert</code>:
+	  <ul>
+		  <li>
+        pre-condiciones (en métodos privados sólo) - los requisitos que un método requiere que cumpla su llamador 
+      </li>
+		  <li>
+        post-condiciones - verifica las promesas hechas por un método a su llamador
+      </li>
+		  <li>
+        clases invariantes - validar el estado del objeto
+      </li>
+		  <li>
+        código no alcanzable en tiempo de ejecución - partes de su programa que usted espera no sean alcanzables, pero que no 
+        pueden ser verificadas como tales en tiempo de compilación (a menudo cláusulas <code>else</code> y casos por defecto en 
+        sentencias <code>switch</code>)
+		  </li>
+	  </ul>
+	  <b>Ejemplo</b>
+	  <br />
+	  <pre>
+<span class="keyword">import</span> java.util.Random;
+
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+			class="keyword">class</span> Flower {
+
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> main(String... arguments) {
+    <span class="keyword">final</span> Flower tulip = <span
+			class="keyword">new</span> Flower(<span class="literal">"Tulip"</span>, <span
+			class="literal">1</span>);
+    tulip.grow();
+    tulip.grow();
+    System.out.println(tulip);
+
+    tulip.randomGrowOrWither();
+    System.out.println(tulip);
+
+    tulip.wither();
+    tulip.wither();
+    System.out.println(tulip);
+  }
+
+  <span class="comment">/**
+  * @param aSpecies debe tener contenido.
+  * @param aInitialLength debe ser mayor que 0.
+  */</span>
+  <span class="keyword">public</span> Flower(<span class="keyword">final</span> String aSpecies, <span
+			class="keyword">final</span> <span class="keyword">int</span> aInitialLength) {
+    <span class="comment">//assert NO es usada para validar los parámetros de los métodos públicos
+</span>    <span class="keyword">if</span> (!isValidSpecies(aSpecies)) {
+      <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
+			class="literal">"Species debe tener contenido."</span>);
+    }
+    <span class="keyword">if</span> (!isValidLength(aInitialLength)) {
+      <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
+			class="literal">"Initial length debe ser positivo."</span>);
+    }
+
+    fSpecies = aSpecies;
+    fLength = aInitialLength;
+
+    <span class="comment">//verifica la clase invariante
+</span>    assert hasValidState(): <span class="literal">"Construcción fallida - estado no válido."</span>;
+  }
+
+  <span class="keyword">public</span> <span class="keyword">boolean</span> isMature() {
+    <span class="keyword">return</span> fLength &gt; <span
+			class="literal">5</span> ;
+    <span class="comment">//no es necesario asegurar el estado válido aquí, ya que
+</span>    <span class="comment">//el estado no ha cambiado.
+</span>  }
+
+  <span class="comment">/**
+  * Incrementa la longitud por al menos una unidad.
+  */</span>
+  <span class="keyword">public</span> <span class="keyword">void</span> grow(){
+    <span class="comment">//este estilo de comprobar post-condiciones NO es recomendado,
+</span>    <span class="comment">//ya que la copia de fLength se hace siempre, incluso cuando
+</span>    <span class="comment">//las aserciones son deshabilitadas.
+</span>    <span class="comment">//Vea &lt;tt&gt;wither&lt;/tt&gt; (abajo) para un ejemplo con un estilo mejorado.
+</span>    <span class="keyword">final</span> <span class="keyword">int</span> oldLength = fLength;
+    fLength += getLengthIncrease(fLength);
+    <span class="comment">//post-condición: se incrementó la longitud
+</span>    assert fLength &gt; oldLength;
+
+    <span class="comment">//comprueba la clase invariante
+</span>    assert hasValidState(): <span class="keyword">this</span>;
+  }
+
+  <span class="comment">/**
+  * Decrementa la longitud en una unidad, pero sólo si la longitud resultante
+  * va a ser aún mayor que 0.
+  */</span>
+  <span class="keyword">public</span> <span class="keyword">void</span> wither(){
+
+    <span class="comment">//esta clase local existe sólo para tomar una instantánea del estado actual.
+</span>    <span class="comment">//aunque voluminoso, este estilo permite condiciones posteriores de complejidad arbitraria.
+</span>    <span class="keyword">class</span> OriginalState {
+      OriginalState() {
+        fOriginalLength = fLength;
+      }
+      <span class="keyword">int</span> getLength() {
+        <span class="keyword">return</span> fOriginalLength;
+      }
+      <span class="keyword">private</span> <span class="keyword">final</span> <span
+			class="keyword">int</span> fOriginalLength;
+    }
+    OriginalState originalState = <span class="keyword">null</span>;
+    <span class="comment">//construye el objeto dentro de una aserción, para asegurarse de que  
+</span>    <span class="comment">//no se realiza ninguna construcción cuando las aserciones están deshabilitadas.
+</span>    <span class="comment">//esta aserción es bastante inusual ya que siempre tendrá éxito, y 
+</span>    <span class="comment">//tiene efectos laterales - crea un objeto y establece una referencia
+</span>    assert (originalState = <span class="keyword">new</span> OriginalState()) != <span
+			class="keyword">null</span>;
+
+    <span class="keyword">if</span> (fLength &gt; <span class="literal">1</span>) {
+      --fLength;
+    }
+
+    <span class="comment">//post-condición: la longitud ha decrecido en uno o ha permanecido igual
+</span>    assert fLength &lt;= originalState.getLength();
+
+    <span class="comment">//comprueba la clase invariante
+</span>    assert hasValidState(): <span class="keyword">this</span>;
+  }
+
+  <span class="comment">/**
+  * selecciona aleatoriamente una de tres acciones
+  * &lt;ul&gt;
+  * &lt;li&gt;do nothing
+  * &lt;li&gt;grow
+  * &lt;li&gt;wither
+  * &lt;/ul&gt;
+  */</span>
+  <span class="keyword">public</span> <span class="keyword">void</span> randomGrowOrWither() {
+    <span class="comment">//(se usan número mágicos aquí en vez de constantes simbólicas
+</span>    <span class="comment">//para aclarar un poco el ejemplo)
+</span>    Random generator = <span class="keyword">new</span> Random();
+    <span class="keyword">int</span> action = generator.nextInt(<span
+			class="literal">3</span>);
+    <span class="comment">//de acuerdo a la documentación para la clase Random, la acción 
+</span>    <span class="comment">//tomará uno de los valores 0,1,2.
+</span>    <span class="keyword">if</span> (action == <span class="literal">0</span>) {
+      <span class="comment">//do nothing
+</span>    }
+    <span class="keyword">else</span> <span class="keyword">if</span> (action == <span
+			class="literal">1</span>) {
+      grow();
+    }
+    <span class="keyword">else</span> <span class="keyword">if</span> (action == <span
+			class="literal">2</span>) {
+      wither();
+    }
+    <span class="keyword">else</span> {
+      <span class="comment">//esto es aún ejecutado si las aserciones son deshabilitadas
+</span>      <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(<span
+			class="literal">"Valor no esperado para la acción: "</span> + action);
+    }
+    <span class="comment">//comprueba la clase invariante
+</span>    assert hasValidState(): <span class="keyword">this</span>;
+  }
+
+  <span class="comment">/** Usar solo para depurar.  */</span>
+  <span class="keyword">public</span> String toString(){
+    <span class="keyword">final</span> StringBuilder result = <span
+			class="keyword">new</span> StringBuilder();
+    result.append(<span class="keyword">this</span>.getClass().getName());
+    result.append(<span class="literal">": Species="</span>);
+    result.append(fSpecies);
+    result.append(<span class="literal">" Length="</span>);
+    result.append(fLength);
+    <span class="keyword">return</span> result.toString();
+  }
+
+  <span class="comment">// PRIVADO 
+</span>  <span class="keyword">private</span> <span class="keyword">final</span> String fSpecies;
+  <span class="keyword">private</span> <span class="keyword">int</span> fLength;
+
+  <span class="comment">/**
+  * Implementa la clase invariante.
+  *
+  * Realiza todas las comprobaciones en el estado del objeto.
+  * Uno puede asertar que este método devuelve verdadero al final de 
+  * cada método público.
+  */</span>
+  <span class="keyword">private</span> <span class="keyword">boolean</span> hasValidState(){
+    <span class="keyword">return</span> isValidSpecies(fSpecies) &amp;&amp; isValidLength(fLength);
+  }
+
+  <span class="comment">/** Species debe tener contenido.  */</span>
+  <span class="keyword">private</span> <span class="keyword">boolean</span> isValidSpecies(<span
+			class="keyword">final</span> String aSpecies) {
+    <span class="keyword">return</span> aSpecies != <span
+			class="keyword">null</span> &amp;&amp; aSpecies.trim().length()&gt;<span
+			class="literal">0</span>;
+  }
+
+  <span class="comment">/** Length debe ser mayor que 0.  */</span>
+  <span class="keyword">private</span> <span class="keyword">boolean</span> isValidLength(<span
+			class="keyword">final</span> <span class="keyword">int</span> aLength) {
+    <span class="keyword">return</span> aLength &gt; <span
+			class="literal">0</span>;
+  }
+
+  <span class="comment">/** El incremento de Length depende de su valor actual. */</span>
+  <span class="keyword">private</span> <span class="keyword">int</span> getLengthIncrease(<span
+			class="keyword">int</span> aOriginalLength) {
+    <span class="comment">//ya que esto es un método privada, una aserción
+</span>    <span class="comment">//puede ser usada para validar el argumento
+</span>    assert aOriginalLength &gt; <span class="literal">0</span>: <span
+			class="keyword">this</span>;
+    <span class="keyword">int</span> result = <span class="literal">0</span>;
+    <span class="keyword">if</span> (aOriginalLength &gt; <span
+			class="literal">10</span>) {
+      result = <span class="literal">2</span>;
+    }
+    <span class="keyword">else</span> {
+      result = <span class="literal">1</span>;
+    }
+    assert result &gt; <span class="literal">0</span> : result;
+    <span class="keyword">return</span> result;
+  }
+}
+ 
+    </pre>
+	  <br />
+	  <p></p>
+	  <div class="topic-section" id="see-also-title">
+      Vea también:
+    </div>
+	  <div id="see-also" class="main-body">
+		  <a href="../practicascomunes/practicascomunes_6.html">Validar el estado con invariantes de clase</a><br />
+      <a href="../practicascomunes/practicascomunes_194.html">Diseño por contrato</a> <br />
+	  </div>
+    <footer id="footer" class="legalese">
+      <span id="app_name">Prácticas de Java</span> 
+      <span id="app_version_number">3.001</span><br />
+      © <span id="copyright">2018Hirondelle Systems</span><br /> 
+      <a href="http://www.javapractices.com/source/SourceAction.do">Código Fuente</a> | 
+      <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a> | 
+      <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/" rel="license">Licencia</a> | 
+      <a href="http://www.javapractices.com/apps/cjp.rss" rel="alternate" type="application/rss+xml">RSS</a>
+      <!-- ukey="2AC36CD2" -->
+      <!-- ckey="16DF3D87" -->
+      <br /> Los trozos de código individual tienen una 
+      <a href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia BSD</a><br />
+      Sobre 1,000,000 de IPs únicas el último año<br />
+      Última actualización <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+      <br /> - In Memoriam : Bill Dirani -
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+    content="Prácticas y técnicas de programación en Java.">
+<meta name="keywords"
+    content="java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas de Java-&gt;Analizar el texto</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+    href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png" href="../img/favicon.png">
+</head>
+<body>
+    <nav class="menu-bar" id="menu-bar">
+        <a href="../index.html" title="Table of Contents"
+            style="float: left;">Inicio</a> &nbsp;&nbsp;
+        <form method="GET" action="https://www.google.com/search"
+            class="search-form" style="float: right;">
+            <input name="q" size="15" maxlength="255" placeholder=""
+                type="text"> <input name="btnG" value="Search"
+                type="submit"> <input name="sitesearch"
+                value="www.javapractices.com" type="hidden">
+        </form>
+    </nav>
+    <div class="page-title">Analizar el texto</div>
+    <br>There are various ways of parsing text. The usual tools
+    are:
+    <ul>
+        <li><a
+            href="https://docs.oracle.com/javase/10/docs/api/java/lang/String.html#split(java.lang.String)">String.split</a>
+            methods. (Careful! These methods are implemented with a
+            regular expression. If your delimiter uses characters that
+            have special meaning to a regular expression, then <b>you'll
+                need to <a
+                href="https://docs.oracle.com/javase/10/docs/api/java/util/regex/Pattern.html#quote(java.lang.String)">escape</a>
+        </b> the delimiter.)</li>
+        <li>the <a
+            href="https://docs.oracle.com/javase/10/docs/api/java/util/StringTokenizer.html">StringTokenizer</a>
+            and <a
+            href="https://docs.oracle.com/javase/10/docs/api/java/io/StreamTokenizer.html">StreamTokenizer</a>
+            classes
+        </li>
+        <li>the <a
+            href="https://docs.oracle.com/javase/10/docs/api/java/util/Scanner.html">Scanner</a>
+            class
+        </li>
+        <li>the <a
+            href="https://docs.oracle.com/javase/10/docs/api/java/util/regex/Pattern.html">Pattern</a>
+            and <a
+            href="https://docs.oracle.com/javase/10/docs/api/java/util/regex/Matcher.html">Matcher</a>
+            classes, which implement regular expressions
+        </li>
+        <li>for the most complex parsing tasks, you can use tools
+            such as <a href="https://javacc.org/">JavaCC</a>
+        </li>
+    </ul>
+    <b>Example 1</b>
+    <p>
+        This example uses
+        <code>Scanner</code>
+        . Here, the contents of a file containing name-value pairs is
+        read, and each line is parsed into its constituent data. <br>
+    </p>
+    <pre>
+		<span class="keyword">import</span> java.io.IOException;
+<span class="keyword">import</span> java.nio.charset.Charset;
+<span class="keyword">import</span> java.nio.charset.StandardCharsets;
+<span class="keyword">import</span> java.nio.file.Path;
+<span class="keyword">import</span> java.nio.file.Paths;
+<span class="keyword">import</span> java.util.Objects;
+<span class="keyword">import</span> java.util.Scanner;
+
+<span class="comment">/** Assumes UTF-8 encoding. JDK 7+. */</span>
+<span class="keyword">public</span> <span class="keyword">class</span> ReadWithScanner {
+
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> main(String... aArgs) <span
+            class="keyword">throws</span> IOException {
+    ReadWithScanner parser = <span class="keyword">new</span> ReadWithScanner(<span
+            class="literal">"C:\\Temp\\test.txt"</span>);
+    parser.processLineByLine();
+    log(<span class="literal">"Done."</span>);
+  }
+  
+  <span class="comment">/**
+   Constructor.
+   @param aFileName full name of an existing, readable file.
+  */</span>
+  <span class="keyword">public</span> ReadWithScanner(String aFileName){
+    fFilePath = Paths.get(aFileName);
+  }
+  
+  
+  <span class="comment">/** Template method that calls {@link #processLine(String)}.  */</span>
+  <span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">void</span> processLineByLine() <span
+            class="keyword">throws</span> IOException {
+    <span class="keyword">try</span> (Scanner scanner =  <span
+            class="keyword">new</span> Scanner(fFilePath, ENCODING.name())){
+      <span class="keyword">while</span> (scanner.hasNextLine()){
+        processLine(scanner.nextLine());
+      }      
+    }
+  }
+  
+  <span class="comment">/** 
+   Overridable method for processing lines in different ways.
+    
+   &lt;P&gt;This simple default implementation expects simple name-value pairs, separated by an 
+   '=' sign. Examples of valid input: 
+   &lt;tt&gt;height = 167cm&lt;/tt&gt;
+   &lt;tt&gt;mass =  65kg&lt;/tt&gt;
+   &lt;tt&gt;disposition =  "grumpy"&lt;/tt&gt;
+   &lt;tt&gt;this is the name = this is the value&lt;/tt&gt;
+  */</span>
+  <span class="keyword">protected</span> <span class="keyword">void</span> processLine(String aLine){
+    <span class="comment">//use a second Scanner to parse the content of each line 
+</span>    <span class="keyword">try</span>(Scanner scanner = <span
+            class="keyword">new</span> Scanner(aLine)){
+      scanner.useDelimiter(<span class="literal">"="</span>);
+      <span class="keyword">if</span> (scanner.hasNext()){
+        <span class="comment">//assumes the line has a certain structure
+</span>        String name = scanner.next();
+        String value = scanner.next();
+        log(<span class="literal">"Name is : "</span> + quote(name.trim()) + <span
+            class="literal">", and Value is : "</span> + quote(value.trim()));
+      }
+      <span class="keyword">else</span> {
+        log(<span class="literal">"Empty or invalid line. Unable to process."</span>);
+      }
+    }
+  }
+  
+  <span class="comment">// PRIVATE 
+</span>  <span class="keyword">private</span> <span class="keyword">final</span> Path fFilePath;
+  <span class="keyword">private</span> <span class="keyword">final</span> <span
+            class="keyword">static</span> Charset ENCODING = StandardCharsets.UTF_8;  
+  
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> log(Object aObject){
+    System.out.println(Objects.toString(aObject));
+  }
+  
+  <span class="keyword">private</span> String quote(String aText){
+    String QUOTE = <span class="literal">"'"</span>;
+    <span class="keyword">return</span> QUOTE + aText + QUOTE;
+  }
+} 
+</pre>
+    <br>For a file containing:
+    <p></p>
+    <pre>height = 167cm
+mass =  65kg
+disposition =  "grumpy"
+this is the name = this is the value
+</pre>
+    the output of the above class is:
+    <pre>Name is : 'height', and Value is : '167cm'
+Name is : 'mass', and Value is : '65kg'
+Name is : 'disposition', and Value is : '"grumpy"'
+Name is : 'this is the name', and Value is : 'this is the value'
+Done.
+</pre>
+    <p>
+        <b>Example 2</b>
+    </p>
+    <p>
+        This example uses
+        <code>StringTokenizer</code>
+        . This class is used to parse the text entered into a search box
+        on a web page. It returns a
+        <code>Set</code>
+        of tokens to be used for pattern matching. Here, any text
+        appearing in quotes is treated as a single search token. All
+        other text is split into tokens based simply on whitespace.
+    </p>
+    <p>An example run:</p>
+    <p>
+        <code>&gt;java -cp . SearchBoxParser</code>
+        <br>
+        <code>[mars, sun, milky way, venus]</code>
+        <br>
+    </p>
+    <pre>
+		<span class="keyword">import</span> java.util.*;
+
+<span class="comment">/**
+* The user enters text into a search box. This class is used
+* to parse that text into specific search terms (or tokens).
+* It eliminates common words, and allows for the quoting of text, using
+* double quotes.
+* JDK 7+.
+*/</span>
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">class</span> SearchBoxParser {
+
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> main(String... aArguments) {
+    SearchBoxParser parser = <span class="keyword">new</span> SearchBoxParser(<span
+            class="literal">"mars venus \"milky way\" sun"</span>);
+    Set&lt;String&gt; tokens = parser.parseSearchText();
+    <span class="comment">//display the tokens
+</span>    System.out.println(tokens);
+  }
+
+  <span class="comment">/**
+  * @param aSearchText is non-null, but may have no content,
+  * and represents what the user has input in a search box.
+  */</span>
+  <span class="keyword">public</span> SearchBoxParser(String aSearchText) {
+    <span class="keyword">if</span> (aSearchText == <span
+            class="keyword">null</span>) {
+      <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
+            class="literal">"Search Text cannot be null."</span>);
+    }
+    fSearchText = aSearchText;
+  }
+
+  <span class="comment">/**
+  * Parse the user's search box input into a Set of String tokens.
+  *
+  * @return Set of Strings, one for each word in fSearchText; here "word"
+  * is defined as either a lone word surrounded by whitespace, or as a series
+  * of words surrounded by double quotes, "like this"; also, very common
+  * words (and, the, etc.) do not qualify as possible search targets.
+  */</span>
+  <span class="keyword">public</span> Set&lt;String&gt; parseSearchText() {
+    Set&lt;String&gt; result = <span class="keyword">new</span> LinkedHashSet&lt;&gt;();
+
+    <span class="keyword">boolean</span> returnTokens = <span
+            class="keyword">true</span>;
+    String currentDelims = fWHITESPACE_AND_QUOTES;
+    StringTokenizer parser = <span class="keyword">new</span> StringTokenizer(
+      fSearchText, currentDelims, returnTokens
+    );
+
+    String token = <span class="keyword">null</span>;
+    <span class="keyword">while</span> (parser.hasMoreTokens()) {
+      token = parser.nextToken(currentDelims);
+      <span class="keyword">if</span> (!isDoubleQuote(token)){
+        addNonTrivialWordToResult(token, result);
+      }
+      <span class="keyword">else</span> {
+        currentDelims = flipDelimiters(currentDelims);
+      }
+    }
+    <span class="keyword">return</span> result;
+  }
+
+  <span class="comment">// PRIVATE 
+</span>  <span class="keyword">private</span> String fSearchText;
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> Set&lt;String&gt; fCOMMON_WORDS = <span
+            class="keyword">new</span> LinkedHashSet&lt;&gt;();
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> String fDOUBLE_QUOTE = <span
+            class="literal">"\""</span>;
+
+  <span class="comment">//the parser flips between these two sets of delimiters
+</span>  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> String fWHITESPACE_AND_QUOTES = <span
+            class="literal">" \t\r\n\""</span>;
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> String fQUOTES_ONLY =<span
+            class="literal">"\""</span>;
+
+  <span class="comment">/**Very common words to be excluded from searches.*/</span>
+  <span class="keyword">static</span> {
+    fCOMMON_WORDS.add(<span class="literal">"a"</span>);
+    fCOMMON_WORDS.add(<span class="literal">"and"</span>);
+    fCOMMON_WORDS.add(<span class="literal">"be"</span>);
+    fCOMMON_WORDS.add(<span class="literal">"for"</span>);
+    fCOMMON_WORDS.add(<span class="literal">"from"</span>);
+    fCOMMON_WORDS.add(<span class="literal">"has"</span>);
+    fCOMMON_WORDS.add(<span class="literal">"i"</span>);
+    fCOMMON_WORDS.add(<span class="literal">"in"</span>);
+    fCOMMON_WORDS.add(<span class="literal">"is"</span>);
+    fCOMMON_WORDS.add(<span class="literal">"it"</span>);
+    fCOMMON_WORDS.add(<span class="literal">"of"</span>);
+    fCOMMON_WORDS.add(<span class="literal">"on"</span>);
+    fCOMMON_WORDS.add(<span class="literal">"to"</span>);
+    fCOMMON_WORDS.add(<span class="literal">"the"</span>);
+  }
+
+  <span class="comment">/**
+  * Use to determine if a particular word entered in the
+  * search box should be discarded from the search.
+  */</span>
+  <span class="keyword">private</span> <span class="keyword">boolean</span> isCommonWord(String aSearchTokenCandidate){
+    <span class="keyword">return</span> fCOMMON_WORDS.contains(aSearchTokenCandidate);
+  }
+
+  <span class="keyword">private</span> <span class="keyword">boolean</span> textHasContent(String aText){
+    <span class="keyword">return</span> (aText != <span class="keyword">null</span>) &amp;&amp; (!aText.trim().equals(<span
+            class="literal">""</span>));
+  }
+
+  <span class="keyword">private</span> <span class="keyword">void</span> addNonTrivialWordToResult(String aToken, Set&lt;String&gt; aResult){
+    <span class="keyword">if</span> (textHasContent(aToken) &amp;&amp; !isCommonWord(aToken.trim())) {
+      aResult.add(aToken.trim());
+    }
+  }
+
+  <span class="keyword">private</span> <span class="keyword">boolean</span> isDoubleQuote(String aToken){
+    <span class="keyword">return</span> aToken.equals(fDOUBLE_QUOTE);
+  }
+
+  <span class="keyword">private</span> String flipDelimiters(String aCurrentDelims){
+    String result = <span class="keyword">null</span>;
+    <span class="keyword">if</span> (aCurrentDelims.equals(fWHITESPACE_AND_QUOTES)){
+      result = fQUOTES_ONLY;
+    }
+    <span class="keyword">else</span> {
+      result = fWHITESPACE_AND_QUOTES;
+    }
+    <span class="keyword">return</span> result;
+  }
+} 
+</pre>
+    <br>
+    <b>Example 3</b>
+    <p></p>
+    <p>
+        This example demonstrates use of regular expressions, by parsing
+        a fully-qualified type name into two parts - the package and the
+        "simple" type name. <br>
+    </p>
+    <pre>
+		<span class="keyword">import</span> java.util.Objects;
+<span class="keyword">import</span> java.util.regex.*;
+
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">class</span> RegularExpressions {
+
+  <span class="comment">/** The pattern is matched to the first argument. */</span>
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> main (String... aArguments) {
+    matchParts(aArguments[<span class="literal">0</span>]);
+    matchAll(aArguments[<span class="literal">0</span>]);
+  }
+
+  <span class="comment">/**
+   The Matcher.find method attempts to match *parts* of the input
+   to the given pattern.
+  */</span>
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> matchParts(String aText){
+    log(fNEW_LINE + <span class="literal">"Match PARTS:"</span>);
+    <span class="comment">//note the necessity of the comments flag, since our regular
+</span>    <span class="comment">//expression contains comments:
+</span>    Pattern pattern = Pattern.compile(fREGEXP, Pattern.COMMENTS);
+    Matcher matcher = pattern.matcher(aText);
+    <span class="keyword">while</span> (matcher.find()) {
+      log(<span class="literal">"Num groups: "</span> + matcher.groupCount());
+      log(<span class="literal">"Package: "</span> + matcher.group(<span
+            class="literal">1</span>));
+      log(<span class="literal">"Class: "</span> + matcher.group(<span
+            class="literal">2</span>));
+    }
+  }
+
+  <span class="comment">/**
+   The Matcher.matches method attempts to match the *entire*
+   input to the given pattern all at once.
+  */</span>
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> matchAll(String aText){
+    log(fNEW_LINE + <span class="literal">"Match ALL:"</span>);
+    Pattern pattern = Pattern.compile(fREGEXP, Pattern.COMMENTS);
+    Matcher matcher = pattern.matcher(aText);
+    <span class="keyword">if</span>(matcher.matches()) {
+      log(<span class="literal">"Num groups: "</span> + matcher.groupCount());
+      log(<span class="literal">"Package: "</span> + matcher.group(<span
+            class="literal">1</span>));
+      log(<span class="literal">"Class: "</span> + matcher.group(<span
+            class="literal">2</span>));
+    }
+    <span class="keyword">else</span> {
+      log(<span class="literal">"Input does not match pattern."</span>);
+    }
+  }
+
+  <span class="comment">//PRIVATE
+</span>
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> String fNEW_LINE = System.getProperty(<span
+            class="literal">"line.separator"</span>);
+  
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> log(String aMessage){
+    System.out.println(Objects.toString(aMessage));
+  }
+
+  <span class="comment">/**
+   A commented regular expression for fully-qualified type names which
+   follow the common naming conventions, for example, "com.myappBlah.Thing".
+  
+   Thus, the "dot + capital letter" is sufficient to define where the
+   package names end.
+  
+   This regular expression uses two groups, one for the package, and one
+   for the class. Groups are defined by parentheses. Note that ?: will
+   define a group as "non-contributing"; that is, it will not contribute
+   to the return values of the &lt;tt&gt;group&lt;/tt&gt; method.
+   
+   As you can see, regular expressions are often cryptic.
+  */</span>
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> String fREGEXP =
+    <span class="literal">"#Group1 - Package prefix without last dot: "</span> + fNEW_LINE +
+    <span class="literal">"( (?:\\w|\\.)+ ) \\."</span> + fNEW_LINE +
+    <span class="literal">"#Group2 - Class name starts with uppercase: "</span> + fNEW_LINE +
+    <span class="literal">"( [A-Z](?:\\w)+ )"</span>
+  ;
+} 
+</pre>
+    <br>Some example runs:
+    <p></p>
+    <p>
+        <code>&gt;java -cp . RegularExpressions "java.java.Thing
+            java.lang.Random"</code>
+    </p>
+    <p>
+        <code>Match PARTS:</code>
+        <br>
+        <code>Num groups: 2</code>
+        <br>
+        <code>Package: java.java</code>
+        <br>
+        <code>Class: Thing</code>
+        <br>
+        <code>Num groups: 2</code>
+        <br>
+        <code>Package: java.lang</code>
+        <br>
+        <code>Class: Random</code>
+    </p>
+    <p>
+        <code>Match ALL:</code>
+        <br>
+        <code>Input does not match pattern.</code>
+    </p>
+    <p>
+        <code>&gt;java -cp . RegularExpressions "java.java.Thing"</code>
+    </p>
+    <p>
+        <code>Match PARTS:</code>
+        <br>
+        <code>Num groups: 2</code>
+        <br>
+        <code>Package: java.java</code>
+        <br>
+        <code>Class: Thing</code>
+    </p>
+    <p>
+        <code>Match ALL:</code>
+        <br>
+        <code>Num groups: 2</code>
+        <br>
+        <code>Package: java.java</code>
+        <br>
+        <code>Class: Thing</code>
+    </p>
+    <p>
+        <code>&gt;java -cp . RegularExpressions "java.java.Thing
+            "</code>
+    </p>
+    <p>
+        <code>Match PARTS:</code>
+        <br>
+        <code>Num groups: 2</code>
+        <br>
+        <code>Package: java.java</code>
+        <br>
+        <code>Class: Thing</code>
+    </p>
+    <p>
+        <code>Match ALL:</code>
+        <br>
+        <code>Input does not match pattern.</code>
+    </p>
+    <p></p>
+    <p></p>
+    <div class="topic-section" id="see-also-title">See Also :</div>
+    <div id="see-also" class="main-body">
+        <a href="..\entradasalida\entradasalida_42.html">Leer y
+            escribir ficheros de texto</a> <br> <a
+            href="..\tareascomunes\tareascomunes_103.html">Patrón de
+            líneas de un archivo</a> <br> <a
+            href="..\practicascomunes\practicascomunes_104.html">Compile
+            las expresiones regulares una vez</a> <br>
+    </div>
+    <footer id="footer" class="legalese">
+        <span id="app_name">Prácticas de Java</span> <span
+            id="app_version_number">3.001</span><br> © <span
+            id="copyright">2018 Hirondelle Systems</span><br> <a
+            href="http://www.javapractices.com/source/SourceAction.do">Código
+            Fuente</a> | <a href="mailto:webmaster@javapractices.com"
+            rel="author">Contacto</a> | <a
+            href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+            rel="license">Licencia</a> | <a
+            href="http://www.javapractices.com/apps/cjp.rss"
+            rel="alternate" type="application/rss+xml">RSS</a>
+        <!-- ukey="2AC36CD2" -->
+        <!-- ckey="16DF3D87" -->
+        <br> Los trozos de código individual tienen una <a
+            href="http://www.javapractices.com/LICENSE.txt"
+            rel="license">licencia BSD</a><br> Sobre 1,000,000 de
+        IPs únicas el último año<br> Última actualización
+        <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+        <br> - In Memoriam : Bill Dirani -
+    </footer>
+</body>
+</html>

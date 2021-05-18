@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+    content="Prácticas y técnicas de programación en Java.">
+<meta name="keywords"
+    content="java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas de Java-&gt;Estadísticas de la memoria</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+	href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png"
+	href="../img/favicon.png">
+</head>
+<body>
+	<nav class="menu-bar" id="menu-bar">
+		<a href="../index.html"
+			title="Table of Contents" style="float: left;">Inicio</a> &nbsp;&nbsp;
+		<form method="GET" action="https://www.google.com/search"
+			class="search-form" style="float: right;">
+			<input name="q" size="15" maxlength="255" placeholder="" type="text">
+			<input name="btnG" value="Search" type="submit"> <input
+				name="sitesearch" value="www.javapractices.com" type="hidden">
+		</form>
+	</nav>
+	<div class="page-title">Estadísticas de la memoria</div>
+
+	<br>The memory available to your Java program has an upper limit.
+	To specify that limit explicitly, instead of relying on a default
+	value, you can pass a command line parameter named
+	<a
+		href="http://docs.oracle.com/javase/7/docs/technotes/tools/solaris/java.html">-Xmx</a>
+	to the Java runtime.
+
+	<p>
+		It's usually important to know how much memory your app is using. If
+		you're using a high percentage of the total available memory, then
+		it's usually a good idea to use
+		<code>-Xmx</code>
+		to increase the total available.
+
+	</p>
+	<p>
+		Here's an example. (An explanation of methods of the <a
+			href="https://docs.oracle.com/javase/10/docs/api/java/lang/Runtime.html">Runtime</a>
+		class can be found <a
+			href="https://stackoverflow.com/questions/3571203/what-are-runtime-getruntime-totalmemory-and-freememory">here</a>.)
+		<br>
+	</p>
+	<pre>
+		<span class="keyword">import</span> java.math.BigDecimal;
+<span class="keyword">import</span> java.math.RoundingMode;
+<span class="keyword">import</span> java.text.DecimalFormat;
+<span class="keyword">import</span> java.util.Objects;
+
+<span class="comment">/** All values are in bytes. */</span>
+<span class="keyword">public</span> <span class="keyword">class</span> PercentMemory {
+  
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> main(String... args) {
+    log(<span class="literal">"Memory stats:"</span>);
+    PercentMemory pm = <span class="keyword">new</span> PercentMemory();
+    log(<span class="literal">" Total:  "</span> + pm.format(pm.totalAvailableMemory()) + <span
+			class="literal">" bytes (-Xmx setting)"</span>);
+    log(<span class="literal">" In-use: "</span> + pm.format(pm.currentlyUsedMemory()) + <span
+			class="literal">" bytes"</span>);
+    log(<span class="literal">" In-use: "</span> + pm.percentageMemoryUse(NUM_DECIMALS) + <span
+			class="literal">" %"</span>);
+  }
+  
+  <span class="comment">/** 
+   This is the -Xmx setting passed to the java command line.
+   Example: -Xmx=10G. 
+  */</span>
+  Long totalAvailableMemory(){
+    <span class="keyword">return</span> jre().maxMemory();
+  }
+  
+  Long currentlyUsedMemory(){
+    <span class="keyword">return</span> jre().totalMemory() - jre().freeMemory();
+  }
+  
+  Long currentlyFreeMemory(){
+    <span class="keyword">return</span> totalAvailableMemory() - currentlyUsedMemory();
+  }
+  
+  BigDecimal percentageMemoryUse(<span class="keyword">int</span> numDecimals){
+    BigDecimal currentlyUsed = <span class="keyword">new</span> BigDecimal(currentlyUsedMemory().toString()); 
+    BigDecimal totalAvailable = <span class="keyword">new</span> BigDecimal(totalAvailableMemory().toString());
+    BigDecimal HUNDRED = <span class="keyword">new</span> BigDecimal(<span
+			class="literal">"100"</span>);
+    BigDecimal result = currentlyUsed.divide(
+      totalAvailable, numDecimals, RoundingMode.HALF_EVEN
+    );
+    result = result.multiply(HUNDRED);
+    <span class="keyword">return</span> result.stripTrailingZeros();
+  }
+  
+  <span class="keyword">private</span> Runtime jre(){
+    <span class="keyword">return</span> Runtime.getRuntime();
+  }
+  
+  <span class="keyword">private</span> String format(Number value){
+    DecimalFormat formatter = <span class="keyword">new</span> DecimalFormat(<span
+			class="literal">"#,###"</span>);
+    <span class="keyword">return</span> formatter.format(value);
+  }
+  
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> log(Object thing){
+    System.out.println(Objects.toString(thing, <span class="literal">""</span>));
+  }
+
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+			class="keyword">int</span> NUM_DECIMALS = <span class="literal">6</span>; <span
+			class="comment">//before the *100 operation
+</span>}
+ 
+</pre>
+
+	<p></p>
+	<p>Example run:</p>
+	<pre>Memory stats:
+ Total:  2,734,686,208 bytes (-Xmx setting)
+ In-use: 1,929,416 bytes
+ In-use: 0.0706 %</pre>
+	<br>
+	<p></p>
+	<footer id="footer" class="legalese">
+        <span id="app_name">Prácticas de Java</span> <span
+            id="app_version_number">3.001</span><br> © <span id="copyright">2018
+            Hirondelle Systems</span><br> <a
+            href="http://www.javapractices.com/source/SourceAction.do">Código
+            Fuente</a> | <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a>
+        | <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+            rel="license">Licencia</a> | <a
+            href="http://www.javapractices.com/apps/cjp.rss" rel="alternate"
+            type="application/rss+xml">RSS</a>
+        <!-- ukey="2AC36CD2" -->
+        <!-- ckey="16DF3D87" -->
+        <br> Los trozos de código individual tienen una <a
+            href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia
+            BSD</a><br> Sobre 1,000,000 de IPs únicas el último año<br>
+        Última actualización
+        <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+        <br> - In Memoriam : Bill Dirani -
+    </footer>
+</body>
+</html>

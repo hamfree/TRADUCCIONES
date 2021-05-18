@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<!-- saved from url=(0055)http://www.javapractices.com/topic/TopicAction.do?Id=11 -->
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+    content="Presentaciones concisas de prácticas de programación en 
+        java, tareas, y convenciones, ampliamente ilustrado con ejemplos de código con resaltado de 
+        sintaxis.">
+<meta name="keywords"
+    content="constructor,java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas de Java-&gt;Constructores en general</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+    href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png" href="../img/favicon.png">
+</head>
+<body>
+    <nav class="menu-bar" id="menu-bar">
+        <a href="../index.html" title="Tabla de Contenidos"
+            style="float: left;">Inicio</a> &nbsp;&nbsp;
+        <form method="GET" action="https://www.google.com/search"
+            class="search-form" style="float: right;">
+            <input type="text" name="q" size="15" maxlength="255"
+                value="" placeholder=""> <input type="submit"
+                name="btnG" value="Search"> <input type="hidden"
+                name="sitesearch" value="www.javapractices.com">
+        </form>
+    </nav>
+    <div class="page-title">Constructores en general</div>
+    <br>Constructores:
+    <ul>
+        <li>Si se llama a <code>super</code> o <code>this</code>,
+            pueden sólo ser llamados en la primera línea del
+            constructor.
+        </li>
+        <li>una excepción puede ser lanzada si un parámetro no es
+            válido</li>
+        <li>debe asegurarse que el objeto construído está en un <a
+            href="../practicascomunes/practicascomunes_6.html">estado
+                válido</a></li>
+        <li>los constructores <a
+            href="constructors_215.html">nuncan
+                deberán llamar a un método sobreescribible</a> (un método
+            sobreescribible es aquel no es ni <code>private</code>, <code>static</code>,
+            ni <code>final)</code></li>
+        <li>los constructores no son nunca <code>sincronizados</code></li>
+        <li>los constructores pueden crear objetos hilo, pero el
+            hilo <a
+            href="constructors_254.html">no
+                debería ser iniciado</a> dentro del constructor
+        </li>
+        <li>los constructores <a
+            href="constructors_252.html">no
+                deberían pasar una referencia <code>this</code> a otros
+                objetos
+        </a>
+        </li>
+        <li>los <a
+            href="../patrones/patrones_40.html">constructores
+                pueden ser privados</a>, para restringir la construcción
+        </li>
+    </ul>
+    Note que una distinción convencional se hace en Java entre el "
+    <a
+        href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html#jls-8.8.9">constructor
+        por defecto</a>" y un "constructor sin argumentos":
+    <ul>
+        <li>el constructor <em>por defecto</em> es el constructor
+            suministrado por el sistema en ausencia de cualquier
+            constructor suministrado por el programador. Una vez un
+            programador suministra cualquier tipo de constructor, el
+            constructor predeterminado ya no se suministra.
+        </li>
+        <li>un constructor <em>sin argumentos</em>, por otra parte,
+            es un constructor suministrado por el programador que no
+            toma argumentos.
+        </li>
+    </ul>
+    Esta distinción es necesaria porque el comportamiento de las dos
+    clases de constructores no tienen relació: un constructor por
+    defecto tiene un comportamiento fijo definido por Java, mientras el
+    comportamiento de un constructor sin argumentos es definido por el
+    programador de la aplicación.
+    <p>
+        <b>Ejemplo</b>
+    </p>
+    <p>
+        <code>Resto</code>
+        es una clase <a
+            href="../patrones/patrones_29.html">inmutable</a>
+        , ya que su estado no puede cambiar después de la construcción.
+        Dese cuenta que:
+    </p>
+    <ul>
+        <li>toda la validación es realizada en su constructor</li>
+        <li>casi todo su javadoc se preocupa de indicar con
+            precisión qué se debe pasar al constructor</li>
+    </ul>
+    <br>
+    <pre>
+<span class="keyword">package</span> hirondelle.fish.main.resto;
+
+<span class="keyword">import</span> hirondelle.web4j.model.ModelCtorException;
+<span class="keyword">import</span> hirondelle.web4j.model.ModelUtil;
+<span class="keyword">import</span> hirondelle.web4j.model.Id;
+<span class="keyword">import</span> hirondelle.web4j.security.SafeText;
+<span class="keyword">import</span> hirondelle.web4j.model.Decimal;
+<span class="keyword">import</span> <span class="keyword">static</span> hirondelle.web4j.model.Decimal.ZERO;
+<span class="keyword">import</span> hirondelle.web4j.model.Check;
+<span class="keyword">import</span> hirondelle.web4j.model.Validator;
+<span class="keyword">import</span> <span class="keyword">static</span> hirondelle.web4j.util.Consts.FAILS;
+
+<span class="comment">/** Objeto Modelo para un Restaurante. */</span>
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">class</span> Resto {
+
+  <span class="comment">/**
+   Constructor completo.
+    
+   @param aId identificador interno subyacente de la base de datos (opcional) 1..50 caracteres
+   @param aName del restaurante (requerido), 2..50 caracteres
+   @param aLocation dirección de la calle del restaurante (opcional), 2..50 caracteres
+   @param aPrice de la comida de pescado y patatas fritas (opcional) $0.00..$100.00
+   @param aComment sobre el restaurante en general (opcional) 2..50 caracteres
+  */</span>
+  <span class="keyword">public</span> Resto(
+    Id aId, SafeText aName, SafeText aLocation, Decimal aPrice, SafeText aComment
+  ) <span class="keyword">throws</span> ModelCtorException {
+    fId = aId;
+    fName = aName;
+    fLocation = aLocation;
+    fPrice = aPrice;
+    fComment = aComment;
+    validateState();
+  }
+  
+  <span class="keyword">public</span> Id getId() { <span class="keyword">return</span> fId; }
+  <span class="keyword">public</span> SafeText getName() {  <span
+            class="keyword">return</span> fName; }
+  <span class="keyword">public</span> SafeText getLocation() {  <span
+            class="keyword">return</span> fLocation;  }
+  <span class="keyword">public</span> Decimal getPrice() { <span
+            class="keyword">return</span> fPrice; }
+  <span class="keyword">public</span> SafeText getComment() {  <span
+            class="keyword">return</span> fComment; }
+
+  <span class="keyword">@Override</span> <span class="keyword">public</span> String toString(){
+    <span class="keyword">return</span> ModelUtil.toStringFor(<span
+            class="keyword">this</span>);
+  }
+  
+  <span class="keyword">@Override</span> <span class="keyword">public</span>  <span
+            class="keyword">boolean</span> equals(Object aThat){
+    Boolean result = ModelUtil.quickEquals(<span class="keyword">this</span>, aThat);
+    <span class="keyword">if</span> (result ==  <span class="keyword">null</span>) {
+      Resto that = (Resto) aThat;
+      result = ModelUtil.equalsFor(
+        <span class="keyword">this</span>.getSignificantFields(), that.getSignificantFields()
+      );
+    }
+    <span class="keyword">return</span> result;
+  }
+  
+  <span class="keyword">@Override</span> <span class="keyword">public</span> <span
+            class="keyword">int</span> hashCode(){
+    <span class="keyword">if</span> (fHashCode == <span class="literal">0</span>){
+      fHashCode = ModelUtil.hashCodeFor(getSignificantFields());
+    }
+    <span class="keyword">return</span> fHashCode;
+  }
+  
+  <span class="comment">// PRIVADO 
+</span>  <span class="keyword">private</span> <span class="keyword">final</span> Id fId;
+  <span class="keyword">private</span> <span class="keyword">final</span> SafeText fName;
+  <span class="keyword">private</span> <span class="keyword">final</span> SafeText fLocation;
+  <span class="keyword">private</span> <span class="keyword">final</span> Decimal fPrice;
+  <span class="keyword">private</span> <span class="keyword">final</span> SafeText fComment;
+  <span class="keyword">private</span> <span class="keyword">int</span> fHashCode;
+  
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+            class="keyword">final</span> Decimal HUNDRED = Decimal.from(<span
+            class="literal">"100"</span>);
+
+  <span class="keyword">private</span> <span class="keyword">void</span> validateState() <span
+            class="keyword">throws</span> ModelCtorException {
+    ModelCtorException ex = <span class="keyword">new</span> ModelCtorException();
+    <span class="keyword">if</span> (FAILS == Check.optional(fId, Check.range(<span
+            class="literal">1</span>,<span class="literal">50</span>))) {
+      ex.add(<span class="literal">"Id is optional, 1..50 chars."</span>);
+    }
+    <span class="keyword">if</span> (FAILS == Check.required(fName, Check.range(<span
+            class="literal">2</span>,<span class="literal">50</span>))) {
+      ex.add(<span class="literal">"Restaurant Name is required, 2..50 chars."</span>);
+    }
+    <span class="keyword">if</span> (FAILS == Check.optional(fLocation, Check.range(<span
+            class="literal">2</span>,<span class="literal">50</span>))) {
+      ex.add(<span class="literal">"Location is optional, 2..50 chars."</span>);
+    }
+    Validator[] priceChecks = {Check.range(ZERO, HUNDRED), Check.numDecimalsAlways(<span
+            class="literal">2</span>)};
+    <span class="keyword">if</span> (FAILS == Check.optional(fPrice, priceChecks)) {
+      ex.add(<span class="literal">"Price is optional, 0.00 to 100.00."</span>);
+    }
+    <span class="keyword">if</span> (FAILS == Check.optional(fComment, Check.range(<span
+            class="literal">2</span>,<span class="literal">50</span>))) {
+      ex.add(<span class="literal">"Comment is optional, 2..50 chars."</span>);
+    }
+    <span class="keyword">if</span> ( ! ex.isEmpty() ) <span
+            class="keyword">throw</span> ex;
+  }
+  
+  <span class="keyword">private</span> Object[] getSignificantFields(){
+    <span class="keyword">return</span> <span class="keyword">new</span> Object[] {fName, fLocation, fPrice, fComment};
+  }
+}
+ 
+</pre>
+    <br>
+    <p></p>
+    <div class="topic-section" id="see-also-title">Vea también:</div>
+    <div id="see-also" class="main-body">
+        <a href="../practicascomunes/practicascomunes_5.html">Validar
+            los argumentos del método</a> <br> <a
+            href="../practicascomunes/practicascomunes_6.html">Validar
+            el estado con clases invariantes</a> <br> <a
+            href="constructors_14.html">Inicializar
+            campos a 0 falso o nulo es redundante</a> <br> <a
+            href="../patrones/patrones_29.html">Objetos
+            inmutables</a> <br> <a
+            href="../patrones/patrones_40.html">Constructor
+            privado</a> <br> <a
+            href="constructors_84.html">Evitar
+            el estilo de construcción de JavaBeans</a> <br> <a
+            href="constructors_215.html">Los
+            constructores no debería llamar a sobreescribibles</a> <br>
+        <a
+            href="constructors_252.html">No
+            pasar 'this' fuera de un constructor</a> <br> <a
+            href="constructors_254.html">Los
+            constructores no deberían iniciar hilos</a> <br>
+    </div>
+    <footer id="footer" class="legalese">
+        <span id="app_name">Prácticas de Java</span> <span
+            id="app_version_number">3.001</span><br> © <span
+            id="copyright">2018 Hirondelle Systems</span><br> <a
+            href="http://www.javapractices.com/source/SourceAction.do">Source
+            Code</a> | <a href="mailto:webmaster@javapractices.com"
+            rel="author">Contact</a> | <a
+            href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+            rel="license">License</a> | <a
+            href="http://www.javapractices.com/apps/cjp.rss"
+            rel="alternate" type="application/rss+xml">RSS</a>
+        <!-- ukey="2AC36CD2" -->
+        <!-- ckey="16DF3D87" -->
+        <br> Individual code snippets have a <a
+            href="http://www.javapractices.com/LICENSE.txt"
+            rel="license">BSD license</a><br> Over 1,000,000 unique
+        IPs last year<br> Last updated
+        <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+        <br> - In Memoriam : Bill Dirani -
+    </footer>
+</body>
+</html>

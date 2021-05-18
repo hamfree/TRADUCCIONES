@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+	content="Prácticas y técnicas de programación en Java.">
+<meta name="keywords"
+	content="java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas Java-&gt;Considere usar herramientas de la capa de datos</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+    href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png"
+    href="../img/favicon.png">
+</head>
+<body>
+    <nav class="menu-bar" id="menu-bar">
+        <a href="../index.html"
+            title="Table of Contents" style="float: left;">Inicio</a>
+        &nbsp;&nbsp;
+        <form method="GET" action="https://www.google.com/search"
+            class="search-form" style="float: right;">
+            <input name="q" size="15" maxlength="255" placeholder=""
+                type="text"> <input name="btnG" value="Search"
+                type="submit"> <input name="sitesearch"
+                value="www.javapractices.com" type="hidden">
+        </form>
+    </nav>
+    <div class="page-title">Considere usar herramientas de la capa de datos</div>
+    <br> Many applications store data in a relational database. The
+    standard
+    <a
+        href="http://www.oracle.com/technetwork/java/javase/jdbc/index.html">JDBC
+        API</a> is used to interact with relational databases, but it's a
+    bit low level. It's not hard to define a few helper classes that
+    will encapsulate the bulk of repeated JDBC code. But even so, many
+    applications will benefit from using tools that operate on top of
+    the JDBC API.
+    <p>Examples of such tools include:</p>
+    <ul>
+        <li><a
+            href="http://www.oracle.com/technetwork/java/jdo-137135.html">Java
+                Data Objects (JDO)</a></li>
+        <li><a
+            href="http://www.oracle.com/technetwork/articles/javaee/jpa-137156.html">Java
+                Persistence API (JPA)</a></li>
+        <li><a href="http://blog.mybatis.org/">MyBatis</a></li>
+        <li><a href="http://www.hibernate.org/">Hibernate</a></li>
+    </ul>
+    These tools generally fall into two categories:
+    <ul>
+        <li>treat code and objects as primary (Java Persistence API
+            and Hibernate, for example), and SQL as secondary. These are
+            usually referred to as Object-Relational Mapping (ORM)
+            tools.</li>
+        <li>treat SQL as primary (IBatis and web4j, for example),
+            and code as secondary.</li>
+    </ul>
+    <p>ORM tools are widely used, but there are trade-offs:</p>
+    <ul>
+        <li>their performance is usually poorer than approaches
+            based on SQL</li>
+        <li>there's usually no easy way to debug and tune queries</li>
+        <li>they usually don't support all relational databases</li>
+        <li>learning how to use them well is non-trivial</li>
+        <li>they reinvent the wheel by defining query APIs, which
+            more or less reproduce what already exists in SQL</li>
+        <li>they sometimes prevent you from defining your Model
+            Objects as immutable, or otherwise leak into your Model
+            Object</li>
+    </ul>
+    As an example of the relative simplicity of tools which give primacy
+    to SQL, and not objects, here's an example of a
+    <a href="http://www.javapractices.com/topic/TopicAction.do?Id=66">Data
+        Access Object</a> (DAO) implemented with web4j. The actual SQL
+    statements are placed in
+    <code>.sql</code>
+    text files placed near the corresponding DAO (usually in the same
+    directory).
+    <pre>FETCH_PREFERENCES {
+  SELECT Id, LoginName, ScreenName FROM Users WHERE LoginName=?
+}
+CHANGE_PREFERENCES {
+  UPDATE Users SET  ScreenName=? WHERE LoginName=?
+}</pre>
+    Entries in the above
+    <code>.sql</code>
+    file are referenced in code using
+    <code>SqlId</code>
+    objects, such as
+    <code>FETCH_PREFERENCES</code>
+    :
+    <br>
+    <pre>
+        <span class="keyword">import</span> <span class="keyword">static</span> hirondelle.predict.main.preferences.PreferencesAction.CHANGE_PREFERENCES;
+<span class="keyword">import</span> <span class="keyword">static</span> hirondelle.predict.main.preferences.PreferencesAction.FETCH_PREFERENCES;
+<span class="keyword">import</span> hirondelle.web4j.database.DAOException;
+<span class="keyword">import</span> hirondelle.web4j.database.Db;
+<span class="keyword">import</span> hirondelle.web4j.security.SafeText;
+
+<span class="comment">/**
+ Data Access Object for user {@link Preferences}. 
+*/</span>
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">class</span> PreferencesDAO {
+  
+  <span class="comment">/** Fetch the {@link Preferences} for a given user. */</span> 
+  <span class="keyword">public</span> Preferences fetch(SafeText aUserId) <span
+            class="keyword">throws</span> DAOException {
+    <span class="keyword">return</span> Db.fetch(Preferences.<span
+            class="keyword">class</span>, FETCH_PREFERENCES, aUserId);
+  }
+  
+  <span class="comment">/** Change the {@link Preferences} for a given user. */</span>
+  <span class="keyword">void</span> change(Preferences aPreferences) <span
+            class="keyword">throws</span> DAOException {
+    Db.edit(
+      CHANGE_PREFERENCES, 
+      aPreferences.getScreenName(), 
+      aPreferences.getLoginName()
+    );
+  }
+} 
+</pre>
+    That's all there is to it. There's no mapping involved.
+    <br>
+    <p></p>
+    <div class="topic-section" id="see-also-title">See Also :</div>
+    <div id="see-also" class="main-body">
+        <a
+            href="..\bbdd\bbdd_184.html">Simplificar las operaciones de bases de datos</a> <br>
+    </div>
+    <footer id="footer" class="legalese">
+		<span id="app_name">Prácticas de Java</span> <span
+			id="app_version_number">3.001</span><br> © <span id="copyright">2018
+			Hirondelle Systems</span><br> <a
+			href="http://www.javapractices.com/source/SourceAction.do">Código
+			Fuente</a> | <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a>
+		| <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+			rel="license">Licencia</a> | <a
+			href="http://www.javapractices.com/apps/cjp.rss" rel="alternate"
+			type="application/rss+xml">RSS</a>
+		<!-- ukey="2AC36CD2" -->
+		<!-- ckey="16DF3D87" -->
+		<br> Los trozos de código individual tienen una <a
+			href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia
+			BSD</a><br> Sobre 1,000,000 de IPs únicas el último año<br>
+		Última actualización
+		<time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+		<br> - In Memoriam : Bill Dirani -
+	</footer>
+</body>
+</html>

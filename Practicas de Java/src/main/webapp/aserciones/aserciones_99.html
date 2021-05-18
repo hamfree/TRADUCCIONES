@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="Prácticas y técnicas de programación en Java." />
+    <meta name="keywords" content="java,programación java,Prácticas de Java,idioma java,estilo java,patrones de diseño java,convenciones de 
+      codigo java" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prácticas de Java-&gt;Forzar la habilitación de las aserciones</title>
+    <link id="stylesheet" rel="stylesheet" type="text/css" href="../css/stylesheet9.css" media="all" />
+    <link rel="icon" type="image/png" href="../img/favicon.png" />
+  </head>
+  <body>
+    <nav class="menu-bar" id="menu-bar">
+      <a href="../index.html" title="Tabla de Contenidos" style="float: left;">Inicio</a>
+      &nbsp;&nbsp;
+      <form method="GET" action="https://www.google.com/search" class="search-form" style="float: right;">
+        <input name="q" size="15" maxlength="255" placeholder="" type="text" />
+        <input name="btnG" value="Buscar" type="submit" />
+        <input name="sitesearch" value="www.javapractices.com" type="hidden" />
+      </form>
+    </nav>
+    <div class="page-title">
+      Forzar la habilitación de las aserciones
+    </div>
+    <br />
+    Es algunas veces útil requerir que las aserciones esten siempre habilitadas para una clase particular en tiempo de ejecución.
+    <p>
+      <b>Ejemplo</b>
+    </p>
+    <p>
+      Si <code>NuclearReactor</code> se carga dentro de un entorno donde se han deshabilitado las aserciones, entoces su inicializador 
+      estático lanzará una <code>RuntimeException</code>.
+    </p>
+    <p>
+      Dos ejecuciones del ejemplo de <code>NuclearReactor</code> dan: <br />
+        <code>&gt;java -cp . -enableassertions NuclearReactor</code>
+        <br />
+        <code>Proceder normalmente</code>
+        <br />
+        <code>&gt;java -cp . NuclearReactor</code>
+        <br />
+        <code>Exception in thread "main"
+            java.lang.ExceptionInInitializerError</code>
+        <br />
+        <code>Caused by: java.lang.RuntimeException: Las aserciones deben estar habilitadas para el reactor nuclear.</code>
+        <br />
+        <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at
+            NuclearReactor.&lt;clinit&gt;(NuclearReactor.java:18)</code>
+        <br />
+    </p>
+    <pre>
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+            class="keyword">class</span> NuclearReactor {
+
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+            class="keyword">void</span> main(String... arguments){
+    NuclearReactor reactor = <span class="keyword">new</span> NuclearReactor(<span
+            class="literal">"Fermi"</span>);
+    System.out.println(<span class="literal">"Proceder normalmente..."</span>);
+  }
+
+  <span class="comment">/**
+  * Evite que esta clase se ejecute con aserciones deshabilitadas.
+  *
+  * Si las aserciones están deshabilitadas, entonces se lanzará 
+  * una RuntimeException al cargar la clase.
+  */</span>
+  <span class="keyword">static</span> {
+    <span class="keyword">boolean</span> hasAssertEnabled = <span
+            class="keyword">false</span>;
+    assert hasAssertEnabled = <span class="keyword">true</span>; <span
+            class="comment">// raro - ¡un efecto secundario intencional!
+</span>    <span class="keyword">if</span>(!hasAssertEnabled){
+      <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span
+            class="literal">"Las aserciones deben estar habilitadas para el reactor nuclear."</span>);
+    }
+  }
+
+  <span class="comment">/**
+  * @param aName es no nulo.
+  */</span>
+  <span class="keyword">public</span> NuclearReactor(String aName){
+    <span class="comment">//NO use assert para verificar los parámetros pasados a 
+</span>    <span class="comment">//métodos no privados
+</span>    <span class="keyword">if</span>(aName == <span class="keyword">null</span>){
+      <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
+            class="literal">"Name no puede ser nulo."</span>);
+    }
+    fName = aName;
+  }
+
+  <span class="keyword">public</span> String getName(){
+    <span class="keyword">return</span> fName;
+  }
+
+  <span class="comment">// PRIVADO
+</span>  <span class="keyword">private</span> <span class="keyword">final</span> String fName;
+}
+ 
+</pre>
+    <br />
+    <p></p>
+    <p></p>
+    <footer id="footer" class="legalese">
+      <span id="app_name">Prácticas de Java</span> 
+      <span id="app_version_number">3.001</span><br />
+      © <span id="copyright">2018Hirondelle Systems</span><br /> 
+      <a href="http://www.javapractices.com/source/SourceAction.do">Código Fuente</a> | 
+      <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a> | 
+      <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/" rel="license">Licencia</a> | 
+      <a href="http://www.javapractices.com/apps/cjp.rss" rel="alternate" type="application/rss+xml">RSS</a>
+      <!-- ukey="2AC36CD2" -->
+      <!-- ckey="16DF3D87" -->
+      <br /> Los trozos de código individual tienen una 
+      <a href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia BSD</a><br />
+      Sobre 1,000,000 de IPs únicas el último año<br />
+      Última actualización <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+      <br /> - In Memoriam : Bill Dirani -
+    </footer>
+  </body>
+</html>

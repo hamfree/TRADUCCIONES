@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<!-- saved from url=(0056)http://www.javapractices.com/topic/TopicAction.do?Id=257 -->
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+	content="Prácticas y técnicas de programación en Java.">
+<meta name="keywords"
+	content="java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas de Java-&gt;Tenga cuidado de las Marcas de Orden de Byte</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+	href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png" href="../img/favicon.png">
+</head>
+<body>
+	<nav class="menu-bar" id="menu-bar">
+		<a href="../index.html" title="Table of Contents" style="float: left;">Inicio</a>
+		&nbsp;&nbsp;
+		<form method="GET" action="https://www.google.com/search"
+			class="search-form" style="float: right;">
+			<input type="text" name="q" size="15" maxlength="255" value=""
+				placeholder=""> <input type="submit" name="btnG"
+				value="Search"> <input type="hidden" name="sitesearch"
+				value="www.javapractices.com">
+		</form>
+	</nav>
+	<div class="page-title">Tenga cuidado de las Marcas de Orden de
+		Byte</div>
+
+	<br>When dealing with text files having a Unicode encoding, some
+	tools will prepend a special character called a
+	<a href="http://en.wikipedia.org/wiki/Byte_order_mark">byte order
+		mark</a> (BOM) to the file. The BOM is from 2 to 4 bytes long,
+	<a
+		href="http://en.wikipedia.org/wiki/Byte_order_mark#Representations_of_byte_order_marks_by_encoding">according
+		to the encoding</a>. (In the UTF-8 encoding, for example, the byte order
+	mark is 3 bytes long.) The BOM is often not rendered visually in an
+	editor, so they can be difficult to detect.
+
+	<p>
+		Probably the most widely used Unicode encoding is the UTF-8 encoding.
+		However, in UTF-8, the BOM is not required or even recommended by the
+		UTF-8 standard. When a text file having UTF-8 encoding is under your
+		control, you should usually ensure that it does <em>not</em> get saved
+		with a byte order mark, because they can lead to problems. (It should
+		always be safe to remove it.)
+
+	</p>
+	<p>
+		This is particularly important in <a
+			href="http://www.w3.org/International/questions/qa-byte-order-mark">the
+			context of a web application</a>. HTML, Java Server Pages, tag files, and
+		so on, should usually be served using UTF-8 encoding, <em>without</em>
+		using a BOM. If not, the end user may see strange-looking characters
+		in their browser, or perhaps extra, unwanted empty lines. They can
+		also cause cascading style sheets to malfunction.
+
+	</p>
+	<p>Unfortunately, on the Windows operating system, the Notepad tool
+		will always add a byte order mark when saving text files as UTF-8, so
+		you need to exercise care when using Notepad.</p>
+	<p>
+		Some text editors will give you information about the presence or
+		absence of a BOM, and some will not. To help you control your source
+		code, here's a class which will detect and optionally remove UTF-8
+		BOMs from a source tree: <br>
+	</p>
+	<pre>
+		<span class="keyword">import</span> java.io.BufferedInputStream;
+<span class="keyword">import</span> java.io.BufferedOutputStream;
+<span class="keyword">import</span> java.io.File;
+<span class="keyword">import</span> java.io.FileInputStream;
+<span class="keyword">import</span> java.io.FileOutputStream;
+<span class="keyword">import</span> java.io.IOException;
+<span class="keyword">import</span> java.io.InputStream;
+<span class="keyword">import</span> java.io.OutputStream;
+<span class="keyword">import</span> java.util.ArrayList;
+<span class="keyword">import</span> java.util.Arrays;
+<span class="keyword">import</span> java.util.List;
+
+<span class="comment">/** 
+ Detect and remove Byte Order Marks (BOMs) from text files saved with a
+ Unicode encoding.
+
+ &lt;P&gt;Dev tool only. If you use this tool to remove BOMs, please ensure 
+ you have made a backup.
+ 
+ &lt;P&gt;This class assumes the UTF-8 encoding for the BOM, but 
+ is easily changed to handle any encoding. 
+ See http://en.wikipedia.org/wiki/Byte_order_mark for more info.
+ JDK 5+.
+*/</span> 
+<span class="keyword">public</span> <span class="keyword">final</span> <span
+			class="keyword">class</span> BomDetector {
+  
+  <span class="comment">/** Run the tool against a root directory.*/</span>
+  <span class="keyword">public</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> main(String... aArgs) <span
+			class="keyword">throws</span> IOException{
+    BomDetector bom = <span class="keyword">new</span> BomDetector(
+     <span class="literal">"C:\\Temp3\\test\\"</span>, 
+     <span class="literal">".txt"</span>, <span class="literal">".jsp"</span>, <span
+			class="literal">".jspf"</span>, <span class="literal">".tag"</span>, <span
+			class="literal">".html"</span>, 
+     <span class="literal">".css"</span>, <span class="literal">".xml"</span>, <span
+			class="literal">".js"</span>, <span class="literal">".sql"</span>, <span
+			class="literal">".tld"</span>
+    );
+  
+    <span class="keyword">int</span> count = <span class="literal">0</span>;
+    <span class="keyword">for</span>(String file : bom.findBOMs()){
+      log(file);
+      ++count;
+    }
+    log(<span class="literal">"Number of files with BOM:"</span> + count);
+    
+    <span class="comment">/*
+    for(String file : bom.removeBOMs()){
+      log("Removed BOM from: " + file);
+    }
+    */</span>
+  }
+  
+  <span class="keyword">public</span> BomDetector(String aRootDirectory, String... aFileExtensions){
+    fRootDir = <span class="keyword">new</span> File(aRootDirectory);
+    fExtensions = Arrays.asList(aFileExtensions);
+    <span class="keyword">if</span>(!fRootDir.exists() || fRootDir.isFile() ){
+      <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span
+			class="literal">"Root directory not valid."</span>);
+    }
+  }
+  
+  <span class="comment">/** Find files with BOMs under the given root directory. Return their names. */</span>
+  <span class="keyword">public</span> List&lt;String&gt; findBOMs() <span
+			class="keyword">throws</span> IOException {
+    List&lt;String&gt; result = <span class="keyword">new</span> ArrayList&lt;String&gt;();
+    <span class="keyword">for</span>(File textFile : findTextFilesBeneath(fRootDir)){
+      <span class="keyword">if</span>(startsWithBOM(textFile)){
+        result.add(textFile.getCanonicalPath());
+      }
+    }
+    <span class="keyword">return</span> result;
+  }
+  
+  <span class="comment">/** 
+   Find and remove BOMs from files under the given root directory.  
+   Overwrites files.
+   Return the names of the affected files.
+  */</span>
+  <span class="keyword">public</span> List&lt;String&gt; removeBOMs() <span
+			class="keyword">throws</span> IOException{
+    List&lt;String&gt; result = <span class="keyword">new</span> ArrayList&lt;String&gt;();
+    <span class="keyword">for</span>(String bomFile : findBOMs()){
+      stripBomFrom(bomFile);
+      result.add(bomFile);
+    }
+    <span class="keyword">return</span> result;
+  }
+  
+  <span class="comment">// PRIVATE
+</span>  <span class="keyword">private</span> File fRootDir;
+  <span class="keyword">private</span> List&lt;String&gt; fExtensions;
+  
+  <span class="comment">/** Different encodings will have different BOMs. This is for UTF-8. */</span>
+  <span class="keyword">private</span> <span class="keyword">final</span> <span
+			class="keyword">int</span>[] BYTE_ORDER_MARK = {<span class="literal">239</span>, <span
+			class="literal">187</span>, <span class="literal">191</span>};
+  
+  <span class="keyword">private</span> <span class="keyword">static</span> <span
+			class="keyword">void</span> log(Object aThing){
+    System.out.println(String.valueOf(aThing));
+  }
+  
+  <span class="keyword">private</span> List&lt;File&gt; findTextFilesBeneath(File aStartingDir) <span
+			class="keyword">throws</span> IOException {
+    List&lt;File&gt; result = <span class="keyword">new</span> ArrayList&lt;File&gt;();
+    File[] filesAndDirs = aStartingDir.listFiles();
+    List&lt;File&gt; filesDirs = Arrays.asList(filesAndDirs);
+    <span class="keyword">for</span>(File file : filesDirs){
+      <span class="keyword">if</span> (isTextFile(file)){
+        result.add(file);
+      }
+      <span class="keyword">if</span>( file.isDirectory() ) {
+        <span class="comment">//recursive call!!
+</span>        List&lt;File&gt; deeperList = findTextFilesBeneath(file);
+        result.addAll(deeperList);
+      }
+    }
+    <span class="keyword">return</span> result;
+  }
+  
+  <span class="keyword">private</span> <span class="keyword">boolean</span> isTextFile(File aFile) <span
+			class="keyword">throws</span> IOException{
+    <span class="keyword">boolean</span> result = <span class="keyword">false</span>;
+    String fileName = aFile.getCanonicalPath();
+    <span class="keyword">int</span> finalDot = fileName.lastIndexOf(<span
+			class="literal">"."</span>);
+    <span class="keyword">if</span> (finalDot &gt; -<span
+			class="literal">1</span>){
+      String extension = fileName.substring(finalDot);
+      result = fExtensions.contains(extension);
+    }
+    <span class="keyword">return</span> result;
+  }
+  
+  <span class="keyword">private</span> <span class="keyword">boolean</span> startsWithBOM(File aTextFile) <span
+			class="keyword">throws</span> IOException {
+    <span class="keyword">boolean</span> result = <span class="keyword">false</span>;
+    <span class="keyword">if</span>(aTextFile.length() &lt; BYTE_ORDER_MARK.length) <span
+			class="keyword">return</span> <span class="keyword">false</span>;
+    <span class="comment">//open as bytes here, not characters
+</span>    <span class="keyword">int</span>[] firstFewBytes = <span
+			class="keyword">new</span> <span class="keyword">int</span>[BYTE_ORDER_MARK.length];
+    InputStream input = <span class="keyword">null</span>;
+    <span class="keyword">try</span> {
+      input = <span class="keyword">new</span> FileInputStream(aTextFile);
+      <span class="keyword">for</span>(<span class="keyword">int</span> index = <span
+			class="literal">0</span>; index &lt; BYTE_ORDER_MARK.length; ++index){
+        firstFewBytes[index] = input.read(); <span class="comment">//read a single byte
+</span>      }
+      result = Arrays.equals(firstFewBytes, BYTE_ORDER_MARK);
+    }
+    <span class="keyword">finally</span> {
+      input.close();
+    }
+    <span class="keyword">return</span> result;
+  }
+  
+  <span class="keyword">private</span> <span class="keyword">void</span> stripBomFrom(String aTextFile) <span
+			class="keyword">throws</span> IOException{
+    File bomFile = <span class="keyword">new</span> File(aTextFile);
+    <span class="keyword">long</span> initialSize = bomFile.length();
+    <span class="keyword">long</span> truncatedSize = initialSize - BYTE_ORDER_MARK.length;
+    <span class="keyword">byte</span>[] memory = <span class="keyword">new</span> <span
+			class="keyword">byte</span>[(<span class="keyword">int</span>)(truncatedSize)];
+    InputStream input = <span class="keyword">null</span>;
+    <span class="keyword">try</span> {
+      input = <span class="keyword">new</span> BufferedInputStream(<span
+			class="keyword">new</span> FileInputStream(bomFile));
+      input.skip(BYTE_ORDER_MARK.length);
+      <span class="keyword">int</span> totalBytesReadIntoMemory = <span
+			class="literal">0</span>;
+      <span class="keyword">while</span>(totalBytesReadIntoMemory &lt; truncatedSize){
+        <span class="keyword">int</span> bytesRemaining = (<span
+			class="keyword">int</span>)truncatedSize - totalBytesReadIntoMemory;
+        <span class="keyword">int</span> bytesRead = input.read(memory, totalBytesReadIntoMemory, bytesRemaining);
+        <span class="keyword">if</span>(bytesRead &gt; <span
+			class="literal">0</span>){
+          totalBytesReadIntoMemory = totalBytesReadIntoMemory + bytesRead;
+        }
+      }
+      overwriteWithoutBOM(memory, bomFile);
+    }
+    <span class="keyword">finally</span> {
+      input.close();
+    }
+    File after = <span class="keyword">new</span> File(aTextFile);
+    <span class="keyword">long</span> finalSize = after.length();
+    <span class="keyword">long</span> changeInSize = initialSize - finalSize;
+    <span class="keyword">if</span>(changeInSize != BYTE_ORDER_MARK.length){
+      <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(
+        <span class="literal">"Change in file size: "</span> + changeInSize + 
+        <span class="literal">" Expected change: "</span> + BYTE_ORDER_MARK.length  
+      );
+    }
+  }
+  
+  <span class="keyword">private</span> <span class="keyword">void</span> overwriteWithoutBOM(
+    <span class="keyword">byte</span>[] aBytesWithoutBOM, File aTextFile
+  ) <span class="keyword">throws</span> IOException{
+    OutputStream output = <span class="keyword">null</span>;
+    <span class="keyword">try</span> {
+      output = <span class="keyword">new</span> BufferedOutputStream(<span
+			class="keyword">new</span> FileOutputStream(aTextFile));
+      output.write(aBytesWithoutBOM);
+    }
+    <span class="keyword">finally</span> {
+      output.close();
+    }
+  }
+} 
+</pre>
+
+	<br>
+	<p></p>
+	<p></p>
+	<div class="topic-section" id="see-also-title">See Also :</div>
+	<div id="see-also" class="main-body">
+		<a href="..\servlets\servlets_206.html">Prefiera UTF 8 en todas las capas</a> <br>
+	</div>
+	<footer id="footer" class="legalese">
+		<span id="app_name">Prácticas de Java</span> <span
+			id="app_version_number">3.001</span><br> © <span id="copyright">2018
+			Hirondelle Systems</span><br> <a
+			href="http://www.javapractices.com/source/SourceAction.do">Código
+			Fuente</a> | <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a>
+		| <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+			rel="license">Licencia</a> | <a
+			href="http://www.javapractices.com/apps/cjp.rss" rel="alternate"
+			type="application/rss+xml">RSS</a>
+		<!-- ukey="2AC36CD2" -->
+		<!-- ckey="16DF3D87" -->
+		<br> Los trozos de código individual tienen una <a
+			href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia
+			BSD</a><br> Sobre 1,000,000 de IPs únicas el último año<br>
+		Última actualización
+		<time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+		<br> - In Memoriam : Bill Dirani -
+	</footer>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<!-- saved from url=(0055)http://www.javapractices.com/topic/TopicAction.do?Id=48 -->
+<html lang="es">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="description"
+    content="Prácticas y técnicas de programación en Java.">
+<meta name="keywords"
+    content="java,programación java,Prácticas de Java,idioma 
+        java,estilo java,patrones de diseño java,convenciones de codigo java">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prácticas de Java-&gt;Documente la seguridad del hilo</title>
+<link id="stylesheet" rel="stylesheet" type="text/css"
+	href="../css/stylesheet9.css" media="all">
+<link rel="icon" type="image/png"
+	href="../img/favicon.png">
+</head>
+<body>
+	<nav class="menu-bar" id="menu-bar">
+		<a href="../index.html"
+			title="Table of Contents" style="float: left;">Inicio</a> &nbsp;&nbsp;
+		<form method="GET" action="https://www.google.com/search"
+			class="search-form" style="float: right;">
+			<input type="text" name="q" size="15" maxlength="255" value=""
+				placeholder=""> <input type="submit" name="btnG"
+				value="Search"> <input type="hidden" name="sitesearch"
+				value="www.javapractices.com">
+		</form>
+	</nav>
+	<div class="page-title">Documente la seguridad del hilo</div>
+
+	<br>Javadoc comments should describe how the responsibilities for
+	ensuring correct multi-threaded behaviour are shared between a class
+	and its caller. This is equivalent to stating the circumstances, if
+	any, in which the caller must explicitly obtain an external lock before
+	performing certain operations. The central questions to be answered by
+	the documentation are:
+	<p>
+		"<i>When do these objects require external synchronization?</i>" <br>"<i>Which
+			lock is needed for which operations?</i>"
+
+	</p>
+	<p>Here, "operations" on an object might come in two flavours:</p>
+	<ul>
+		<li>single-call operations, where only a single method is called</li>
+		<li>multiple-call operations, where more than one method is
+			called, and they are treated as a single unit; the classic example is
+			iteration over a collection</li>
+	</ul>
+
+
+	The naming convention described below is a modified version of that
+	found in
+	<i><a
+		href="http://www.amazon.com/exec/obidos/ASIN/0134685997/ref=nosim/javapractices-20">Effective
+			Java</a></i>, by Joshua Bloch. The reason for the changes are:
+	<ul>
+		<li>it focuses more on the point of view of the caller, instead
+			of class internals</li>
+		<li>the language is simpler and clearer</li>
+	</ul>
+
+	<p>The goal of this scheme is simply to tell the caller when they
+		need to obtain an external lock before performing an operation in a
+		multithreaded environment.</p>
+	<p>
+		<b>lock-never</b> - the caller <i>never</i> needs to obtain an
+		external lock before performing any operation of any kind. The class
+		may be <a
+			href="http://www.javapractices.com/topic/TopicAction.do?Id=29">immutable</a>,
+		or it may perform all necessary synchronization internally. From the
+		point of view of the caller, these two cases are functionally the same
+		(in the context of documenting thread-safety).
+
+	</p>
+	<p>
+		<b>lock-always</b> - the caller <i>always</i> needs to obtain an
+		external lock before performing any operation. Instances are mutable,
+		and the implementation of the class performs no internal
+		synchronization.
+
+	</p>
+	<p>
+		<b>lock-sometimes</b> - the caller <i>sometimes</i> needs to obtain a
+		lock externally before performing some operations. Instances are
+		mutable, and the implementation of the class performs most
+		synchronization internally. The caller <em>usually</em> doesn't need
+		to obtain an external lock, but there are some operations in which the
+		caller does indeed need to obtain an external lock. The classic
+		example of this is iteration over a collection.
+
+	</p>
+	<p>
+		<b>lock-hostile</b> - operations cannot be performed safely in a
+		multi-threaded environment at all, even when an external lock is
+		always obtained. This is a rare pathological case. It usually occurs
+		when static data is modified without proper synchronization.
+
+	</p>
+	<p>
+		In practice,
+		<code>lock-always</code>
+		and
+		<code>lock-never</code>
+		are likely the most common cases.
+
+	</p>
+	<p>To help you with documenting thread-safety, you might consider
+		using:</p>
+	<ul>
+		<li>annotations, for example those defined by <a
+			href="http://jcip.net.s3-website-us-east-1.amazonaws.com/annotations/doc/index.html">Brian
+				Goetz</a>
+		</li>
+		<li><a
+			href="http://docs.oracle.com/javase/8/docs/technotes/guides/javadoc/index.html">javadoc's</a>
+			<code>-tag</code> option, which lets you define simple custom javadoc
+			tags</li>
+	</ul>
+
+	<p>
+		Another reasonable option is to state in the javadoc overview that,
+		unless stated otherwise, a class is to be considered
+		<code>lock-always</code>
+		. <br>
+	</p>
+	<p></p>
+	<div class="topic-section" id="see-also-title">See Also :</div>
+	<div id="see-also" class="main-body">
+		<a href="..\patrones\patrones_29.html">Objetos inmutables
+        </a> <br> <a
+			href="..\practicascomunes\practicascomunes_60.html">Use javadoc generosamente</a> <br> <a
+			href="..\hilos\hilos_67.html">Sincronizado es detalle de implementación
+            </a> <br>
+	</div>
+
+	    <footer id="footer" class="legalese">
+        <span id="app_name">Prácticas de Java</span> <span
+            id="app_version_number">3.001</span><br> © <span
+            id="copyright">2018 Hirondelle Systems</span><br> <a
+            href="http://www.javapractices.com/source/SourceAction.do">Código
+            Fuente</a> | <a href="mailto:webmaster@javapractices.com"
+            rel="author">Contacto</a> | <a
+            href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+            rel="license">Licencia</a> | <a
+            href="http://www.javapractices.com/apps/cjp.rss"
+            rel="alternate" type="application/rss+xml">RSS</a>
+        <!-- ukey="2AC36CD2" -->
+        <!-- ckey="16DF3D87" -->
+        <br> Los trozos de código individual tienen una <a
+            href="http://www.javapractices.com/LICENSE.txt"
+            rel="license">licencia BSD</a><br> Sobre 1,000,000 de
+        IPs únicas el último año<br> Última actualización
+        <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+        <br> - In Memoriam : Bill Dirani -
+    </footer>
+</body>
+</html>
