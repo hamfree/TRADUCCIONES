@@ -1,82 +1,82 @@
 <!DOCTYPE html>
 <!-- saved from url=(0056)http://www.javapractices.com/topic/TopicAction.do?Id=210 -->
 <html lang="es">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="description"
-    content="Prácticas y técnicas de programación en Java.">
-<meta name="keywords"
-    content="java,programación java,Prácticas de Java,idioma 
-        java,estilo java,patrones de diseño java,convenciones de codigo java">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prácticas de Java-&gt;Tenga cuidado con DecimalFormat</title>
-<link id="stylesheet" rel="stylesheet" type="text/css"
-	href="../css/stylesheet9.css" media="all">
-<link rel="icon" type="image/png"
-	href="../img/favicon.png">
-</head>
-<body>
-	<nav class="menu-bar" id="menu-bar">
-		<a href="../index.html"
-			title="Table of Contents" style="float: left;">Inicio</a> &nbsp;&nbsp;
-		<form method="GET" action="https://www.google.com/search"
-			class="search-form" style="float: right;">
-			<input type="text" name="q" size="15" maxlength="255" value=""
-				placeholder=""> <input type="submit" name="btnG"
-				value="Search"> <input type="hidden" name="sitesearch"
-				value="www.javapractices.com">
-		</form>
-	</nav>
-	<div class="page-title">Tenga cuidado con DecimalFormat</div>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="description"
+          content="Prácticas y técnicas de programación en Java.">
+    <meta name="keywords"
+          content="java,programación java,Prácticas de Java,idioma 
+          java,estilo java,patrones de diseño java,convenciones de codigo java">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prácticas de Java-&gt;Tenga cuidado con DecimalFormat</title>
+    <link id="stylesheet" rel="stylesheet" type="text/css"
+          href="../css/stylesheet9.css" media="all">
+    <link rel="icon" type="image/png"
+          href="../img/favicon.png">
+  </head>
+  <body>
+    <nav class="menu-bar" id="menu-bar">
+      <a href="../index.html"
+         title="Table of Contents" style="float: left;">Inicio</a> &nbsp;&nbsp;
+      <form method="GET" action="https://www.google.com/search"
+            class="search-form" style="float: right;">
+        <input type="text" name="q" size="15" maxlength="255" value=""
+               placeholder=""> <input type="submit" name="btnG"
+               value="Search"> <input type="hidden" name="sitesearch"
+               value="www.javapractices.com">
+      </form>
+    </nav>
+    <div class="page-title">Tenga cuidado con DecimalFormat</div>
 
-	<br>Parsing user input into numbers (especially numbers
-	representing money) is a very common task. Such parsing is often
-	implemented with
-	<code>
-		<a
-			href="https://docs.oracle.com/javase/10/docs/api/java/text/DecimalFormat.html">DecimalFormat</a>
-	</code>
-	. However, parsing with
-	<code>DecimalFormat</code>
-	should be done with care. You may even want to consider an alternative.
-	Here's why:
-	<ul>
-		<li>surprisingly, a <code>
-				<a
-					href="https://docs.oracle.com/javase/10/docs/api/java/text/Format.html">Format</a>
-			</code> does not need to parse <em>all</em> of its input. That is, if it
-			finds a match at the <em>start</em> of an input <code>String</code>,
-			it will cease parsing, and return a value. When parsing user input,
-			this kind of behavior is not usually desired. To accomodate this
-			behavior, an extra step is needed - a <code>
-				<a
-					href="https://docs.oracle.com/javase/10/docs/api/java/text/ParsePosition.html">ParsePosition</a>
-			</code> object needs to be passed as an <a
-			href="http://www.javapractices.com/topic/TopicAction.do?Id=37">output
-				parameter</a> to <code>DecimalFormat</code>.
-		</li>
-		<li>the class seems to be rather <a
-			href="https://bugs.java.com/bugdatabase/">buggy</a>.
-		</li>
-		<li>the class is harder than most to understand.</li>
-	</ul>
+    <br>Parsing user input into numbers (especially numbers
+    representing money) is a very common task. Such parsing is often
+    implemented with
+    <code>
+      <a
+        href="https://docs.oracle.com/javase/10/docs/api/java/text/DecimalFormat.html">DecimalFormat</a>
+    </code>
+    . However, parsing with
+    <code>DecimalFormat</code>
+    should be done with care. You may even want to consider an alternative.
+    Here's why:
+    <ul>
+      <li>surprisingly, a <code>
+          <a
+            href="https://docs.oracle.com/javase/10/docs/api/java/text/Format.html">Format</a>
+        </code> does not need to parse <em>all</em> of its input. That is, if it
+        finds a match at the <em>start</em> of an input <code>String</code>,
+        it will cease parsing, and return a value. When parsing user input,
+        this kind of behavior is not usually desired. To accomodate this
+        behavior, an extra step is needed - a <code>
+          <a
+            href="https://docs.oracle.com/javase/10/docs/api/java/text/ParsePosition.html">ParsePosition</a>
+        </code> object needs to be passed as an <a
+          href="http://www.javapractices.com/topic/TopicAction.do?Id=37">output
+          parameter</a> to <code>DecimalFormat</code>.
+      </li>
+      <li>the class seems to be rather <a
+          href="https://bugs.java.com/bugdatabase/">buggy</a>.
+      </li>
+      <li>the class is harder than most to understand.</li>
+    </ul>
 
-	<p>
-		Here's an example of parsing with
-		<code>DecimalFormat</code>
-		. An example run appears below. As you can see,
-	</p>
-	<ul>
-		<li>parsing user input will always require the caller to use <code>
-				<a
-					href="https://docs.oracle.com/javase/10/docs/api/java/text/ParsePosition.html">ParsePosition</a>
-			</code> to detect if the whole input has been parsed.
-		</li>
-		<li>there are cases when the parsing seems just plain <em>wrong</em>.
-		</li>
-	</ul>
-	<br>
-	<pre>
+    <p>
+      Here's an example of parsing with
+      <code>DecimalFormat</code>
+      . An example run appears below. As you can see,
+    </p>
+    <ul>
+      <li>parsing user input will always require the caller to use <code>
+          <a
+            href="https://docs.oracle.com/javase/10/docs/api/java/text/ParsePosition.html">ParsePosition</a>
+        </code> to detect if the whole input has been parsed.
+      </li>
+      <li>there are cases when the parsing seems just plain <em>wrong</em>.
+      </li>
+    </ul>
+    <br>
+    <pre>
 		<span class="keyword">import</span> java.text.*;
 
 <span class="keyword">public</span> <span class="keyword">final</span> <span
@@ -148,10 +148,10 @@
     System.out.println(String.valueOf(aMessage));
   }
 } 
-</pre>
+    </pre>
 
-	<br>Example run:
-	<pre>&gt;java -cp . BewareDecimalFormat
+    <br>Example run:
+    <pre>&gt;java -cp . BewareDecimalFormat
 Format : #,##0.00
 1000 parsed OK. ParsePos: 4, Parse Result: 1000
 1,000.00 parsed OK. ParsePos: 8, Parse Result: 1000
@@ -175,28 +175,28 @@ Format : #,###0.00
 1,0000.00 parsed OK. ParsePos: 9, Parse Result: 10000
 1,00000.00 parsed OK. ParsePos: 10, Parse Result: 100000
 Done.</pre>
-	<br>
-	<p></p>
+    <br>
+    <p></p>
 
-	<footer id="footer" class="legalese">
-        <span id="app_name">Prácticas de Java</span> <span
-            id="app_version_number">3.001</span><br> © <span
-            id="copyright">2018 Hirondelle Systems</span><br> <a
-            href="http://www.javapractices.com/source/SourceAction.do">Código
-            Fuente</a> | <a href="mailto:webmaster@javapractices.com"
-            rel="author">Contacto</a> | <a
-            href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
-            rel="license">Licencia</a> | <a
-            href="http://www.javapractices.com/apps/cjp.rss"
-            rel="alternate" type="application/rss+xml">RSS</a>
-        <!-- ukey="2AC36CD2" -->
-        <!-- ckey="16DF3D87" -->
-        <br> Los trozos de código individual tienen una <a
-            href="http://www.javapractices.com/LICENSE.txt"
-            rel="license">licencia BSD</a><br> Sobre 1,000,000 de
-        IPs únicas el último año<br> Última actualización
-        <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
-        <br> - In Memoriam : Bill Dirani -
+    <footer id="footer" class="legalese">
+      <span id="app_name">Prácticas de Java</span> <span
+        id="app_version_number">3.001</span><br> © <span
+        id="copyright">2018 Hirondelle Systems</span><br> <a
+        href="http://www.javapractices.com/source/SourceAction.do">Código
+        Fuente</a> | <a href="mailto:webmaster@javapractices.com"
+                      rel="author">Contacto</a> | <a
+                      href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+                      rel="license">Licencia</a> | <a
+                      href="http://www.javapractices.com/apps/cjp.rss"
+                      rel="alternate" type="application/rss+xml">RSS</a>
+      <!-- ukey="2AC36CD2" -->
+      <!-- ckey="16DF3D87" -->
+      <br> Los trozos de código individual tienen una <a
+        href="http://www.javapractices.com/LICENSE.txt"
+        rel="license">licencia BSD</a><br> Sobre 1,000,000 de
+      IPs únicas el último año<br> Última actualización
+      <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+      <br> - In Memoriam : Bill Dirani -
     </footer>
-</body>
+  </body>
 </html>

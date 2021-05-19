@@ -1,161 +1,161 @@
 <!DOCTYPE html>
 <!-- saved from url=(0055)http://www.javapractices.com/topic/TopicAction.do?Id=84 -->
 <html lang="es">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="description"
-	content="Presentaciones concisas de prácticas de programación en 
-        java, tareas, y convenciones, ampliamente ilustrado con ejemplos de código con resaltado de 
-        sintaxis.">
-<meta name="keywords"
-	content="constructor,java,programación java,Prácticas de Java,idioma 
-        java,estilo java,patrones de diseño java,convenciones de codigo java">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prácticas de Java-&gt;Evite el estilo JavaBeans de
-	construcción</title>
-<link id="stylesheet" rel="stylesheet" type="text/css"
-	href="../css/stylesheet9.css" media="all">
-<link rel="icon" type="image/png" href="../img/favicon.png">
-</head>
-<body>
-	<nav class="menu-bar" id="menu-bar">
-		<a href="../index.html" title="Table of Contents" style="float: left;">Inicio</a>
-		&nbsp;&nbsp;
-		<form method="GET" action="https://www.google.com/search"
-			class="search-form" style="float: right;">
-			<input type="text" name="q" size="15" maxlength="255" value=""
-				placeholder=""> <input type="submit" name="btnG"
-				value="Search"> <input type="hidden" name="sitesearch"
-				value="www.javapractices.com">
-		</form>
-	</nav>
-	<div class="page-title">Evite el estilo JavaBeans de construcción</div>
-	<br>Algunos argumentan que construir un
-	<a href="..\patrones\patrones_187.html">Modelo de Objetos</a> en muchos
-	pasos, llamando primero a un constructor sin argumentos, y después
-	llamar a una serie de métodos
-	<code>setXXX</code>
-	, es algo a ser evitado, si es posible:
-	<ul>
-		<li>es más complejo, ya que una llamada es reemplazada con muchas</li>
-		<li>no hay un forma simple de asegurarse que se han llamado a
-			todoso los métodos <code>setXXX</code> necesarios
-		</li>
-		<li>no hay una forma simple de implementar una <a
-			href="..\practicascomunes\practicascomunes_6.html">clase
-				invariante</a></li>
-		<li>permite que el objeto esté en estados intermedios los cuales
-			no son inmediatamente útiles, y quizás incluso inválidos/li>
-		<li>no es compatible con el (muy útil) patrón de <a
-			href="..\patrones\patrones_29.html">objeto inmutable</a>
-		</li>
-		<li>no sigue el estilo de muchos patrones de diseño, en los
-			cuales clases concretas usualmente tienen sus argumentos pasados en
-			el constructor. Esto es un tema recurrente en el libro de <i>Patrones
-				de Diseño</i>. Los constructores usualmente actúan como una "puerta 
-				de atrás" para los datos que son necesitados por una implementación,
-			pero los cuales no pueden aparecer en la firma de alguna abstracción
-			de más alto nivel (ya que contaminaría tal abstracción con datos
-			específicos de una implementación).
-		</li>
-	</ul>
-	Por supuesto, los JavaBeans siguen este patrón de "constructor sin
-	argumentos más
-	<code>setXXX</code>
-	". Sin embargo, los JavaBeans fueron diseñados originalmente para un
-	dominio problemático muy estrecho - la manipulación de componentes
-	gráficos en un EID (Entorno Integrado de Desarrollo).
-	<span class="highlight">Como un modelo para la construcción de
-		objetos típicamente centrados en datos (Objeto del Modelo), los
-		JavaBeans parecen completamente inapropiados</span>. Uno puede incluso
-	argumentar fuertemente que, para los Objetos Modelo, el estilo de los
-	JavaBeans es un
-	<i>anti-patron</i>, y debería ser evitado a menos que sea absolutamente
-	necesario.
-	<p>
-		<b><em>"El patron JavaBeans pattern tiene serias
-				desventajas."</em> - Joshua Bloch, <em>Java Efectivo</em></b>
-	</p>
-	<p></p>
-	<hr width="30%">
-	Si necesita algo más convincente, siga leyendo.
-	<p>
-		Aquí está la definición de un Bean de Java, directamente desde la
-		especificación <a
-			href="http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html">original
-		</a>:
-	</p>
-	<p>
-		<b>"Un Bean de Java es un componente de software reutilizable que
-			puede ser manipulado visualmente en una herramienta de construcción
-			."</b>
-	</p>
-	<p>Esto es muy claro y simple. No se hace mención aquí, o en
-		ninguna otra parte en la especificación, de Objetos de Modelo usados
-		para encapsular registros de bases de datos. La idea completa de un
-		Modelo de Objetos está completamente ausente de la especificación de
-		Beans de Java, y por una buena razón: la manipulación de controles
-		gráficos y la representación de registros de bases de datos son
-		cuestiones no relacionadas.</p>
-	<p>
-		El ciclo de vida de un Bean de Java, empezando con su constructor sin
-		argumentos, es derivado principalmente de la tarea de <em>configurar</em>
-		un control gráfico teniendo algún estado inicial por defecto. Para el
-		dominio deseado, este es de hecho un diseño razonable. Para un <a
-			href="..\patrones\patrones_187.html">Modelo de Objetos</a>, sin
-		embargo, la idea de <em>configuración</em> en este sentido es absurda.
-	</p>
-	<p>El papel de un Objeto de Modelo es llevar datos. Ya que un
-		constructor sin argumentos puede sólo construir un objeto que está
-		inicialmente vacío, entonces no puede contribuir directamente a este
-		objetivo. No forma un candidato natural para el diseño de un Objeto
-		del Modelo.</p>
-	<p>
-		Para colocar datos en Beans de Java vacíos, los marcos de trabajo
-		típicamente llaman a varios métodos
-		<code>setXXX</code>
-		usando reflexión. No hay nada que les impida llamar a los
-		constructores exactamente de la misma manera.
-	</p>
-	<p>
-		Una demostración de que un marco de trabajo <em>no</em> no necesita
-		JavaBeans para su Modelo de Objetos se encuentra en la herramienta <a
-			href="..\servlets\servlets_188.html">WEB4J</a> . WEB4J llama
-		(sorpresa, sorpresa) a un constructor para construir Modelos de
-		Objetos. Se recomienda implementar Modelos de Objetos como <a
-			href="..\patrones\patrones_29.html">objetos inmutables</a>, no Beans
-		de Java.
-	</p>
-	<p>
-		La adopción generalizada de Java Beans como supuestamente el diseño
-		apropiado para los modelos de objetos parece ser un error. <br>
-	</p>
-	<p></p>
-	<div class="topic-section" id="see-also-title">Vea También :</div>
-	<div id="see-also" class="main-body">
-		<a href="../practicascomunes/practicascomunes_6.html">Validar el
-			estado con invariantes de clase</a> <br> <a
-			href="../patrones/patrones_29.html">Objetos Inmutables</a> <br>
-		<a href="../patrones/patrones_187.html">Objetos de Modelo</a> <br>
-	</div>
-	<footer id="footer" class="legalese">
-		<span id="app_name">Prácticas de Java</span> <span
-			id="app_version_number">3.001</span><br> © <span id="copyright">2018
-			Hirondelle Systems</span><br> <a
-			href="http://www.javapractices.com/source/SourceAction.do">Código
-			Fuente</a> | <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a>
-		| <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
-			rel="license">Licencia</a> | <a
-			href="http://www.javapractices.com/apps/cjp.rss" rel="alternate"
-			type="application/rss+xml">RSS</a>
-		<!-- ukey="2AC36CD2" -->
-		<!-- ckey="16DF3D87" -->
-		<br> Los trozos de código individual tienen una <a
-			href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia
-			BSD</a><br> Sobre 1,000,000 de IPs únicas el último año<br>
-		Última actualización
-		<time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
-		<br> - In Memoriam : Bill Dirani -
-	</footer>
-</body>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="description"
+          content="Presentaciones concisas de prácticas de programación en 
+          java, tareas, y convenciones, ampliamente ilustrado con ejemplos de código con resaltado de 
+          sintaxis.">
+    <meta name="keywords"
+          content="constructor,java,programación java,Prácticas de Java,idioma 
+          java,estilo java,patrones de diseño java,convenciones de codigo java">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prácticas de Java-&gt;Evite el estilo JavaBeans de
+      construcción</title>
+    <link id="stylesheet" rel="stylesheet" type="text/css"
+          href="../css/stylesheet9.css" media="all">
+    <link rel="icon" type="image/png" href="../img/favicon.png">
+  </head>
+  <body>
+    <nav class="menu-bar" id="menu-bar">
+      <a href="../index.html" title="Table of Contents" style="float: left;">Inicio</a>
+      &nbsp;&nbsp;
+      <form method="GET" action="https://www.google.com/search"
+            class="search-form" style="float: right;">
+        <input type="text" name="q" size="15" maxlength="255" value=""
+               placeholder=""> <input type="submit" name="btnG"
+               value="Search"> <input type="hidden" name="sitesearch"
+               value="www.javapractices.com">
+      </form>
+    </nav>
+    <div class="page-title">Evite el estilo JavaBeans de construcción</div>
+    <br>Algunos argumentan que construir un
+    <a href="..\patrones\patrones_187.html">Modelo de Objetos</a> en muchos
+    pasos, llamando primero a un constructor sin argumentos, y después
+    llamar a una serie de métodos
+    <code>setXXX</code>
+    , es algo a ser evitado, si es posible:
+    <ul>
+      <li>es más complejo, ya que una llamada es reemplazada con muchas</li>
+      <li>no hay un forma simple de asegurarse que se han llamado a
+        todoso los métodos <code>setXXX</code> necesarios
+      </li>
+      <li>no hay una forma simple de implementar una <a
+          href="..\practicascomunes\practicascomunes_6.html">clase
+          invariante</a></li>
+      <li>permite que el objeto esté en estados intermedios los cuales
+        no son inmediatamente útiles, y quizás incluso inválidos/li>
+      <li>no es compatible con el (muy útil) patrón de <a
+          href="..\patrones\patrones_29.html">objeto inmutable</a>
+      </li>
+      <li>no sigue el estilo de muchos patrones de diseño, en los
+        cuales clases concretas usualmente tienen sus argumentos pasados en
+        el constructor. Esto es un tema recurrente en el libro de <i>Patrones
+          de Diseño</i>. Los constructores usualmente actúan como una "puerta 
+        de atrás" para los datos que son necesitados por una implementación,
+        pero los cuales no pueden aparecer en la firma de alguna abstracción
+        de más alto nivel (ya que contaminaría tal abstracción con datos
+        específicos de una implementación).
+      </li>
+    </ul>
+    Por supuesto, los JavaBeans siguen este patrón de "constructor sin
+    argumentos más
+    <code>setXXX</code>
+    ". Sin embargo, los JavaBeans fueron diseñados originalmente para un
+    dominio problemático muy estrecho - la manipulación de componentes
+    gráficos en un EID (Entorno Integrado de Desarrollo).
+    <span class="highlight">Como un modelo para la construcción de
+      objetos típicamente centrados en datos (Objeto del Modelo), los
+      JavaBeans parecen completamente inapropiados</span>. Uno puede incluso
+    argumentar fuertemente que, para los Objetos Modelo, el estilo de los
+    JavaBeans es un
+    <i>anti-patron</i>, y debería ser evitado a menos que sea absolutamente
+    necesario.
+    <p>
+      <b><em>"El patron JavaBeans pattern tiene serias
+          desventajas."</em> - Joshua Bloch, <em>Java Efectivo</em></b>
+    </p>
+    <p></p>
+    <hr style="width: 30%">
+    Si necesita algo más convincente, siga leyendo.
+    <p>
+      Aquí está la definición de un Bean de Java, directamente desde la
+      especificación <a
+        href="http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html">original
+      </a>:
+    </p>
+    <p>
+      <b>"Un Bean de Java es un componente de software reutilizable que
+        puede ser manipulado visualmente en una herramienta de construcción
+        ."</b>
+    </p>
+    <p>Esto es muy claro y simple. No se hace mención aquí, o en
+      ninguna otra parte en la especificación, de Objetos de Modelo usados
+      para encapsular registros de bases de datos. La idea completa de un
+      Modelo de Objetos está completamente ausente de la especificación de
+      Beans de Java, y por una buena razón: la manipulación de controles
+      gráficos y la representación de registros de bases de datos son
+      cuestiones no relacionadas.</p>
+    <p>
+      El ciclo de vida de un Bean de Java, empezando con su constructor sin
+      argumentos, es derivado principalmente de la tarea de <em>configurar</em>
+      un control gráfico teniendo algún estado inicial por defecto. Para el
+      dominio deseado, este es de hecho un diseño razonable. Para un <a
+        href="..\patrones\patrones_187.html">Modelo de Objetos</a>, sin
+      embargo, la idea de <em>configuración</em> en este sentido es absurda.
+    </p>
+    <p>El papel de un Objeto de Modelo es llevar datos. Ya que un
+      constructor sin argumentos puede sólo construir un objeto que está
+      inicialmente vacío, entonces no puede contribuir directamente a este
+      objetivo. No forma un candidato natural para el diseño de un Objeto
+      del Modelo.</p>
+    <p>
+      Para colocar datos en Beans de Java vacíos, los marcos de trabajo
+      típicamente llaman a varios métodos
+      <code>setXXX</code>
+      usando reflexión. No hay nada que les impida llamar a los
+      constructores exactamente de la misma manera.
+    </p>
+    <p>
+      Una demostración de que un marco de trabajo <em>no</em> no necesita
+      JavaBeans para su Modelo de Objetos se encuentra en la herramienta <a
+        href="..\servlets\servlets_188.html">WEB4J</a> . WEB4J llama
+      (sorpresa, sorpresa) a un constructor para construir Modelos de
+      Objetos. Se recomienda implementar Modelos de Objetos como <a
+        href="..\patrones\patrones_29.html">objetos inmutables</a>, no Beans
+      de Java.
+    </p>
+    <p>
+      La adopción generalizada de Java Beans como supuestamente el diseño
+      apropiado para los modelos de objetos parece ser un error. <br>
+    </p>
+    <p></p>
+    <div class="topic-section" id="see-also-title">Vea También :</div>
+    <div id="see-also" class="main-body">
+      <a href="../practicascomunes/practicascomunes_6.html">Validar el
+        estado con invariantes de clase</a> <br> <a
+        href="../patrones/patrones_29.html">Objetos Inmutables</a> <br>
+      <a href="../patrones/patrones_187.html">Objetos de Modelo</a> <br>
+    </div>
+    <footer id="footer" class="legalese">
+      <span id="app_name">Prácticas de Java</span> <span
+        id="app_version_number">3.001</span><br> © <span id="copyright">2018
+        Hirondelle Systems</span><br> <a
+        href="http://www.javapractices.com/source/SourceAction.do">Código
+        Fuente</a> | <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a>
+      | <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
+           rel="license">Licencia</a> | <a
+           href="http://www.javapractices.com/apps/cjp.rss" rel="alternate"
+           type="application/rss+xml">RSS</a>
+      <!-- ukey="2AC36CD2" -->
+      <!-- ckey="16DF3D87" -->
+      <br> Los trozos de código individual tienen una <a
+        href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia
+        BSD</a><br> Sobre 1,000,000 de IPs únicas el último año<br>
+      Última actualización
+      <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+      <br> - In Memoriam : Bill Dirani -
+    </footer>
+  </body>
 </html>

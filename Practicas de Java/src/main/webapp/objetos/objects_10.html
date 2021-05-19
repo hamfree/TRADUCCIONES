@@ -5,126 +5,126 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="description" content="Prácticas y técnicas de programación en Java." />
     <meta name="keywords" content="java,programación java,Prácticas de Java,idioma java,estilo java,patrones de diseño java,convenciones de 
-      codigo java" />
+          codigo java" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Prácticas en Java-&gt;Implementar compareTo</title>
     <link id="stylesheet" rel="stylesheet" type="text/css" href="../css/stylesheet9.css" media="all" />
     <link rel="icon" type="image/png" href="../img/favicon.png" />
   </head>
   <body>
-	<nav class="menu-bar" id="menu-bar">
-  	  <a href="../index.html" title="Tabla de Contenido" style="float: left;">Inicio</a>&nbsp;&nbsp;
-  	  <form method="GET" action="https://www.google.com/search" class="search-form" style="float: right;">
-  		<input type="text" name="q" size="15" maxlength="255" value="" placeholder="" />
+    <nav class="menu-bar" id="menu-bar">
+      <a href="../index.html" title="Tabla de Contenido" style="float: left;">Inicio</a>&nbsp;&nbsp;
+      <form method="GET" action="https://www.google.com/search" class="search-form" style="float: right;">
+        <input type="text" name="q" size="15" maxlength="255" value="" placeholder="" />
         <input type="submit" name="btnG" value="Buscar" /> 
         <input type="hidden" name="sitesearch" value="www.javapractices.com" />
-  	  </form>
-	</nav>
-	<div class="page-title">
+      </form>
+    </nav>
+    <div class="page-title">
       Implementando compareTo
     </div>
-	  <br>El método <code>compareTo</code> es el único miembro de la interfaz
-	  <code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Comparable.html">Comparable</a></code>, y no es un miembro de 
-      <code>Object</code>. Sin embargo, es bastante similiar en naturaleza a <code>equals</code> y <code>hashCode</code>. Proporciona un 
-      medio para ordenar completamente los objetos.
-  	  <p>
-  		Implementar <code>Comparable</code> permite:
-  	  </p>
-	  <ul>
-		<li>
-          llamar <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/Collections.html">Collections</a>.sort</code> y 
-          <code>Collections.binarySearch</code>
-        </li>
-		<li>
-          llamar <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/Arrays.html">Arrays</a>.sort</code> y 
-          <code>Arrays.binarySearch</code>
-        </li>
-		<li>
-          usar objetos como claves en un <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/TreeMap.html">TreeMap</a></code>
-        </li>
-		<li>
-          usar objetos como elementos en un 
-          <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/TreeSet.html">TreeSet</a></code>
-        </li>
-	  </ul>
-      El método <code>compareTo</code> necesita satisfacer las siguientes condiciones. Estas condiciones tienen el objetivo de permitir que 
-      los objetos sean completamente ordenados,al igual que la ordenación de un conjunto de resultados de base de datos en todos los campos.
-	  <ul>
-		<li>
-          anticomutación :&nbsp; <code>x.compareTo(y)</code> es el signo opuesto de <code>y.compareTo(x)</code>
-        </li>
-		<li>
-          simetría de excepción : <code>x.compareTo(y)</code> lanza exactamente las mismas excepciones que <code>y.compareTo(x)</code>
-        </li>
-		<li>
-          transitividad :&nbsp; <code>si x.compareTo(y)&gt;0</code> y <code>y.compareTo(z)&gt;0</code>, entonces 
-          <code>x.compareTo(z)&gt;0</code>&nbsp; (y lo mismo para menor que)
-		</li>
-		<li>
-          &nbsp;si <code>x.compareTo(y)==0</code>, entonces <code>x.compareTo(z)</code> tiene el mismo signo como <code>y.compareTo(z)</code>
-        </li>
-		<li>
-          la consistencia con <code>equals</code> es altamente recomendada, pero no se requiere :<code> x.compareTo(y)==0</code>, si y sólo 
-          si <code>x.equals(y)</code> ; la consistencia con <code>equals</code> es requerida para asegurar que las colecciones ordenadas 
-          (como <code>TreeSet</code>) se comporten bien.
-		</li>
-	  </ul>
-	  Uno puede aumentar considerablemente el rendimiento de <code>compareTo</code> comparando primero los elementos que tienen más 
-      probabilidades de diferir.
-	  <p>
-		Cuando una clase extiende una clase <i>concreta</i> <code>Comparable</code> y agrega un campo significativo, una implementación 
-        correcta de <code>compareTo</code> no puede ser construida. La única alternativa es usar la composición en vez de la herencia. 
-        (Vea <i><a href="http://www.amazon.com/exec/obidos/ASIN/0134685997/ref=nosim/javapractices-20">Java Efectivo</a></i> para más 
-        información).
-	  </p>
-	  <p>
-        Compare los distintos tipos de campos como sigue:
-      </p>
-	  <ul>
-		<li>
-          tipo primitivo numérico: use <code>&lt;</code> y <code>&gt;</code>. Hay una excepción a esta regla: los tipos primitivos 
-          <code>float</code> y <code>double</code> deben ser comparados usando 
-          <code>
-            Float.<a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Float.html#compare(float,float)">compare(float,float)</a>
-		  </code> y 
-          <code>
-			Double.<a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Double.html#compare(double,double)">compare(double,double)</a>
-		  </code>. Esto evita problemas asociados con los valores de borde especiales. (Gracias a Roger Orr de GB por señalar esto).
-		</li>
-		<li>
-          tipo primitivo <code>boolean</code> :&nbsp; use tests de la forma <code>(x &amp;&amp; !y)</code>
-        </li>
-		<li>
-          <code>Object</code> : use <code>compareTo</code>. (Note que los campos posiblemente nulos presentan un problema: mientras 
-          <code>x.equals(null)</code> devuelve <code>false</code>, <code>x.compareTo(null)</code> siempre lanzará una 
-          <code>NullPointerException</code>)
-        </li>
-		<li>
-          enumeración de tipo-seguro: use <code>compareTo</code>, como con cualquier <code>Object</code>
-        </li>
-		<li>
-          Colección o matriz : <code>Comparable</code> no parece estar destinado a este tipo de campos. Por ejemplo, <code>List</code>, 
-          <code>Map</code> y <code>Set</code> no implementan <code>Comparable</code>. Además, algunas colecciones no tienen un orden 
-          definido de iteración, así que hacer una comparación elemento-por-elemento puede no tener sentido en estos casos.
-		</li>
-	  </ul>
-      Si la tarea es realizar una ordenación de elementos que son almacenados en una base de datos relacional, entonces por lo general, es 
-      preferible que la base de datos realice la ordenación utilizando la cláusula ORDER BY, en lugar de en el código. 
-	  <p>
-	    Una alternativa a implementar <code>Comparable</code> es pasar objetos 
-		<code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/Comparator.html">Comparator</a></code> como parámetros. Tenga en 
-        cuenta que si un <code>Comparator</code> compara sólo uno de varios campos significativos, entonces el <code>Comparator</code> es 
-        muy probable que no esté sincronizado con <code>equals</code>.
-	  </p>
-	  <p>
-	    Todas las clases envoltorio de tipos primitivos implementan <code>Comparable</code>. Sin embargo, note que 
-		<code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Boolean.html#compareTo(java.lang.Boolean)">Boolean</a></code>
-		no implementaron <code>Comparable</code> hasta la version 1.5.
-	  </p>
-	  <p>
-		<b>Ejemplo</b>
-	  </p>
-	  <pre>
+    <br>El método <code>compareTo</code> es el único miembro de la interfaz
+    <code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Comparable.html">Comparable</a></code>, y no es un miembro de 
+    <code>Object</code>. Sin embargo, es bastante similiar en naturaleza a <code>equals</code> y <code>hashCode</code>. Proporciona un 
+    medio para ordenar completamente los objetos.
+    <p>
+      Implementar <code>Comparable</code> permite:
+    </p>
+    <ul>
+      <li>
+        llamar <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/Collections.html">Collections</a>.sort</code> y 
+        <code>Collections.binarySearch</code>
+      </li>
+      <li>
+        llamar <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/Arrays.html">Arrays</a>.sort</code> y 
+        <code>Arrays.binarySearch</code>
+      </li>
+      <li>
+        usar objetos como claves en un <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/TreeMap.html">TreeMap</a></code>
+      </li>
+      <li>
+        usar objetos como elementos en un 
+        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/TreeSet.html">TreeSet</a></code>
+      </li>
+    </ul>
+    El método <code>compareTo</code> necesita satisfacer las siguientes condiciones. Estas condiciones tienen el objetivo de permitir que 
+    los objetos sean completamente ordenados,al igual que la ordenación de un conjunto de resultados de base de datos en todos los campos.
+    <ul>
+      <li>
+        anticomutación :&nbsp; <code>x.compareTo(y)</code> es el signo opuesto de <code>y.compareTo(x)</code>
+      </li>
+      <li>
+        simetría de excepción : <code>x.compareTo(y)</code> lanza exactamente las mismas excepciones que <code>y.compareTo(x)</code>
+      </li>
+      <li>
+        transitividad :&nbsp; <code>si x.compareTo(y)&gt;0</code> y <code>y.compareTo(z)&gt;0</code>, entonces 
+        <code>x.compareTo(z)&gt;0</code>&nbsp; (y lo mismo para menor que)
+      </li>
+      <li>
+        &nbsp;si <code>x.compareTo(y)==0</code>, entonces <code>x.compareTo(z)</code> tiene el mismo signo como <code>y.compareTo(z)</code>
+      </li>
+      <li>
+        la consistencia con <code>equals</code> es altamente recomendada, pero no se requiere :<code> x.compareTo(y)==0</code>, si y sólo 
+        si <code>x.equals(y)</code> ; la consistencia con <code>equals</code> es requerida para asegurar que las colecciones ordenadas 
+        (como <code>TreeSet</code>) se comporten bien.
+      </li>
+    </ul>
+    Uno puede aumentar considerablemente el rendimiento de <code>compareTo</code> comparando primero los elementos que tienen más 
+    probabilidades de diferir.
+    <p>
+      Cuando una clase extiende una clase <i>concreta</i> <code>Comparable</code> y agrega un campo significativo, una implementación 
+      correcta de <code>compareTo</code> no puede ser construida. La única alternativa es usar la composición en vez de la herencia. 
+      (Vea <i><a href="http://www.amazon.com/exec/obidos/ASIN/0134685997/ref=nosim/javapractices-20">Java Efectivo</a></i> para más 
+      información).
+    </p>
+    <p>
+      Compare los distintos tipos de campos como sigue:
+    </p>
+    <ul>
+      <li>
+        tipo primitivo numérico: use <code>&lt;</code> y <code>&gt;</code>. Hay una excepción a esta regla: los tipos primitivos 
+        <code>float</code> y <code>double</code> deben ser comparados usando 
+        <code>
+          Float.<a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Float.html#compare(float,float)">compare(float,float)</a>
+        </code> y 
+        <code>
+          Double.<a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Double.html#compare(double,double)">compare(double,double)</a>
+        </code>. Esto evita problemas asociados con los valores de borde especiales. (Gracias a Roger Orr de GB por señalar esto).
+      </li>
+      <li>
+        tipo primitivo <code>boolean</code> :&nbsp; use tests de la forma <code>(x &amp;&amp; !y)</code>
+      </li>
+      <li>
+        <code>Object</code> : use <code>compareTo</code>. (Note que los campos posiblemente nulos presentan un problema: mientras 
+        <code>x.equals(null)</code> devuelve <code>false</code>, <code>x.compareTo(null)</code> siempre lanzará una 
+        <code>NullPointerException</code>)
+      </li>
+      <li>
+        enumeración de tipo-seguro: use <code>compareTo</code>, como con cualquier <code>Object</code>
+      </li>
+      <li>
+        Colección o matriz : <code>Comparable</code> no parece estar destinado a este tipo de campos. Por ejemplo, <code>List</code>, 
+        <code>Map</code> y <code>Set</code> no implementan <code>Comparable</code>. Además, algunas colecciones no tienen un orden 
+        definido de iteración, así que hacer una comparación elemento-por-elemento puede no tener sentido en estos casos.
+      </li>
+    </ul>
+    Si la tarea es realizar una ordenación de elementos que son almacenados en una base de datos relacional, entonces por lo general, es 
+    preferible que la base de datos realice la ordenación utilizando la cláusula ORDER BY, en lugar de en el código. 
+    <p>
+      Una alternativa a implementar <code>Comparable</code> es pasar objetos 
+      <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/Comparator.html">Comparator</a></code> como parámetros. Tenga en 
+      cuenta que si un <code>Comparator</code> compara sólo uno de varios campos significativos, entonces el <code>Comparator</code> es 
+      muy probable que no esté sincronizado con <code>equals</code>.
+    </p>
+    <p>
+      Todas las clases envoltorio de tipos primitivos implementan <code>Comparable</code>. Sin embargo, note que 
+      <code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Boolean.html#compareTo(java.lang.Boolean)">Boolean</a></code>
+      no implementaron <code>Comparable</code> hasta la version 1.5.
+    </p>
+    <p>
+      <b>Ejemplo</b>
+    </p>
+    <pre>
 <span class="keyword">import</span> java.util.*;
 <span class="keyword">import</span> java.io.*;
 
@@ -326,45 +326,45 @@
      System.out.println( <span class="literal">"account type -: "</span> +  flaubert7.compareTo(flaubert) );
    }
 } 
-      </pre>
-	  <br>Una muestra de ejecución de esta clase da:
-	  <br>
-	  <code>&gt;java -cp . Account</code>
-	  <br>
-	  <code>false: false</code>
-	  <br>
-	  <code>false: false</code>
-	  <br>
-	  <code>0: 0</code>
-	  <br>
-	  <code>first name +: 6</code>
-	  <br>
-	  <code>last name +: 30</code>
-	  <br>
-	  <code>acct number +: 1</code>
-	  <br>
-	  <code>balance +: 1</code>
-	  <br>
-	  <code>is new -: -1</code>
-	  <br>
-	  <code>account type -: -1</code>
-	  <p></p>
-	  <p>
-        En el viejo JDK 1.4, hay dos diferencias:
-      </p>
-	  <ul>
-		<li>
-          la versión segura-para-tipos de la interfaz &nbsp;<code>Comparable</code>&nbsp; no puede ser usada. En vez de eso,&nbsp;
-          <code>Object</code> aparece, junto con una operación de casteo
-		</li>
-		<li>
-          los objetos <code>Boolean</code> deben ser tratados de forma diferente de otras clases envolventes, ya que &nbsp;
-          <code>Boolean</code> no implementó &nbsp;<code>Comparable</code> hasta el JDK 1.5.
-        </li>
-	  </ul>
-	  <b>Ejemplo</b>:
-	  <br>
-	  <pre>
+    </pre>
+    <br>Una muestra de ejecución de esta clase da:
+    <br>
+    <code>&gt;java -cp . Account</code>
+    <br>
+    <code>false: false</code>
+    <br>
+    <code>false: false</code>
+    <br>
+    <code>0: 0</code>
+    <br>
+    <code>first name +: 6</code>
+    <br>
+    <code>last name +: 30</code>
+    <br>
+    <code>acct number +: 1</code>
+    <br>
+    <code>balance +: 1</code>
+    <br>
+    <code>is new -: -1</code>
+    <br>
+    <code>account type -: -1</code>
+    <p></p>
+    <p>
+      En el viejo JDK 1.4, hay dos diferencias:
+    </p>
+    <ul>
+      <li>
+        la versión segura-para-tipos de la interfaz &nbsp;<code>Comparable</code>&nbsp; no puede ser usada. En vez de eso,&nbsp;
+        <code>Object</code> aparece, junto con una operación de casteo
+      </li>
+      <li>
+        los objetos <code>Boolean</code> deben ser tratados de forma diferente de otras clases envolventes, ya que &nbsp;
+        <code>Boolean</code> no implementó &nbsp;<code>Comparable</code> hasta el JDK 1.5.
+      </li>
+    </ul>
+    <b>Ejemplo</b>:
+    <br>
+    <pre>
 <span class="keyword">import</span> java.util.*;
 <span class="keyword">import</span> java.io.*;
 
@@ -564,34 +564,34 @@
      System.out.println( <span class="literal">"account type -: "</span> +  flaubert7.compareTo(flaubert) );
    }
 } 
-      </pre>
-	  <br>
-	  <p></p>
-	  <div class="topic-section" id="see-also-title">
-        Vea también :
-      </div>
-	  <div id="see-also" class="main-body">
-		<a href="..\patrones\patrones_1.html">Enumeraciones seguras</a><br>
-		<a href="..\objetos\objects_17.html">Implementar equals</a><br>
-		<a href="..\objetos\objects_28.html">Implementar hashCode</a><br>
-		<a href="..\bbdd\bbdd_106.html">No ejecute tareas básicas de SQL mediante código</a><br>
-        <a href="..\tareascomunes\tareascomunes_225.html">Modernizar código viejo</a><br>
-	  </div>
-	  <footer id="footer" class="legalese">
-		<span id="app_name">Prácticas de Java</span> 
-        <span id="app_version_number">3.001</span><br>
-        © <span id="copyright">2018Hirondelle Systems</span><br> 
-        <a href="http://www.javapractices.com/source/SourceAction.do">Código Fuente</a> | 
-        <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a> | 
-        <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/" rel="license">Licencia</a> | 
-        <a href="http://www.javapractices.com/apps/cjp.rss" rel="alternate" type="application/rss+xml">RSS</a>
-		<!-- ukey="2AC36CD2" -->
-		<!-- ckey="16DF3D87" -->
-		<br> Los trozos de código individual tienen una 
-        <a href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia BSD</a><br>
-        Sobre 1,000,000 de IPs únicas el último año<br>
-		Última actualización <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
-		<br> - In Memoriam : Bill Dirani -
-	  </footer>
+    </pre>
+    <br>
+    <p></p>
+    <div class="topic-section" id="see-also-title">
+      Vea también :
+    </div>
+    <div id="see-also" class="main-body">
+      <a href="..\patrones\patrones_1.html">Enumeraciones seguras</a><br>
+      <a href="..\objetos\objects_17.html">Implementar equals</a><br>
+      <a href="..\objetos\objects_28.html">Implementar hashCode</a><br>
+      <a href="..\bbdd\bbdd_106.html">No ejecute tareas básicas de SQL mediante código</a><br>
+      <a href="..\tareascomunes\tareascomunes_225.html">Modernizar código viejo</a><br>
+    </div>
+    <footer id="footer" class="legalese">
+      <span id="app_name">Prácticas de Java</span> 
+      <span id="app_version_number">3.001</span><br>
+      © <span id="copyright">2018Hirondelle Systems</span><br> 
+      <a href="http://www.javapractices.com/source/SourceAction.do">Código Fuente</a> | 
+      <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a> | 
+      <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/" rel="license">Licencia</a> | 
+      <a href="http://www.javapractices.com/apps/cjp.rss" rel="alternate" type="application/rss+xml">RSS</a>
+      <!-- ukey="2AC36CD2" -->
+      <!-- ckey="16DF3D87" -->
+      <br> Los trozos de código individual tienen una 
+      <a href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia BSD</a><br>
+      Sobre 1,000,000 de IPs únicas el último año<br>
+      Última actualización <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
+      <br> - In Memoriam : Bill Dirani -
+    </footer>
   </body>
 </html>
