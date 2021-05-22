@@ -3,8 +3,8 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="description" content="Prácticas y técnicas de programación en Java.">
-    <meta name="keywords" content="java,programación java,Prácticas de Java,idioma java,estilo java,patrones 
-          de diseño java,convenciones de codigo java">
+    <meta name="keywords" content="java, programación java, Prácticas de Java, idioma java, estilo java, patrones de diseño java, 
+          convenciones de codigo java">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prácticas de Java-&gt;Finally y catch</title>
     <link id="stylesheet" rel="stylesheet" type="text/css" href="../css/stylesheet9.css?3.001" media="all">
@@ -21,45 +21,43 @@
     </nav>
     <div class="page-title">Finally y catch</div>
     <br /> 
-    The <code>finally</code> block is used to ensure resources are recovered regardless of any
-    problems that may occur.
+    El bloque <code>finally</code> se usa par asegurar que los recursos son recuperados independientemente de cualesquiera 
+    problemas que peucdan ocurrir.
     <p>
-      There are several variations for using the <code>finally</code> block, according to how exceptions are 
-      handled. (See the excellent book <em>The Java Programming Language</em> by Arnold, Gosling, and Holmes 
-      for related information.)
+      Hay diversas variaciones para usar el bloque <code>finally</code>. de acuerdo a cómo se manejan las excepciones. (Vea el 
+      excelente libro <em>El Lenguaje de Programación Java</em> de Arnold, Goslin, y Holmes por información relacionada).
     </p>
     <p>
-      If you're using JDK 7+, then <b>most uses of the <code>finally</code> block can be eliminated
-      </b>, simply by using a 
+      Si está usando el KDJ 7+, entonces <b>la mayoría de los usos del bloque <code>finally</code> se pueden eliminar</b>, 
+      simplemente usando una sentencia 
       <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/language/try-with-resources.html">
-        try-with-resources</a> statement. If a resource doesn't implement
+        try-with-resources</a>. Si un recurso no implementa 
       <code>
         <a href="https://docs.oracle.com/javase/10/docs/api/java/lang/AutoCloseable.html">AutoCloseable</a>
-      </code>, then a <code>finally</code> block will still be needed, even in JDK 7+. Two examples would be:
+      </code>, entonces aún sen necesitará un bloque <code>finally</code>, incluso en el KDJ 7+. Dos ejemplos podrían ser:
     </p>
     <ul>
-      <li>resources related to threads</li>
-      <li>resources related to a <code>
-          <a href="https://docs.oracle.com/javase/10/docs/api/java/awt/Graphics.html">Graphics</a></code>
-        object
+      <li>recursos relacionados con hilos</li>
+      <li>
+        recursos relacionados con un objeto 
+        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/awt/Graphics.html">Graphics</a></code>
       </li>
     </ul>
     <p>
-      <b>JDK &lt; 7, and resources that aren't <code>AutoCloseable</code></b><br />
-      The following examples are appropriate for older versions of the JDK. They are also appropriate in 
-      JDK 7+, but only for resources that don't implement <code>AutoCloseable</code>.
+      <b>KDJ &lt; 7, y recursos que no son <code>AutoCloseable</code></b><br />
+      Los ejemplos siguientes son apropiados para las versiones más viejas del KDJ. También son apropaidos en el KDJ 7+, pero solo 
+      para recursos que no implementan <code>AutoCloseable</code>.
     </p>
     <p>
-      <b>Style 1</b>
+      <b>Estilo 1</b>
     </p>
     <p>
-      If a method <em>throws</em> all exceptions, then it may use a <code>finally</code> with no 
-      <code>catch</code>: <br />
+      Si un método <em>lanza</em> todas las excepciones, entonces se puede usar un <code>finally</code> sin <code>catch</code>: <br />
     </p>
     <pre>
 <span class="keyword">import</span> java.io.*;
 
-<span class="comment">/** Before JDK 7. */</span>
+<span class="comment">/** Antes del KDJ 7. */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
             class="keyword">class</span> SimpleFinally {
   
@@ -72,44 +70,44 @@
   <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">void</span> simpleFinally(String aFileName) <span
             class="keyword">throws</span> IOException {
-    <span class="comment">//If this line throws an exception, then neither the try block
-</span>    <span class="comment">//nor the finally block will execute.
-</span>    <span class="comment">//That's a good thing, since reader would be null.
+    <span class="comment">//Si esta línea lanza una excepción, entonces ni el bloque try 
+</span>    <span class="comment">//ni el bloque finally se ejecutarán.
+</span>    <span class="comment">//Eso es bueno, ya que el lector sería nulo.
 </span>    BufferedReader reader = <span class="keyword">new</span> BufferedReader(<span
             class="keyword">new</span> FileReader(aFileName));
     <span class="keyword">try</span> {
-      <span class="comment">//Any exception in the try block will cause the finally block to execute
+      <span class="comment">//Cualquier excepción en el bloque try causará que se ejecute el bloque finally
 </span>      String line = <span class="keyword">null</span>;
       <span class="keyword">while</span> ((line = reader.readLine()) != <span
             class="keyword">null</span>) {
-        <span class="comment">//process the line...
+        <span class="comment">//procesa la línea...
 </span>      }
     }
     <span class="keyword">finally</span> {
-      <span class="comment">//The reader object will never be null here.
-</span>      <span class="comment">//This finally is only entered after the try block is 
-</span>      <span class="comment">//entered. But, it's NOT POSSIBLE to enter the try block 
-</span>      <span class="comment">//with a null reader object.
+      <span class="comment">//El objeto reader nunca será nulo aquí.
+</span>      <span class="comment">//A este finally solo se entra después de que se entre en el bloque try.
+</span>      <span class="comment">//Pero, NO ES POSIBLE entrar en el bloque try 
+</span>      <span class="comment">//con un objeto reader nulo.
 </span>      reader.close();
     }
   }
 }
  
     </pre>
-    <b>Style 2</b>
+    <b>Estilo 2</b>
     <p></p>
     <p>
-      If a method <em>handles</em> all of the <em>checked</em> exceptions that may be thrown by its 
-      implementation, then an interesting variation is to nest a <code>try..finally</code> within a
-      <code>try..catch</code>. This style is particularly useful when the <code>finally</code> block throws 
-      the same exceptions as the rest of the code (which is common with <code>java.io</code> operations.) 
-      Although this style may seem slightly complex, it appears to be superior to alternative styles: <br />
+      Si un método <em>maneja</em> todas las excepciones <em>comprobadas</em> que pueden ser lanzadas por su implementación, 
+      entonces una variación interesante es anidar un <code>try..finally</code> dentro de un <code>try..catch</code>. Este estilo 
+      es particularmente útil cuando el bloque <code>finally</code> lanza las mismas excepciones que el resto del código (lo que 
+      es común con las operaciones <code>java.io</code>). Aunque este estilo podría parecer ligeramente complicado, parece ser 
+      superior a los estilos alternativos: <br />
     </p>
     <pre>
 <span class="keyword">import</span> java.io.*;
 <span class="keyword">import</span> java.util.logging.*;
 
-<span class="comment">/** Before JDK 7. */</span>
+<span class="comment">/** Antes KDJ 7. */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
             class="keyword">class</span> NestedFinally {
   
@@ -121,20 +119,20 @@
   <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">void</span> nestedFinally(String aFileName) {
     <span class="keyword">try</span> {
-      <span class="comment">//If the constructor throws an exception, the finally block will NOT execute
+      <span class="comment">//Si el constructor lanza una excepción, el bloque finally NO se ejecutará
 </span>      BufferedReader reader = <span class="keyword">new</span> BufferedReader(<span
             class="keyword">new</span> FileReader(aFileName));
       <span class="keyword">try</span> {
         String line = <span class="keyword">null</span>;
         <span class="keyword">while</span> ((line = reader.readLine()) != <span
             class="keyword">null</span>) {
-          <span class="comment">//process the line...
+          <span class="comment">//procesa la línea...
 </span>        }
       }
       <span class="keyword">finally</span> {
-        <span class="comment">//no need to check for null
-</span>        <span class="comment">//any exceptions thrown here will be caught by 
-</span>        <span class="comment">//the outer catch block
+        <span class="comment">//no se necesita comprobar nulo 
+</span>        <span class="comment">//en ninguna excepción lanzada aquí, será recogida por 
+</span>        <span class="comment">//el bloque catch más externo
 </span>        reader.close();
       }
     }
@@ -150,11 +148,11 @@
 }
  
     </pre>
-    <b>Style 3</b>
+    <b>Estilo 3</b>
     <p></p>
     <p>
-      A more verbose style places a <code>catch</code> within the <code>finally</code>. This style is likely 
-      the least desirable, since it has the most blocks: <br />
+      Un estilo más detallado coloca un <code>catch</code> dentro de <code>finally</code>. Este estilo es probablemente el menos 
+      deseable, ya que tiene mayor cantidad de bloques: <br />
     </p>
     <pre>
 <span class="keyword">import</span> java.io.BufferedReader;
@@ -162,7 +160,7 @@
 <span class="keyword">import</span> java.io.IOException;
 <span class="keyword">import</span> java.util.logging.Logger;
 
-<span class="comment">/** Before JDK 7. */</span>
+<span class="comment">/** Antes KJD 7. */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
             class="keyword">class</span> CatchInsideFinally {
   
@@ -173,31 +171,31 @@
   
   <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">void</span> catchInsideFinally(String aFileName) {
-    <span class="comment">//Declared here to be visible from finally block
+    <span class="comment">//Declaradas aquí para ser visible desde el bloque finally
 </span>    BufferedReader reader = <span class="keyword">null</span>;
     <span class="keyword">try</span> {
-      <span class="comment">//if this line fails, finally will be executed, and reader will be null
+      <span class="comment">//si esta línea falla, se ejecutará finally, y el reader será nulo
 </span>      reader = <span class="keyword">new</span> BufferedReader(<span
             class="keyword">new</span> FileReader(aFileName));
       String line = <span class="keyword">null</span>;
       <span class="keyword">while</span> ( (line = reader.readLine()) != <span
             class="keyword">null</span> ) {
-        <span class="comment">//process the line...
+        <span class="comment">//procesa la línea...
 </span>      }
     }
     <span class="keyword">catch</span>(IOException ex){
-      fLogger.severe(<span class="literal">"Problem occured : "</span> + ex.getMessage());
+      fLogger.severe(<span class="literal">"Ocurrió un problema : "</span> + ex.getMessage());
     }
     <span class="keyword">finally</span> {
       <span class="keyword">try</span> {
-        <span class="comment">//need to check for null
+        <span class="comment">//necesita comprobar el nulo
 </span>        <span class="keyword">if</span> ( reader != <span
             class="keyword">null</span> ) {
           reader.close();
         }
       }
       <span class="keyword">catch</span>(IOException ex){
-        fLogger.severe(<span class="literal">"Problem occured. Cannot close reader : "</span> + ex.getMessage());
+        fLogger.severe(<span class="literal">"Ocurrió un problema. No puedo cerrar el reader : "</span> + ex.getMessage());
       }
     }
   }
@@ -211,11 +209,11 @@
     <br />
     <p></p>
     <p></p>
-    <div class="topic-section" id="see-also-title">See Also :</div>
+    <div class="topic-section" id="see-also-title">Vea También :</div>
     <div id="see-also" class="main-body">
-      <a href="..\entradasalida\entradasalida_8.html">Cierre siempre los flujos</a> <br />
-      <a href="..\tareascomunes\tareascomunes_43.html">Recuperando recursos</a> <br />
-      <a href="..\hilos\hilos_253.html">Usar finally para desbloquear</a> <br />
+      <a href="..\entradasalida\entradasalida_8.html">Cierre siempre los flujos</a><br />
+      <a href="..\tareascomunes\tareascomunes_43.html">Recuperando recursos</a><br />
+      <a href="..\hilos\hilos_253.html">Usar finally para desbloquear</a><br />
     </div>
     <footer id="footer" class="legalese">
       <span id="app_name">Prácticas de Java</span> 
