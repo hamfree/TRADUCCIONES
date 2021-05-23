@@ -21,24 +21,25 @@
     </nav>
     <div class="page-title">Leer y escribir objetos serializables</div>
     <br />
-    Reading and writing <code><a href="https://docs.oracle.com/javase/10/docs/api/java/io/Serializable.html">Serializable</a></code>
-    objects is very similar to reading and writing text:
+    Leer y escribiro objetos 
+    <code><a href="https://docs.oracle.com/javase/10/docs/api/java/io/Serializable.html">Serializable</a></code> es muy similar a 
+    leer y escribir texto:
     <ul>
-      <li>it's almost always a good idea to use buffering (default size is 8K)</li>
-      <li>it's often possible to use abstract base class references, instead of references to concrete classes</li>
+      <li>es casi siempre una buena idea usar almacenamiento en búfer (el tamaño predeterminado es 8K)</li>
+      <li>es a menudo posible usar referencias a clases base abstractas, en vez de referencias a a clases concretas</li>
       <li>
-        there's always a need to pay attention to exceptions; in particular, 
-        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/io/IOException.html">IOException</a></code> and 
+        hay siempre una necesidad de prestar atención a las excepciones; en particular, 
+        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/io/IOException.html">IOException</a></code> y 
         <code>
           <a href="https://docs.oracle.com/javase/10/docs/api/java/lang/ClassNotFoundException.html">ClassNotFoundException</a>
         </code>
       </li>
     </ul>
     <p>
-      <b>Example</b>
+      <b>Ejemplo</b>
     </p>
     <p>
-      Here, a <code>List</code> of <code>String</code> objects is serialized and then deserialized. <br />
+      Aquí, una <code>List</code> de objetos <code>String</code> se serializa y después se deserializa.<br />
     </p>
     <pre>
 <span class="keyword">import</span> java.io.*;
@@ -46,21 +47,21 @@
 <span class="keyword">import</span> java.util.logging.*;
 
 <span class="comment">/**
- Uses buffering, and abstract base classes. 
- JDK 7+. 
+ Usa almacenamiento de búfer, y clases base abstractas.
+ KDJ 7+. 
 */</span>
 <span class="keyword">public</span> <span class="keyword">class</span> ExerciseSerializableNew {
 
   <span class="keyword">public</span> <span class="keyword">static</span> <span
             class="keyword">void</span> main(String... aArguments) {
-    <span class="comment">//create a Serializable List
+    <span class="comment">//crea una Lista serializable
 </span>    List&lt;String&gt; quarks = Arrays.asList(
       <span class="literal">"up"</span>, <span class="literal">"down"</span>, <span
             class="literal">"strange"</span>, <span class="literal">"charm"</span>, <span
             class="literal">"top"</span>, <span class="literal">"bottom"</span>
     );
 
-    <span class="comment">//serialize the List
+    <span class="comment">//serializa la Lista
 </span>    <span class="keyword">try</span> (
       OutputStream file = <span class="keyword">new</span> FileOutputStream(<span
             class="literal">"quarks.ser"</span>);
@@ -73,29 +74,29 @@
       fLogger.log(Level.SEVERE, <span class="literal">"Cannot perform output."</span>, ex);
     }
 
-    <span class="comment">//deserialize the quarks.ser file
+    <span class="comment">//deserializa el fichero quarks.ser
 </span>    <span class="keyword">try</span>(
       InputStream file = <span class="keyword">new</span> FileInputStream(<span
             class="literal">"quarks.ser"</span>);
       InputStream buffer = <span class="keyword">new</span> BufferedInputStream(file);
       ObjectInput input = <span class="keyword">new</span> ObjectInputStream (buffer);
     ){
-      <span class="comment">//deserialize the List
+      <span class="comment">//deserializa la Lista
 </span>      List&lt;String&gt; recoveredQuarks = (List&lt;String&gt;)input.readObject();
-      <span class="comment">//display its data
+      <span class="comment">//visualiza sus datos
 </span>      <span class="keyword">for</span>(String quark: recoveredQuarks){
-        System.out.println(<span class="literal">"Recovered Quark: "</span> + quark);
+        System.out.println(<span class="literal">"Quark Recuperado: "</span> + quark);
       }
     }
     <span class="keyword">catch</span>(ClassNotFoundException ex){
-      fLogger.log(Level.SEVERE, <span class="literal">"Cannot perform input. Class not found."</span>, ex);
+      fLogger.log(Level.SEVERE, <span class="literal">"No se puede realizar la entrada. Clase no encontrada"</span>, ex);
     }
     <span class="keyword">catch</span>(IOException ex){
-      fLogger.log(Level.SEVERE, <span class="literal">"Cannot perform input."</span>, ex);
+      fLogger.log(Level.SEVERE, <span class="literal">"No se puede realizar la entrada."</span>, ex);
     }
   }
 
-  <span class="comment">// PRIVATE
+  <span class="comment">// PRIVADO
 </span>
   <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">final</span> Logger fLogger =
@@ -105,45 +106,45 @@
     </pre>
     <p></p>
     <p>
-      <b>Example - JDK 6-</b>
+      <b>Ejemplo - KDJ 6-</b>
     </p>
     <p>
-      If try-with-resources is not available (JDK 6-), then you must be careful with the <code>close</code> method:
+      Si no está disponible try-with-resources (KDJ 6-), entonces debe ser cuidadoso con el método <code>close</code>:
     </p>
     <ul>
-      <li>it always needs to be called, or else resources will leak</li>
-      <li>it will automatically flush the stream, if necessary</li>
-      <li>calling <code>close</code> on a "wrapper" stream will automatically call <code>close</code> on its underlying stream</li>
-      <li>closing a stream a second time has no consequence</li>
+      <li>siempre hay que llamarlo, de lo contrario se filtrarán recursos</li>
+      <li>vaciará automáticamente el flujo, si es necesario</li>
+      <li>llamar a <code>close</code> en un flujo "envoltorio" llamará automáticamente a <code>close</code> en su flujo subyacente</li>
+      <li>cerrar un flujo una segunda vez no tiene consecuencias</li>
     </ul>
     <p>
-      <b>Example</b>
+      <b>Ejemplo</b>
     </p>
     <p>
-      Here's the same example as above, but using JDK 6-. <br />
+      Aquí está el mismo ejemplo que arriba, pero usando KDJ 6-.<br />
     </p>
     <pre>
 <span class="keyword">import</span> java.io.*;
 <span class="keyword">import</span> java.util.*;
 <span class="keyword">import</span> java.util.logging.*;
 
-<span class="comment">/** JDK before version 7. */</span>
+<span class="comment">/** KDJJ antes de la versión 7. */</span>
 <span class="keyword">public</span> <span class="keyword">class</span> ExerciseSerializable {
 
   <span class="keyword">public</span> <span class="keyword">static</span> <span
             class="keyword">void</span> main(String... aArguments) {
-    <span class="comment">//create a Serializable List
+    <span class="comment">//crea una Lista serializable
 </span>    List&lt;String&gt; quarks = Arrays.asList(
       <span class="literal">"up"</span>, <span class="literal">"down"</span>, <span
             class="literal">"strange"</span>, <span class="literal">"charm"</span>, <span
             class="literal">"top"</span>, <span class="literal">"bottom"</span>
     );
 
-    <span class="comment">//serialize the List
-</span>    <span class="comment">//note the use of abstract base class references
+    <span class="comment">//serializa la Lista
+</span>    <span class="comment">//tenga en cuenta el uso de referencias abstractas de clases base
 </span>
     <span class="keyword">try</span>{
-      <span class="comment">//use buffering
+      <span class="comment">//usa almacenamiento en búfer
 </span>      OutputStream file = <span class="keyword">new</span> FileOutputStream(<span
             class="literal">"quarks.ser"</span>);
       OutputStream buffer = <span class="keyword">new</span> BufferedOutputStream(file);
@@ -156,24 +157,24 @@
       }
     }  
     <span class="keyword">catch</span>(IOException ex){
-      fLogger.log(Level.SEVERE, <span class="literal">"Cannot perform output."</span>, ex);
+      fLogger.log(Level.SEVERE, <span class="literal">"No puedo realizar la entrada."</span>, ex);
     }
 
-    <span class="comment">//deserialize the quarks.ser file
-</span>    <span class="comment">//note the use of abstract base class references
+    <span class="comment">//deserializa el fichero quarks.ser
+</span>    <span class="comment">//tenga en cuenta el uso de referencias abstractas de clases base
 </span>    
     <span class="keyword">try</span>{
-      <span class="comment">//use buffering
+      <span class="comment">//usa almacenamiento en búfer
 </span>      InputStream file = <span class="keyword">new</span> FileInputStream(<span
             class="literal">"quarks.ser"</span>);
       InputStream buffer = <span class="keyword">new</span> BufferedInputStream(file);
       ObjectInput input = <span class="keyword">new</span> ObjectInputStream (buffer);
       <span class="keyword">try</span>{
-        <span class="comment">//deserialize the List
+        <span class="comment">//deserializa la Lista
 </span>        List&lt;String&gt; recoveredQuarks = (List&lt;String&gt;)input.readObject();
-        <span class="comment">//display its data
+        <span class="comment">//visualiza sus datos
 </span>        <span class="keyword">for</span>(String quark: recoveredQuarks){
-          System.out.println(<span class="literal">"Recovered Quark: "</span> + quark);
+          System.out.println(<span class="literal">"Quark recuperado: "</span> + quark);
         }
       }
       <span class="keyword">finally</span>{
@@ -181,18 +182,18 @@
       }
     }
     <span class="keyword">catch</span>(ClassNotFoundException ex){
-      fLogger.log(Level.SEVERE, <span class="literal">"Cannot perform input. Class not found."</span>, ex);
+      fLogger.log(Level.SEVERE, <span class="literal">"No puedo realizar la entrada. Clase no encontrada."</span>, ex);
     }
     <span class="keyword">catch</span>(IOException ex){
-      fLogger.log(Level.SEVERE, <span class="literal">"Cannot perform input."</span>, ex);
+      fLogger.log(Level.SEVERE, <span class="literal">"No puedo realizar la entrada."</span>, ex);
     }
   }
 
-  <span class="comment">// PRIVATE 
+  <span class="comment">// PRIVADO
 </span>
-  <span class="comment">//Use Java's logging facilities to record exceptions.
-</span>  <span class="comment">//The behavior of the logger can be configured through a
-</span>  <span class="comment">//text file, or programmatically through the logging API.
+  <span class="comment">//Usa las facilidades de registro de Java para grabar las excepciones
+</span>  <span class="comment">//El comportamiento del logger se puede configurar a través de un 
+</span>  <span class="comment">//fichero de texto, o mediante programación a través de la IPA de logging.
 </span>  <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">final</span> Logger fLogger =
     Logger.getLogger(ExerciseSerializable.<span class="keyword">class</span>.getPackage().getName())

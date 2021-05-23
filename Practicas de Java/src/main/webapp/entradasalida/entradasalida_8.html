@@ -21,58 +21,58 @@
     </nav>
     <div class="page-title">Cierre siempre los flujos</div>
     <br />
-    When you use the
+    Cuando usa la sentencia 
     <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/language/try-with-resources.html">try-with-resources</a> 
-    statement correctly, then you will never have to close streams explicitly. (Indeed, that's the reason try-with-resources was 
-    added in the first place.)
+    correctamente, después nunca tiene que cerrar los flujos explícitamente. (De hecho, esa es la razón por la que se agregó 
+    try-with-resources en primer lugar).
     <p>
-      However, you may see still see code that either doesn't use a modern JDK, or fails to take advantage of try-with-resources.
+      Sin embargo, puede ver aún código que no usa un KDJ moderno, o falla en aprovecharse de try-with-resources.
     </p>
     <p>
-      <b>JDK &lt; 7</b>
+      <b>KDJ &lt; 7</b>
     </p>
     <p>
-      Streams represent resources which you must always clean up explicitly, by calling the <code>close</code> method.
+      Los flujos representan recursos a los que debe siempre limpiar de forma explícita, llamando al método <code>close</code>.
     </p>
     <p>
-      Some <code>java.io</code> classes (apparently just the output classes) include a <code>flush</code> method. When a 
-      <code>close</code> method is called on a such a class, it automatically performs a <code>flush</code>. There is no need to 
-      explicitly call <code>flush</code> before calling <code>close</code>.
+      Algunas clases <code>java.io</code> (aparentemente solo las clases de salida) incluyen un método <code>flush</code>. 
+      Cuando se llama a un método <code>close</code> en tal clase, esta automáticamente realiza un <code>flush</code>. No hay 
+      necesidad de llamar explícitamente a <code>flush</code> antes de llamar a <code>close</code>.
     </p>
     <p>
-      One stream can be chained to another by passing it to the constructor of some second stream. When this second stream is 
-      closed, then it automatically closes the original underlying stream as well.
+      Un flujo puede ser encadenado a otro pasándoselo al constructor de un segundo flujo. Cuando este segundo flujo se cierra, 
+      después este automáticamente también cierra el flujo subyacente original.
     </p>
     <p>
-      If multiple streams are chained together, then closing the one which was the last to be constructed, and is thus at the 
-      highest level of abstraction, will automatically close all the underlying streams. So, one only has to call <code>close</code>
-      on one stream in order to close (and flush, if applicable) an entire series of related streams.
+      Si se encadenan múltiples flujos juntos, cerrar el  último que se construyó y, por lo tanto, se encuentra en el nivel más alto 
+      de abstracción, cerrará automáticamente todas los flujos subyacentes. Así, uno solo tiene que llamar a <code>close</code> 
+      en un flujo para cerrar (y limpiar, si es aplicable) una serie entera de flujos relacionados.
     </p>
     <p>
-      <b>Example</b> <br />
+      <b>Ejemplo</b> <br />
     </p>
     <pre>
 <span class="keyword">import</span> java.io.*;
 <span class="keyword">import</span> java.util.*;
 <span class="keyword">import</span> java.util.logging.*;
 
-<span class="comment">/** JDK before version 7. */</span>
+<span class="comment">/** KDJ antes de la versión 7. */</span>
 <span class="keyword">public</span> <span class="keyword">class</span> ExerciseSerializable {
 
   <span class="keyword">public</span> <span class="keyword">static</span> <span
             class="keyword">void</span> main(String... aArguments) {
-    <span class="comment">//create a Serializable List
+    <span class="comment">//crea una Lista serializable
 </span>    List&lt;String&gt; quarks = Arrays.asList(
       <span class="literal">"up"</span>, <span class="literal">"down"</span>, <span
             class="literal">"strange"</span>, <span class="literal">"charm"</span>, <span
             class="literal">"top"</span>, <span class="literal">"bottom"</span>
     );
 
-    <span class="comment">//serialize the List
-</span>    <span class="comment">//note the use of abstract base class references
+    <span class="comment">//serializa la Lista
+</span>    <span class="comment">//tenga en cuenta el uso de referencias a clase base abstracta
 </span>
     <span class="keyword">try</span>{
-      <span class="comment">//use buffering
+      <span class="comment">//usa almacenamiento en búfer
 </span>      OutputStream file = <span class="keyword">new</span> FileOutputStream(<span
             class="literal">"quarks.ser"</span>);
       OutputStream buffer = <span class="keyword">new</span> BufferedOutputStream(file);
@@ -85,24 +85,24 @@
       }
     }  
     <span class="keyword">catch</span>(IOException ex){
-      fLogger.log(Level.SEVERE, <span class="literal">"Cannot perform output."</span>, ex);
+      fLogger.log(Level.SEVERE, <span class="literal">"No puedo realizar la salida."</span>, ex);
     }
 
-    <span class="comment">//deserialize the quarks.ser file
-</span>    <span class="comment">//note the use of abstract base class references
+    <span class="comment">//deserializa el fichero quarks.ser
+</span>    <span class="comment">//tenga en cuenta el uso de referencias a clase base abstracta
 </span>    
     <span class="keyword">try</span>{
-      <span class="comment">//use buffering
+      <span class="comment">//usa almacenamiento en búfer
 </span>      InputStream file = <span class="keyword">new</span> FileInputStream(<span
             class="literal">"quarks.ser"</span>);
       InputStream buffer = <span class="keyword">new</span> BufferedInputStream(file);
       ObjectInput input = <span class="keyword">new</span> ObjectInputStream (buffer);
       <span class="keyword">try</span>{
-        <span class="comment">//deserialize the List
+        <span class="comment">//deserializa la Lista
 </span>        List&lt;String&gt; recoveredQuarks = (List&lt;String&gt;)input.readObject();
-        <span class="comment">//display its data
+        <span class="comment">//visualiza sus datos
 </span>        <span class="keyword">for</span>(String quark: recoveredQuarks){
-          System.out.println(<span class="literal">"Recovered Quark: "</span> + quark);
+          System.out.println(<span class="literal">"Quark Recuperado: "</span> + quark);
         }
       }
       <span class="keyword">finally</span>{
@@ -110,18 +110,18 @@
       }
     }
     <span class="keyword">catch</span>(ClassNotFoundException ex){
-      fLogger.log(Level.SEVERE, <span class="literal">"Cannot perform input. Class not found."</span>, ex);
+      fLogger.log(Level.SEVERE, <span class="literal">"No puedo realizar la entrada. Clase no encontrada."</span>, ex);
     }
     <span class="keyword">catch</span>(IOException ex){
-      fLogger.log(Level.SEVERE, <span class="literal">"Cannot perform input."</span>, ex);
+      fLogger.log(Level.SEVERE, <span class="literal">"No puedo realizar la entrada."</span>, ex);
     }
   }
 
-  <span class="comment">// PRIVATE 
+  <span class="comment">// PRIVADO
 </span>
-  <span class="comment">//Use Java's logging facilities to record exceptions.
-</span>  <span class="comment">//The behavior of the logger can be configured through a
-</span>  <span class="comment">//text file, or programmatically through the logging API.
+  <span class="comment">//Usa las facilidades de registro de Java para grabar las excepciones.
+</span>  <span class="comment">//El comportamiento del logger se puede configurrar a través de 
+</span>  <span class="comment">//un fichero de texto, o mediante programación a través de la IPA de logging.
 </span>  <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">final</span> Logger fLogger =
     Logger.getLogger(ExerciseSerializable.<span class="keyword">class</span>.getPackage().getName())
