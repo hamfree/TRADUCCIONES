@@ -22,78 +22,80 @@
     </nav>
     <div class="page-title">Implementar Serializable</div>
     <br />
-    <span class="highlight">Do not implement 
-      <code><a href="https://docs.oracle.com/javase/10/docs/api/java/io/Serializable.html">Serializable</a></code> lightly, since it 
-      restricts future flexibility, and publicly exposes class implementation details which are usually private.
-    </span> As well, implementing <code>Serializable</code> correctly is not trivial.
+    <span class="highlight">No implemente 
+      <code><a href="https://docs.oracle.com/javase/10/docs/api/java/io/Serializable.html">Serializable</a></code> a la ligera, ya 
+      que restringe la flexibilidad futura, y públicamente expone los detalles de la implementación de la clase que son 
+      habitualmente privados.
+    </span> Además, implementar <code>Serializable</code> correctamente no es trivial.
     <p>
-      The <code>serialVersionUID</code> is a universal version identifier for a
-      <code><a href="https://docs.oracle.com/javase/10/docs/api/java/io/Serializable.html">Serializable</a></code> class. 
-      Deserialization uses this number to ensure that a loaded class corresponds exactly to a serialized object. If no match is 
-      found, then an 
-      <code><a href="https://docs.oracle.com/javase/10/docs/api/java/io/InvalidClassException.html">InvalidClassException</a></code>
-      is thrown.
+      El <code>serialVersionUID</code> es un identificador de versión universal para una clase 
+      <code><a href="https://docs.oracle.com/javase/10/docs/api/java/io/Serializable.html">Serializable</a></code>. La 
+      deserialización usa este número para asegurar que una clase cargada corresponde exactamente a un objeto serializado. Si no 
+      se encuentrra coincidencia, entonces se lanza una 
+      <code>
+        <a href="https://docs.oracle.com/javase/10/docs/api/java/io/InvalidClassException.html">InvalidClassException</a></code>.
     </p>
     <p>
-      Guidelines for <code>serialVersionUID</code>:
+      Guías para <code>serialVersionUID</code>:
     </p>
     <ul>
       <li>
-        always include it as a field, for example: <pre>private static final long serialVersionUID = 7526472295622776147L;</pre>
+        siempre inclúyalo como un campo, por ejemplo: <pre>private static final long serialVersionUID = 7526472295622776147L;</pre>
       </li>
-      <li>include this field even in the first version of the class, as a reminder of its importance</li>
+      <li>incluya este campo incluso en la primera versión de la clase, como un recordatorio de su importancia</li>
       <li>
-        don't change the value of this field in future versions, unless you are knowingly making changes to the class which will 
-        render it incompatible with old serialized objects
+        no cambie el valor de este campo en versiones futuras, a menos que esté realizando cambios a sabiendas en la clase que 
+        la harán incompatible con los objetos serializados antiguos
       </li>
       <li>
-        new versions of <code>Serializable</code> classes may or may not be able to read old serialized objects; it depends upon the 
-        nature of the change; provide a pointer to Oracle's 
-        <a href="http://docs.oracle.com/javase/8/docs/platform/serialization/spec/version.html#6678">guidelines</a> for what 
-        constitutes a compatible change, as a convenience to future maintainers
+        nuevas versiones de clases <code>Serializable</code> pueden o no pueden ser capaces de leer viejos objetos serializados; 
+        depende de la naturaleza del cambio; proporcionar un puntero a las 
+        <a href="http://docs.oracle.com/javase/8/docs/platform/serialization/spec/version.html#6678">pautas</a> de Oracle sobre lo 
+        que constituye un cambio compatible, como una conveniencia para futuros mantenedores
       </li>
     </ul>
     <p>
-      Modern IDE's can generate a value of <code>serialVersionUID</code> for you. In addition, the JDK includes the
-      <code>serialver</code> tool for generating these values. Here are the docs for both 
-      <a href="http://docs.oracle.com/javase/8/docs/technotes/tools/windows/serialver.html">Win</a> and 
-      <a href="http://docs.oracle.com/javase/8/docs/technotes/tools/unix/serialver.html">Unix</a>. (The class name you pass to this 
-      tool doesn't include the <code>.class</code> extension.)
+      Los EID modernos pueden generar un valor de <code>serialVersionUID</code> por usted. Además, el KDJ incluye la herramienta 
+      <code>serialver</code> para generar estos valores. Aquí están los documentos tanto para 
+      <a href="http://docs.oracle.com/javase/8/docs/technotes/tools/windows/serialver.html">Windows</a> como 
+      <a href="http://docs.oracle.com/javase/8/docs/technotes/tools/unix/serialver.html">Unix</a>. (El nombre de clase que pasa a 
+      esta herramienta no incluye la extensión <code>.class</code>).
     </p>
     <p>
-      <code>readObject</code> and <code>writeObject</code>:
+      <code>readObject</code> y <code>writeObject</code>:
     </p>
     <ul>
-      <li><code>readObject</code> implementations always start by calling default methods</li>
+      <li>las implementaciones de <code>readObject</code> siempre empiezan llamando a los métodos predeterminados</li>
       <li>
-        deserialization must be treated as any constructor: validate the object state at the end of deserializing - this implies 
-        that <code>readObject</code> should almost always be implemented in <code>Serializable</code> classes, such that this 
-        validation is performed.
+        La deserialiación debe ser tratada como cualquier constructor: valide el estado del objeto al final de la deserialización - 
+        esto implica que <code>readObject</code> casi siempre debería implementarse en clases <code>Serializable</code>, de modo que 
+        esta validación se realize.
       </li>
       <li>
-        deserialization must be treated as any constructor: if constructors make defensive copies for mutable object fields, so 
-        must <code>readObject</code>
+        la deserialización debe ser tratada como cualquier constructor: si los constructores hacen copias defensivas para los 
+        campos de objetos mutables, también debe <code>readObject</code>
+        
       </li>
       <li>
-        when serializing a <code>Collection</code>, store the number of objects in the <code>Collection</code> as well, and use this 
-        number to read them back in upon deserialization; avoid tricks using <code>null</code>
+        cuando serialize una <code>Collection</code>, almacene el número de objetos en la <code>Collection</code> también, y use 
+        este número para leerlos de vuelta en cada deserialización; evite trucos usando <code>null</code>
       </li>
     </ul>
-    Other points:
+    Otros puntos:
     <ul>
-      <li>use javadoc's <code>@serial</code> tag to denote 
-        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/io/Serializable.html">Serializable</a></code> fields
+      <li>use la etiqueta <code>@serial</code> de javadoc para denotar campos 
+        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/io/Serializable.html">Serializable</a></code>
       </li>
-      <li>the <code>.ser</code> extension is conventionally used for files representing serialized objects</li>
-      <li>no <code>static</code> or <code>transient</code> fields undergo default serialization</li>
-      <li>extendable classes should not be <code>Serializable</code>, unless necessary</li>
-      <li>inner classes should rarely, if ever, implement <code>Serializable</code></li>
+      <li>la extensión <code>.ser</code> se usa convecionalmente para ficheros que representan objetos serializados</li>
+      <li>ningún campo <code>static</code> o <code>transient</code> se somete a una serialización predeterminada</li>
+      <li>las clases extensibles no deben ser <code>Serializable</code>, a menos que sea necesario</li>
+      <li>las clases internas rara vez, o nunca, deben implementar <code>Serializable</code></li>
       <li>
-        container classes should usually follow the style of <code>Hashtable</code>, which implements <code>Serializable</code> by 
-        storing keys and values, as opposed to a large hash table data structure
+        las clases contenedoreas deben seguir usualmente el estilo de <code>Hashtable</code>, que implementa 
+        <code>Serializable</code> almacenando claves y valores, a diferencia de una gran estructura de datos de tabla hash
       </li>
     </ul>
-    <b>Example</b>
+    <b>Ejemplo</b>
     <br />
     <pre>
 		<span class="keyword">import</span> java.io.Serializable;
@@ -106,12 +108,12 @@
             class="keyword">implements</span> Serializable {
 
    <span class="comment">/**
-   * This constructor requires all fields to be passed as parameters.
+   * Este constructor requiere que se pasen todos los campos como parámetros.
    *
-   * @param aFirstName contains only letters, spaces, and apostrophes.
-   * @param aLastName contains only letters, spaces, and apostrophes.
-   * @param aAccountNumber is non-negative.
-   * @param aDateOpened has a non-negative number of milliseconds.
+   * @param aFirstName contiene solo letras, espacios, y apóstrofes.
+   * @param aLastName contains solo letras, espcios, y apostrofes.
+   * @param aAccountNumber es no negativo.
+   * @param aDateOpened tiene un número no negativo de milisegundos.
    */</span>
    <span class="keyword">public</span> SavingsAccount(
      String aFirstName, String aLastName, <span class="keyword">int</span> aAccountNumber, Date aDateOpened
@@ -119,9 +121,9 @@
      setFirstName(aFirstName);
      setLastName(aLastName);
      setAccountNumber(aAccountNumber);
-     <span class="comment">//make a defensive copy of the mutable Date passed to the constructor
+     <span class="comment">//hace una copia defensiva del Date mutable pasado al constructor
 </span>     setDateOpened(<span class="keyword">new</span> Date(aDateOpened.getTime()));
-     <span class="comment">//there is no need here to call validateState.
+     <span class="comment">//no hay necesidad aquí de llamar a validateState.
 </span>   }
 
    <span class="keyword">public</span> SavingsAccount(){
@@ -143,19 +145,19 @@
    }
 
    <span class="comment">/**
-   * Returns a defensive copy of the field.
-   * The caller may change the state of the returned object in any way,
-   * without affecting the internals of this class.
+   * Devuelve una copia defensiva del campo.
+   * El llamador puede cambiar el estado del objeto devuelto en cualquier forma,
+   * sin afectar el interior de esta clase.
    */</span>
    <span class="keyword">public</span> Date getDateOpened() {
      <span class="keyword">return</span> <span class="keyword">new</span> Date(fDateOpened.getTime());
    }
 
    <span class="comment">/**
-   * Names must contain only letters, spaces, and apostrophes.
-   * Validate before setting field to new value.
+   * Los nombres deben contener solo letras, espacios, y apóstrofes.
+   * Validar antes de establecer el campo al nuevo valor.
    *
-   * @throws IllegalArgumentException if the new value is not acceptable.
+   * @throws IllegalArgumentException si el nuevo valor no es aceptable.
    */</span>
    <span class="keyword">public</span> <span class="keyword">void</span> setFirstName(String aNewFirstName) {
      validateName(aNewFirstName);
@@ -163,10 +165,10 @@
    }
 
    <span class="comment">/**
-   * Names must contain only letters, spaces, and apostrophes.
-   * Validate before setting field to new value.
+   * Los nombres deben contener solo letras, espacios, y apóstrofes.
+   * Validar antes de establecer el campo al nuevo valor.
    *
-   * @throws IllegalArgumentException if the new value is not acceptable.
+   * @throws IllegalArgumentException si el nuevo valor no es aceptable.
    */</span>
    <span class="keyword">public</span> <span class="keyword">void</span> setLastName (String aNewLastName) {
      validateName(aNewLastName);
@@ -174,9 +176,9 @@
    }
 
    <span class="comment">/**
-   * Validate before setting field to new value.
+   * Validar antes de establecer el campo al nuevo valor.
    *
-   * @throws IllegalArgumentException if the new value is not acceptable.
+   * @throws IllegalArgumentException si el nuevo valor no es aceptable.
    */</span>
    <span class="keyword">public</span> <span class="keyword">void</span> setAccountNumber(<span
             class="keyword">int</span> aNewAccountNumber){
@@ -191,64 +193,64 @@
      fDateOpened = newDate;
    }
 
-   <span class="comment">// PRIVATE
+   <span class="comment">// PRIVADO
 </span>
    <span class="comment">/**
-   * The client's first name.
+   * El nombre del cliente.
    * @serial
    */</span>
    <span class="keyword">private</span> String fFirstName;
 
    <span class="comment">/**
-   * The client's last name.
+   * El apellido del cliente.
    * @serial
    */</span>
    <span class="keyword">private</span> String fLastName;
 
    <span class="comment">/**
-   * The client's account number.
+   * El número de cuenta del cliente.
    * @serial
    */</span>
    <span class="keyword">private</span> <span class="keyword">int</span> fAccountNumber;
 
    <span class="comment">/**
-   * The date the account was opened.
+   * La fecha en la que la cuenta fue abierta.
    * @serial
    */</span>
    <span class="keyword">private</span> Date fDateOpened;
 
    <span class="comment">/**
-   * Determines if a de-serialized file is compatible with this class.
+   * Determina si un fichero deserializado es compatible con esta clase.
    *
-   * Maintainers must change this value if and only if the new version
-   * of this class is not compatible with old versions. See Sun docs
-   * for &lt;a href=http://java.sun.com/products/jdk/1.1/docs/guide
-   * /serialization/spec/version.doc.html&gt; details. &lt;/a&gt;
+   * Los mantenedores deben cambiar este valor si y solo si la nueva versión
+   * de esta clase no es compatible con versiones viejas. Vea los documentos de Sun 
+   * para &lt;a href=http://java.sun.com/products/jdk/1.1/docs/guide
+   * /serialization/spec/version.doc.html&gt; los detalles. &lt;/a&gt;
    *
-   * Not necessary to include in first version of the class, but
-   * included here as a reminder of its importance.
+   * No es necesario incluir en la primera versión de la clase, pero 
+   * incluído aquí como un recordatorio de su importancia.
    */</span>
    <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span
             class="literal">7526471155622776147L</span>;
 
    <span class="comment">/**
-   * Verify that all fields of this object take permissible values; that is,
-   * this method defines the class invariant.
+   * Verifica que todos los campos de este objeto toman valores permisibles; esto es, 
+   * este método define la clase invariante.
    *
-   * In this style of implementation, both the entire state of the object
-   * and its individual fields can be validated without repeating or
-   * duplicating code.
-   * Each condition is defined in one place. Checks on the entire
-   * object are performed at the end of object construction, and at
-   * the end of de-serialization. Checks on individual fields are
-   * performed at the start of the corresponding setXXX method.
-   * As well, this style replaces the if's and throwing
-   * of exceptions at the start of a setXXX, with a simple call to validateXXX.
-   * Validation is separated from the regular path of execution,
-   * which leads to improved legibility.
+   * En este estilo de implementación, el estado entero del objeto 
+   * y sus campos individuales pueden ser validados sin repetir o 
+   * duplicar código.
+   * Cada condición se define en un lugar. Las comprobaciones de todo el objeto 
+   * se realizan al final de la construcción del objeto 
+   * y al final de la deserialización. Las comprobaciones de los campos individuales se 
+   * realizan al comienzo del método setXXX correspondiente.
+   * Además, este estilo reemplaza los if y el lanzamiento 
+   * de excepciones al comienzo de un setXXX, con una simple llamada a validateXXX.
+   * La validación está separada de la ruta regular de ejecución, 
+   * lo que conduje a una mejor legibilidad.
    *
-   * @throws IllegalArgumentException if any field takes an unpermitted value.
+   * @throws IllegalArgumentException si cualquier campo toma un valor no permitido.
    */</span>
    <span class="keyword">private</span> <span class="keyword">void</span> validateState() {
      validateAccountNumber(fAccountNumber);
@@ -258,9 +260,9 @@
    }
 
    <span class="comment">/**
-   * Ensure names contain only letters, spaces, and apostrophes.
+   * Se asegura que los nombres contienen solo letras, espacioes, y apóstrofes.
    *
-   * @throws IllegalArgumentException if field takes an unpermitted value.
+   * @throws IllegalArgumentException si el campo toma un valor no permitido.
    */</span>
    <span class="keyword">private</span> <span class="keyword">void</span> validateName(String aName){
      <span class="keyword">boolean</span> nameHasContent = (aName != <span
@@ -268,7 +270,7 @@
             class="literal">""</span>));
      <span class="keyword">if</span> (!nameHasContent){
        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
-            class="literal">"Names must be non-null and non-empty."</span>);
+            class="literal">"Los nombres no deben ser nulos ni estar vacíos."</span>);
      }
      StringCharacterIterator iterator = <span class="keyword">new</span> StringCharacterIterator(aName);
      <span class="keyword">char</span> character = iterator.current();
@@ -279,10 +281,10 @@
          character ==<span class="literal">'\''</span>
        );
        <span class="keyword">if</span> (isValidChar) {
-         <span class="comment">//do nothing
+         <span class="comment">//no hace nada
 </span>       }
        <span class="keyword">else</span> {
-         String message = <span class="literal">"Names can contain only letters, spaces, and apostrophes."</span>;
+         String message = <span class="literal">"Los nombres solo pueden contener letras, espacios y apóstrofos."</span>;
          <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(message);
        }
        character = iterator.next();
@@ -290,55 +292,55 @@
   }
 
   <span class="comment">/**
-  * AccountNumber must be non-negative.
-  * @throws IllegalArgumentException if field takes an unpermitted value.
+  * AccountNumber debe ser no negativo.
+  * @throws IllegalArgumentException si el campo toma un valor no permitido.
   */</span>
    <span class="keyword">private</span> <span class="keyword">void</span> validateAccountNumber(<span
             class="keyword">int</span> aAccountNumber){
      <span class="keyword">if</span> (aAccountNumber &lt; <span
             class="literal">0</span>) {
-       String message = <span class="literal">"Account Number must be greater than or equal to 0."</span>;
+       String message = <span class="literal">"El número de cuenta debe ser mayor o igual a 0."</span>;
        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(message);
      }
    }
 
   <span class="comment">/**
-  * DateOpened must be after 1970.
-  * @throws IllegalArgumentException if field takes an unpermitted value.
+  * DateOpened debe ser después de 1970.
+  * @throws IllegalArgumentException si el campo toma un valor no permitido.
   */</span>
    <span class="keyword">private</span> <span class="keyword">void</span> validateDateOpened(Date aDateOpened) {
      <span class="keyword">if</span>(aDateOpened.getTime() &lt; <span
             class="literal">0</span>) {
        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
-            class="literal">"Date Opened must be after 1970."</span>);
+            class="literal">"La fecha de apertura debe ser posterior a 1970."</span>);
      }
    }
 
    <span class="comment">/**
-   * Always treat de-serialization as a full-blown constructor, by
-   * validating the final state of the de-serialized object.
+   * Siempre trata la deserialización como un constructor en toda regla, 
+   * validando el estado final del objeto deserializado.
    */</span>
    <span class="keyword">private</span> <span class="keyword">void</span> readObject(
      ObjectInputStream aInputStream
    ) <span class="keyword">throws</span> ClassNotFoundException, IOException {
-     <span class="comment">//always perform the default de-serialization first
+     <span class="comment">//siempre realiza la deserialización predeterminada primero
 </span>     aInputStream.defaultReadObject();
 
-     <span class="comment">//make defensive copy of the mutable Date field
+     <span class="comment">//hace una copia defensiva del campo mutable Date
 </span>     fDateOpened = <span class="keyword">new</span> Date(fDateOpened.getTime());
 
-     <span class="comment">//ensure that object state has not been corrupted or tampered with maliciously
+     <span class="comment">//se asegura que el estado del objeto no ha sido corrompido o manipulado maliciosamente
 </span>     validateState();
   }
 
     <span class="comment">/**
-    * This is the default implementation of writeObject.
-    * Customise if necessary.
+    * Esta es la implementación predeterminada de writeObject.
+    * Personalizar si es necesario.
     */</span>
     <span class="keyword">private</span> <span class="keyword">void</span> writeObject(
       ObjectOutputStream aOutputStream
     ) <span class="keyword">throws</span> IOException {
-      <span class="comment">//perform the default serialization for all non-transient, non-static fields
+      <span class="comment">//realizar la serialización predeterminada para todos los campos no transitorios y no estáticos
 </span>      aOutputStream.defaultWriteObject();
     }
 } 
