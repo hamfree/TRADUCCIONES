@@ -22,64 +22,67 @@
     </nav>
     <div class="page-title">Sincronize el acceso a los campos mutables</div>
     <br />
-    In a multi-threaded environment, accessing mutable data (data that can change) must always be coordinated between readers and 
-    writers. The task of making sure that readers and writers don't interfere with each other in undesirable ways is called 
-    <em>synchronization</em>. Synchronization can be done with an explicit lock object, but a more common style is to use the 
-    <i>intrinsic locks</i> implied by the <code>synchronized</code> keyword.
+    En un entorno multiproceso, acceder a datos mutables (datos que pueden cambiar) debe ser siempre coordinado entre los lectores 
+    y los escritores. La tarea de asegurarse de que los lectores y escritores no se interfieran entre ellos de formas no deseables 
+    se llama <em>sincronización</em>. La sincronización se puede hacer con un objeto de bloque explícito, pero un estilo más común 
+    es usar los <i>bloqueos intrínsecos</i> implicados por la palabra clave <code>synchronized</code>.
     <p>
-      For example, in a multi-threaded environment, all <code>get</code> and <code>set</code> methods for mutable fields should 
-      usually be <code>synchronized</code> methods. This includes primitive fields.
+      Por ejemplo, en un entorno multiproceso, todos los métodos <code>get</code> y <code>set</code> para campos mutables deben 
+      ser habitualemnte métodos <code>synchronized</code>. Esto incluye a los campos de tipos primitivos.
     </p>
     <p>
-      Most classes do not need to be designed for operation in a multi-threaded environment, and can ignore these considerations.
+      La mayoría de las clases no necesitan ser diseñadas para operar en un entorno multiproceso, y pueden ignorar estas 
+      consideraciones.
     </p>
     <p>
-      If an object does need to live in a multi-threaded environment, however, then a significant amount of care must be taken to 
-      ensure that it is correctly designed.
+      Si un objeto necesita existir en un entorno multiproceso, sin embargo, entonces se debe tener mucho cuidado para asegurar que 
+      esté correctamente diseñado.
     </p>
     <p>
-      If an object is <a href="http://www.javapractices.com/topic/TopicAction.do?Id=29">immutable</a>, then it's automatically 
-      <a href="http://www.javapractices.com/topic/TopicAction.do?Id=48">thread-safe</a>. If it's mutable, then extra steps must be 
-      taken to ensure thread-safety: every use of every mutable field must be synchronized in some way (usually with using the 
-      <code>synchronized</code> keyword).
+      Sin un objeto es <a href="../patrones/patrones_29.html">inmutable</a>, entonces es automáticamente
+      <a href="hilos_48.html">seguro en multiproceso</a>. Si es mutable, se deben tomar unos 
+      pasos extra para asegurar la seguridad en multiproceso: cada uso de cada campo mutable debe ser sincronizado de alguna forma 
+      (usualmente con el uso de la palabra clave <code>synchronized</code>).
     </p>
     <p>
-      Here, <i>mutable field</i> simply means a field which might change in any way, after the initial construction of the object. 
-      (Objects are never shared between threads until after the object is fully created.) For example,
+      Aquí, <i>campo mutable</i> simplemente significa que un campo podría cambiar de cualquier forma, después de la construcción 
+      inicial del objeto. (Los objetos no se comparten nunca entre subprocesos hasta después de que el objeto se ha creado 
+      completamente). Por ejemplo, 
     </p>
     <ul>
-      <li>an <code>int</code> field that changes its value some time after the constructor completes</li>
+      <li>un campo de <code>int</code> cambia su valor alguna vez después que se completa el constructor</li>
       <li>
-        a <code>Date</code> field that changes state some time after the constructor completes, to represent a different date from 
-        the original
+        un campo de <code>Date</code> que cambia de estado alguna vez después de que termina el constructor, para representar una 
+        fecha diferente de la original
       </li>
-      <li>any object field that is "pointed" to a new object, some time after the constructor completes</li>
+      <li>cualquier campo del objeto que se "apunte" a un nuevo objeto, alguna vez después de que el constructor se completa</li>
     </ul>
-    Remember that all <i>local</i> variables declared in the body of a method are never shared between threads, and so have no 
-    thread-safety considerations. 
+    Recuerde que todas las variables <i>locales</i> declaradas en el cuerpo de un método no son compartidas nunca entre subprocesos, 
+    y por lo tanto no tienen consideraciones de seguridad multiproceso.
+    
     <p>
-      It's a misconception that all mutable primitives except <code>long</code> and <code>double</code> do not need 
-      <code>synchronized</code> access.
+      Es un error pensar que todos los tipos primitivos mutables excepto <code>long</code> y <code>double</code> no necesitan acceso 
+      <code>synchronized</code>.
     </p>
     <p>
-      <b>Example</b>
+      <b>Ejemplo</b>
     </p>
     <p>
-      Note that even the <code>get</code> of the <code>int</code> field is a <code>synchronized</code> method.<br />
+      Tenga en cuenta que incluso el <code>get</code> del campo <code>int</code> es un método <code>synchronized</code>.<br />
     </p>
     <pre>
 <span class="keyword">import</span> java.util.Date;
 
 <span class="comment">/**
-* This class is mutable, but thread-safe : the caller never
-* needs to perform external synchronization, except when multiple calls
-* need to be treated as a single unit.
+* Esta clase es mutable, pero segura para subprocesos: el llamante nunca 
+* necesita realizar sincronización externa, excepto cuando múltiples llamadas
+* necesitan ser tratadas como una única unidad.
 *
-* This class illustrates the three possible cases for fields :
+* Esta clase ilustra los tres posibles casos para los campos:
 *&lt;ul&gt;
-* &lt;li&gt; a primitive (int)
-* &lt;li&gt; an immutable object (String)
-* &lt;li&gt; a mutable object (Date)
+* &lt;li&gt; un primitivo (int)
+* &lt;li&gt; un objeto inmutable (String)
+* &lt;li&gt; un objeto mutable (Date)
 *&lt;/ul&gt;
 */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
@@ -89,11 +92,11 @@
 			class="keyword">int</span> aId, String aName, Date aDateOfDiscovery) {
      fId = aId;
      fName = aName;
-     <span class="comment">//Make a private copy of aDateOfDiscovery.
-</span>     <span class="comment">//This is the only way to keep the fDateOfDiscovery
-</span>     <span class="comment">//field private, and shields this class from any changes
-</span>     <span class="comment">//to the original aDateOfDiscovery object which might be
-</span>     <span class="comment">//made by the caller.
+     <span class="comment">//Hace una copia privada de aDateOfDiscovery.
+</span>     <span class="comment">//Esta es la única forma de mantener el campo fDateOfDiscovery
+</span>     <span class="comment">//privado, y blinda esta clase de cualquier cambio al 
+</span>     <span class="comment">//objeto original aDateOfDiscovery que podría ser 
+</span>     <span class="comment">//realizado por el llamador.
 </span>     fDateOfDiscovery = <span class="keyword">new</span> Date(aDateOfDiscovery.getTime());
   }
 
@@ -115,36 +118,36 @@
   }
 
   <span class="comment">/**
-  * Returns a defensive copy of the field.
-  * The caller of this method can do anything they want with the
-  * returned Date object, without affecting the internals of this
-  * class in any way.
+  * Devuelve una copia defensiva del campo.
+  * El llamador de este método puede hacer lo que quierea con el 
+  * objeto Date devuelto, sin afectar los aspectos internos de esta 
+  * clase de ninguna forma.
   */</span>
   <span class="keyword">public</span> <span class="keyword">synchronized</span> Date getDateOfDiscovery() {
     <span class="keyword">return</span> <span class="keyword">new</span> Date(fDateOfDiscovery.getTime());
   }
   <span class="keyword">public</span> <span class="keyword">synchronized</span> <span
 			class="keyword">void</span> setDateOfDiscovery(Date aNewDiscoveryDate) {
-    <span class="comment">//change the state of the mutable Date field
+    <span class="comment">//cambia el estado del campo Data mutable
 </span>    fDateOfDiscovery.setTime(aNewDiscoveryDate.getTime());
   }
 
-  <span class="comment">// PRIVATE
+  <span class="comment">// PRIVADO
 </span>
   <span class="comment">/**
-  * A primitive field.
+  * Un campo primitivo.
   */</span>
   <span class="keyword">private</span> <span class="keyword">int</span> fId;
 
   <span class="comment">/**
-  * An immutable object field.
-  * Strings never alter state after construction.
+  * Un campo de objeto inmutable.
+  * Las Strings nunca alteran su estado después de la construcción.
   */</span>
   <span class="keyword">private</span> String fName;
 
   <span class="comment">/**
-  * A mutable object field.
-  * The state of a Date can change after construction.
+  * Un campo de objeto mutable.
+  * El estado de un Date puede cambiar después de la construcción.
   */</span>
   <span class="keyword">private</span> Date fDateOfDiscovery;
 }

@@ -22,21 +22,22 @@
     </nav>
     <div class="page-title">Leer y escribir bloqueos</div>
     <br />
-    In the great majority of database applications, the frequency of read operations greatly exceeds the frequency of write 
-    operations. This is why databases implement read-write locks for their records, which allow for concurrent reading, but still 
-    demand exclusive writing. This can markedly increase performance.
+    En la gran mayorñua de las aplicaciones de bases de datos, la frecuencia de las operaciones de lectura supera con creces la 
+    frecuencia de las operaciones de escritura. Esto es porque las bases de datos implementan los bloqueos de lectura-escritura 
+    para sus registros, que permiten la lectura concurrente, pero todavía demandan escritura exclusiva. Esto puede aumentar 
+    notablemente el rendimiento.
     <p>
-      <em>Occasionally</em>, a class may benefit as well from a read-write lock, for exactly the same reasons - reads are much more 
-      frequent than writes. As usual, you should measure performance to determine if a read-write lock is really improving 
-      performance.
+      <em>Ocasionalmente</em>, una clase puede beneficiarse también de un bloqueo de lectura-escritura, por exactamente las mismas 
+      razones - las lecturas son mucho más frecuentes que las escrituras. Como es habitual, debe medir el rendimiento para 
+      determinar si un bloque de lectura-escritura realmente mejora el rendimiento.
     </p>
     <p>
-      Here's a sketch of how to use such locks. It uses the
+      Aquí hay un boceto de cómo usar tales bloqueos. Use 
       <code>
         <a
           href="https://docs.oracle.com/javase/10/docs/api/java/util/concurrent/locks/ReentrantReadWriteLock.html">
           ReentrantReadWriteLock</a>
-      </code> of the <code>java.util.concurrent</code> package. <br />
+      </code> del paquete <code>java.util.concurrent</code>.<br />
     </p>
     <pre>
 <span class="keyword">import</span> java.util.LinkedHashMap;
@@ -45,24 +46,25 @@
 <span class="keyword">import</span> java.util.concurrent.locks.ReentrantReadWriteLock;
 
 <span class="comment">/**
-  User preferences, using a read-write lock. 
+  Preferencias de usuario, usando un bloqueo de lectura-escritura.
   
- &lt;P&gt;The context: preference information is read in upon startup.
- The config data is 'read-mostly': usually, a caller simply reads the 
- information. It gets updated only occasionally. 
+  
+ &lt;P&gt;El contexto: la información de preferencias se lee al inicio.
+ Los datos de configuración son 'leídos mayormente': usualmente, un llamador 
+ simplemente lee la información. Se actualiza solo ocasionalmente.
  
- &lt;P&gt;Using a read-write lock means that multiple readers can access the 
- same data simultaneously. If a single writer gets the lock, however, then 
- all other callers (either reader or writer) will block until the lock is 
- released by the writer.
+ &lt;P&gt;El uso de un bloque de lectura-escritura significa que varios lectores pueden acceder a los 
+ mismos datos simultáneamente. Si un único escritor obtiene el bloqueo, sin embargo, entonces 
+ el resto de escritores (ya sean lectores o escritores) se bloquearán hasta que el bloqueo sea 
+ liberado por el escritor.
  
-  &lt;P&gt;(In practice, Brian Goetz reports that the implementation of ConcurrentHashMap 
-  is so good that it would likely suffice in many cases, instead of a read-write lock.)
+  &lt;P&gt;(En la práctica, Brian Goetz informa que la implementación de ConcurrentHashMap es tan buena 
+  que probablemente sería suficiente en muchos casos, en lugar de un bloqueo de lectura y escritura).
 */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
 			class="keyword">class</span> Preferences {
   
-  <span class="comment">/** Fetch a setting - this is the more common operation.  */</span>
+  <span class="comment">/** Obtener una configuración - esta es la operación más común.  */</span>
   <span class="keyword">public</span> String fetch(String aName){
     String result = <span class="literal">""</span>;
     fReadLock.lock();
@@ -75,7 +77,7 @@
     <span class="keyword">return</span> result;
   }
  
-  <span class="comment">/** Change a setting - this is the less common operation. */</span>
+  <span class="comment">/** Cambiar una configuración - esta la operación menos común. */</span>
   <span class="keyword">public</span> <span class="keyword">void</span> update(String aName, String aValue){
     fWriteLock.lock();
     <span class="keyword">try</span> {
@@ -86,11 +88,11 @@
     }
   }
  
-  <span class="comment">//...elided
+  <span class="comment">//...omitido
 </span>  
-  <span class="comment">// PRIVATE
+  <span class="comment">// PRIVADO
 </span>  
-  <span class="comment">/** Holds the preferences as simple name-value pairs of Strings. */</span>
+  <span class="comment">/** Contiene las preferencias como pares simples de nombre-valor de Strings. */</span>
   <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, String&gt; fPreferences = <span
 			class="keyword">new</span> LinkedHashMap&lt;&gt;();
   <span class="keyword">private</span> <span class="keyword">final</span> ReentrantReadWriteLock fLock = <span
@@ -100,7 +102,6 @@
 }
  
     </pre>
-
     <br />
     <p></p>
     <p></p>

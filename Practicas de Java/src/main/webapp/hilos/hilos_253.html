@@ -22,27 +22,28 @@
     </nav>
     <div class="page-title">Usar finally para desbloquear</div>
     <br />
-    Sometimes <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/concurrent/locks/Lock.html">Lock</a></code> 
-    objects are used to control access to mutable data in a multithreaded environment. When a thread is finished with the data, you 
-    must ensure the lock is released.
+    Algunas veces los objetos 
+    <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/concurrent/locks/Lock.html">Lock</a></code> se usan para 
+    controlar el acceso a datos mutables en un entorno multihilo. Cuando un hilo termina con los datos, debe asegurarse de que se 
+    libera el bloqueo.
     <p>
-      Brian Goetz in <em>Java Concurrency in Practice</em> strongly recommends the following technique for ensuring that a lock is
-      released. It uses a <code>try..finally</code> style; this ensures that no matter what happens during the time the lock is 
-      held, it will eventually be unlocked. Even if an unexpected <code>RuntimeException</code> is thrown, the lock will still be 
-      released.
+      Brian Goetz en <em>Concurrencia de Java en la Práctica</em> recomienda firmemente la técnica siguiente para asegurar que se 
+      libera un bloqueo. Usa un estilo <code>try..finally</code>; esto asegura que sin importar lo que ocurra durante el tiempo que 
+      se mantenía el bloqueo, este será eventualmente desbloqueado. Incluso si se lanza una <code>RuntimeException</code> 
+      inesperada, el bloqueo aún será liberado.
     </p>
     <pre>
 Lock myLock = ...
 myLock.lock();
 try {
-  //interact with mutable data
+  //interactuar con datos mutables
 }
 finally{
   myLock.unlock();
 }
     </pre>
     <p>
-      Here's an example which follows the above pattern, with a read-write lock. <br />
+      Aquí tiene un ejemplo que sigue el patrón de arriba, con un bloque de lectura-escritura.<br />
     </p>
     <pre>
 <span class="keyword">import</span> java.util.LinkedHashMap;
@@ -51,24 +52,23 @@ finally{
 <span class="keyword">import</span> java.util.concurrent.locks.ReentrantReadWriteLock;
 
 <span class="comment">/**
-  User preferences, using a read-write lock. 
+  Preferencias de usuario, usando un bloque de lectura-escritura.
   
- &lt;P&gt;The context: preference information is read in upon startup.
- The config data is 'read-mostly': usually, a caller simply reads the 
- information. It gets updated only occasionally. 
+ &lt;P&gt;El contexto: la información de preferencias se lee al inicio.
+  Los datos de configuración son 'en su mayoría de lectura': por lo general, una persona que llama simplemente lee el
+  información. Se actualiza solo ocasionalmente.
  
- &lt;P&gt;Using a read-write lock means that multiple readers can access the 
- same data simultaneously. If a single writer gets the lock, however, then 
- all other callers (either reader or writer) will block until the lock is 
- released by the writer.
+ &lt;P&gt;El uso de un bloqueo de lectura y escritura significa que varios lectores pueden acceder a los mismos datos 
+  simultáneamente. Sin embargo, si un solo escritor obtiene el bloqueo, todas las demás personas que llaman (ya sea lector o 
+  escritor) se bloquearán hasta que el escritor libere el bloqueo.
  
-  &lt;P&gt;(In practice, Brian Goetz reports that the implementation of ConcurrentHashMap 
-  is so good that it would likely suffice in many cases, instead of a read-write lock.)
+  &lt;P&gt;(En la práctica, Brian Goetz informa de que la implementación de ConcurrentHashMap 
+  es tan buena que probablemente sería suficiente en muchos casos, en lugar de un bloqueo de lectura y escritura).
 */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
 			class="keyword">class</span> Preferences {
   
-  <span class="comment">/** Fetch a setting - this is the more common operation.  */</span>
+  <span class="comment">/** Obtiene una configuración - esta es la operación más común.  */</span>
   <span class="keyword">public</span> String fetch(String aName){
     String result = <span class="literal">""</span>;
     fReadLock.lock();
@@ -81,7 +81,7 @@ finally{
     <span class="keyword">return</span> result;
   }
  
-  <span class="comment">/** Change a setting - this is the less common operation. */</span>
+  <span class="comment">/** Cambia una configuración - esta es la operación menos común. */</span>
   <span class="keyword">public</span> <span class="keyword">void</span> update(String aName, String aValue){
     fWriteLock.lock();
     <span class="keyword">try</span> {
@@ -92,11 +92,11 @@ finally{
     }
   }
  
-  <span class="comment">//...elided
+  <span class="comment">//...omitido
 </span>  
-  <span class="comment">// PRIVATE
+  <span class="comment">// PRIVADO
 </span>  
-  <span class="comment">/** Holds the preferences as simple name-value pairs of Strings. */</span>
+  <span class="comment">/** Contiene las preferencias como simples pares de nombre-valor de Strings. */</span>
   <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, String&gt; fPreferences = <span
 			class="keyword">new</span> LinkedHashMap&lt;&gt;();
   <span class="keyword">private</span> <span class="keyword">final</span> ReentrantReadWriteLock fLock = <span
@@ -106,8 +106,6 @@ finally{
 }
  
     </pre>
-
-
     <p></p>
     <p></p>
     <div class="topic-section" id="see-also-title">Vea También :</div>

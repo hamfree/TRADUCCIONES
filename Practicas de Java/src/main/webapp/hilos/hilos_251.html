@@ -22,61 +22,62 @@
     </nav>
     <div class="page-title">Manejar la InterruptedException</div>
     <br /> 
-    In thread-related code, you will often need to handle an
+    En código relacionado con hilos, a menudo necesitará manejar una 
     <code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/InterruptedException.html">InterruptedException</a></code>. 
-    There are two common ways of handling it:
+    Hay dos formas comunes de manejarla:
     <ul>
-      <li>just throw the exception up to the caller (perhaps after doing some clean up)</li>
+      <li>simplemente lance la excepción hacia arriba al llamador (tal vez después de hacer una limpieza)</li>
       <li>
-        call the <code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Thread.html#interrupt()">interrupt</a></code> 
-        method on the current thread
+        llame al método 
+        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Thread.html#interrupt()">interrupt</a></code> en el hilo 
+        actual
       </li>
     </ul>
     <p>
-      In the second case, the standard style is:
+      En el segundo caso, el estilo estándar es:
     </p>
     <pre>
 try {
-  <i>...thread-related code...</i>
+  <i>...código relacionado-con-el-hilo...</i>
 }
 catch(InterruptedException ex){
-  <i>...perhaps some error handling here...</i>
-  //re-interrupt the current thread
+  <i>...quizás algún manejo del error aquí...</i>
+  //re-interrupir el hilo actual
   Thread.currentThread().<a
 			href="https://docs.oracle.com/javase/10/docs/api/java/lang/Thread.html#interrupt()">interrupt</a>();
 }
     </pre>
 
-    <h3>Background</h3>
-    In multi-threaded code, threads can often <i>block</i>; the thread pauses execution until some external condition is met, such 
-    as :
+    <h3>Antecedentes</h3>
+    En código multihilo, los hilos pueden a menudo <i>bloquearse</i>; los hilos pausan la ejecución hasta que se cumpla alguna 
+    condición externa, tal como:
     <ul>
-      <li>a lock is released</li>
-      <li>another thread completes an operation</li>
-      <li>some I/O operation completes</li>
-      <li>and so on...</li>
+      <li>se libera un bloqueo</li>
+      <li>otro hilo completa una operación</li>
+      <li>se completa alguna operación de E/S</li>
+      <li>y así...</li>
     </ul>
     <p>
-      Threads can be <i>interrupted</i>. An interrupt asks a thread to stop what it's doing in an orderly fashion. However, the 
-      exact response to the interrupt depends on the thread's state, and how the thread is implemented:
+      Los hilos pueden ser <i>interrumpidos</i>. Una interrupción pide a un hilo que pare lo que está haciendo de una forma 
+      ordenada. Sin embargo, la respuesta exacta a la interrupción depende del estado del hilo, y cómo se implementó el hilo:
     </p>
     <pre>
-if the thread is currently <i>blocking</i> 
-  stop blocking early
-  throw InterruptedException
-else thread is doing real work
-  thread's interrupted status is set to true
-  if thread polls isInterrupted() periodically
-    (which is preferred)
-    orderly cleanup and stop execution
-    throw InterruptedException
-  else 
-    regular execution continues
+si el hilo está actualmente <i>bloqueado</i> 
+  dejar de bloquear temprano
+  lanzar InterruptedException
+si no, el hilo está haciendo un trabajo real 
+  el estado interrumpido del hilo se establece en verdadero
+  si el hilo consulta isInterrupted() periódicamente
+    (lo cual se prefiere)
+    limpiar ordenadamente y detener la ejecución
+    lanzar InterruptedException
+  si no
+    la ejecución regular continúa
     </pre>
-    The main idea here is that an interrupt should not shutdown a thread immediately, in the middle of a computation. Rather, a 
-    thread and it's caller communicate with each other to allow for an orderly shutdown.
+    La idea principal aquí es que una interrupción no debería apagar un hilo inmediatamente, en medio de un cálculo. Más bien, un 
+    hilo y su llamador se comunican entre sí para permitir un apagado ordenado.
     <p>
-      See also this <a href="http://www.ibm.com/developerworks/java/library/j-jtp05236/index.html">article by Brian Goetz</a>.
+      Vea también este <a href="http://www.ibm.com/developerworks/java/library/j-jtp05236/index.html">artículo de Brian Goetz</a>.
     </p>
     <p></p>
     <footer id="footer" class="legalese">

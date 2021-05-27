@@ -22,73 +22,76 @@
     </nav>
     <div class="page-title">Documente la seguridad del hilo</div>
     <br />
-    Javadoc comments should describe how the responsibilities for ensuring correct multi-threaded behaviour are shared between a 
-    class and its caller. This is equivalent to stating the circumstances, if any, in which the caller must explicitly obtain an 
-    external lock before performing certain operations. The central questions to be answered by the documentation are:
+    Los comentarios de javadoc deben describir cómo se comparten las responsabilidades para garantizar el comportamiento correcto 
+    de subprocesos múltiples entre una clase y su llamador. Esto equivale a indicar las circunstancias, si las hay, en las que el 
+    llamador debe obtener explícitamente un bloqueo externo antes de realizar determinadas operaciones. Las preguntas centrales que 
+    debe responder la documentación son:
     <p>
-      "<i>When do these objects require external synchronization?</i>" <br />"<i>Which lock is needed for which operations?</i>"
+      "<i>¿Cuando estos objetos requieren sincronización externa?</i>" <br />
+      "<i>¿Qué bloqueo se necesita para qué operaciones?</i>"
     </p>
     <p>
-      Here, "operations" on an object might come in two flavours:
+      Aquí, "operaciones" en un objeto pueden ser de dos tipos:
     </p>
     <ul>
-      <li>single-call operations, where only a single method is called</li>
+      <li>operaciones de llamada única, donde solo se llama a un método</li>
       <li>
-        multiple-call operations, where more than one method is called, and they are treated as a single unit; the classic example 
-        is iteration over a collection
+        operaciones de llamadas múltiples, donde se llama a más de un método, y son tratados como una única unidad; el ejemplo 
+        clásico es la iteración sobre una colección
       </li>
     </ul>
-    The naming convention described below is a modified version of that found in
-    <i><a href="http://www.amazon.com/exec/obidos/ASIN/0134685997/ref=nosim/javapractices-20">Effective Java</a></i>, by Joshua 
-    Bloch. The reason for the changes are: 
+    La convención de nomenclatura descrita a continuación es una versión modificada de la que se encuentra en 
+    <i><a href="http://www.amazon.com/exec/obidos/ASIN/0134685997/ref=nosim/javapractices-20">Java Efectivo</a></i>, de Joshua 
+    Bloch. La razón para los cambios son: 
     <ul>
-      <li>it focuses more on the point of view of the caller, instead of class internals</li>
-      <li>the language is simpler and clearer</li>
+      <li>este se enfoca más en el punto de vista del llamador, en lugar de en los aspectos internos de la clase</li>
+      <li>el lenguaje es más simple y más claro</li>
     </ul>
     <p>
-      The goal of this scheme is simply to tell the caller when they need to obtain an external lock before performing an operation 
-      in a multithreaded environment.
+      El objetivo de este esquema es simplemente indicar al llamdor cuando necesita obtener un bloque externo antes de realizar una 
+      operación en un entorno multiproceso.
     </p>
     <p>
-      <b>lock-never</b> - the caller <i>never</i> needs to obtain an external lock before performing any operation of any kind. The 
-      class may be <a href="http://www.javapractices.com/topic/TopicAction.do?Id=29">immutable</a>, or it may perform all necessary 
-      synchronization internally. From the point of view of the caller, these two cases are functionally the same (in the context of 
-      documenting thread-safety).
+      <b>nunca-bloquear</b> - el llamador <i>nunca</i> necesita obtener un bloqueo externo antes de realizar cualquier operación de 
+      cualquier clase. La clase puede ser <a href="http://www.javapractices.com/topic/TopicAction.do?Id=29">immutable</a>, o puede 
+      realizar toda la sincronización necesaria internamente. Desde el punto de vista del llamador, estos dos casos son 
+      funcionalmente el mismo (en el contexto de documentar la seguridad de los subprocesos).
     </p>
     <p>
-      <b>lock-always</b> - the caller <i>always</i> needs to obtain an external lock before performing any operation. Instances are 
-      mutable, and the implementation of the class performs no internal synchronization.
+      <b>siempre-bloquear</b> - el llamador <i>siempre</i> necesita obtener un bloqueo externo antes de realizar cualquier 
+      operación. Las instancias son mutables, y la implementación de la clase realiza sincronización no interna.
     </p>
     <p>
-      <b>lock-sometimes</b> - the caller <i>sometimes</i> needs to obtain a lock externally before performing some operations. 
-      Instances are mutable, and the implementation of the class performs most synchronization internally. The caller 
-      <em>usually</em> doesn't need to obtain an external lock, but there are some operations in which the caller does indeed need 
-      to obtain an external lock. The classic example of this is iteration over a collection.
+      <b>algunas veces-bloquear</b> - el llamador <i>algunas veces</i> necesita obtener un bloque externamente antes de realizar 
+      algunas operaciones. Las instancias son mutables, y la implementación de la clase realiza la mayoría de la sincronización 
+      internamente. El llamador <em>usualmente</em> no necesita obtener un bloqueo externo, pero hay algunas operaciones en las que 
+      el llamador sí necesita obtener un bloque externo. El ejemplo clásico de esto es la iteración sobre una colección.
     </p>
     <p>
-      <b>lock-hostile</b> - operations cannot be performed safely in a multi-threaded environment at all, even when an external lock 
-      is always obtained. This is a rare pathological case. It usually occurs when static data is modified without proper 
-      synchronization.
+      <b>hostil al-bloqueo</b> - las operaciones no pueden realizarse de forma segura en un entorno multiproceso en absoluto, 
+      incluso si siempre se obtiene un bloqueo externo. Estes es un caso patológico raro. Usualmente ocurre cuando se modifican los 
+      datos estáticos sin una sincronización apropiada.
     </p>
     <p>
-      In practice, <code>lock-always</code> and <code>lock-never</code> are likely the most common cases.
+      En la práctica, <code>siempre-bloquear</code> y <code>nunca-bloquear</code> son probablemente los casos más comunes.
     </p>
     <p>
-      To help you with documenting thread-safety, you might consider using:
+      Para ayudarle con la documentación de la seguridad de los subprocesos, podría considerar usar:
     </p>
     <ul>
       <li>
-        annotations, for example those defined by 
+        anotaciones, por ejemplo aquellas definidas por 
         <a href="http://jcip.net.s3-website-us-east-1.amazonaws.com/annotations/doc/index.html">Brian Goetz</a>
       </li>
       <li>
-        <a href="http://docs.oracle.com/javase/8/docs/technotes/guides/javadoc/index.html">javadoc's</a> <code>-tag</code> option, 
-        which lets you define simple custom javadoc tags
+        La opción <code>-tag</code> de 
+        <a href="http://docs.oracle.com/javase/8/docs/technotes/guides/javadoc/index.html">javadoc</a>,  que le permite definir 
+        etiquetas simples personalizadas de javadoc
       </li>
     </ul>
     <p>
-      Another reasonable option is to state in the javadoc overview that, unless stated otherwise, a class is to be considered
-      <code>lock-always</code>. <br />
+      Otra opción razonable es indicar en el resumen de javadoc que, a menos que se indique lo contrario, una clase debe 
+      considerarse <code>siempre-bloquear</code>.<br />
     </p>
     <p></p>
     <div class="topic-section" id="see-also-title">Vea También :</div>
