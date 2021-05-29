@@ -21,66 +21,67 @@
       </form>
     </nav>
     <div class="page-title">No declare variables locales antes de usarlas</div>
-    <br>Most local variables are declared and initialized on the same line, at the point in the method where both its initial value
-    is available and the variable itself is immediately useful. 
+    <br />
+    La mayoría de las variables locales se declaran e inicializan en la misma línea, en el punto en el método donde tanto su valor 
+    inicial está disponible y la variable en sí misma es inmediatamente útil.
     <p>
-      Declaring local variables without using them immediately may unnecessarily increase their scope. This decreases legibility,
-      and increases the likelihood of error.
+      Declarar variables locales sin usarlas inmediatamente puede incrementar innecesariamente su alcance. Esto decrementa la 
+      legibilidad, e incremente la probabilidad de error.
     </p>
     <p>
-      There are two common cases where a local variable is assigned some default initial value (typically 
-      <code>null, 0, false, </code> or an empty <code>String</code>):
+      Hay dos casos comunes donde a una variable local se le asigna algún valor inicial (típicamente 
+      <code>null, 0, false, </code> o una <code>String</code> vacía):
     </p>
     <ul>
       <li>
-        variables which need to be visible outside of a <code>try</code> block, and are thus declared and initialized just before 
-        the <code>try</code> block (in modern code using try-with-resources, this is now relatively rare)
+        las variables que necesitan ser visibles fuera de un bloque <code>try</code>, y son así declaradas e inicializadas justo 
+        antes del bloque <code>try</code> (en código moderno usando try-with-resources, esto es ahora relativamente raro)
       </li>
-      <li>some loop variables, which are initialized to some default value just before the loop</li>
+      <li>algunas variables de bucle, que son inicializadas a algún valor predeterminado justo antes del bucle</li>
     </ul>
-    <b>Example</b>
+    <b>Ejemplo</b>
     <p>
-      Here, <code>input</code> and <code>output</code> are examples of local variables being initialized to <code>null</code>, since 
-      they need to be visible in both the <code>try</code> and <code>finally</code> blocks.
+      Aquí, <code>input</code> y <code>output</code> son ejemplos de variables locales siendo inicializadas a <code>null</code>, 
+      ya que necesitan ser visibles tanto en los bloques <code>try</code> y <code>finally</code>.
     </p>
     <p>
-      As well, <code>line</code> is an example of a loop variable declared and initialized outside the loop.
+      Tambíen, <code>line</code> es un ejemplo de variable de bucle declarada e inicializada fuera del bucle.
     </p>
     <p>
-      Note that this example uses JDK 6, simply to illustrate the point. In JDK 7, 
-      <a href="http://docs.oracle.com/javase/8/docs/technotes/guides/language/try-with-resources.html">try-with-resources</a> would 
-      be used to automatically close streams, and the issue of stream references being initialized to <code>null</code> would not 
-      occur.<br />
+      Tenga en cuenta que este ejemplo usa KDJ 6, simplemente para ilustrar el punto En KDJ 7, 
+      <a href="http://docs.oracle.com/javase/8/docs/technotes/guides/language/try-with-resources.html">try-with-resources</a> 
+      sería usada para automáticamente cerrar los flujos, y el problema de las referencias de flujo siendo inicializadas a 
+      <code>null</code> no ocurrirían.<br />
     </p>
     <pre>
 <span class="keyword">import</span> java.io.*;
 
-<span class="comment">/** JDK 6 or before. */</span>
+<span class="comment">/** KDJ 6 o anterior. */</span>
 <span class="keyword">public</span> <span class="keyword">class</span> ReadWriteTextFile {
 
   <span class="comment">/**
-  * Fetch the entire contents of a text file, and return it in a String.
-  * This style of implementation does not throw Exceptions to the caller.
+  * Obtiene los contenidos enteros de un fichero de texto, y lo devuelve en un String.
+  * Este estilo de implementación no lanza Excepciones al llamador.
   *
-  * @param aFile is a file which already exists and can be read.
+  * @param aFile es un fichero que ya existe y puede ser leído.
   */</span>
   <span class="keyword">static</span> <span class="keyword">public</span> String getContents(File aFile) {
-    <span class="comment">//...checks on aFile are elided
+    <span class="comment">//...comprobaciones sobre aFile son omitidas
 </span>    StringBuilder contents = <span class="keyword">new</span> StringBuilder();
     
     <span class="keyword">try</span> {
-      <span class="comment">//use buffering, reading one line at a time
-</span>      <span class="comment">//FileReader always assumes default encoding is OK!
+      <span class="comment">//usa almacenamiento en búfer, leyendo una línea a la vez
+</span>      <span class="comment">//¡FileReader siempre asume que la codificación predeterminada es correcta!
 </span>      BufferedReader input =  <span class="keyword">new</span> BufferedReader(<span
             class="keyword">new</span> FileReader(aFile));
       <span class="keyword">try</span> {
         String line = <span class="keyword">null</span>; <span
-            class="comment">//not declared within while loop
+            class="comment">//no declarada dentro del bucle while
 </span>        <span class="comment">/*
-        * readLine is a bit quirky :
-        * it returns the content of a line MINUS the newline.
-        * it returns null only for the END of the stream.
-        * it returns an empty String if two newlines appear in a row.
+        * readLine es un poco peculiar :
+        * devuelve el contenido de una línea MENOS el retorno de carro.
+        * devuelve null solo para el FIN del flujo.
+        * devuelve una String vacía si aparecen dos retornos de carro en una fila.
         */</span>
         <span class="keyword">while</span> (( line = input.readLine()) != <span
             class="keyword">null</span>){
@@ -100,41 +101,41 @@
   }
 
   <span class="comment">/**
-  * Change the contents of text file in its entirety, overwriting any
-  * existing text.
+  * Cambia el contenido del fichero de texto por completo, sobreescribiendo cualquier
+  * texto existente.
   *
-  * This style of implementation throws all exceptions to the caller.
+  * Este estilo de implementación lanza todas las excepciones al llamador.
   *
-  * @param aFile is an existing file which can be written to.
-  * @throws IllegalArgumentException if param does not comply.
-  * @throws FileNotFoundException if the file does not exist.
-  * @throws IOException if problem encountered during write.
+  * @param aFile es un fichero existente que puede ser escrito.
+  * @throws IllegalArgumentException si el parámetro no cumple.
+  * @throws FileNotFoundException si el fichero no existe.
+  * @throws IOException si se encuentra un problema durante la escritura.
   */</span>
   <span class="keyword">static</span> <span class="keyword">public</span> <span
             class="keyword">void</span> setContents(File aFile, String aContents)
                                  <span class="keyword">throws</span> FileNotFoundException, IOException {
     <span class="keyword">if</span> (aFile == <span class="keyword">null</span>) {
       <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
-            class="literal">"File should not be null."</span>);
+            class="literal">"El archivo no debe ser nulo."</span>);
     }
     <span class="keyword">if</span> (!aFile.exists()) {
       <span class="keyword">throw</span> <span class="keyword">new</span> FileNotFoundException (<span
-            class="literal">"File does not exist: "</span> + aFile);
+            class="literal">"El archivo no existe: "</span> + aFile);
     }
     <span class="keyword">if</span> (!aFile.isFile()) {
       <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
-            class="literal">"Should not be a directory: "</span> + aFile);
+            class="literal">"No debería ser un directorio: "</span> + aFile);
     }
     <span class="keyword">if</span> (!aFile.canWrite()) {
       <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
-            class="literal">"File cannot be written: "</span> + aFile);
+            class="literal">"El archivo no se puede escribir: "</span> + aFile);
     }
 
-    <span class="comment">//use buffering
+    <span class="comment">//usa almacenamiento en búfer
 </span>    Writer output = <span class="keyword">new</span> BufferedWriter(<span
             class="keyword">new</span> FileWriter(aFile));
     <span class="keyword">try</span> {
-      <span class="comment">//FileWriter always assumes default encoding is OK!
+      <span class="comment">//¡FileReader siempre asume que la codificación predeterminada es correcta!
 </span>      output.write( aContents );
     }
     <span class="keyword">finally</span> {
@@ -142,15 +143,15 @@
     }
   }
 
-  <span class="comment">/** Simple test harness.   */</span>
+  <span class="comment">/** Prueba simple.   */</span>
   <span class="keyword">public</span> <span class="keyword">static</span> <span
             class="keyword">void</span> main (String... aArguments) <span
             class="keyword">throws</span> IOException {
     File testFile = <span class="keyword">new</span> File(<span
             class="literal">"C:\\Temp\\blah.txt"</span>);
-    System.out.println(<span class="literal">"Original file contents: "</span> + getContents(testFile));
-    setContents(testFile, <span class="literal">"The content of this file has been overwritten..."</span>);
-    System.out.println(<span class="literal">"New file contents: "</span> + getContents(testFile));
+    System.out.println(<span class="literal">"Contenido del archivo original: "</span> + getContents(testFile));
+    setContents(testFile, <span class="literal">"El contenido de este archivo se ha sobrescrito ..."</span>);
+    System.out.println(<span class="literal">"Contenido de archivo nuevo: "</span> + getContents(testFile));
   }
 } 
     </pre>
