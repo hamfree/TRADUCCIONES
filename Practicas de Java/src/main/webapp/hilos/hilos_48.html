@@ -3,156 +3,118 @@
 <html lang="es">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="description"
-          content="Prácticas y técnicas de programación en Java.">
-    <meta name="keywords"
-          content="java,programación java,Prácticas de Java,idioma 
-          java,estilo java,patrones de diseño java,convenciones de codigo java">
+    <meta name="description" content="Prácticas y técnicas de programación en Java.">
+    <meta name="keywords" content="java, programación java, Prácticas de Java, idioma java, estilo java, patrones de diseño java, 
+          convenciones de codigo java">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prácticas de Java-&gt;Documente la seguridad del hilo</title>
-    <link id="stylesheet" rel="stylesheet" type="text/css"
-          href="../css/stylesheet9.css" media="all">
-    <link rel="icon" type="image/png"
-          href="../img/favicon.png">
+    <link id="stylesheet" rel="stylesheet" type="text/css" href="../css/stylesheet9.css" media="all">
+    <link rel="icon" type="image/png" href="../img/favicon.png">
   </head>
   <body>
     <nav class="menu-bar" id="menu-bar">
-      <a href="../index.html"
-         title="Tabla de Contenido" style="float: left;">Inicio</a> &nbsp;&nbsp;
-      <form method="GET" action="https://www.google.com/search"
-            class="search-form" style="float: right;">
-        <input type="text" name="q" size="15" maxlength="255" value=""
-               placeholder=""> <input type="submit" name="btnG"
-               value="Search"> <input type="hidden" name="sitesearch"
-               value="www.javapractices.com">
+      <a href="../index.html" title="Tabla de Contenido" style="float: left;">Inicio</a> &nbsp;&nbsp;
+      <form method="GET" action="https://www.google.com/search" class="search-form" style="float: right;">
+        <input type="text" name="q" size="15" maxlength="255" value="" placeholder=""/> 
+        <input type="submit" name="btnG" value="Search" /> 
+        <input type="hidden" name="sitesearch" value="www.javapractices.com" />
       </form>
     </nav>
     <div class="page-title">Documente la seguridad del hilo</div>
-
-    <br>Javadoc comments should describe how the responsibilities for
-    ensuring correct multi-threaded behaviour are shared between a class
-    and its caller. This is equivalent to stating the circumstances, if
-    any, in which the caller must explicitly obtain an external lock before
-    performing certain operations. The central questions to be answered by
-    the documentation are:
+    <br />
+    Los comentarios de javadoc deben describir cómo se comparten las responsabilidades para garantizar el comportamiento correcto 
+    de subprocesos múltiples entre una clase y su llamador. Esto equivale a indicar las circunstancias, si las hay, en las que el 
+    llamador debe obtener explícitamente un bloqueo externo antes de realizar determinadas operaciones. Las preguntas centrales que 
+    debe responder la documentación son:
     <p>
-      "<i>When do these objects require external synchronization?</i>" <br>"<i>Which
-        lock is needed for which operations?</i>"
-
+      "<i>¿Cuando estos objetos requieren sincronización externa?</i>" <br />
+      "<i>¿Qué bloqueo se necesita para qué operaciones?</i>"
     </p>
-    <p>Here, "operations" on an object might come in two flavours:</p>
+    <p>
+      Aquí, "operaciones" en un objeto pueden ser de dos tipos:
+    </p>
     <ul>
-      <li>single-call operations, where only a single method is called</li>
-      <li>multiple-call operations, where more than one method is
-        called, and they are treated as a single unit; the classic example is
-        iteration over a collection</li>
-    </ul>
-
-
-    The naming convention described below is a modified version of that
-    found in
-    <i><a
-        href="http://www.amazon.com/exec/obidos/ASIN/0134685997/ref=nosim/javapractices-20">Effective
-        Java</a></i>, by Joshua Bloch. The reason for the changes are:
-    <ul>
-      <li>it focuses more on the point of view of the caller, instead
-        of class internals</li>
-      <li>the language is simpler and clearer</li>
-    </ul>
-
-    <p>The goal of this scheme is simply to tell the caller when they
-      need to obtain an external lock before performing an operation in a
-      multithreaded environment.</p>
-    <p>
-      <b>lock-never</b> - the caller <i>never</i> needs to obtain an
-      external lock before performing any operation of any kind. The class
-      may be <a
-        href="http://www.javapractices.com/topic/TopicAction.do?Id=29">immutable</a>,
-      or it may perform all necessary synchronization internally. From the
-      point of view of the caller, these two cases are functionally the same
-      (in the context of documenting thread-safety).
-
-    </p>
-    <p>
-      <b>lock-always</b> - the caller <i>always</i> needs to obtain an
-      external lock before performing any operation. Instances are mutable,
-      and the implementation of the class performs no internal
-      synchronization.
-
-    </p>
-    <p>
-      <b>lock-sometimes</b> - the caller <i>sometimes</i> needs to obtain a
-      lock externally before performing some operations. Instances are
-      mutable, and the implementation of the class performs most
-      synchronization internally. The caller <em>usually</em> doesn't need
-      to obtain an external lock, but there are some operations in which the
-      caller does indeed need to obtain an external lock. The classic
-      example of this is iteration over a collection.
-
-    </p>
-    <p>
-      <b>lock-hostile</b> - operations cannot be performed safely in a
-      multi-threaded environment at all, even when an external lock is
-      always obtained. This is a rare pathological case. It usually occurs
-      when static data is modified without proper synchronization.
-
-    </p>
-    <p>
-      In practice,
-      <code>lock-always</code>
-      and
-      <code>lock-never</code>
-      are likely the most common cases.
-
-    </p>
-    <p>To help you with documenting thread-safety, you might consider
-      using:</p>
-    <ul>
-      <li>annotations, for example those defined by <a
-          href="http://jcip.net.s3-website-us-east-1.amazonaws.com/annotations/doc/index.html">Brian
-          Goetz</a>
+      <li>operaciones de llamada única, donde solo se llama a un método</li>
+      <li>
+        operaciones de llamadas múltiples, donde se llama a más de un método, y son tratados como una única unidad; el ejemplo 
+        clásico es la iteración sobre una colección
       </li>
-      <li><a
-          href="http://docs.oracle.com/javase/8/docs/technotes/guides/javadoc/index.html">javadoc's</a>
-        <code>-tag</code> option, which lets you define simple custom javadoc
-        tags</li>
     </ul>
-
+    La convención de nomenclatura descrita a continuación es una versión modificada de la que se encuentra en 
+    <i><a href="http://www.amazon.com/exec/obidos/ASIN/0134685997/ref=nosim/javapractices-20">Java Efectivo</a></i>, de Joshua 
+    Bloch. La razón para los cambios son: 
+    <ul>
+      <li>este se enfoca más en el punto de vista del llamador, en lugar de en los aspectos internos de la clase</li>
+      <li>el lenguaje es más simple y más claro</li>
+    </ul>
     <p>
-      Another reasonable option is to state in the javadoc overview that,
-      unless stated otherwise, a class is to be considered
-      <code>lock-always</code>
-      . <br>
+      El objetivo de este esquema es simplemente indicar al llamdor cuando necesita obtener un bloque externo antes de realizar una 
+      operación en un entorno multiproceso.
+    </p>
+    <p>
+      <b>nunca-bloquear</b> - el llamador <i>nunca</i> necesita obtener un bloqueo externo antes de realizar cualquier operación de 
+      cualquier clase. La clase puede ser <a href="http://www.javapractices.com/topic/TopicAction.do?Id=29">immutable</a>, o puede 
+      realizar toda la sincronización necesaria internamente. Desde el punto de vista del llamador, estos dos casos son 
+      funcionalmente el mismo (en el contexto de documentar la seguridad de los subprocesos).
+    </p>
+    <p>
+      <b>siempre-bloquear</b> - el llamador <i>siempre</i> necesita obtener un bloqueo externo antes de realizar cualquier 
+      operación. Las instancias son mutables, y la implementación de la clase realiza sincronización no interna.
+    </p>
+    <p>
+      <b>algunas veces-bloquear</b> - el llamador <i>algunas veces</i> necesita obtener un bloque externamente antes de realizar 
+      algunas operaciones. Las instancias son mutables, y la implementación de la clase realiza la mayoría de la sincronización 
+      internamente. El llamador <em>usualmente</em> no necesita obtener un bloqueo externo, pero hay algunas operaciones en las que 
+      el llamador sí necesita obtener un bloque externo. El ejemplo clásico de esto es la iteración sobre una colección.
+    </p>
+    <p>
+      <b>hostil al-bloqueo</b> - las operaciones no pueden realizarse de forma segura en un entorno multiproceso en absoluto, 
+      incluso si siempre se obtiene un bloqueo externo. Estes es un caso patológico raro. Usualmente ocurre cuando se modifican los 
+      datos estáticos sin una sincronización apropiada.
+    </p>
+    <p>
+      En la práctica, <code>siempre-bloquear</code> y <code>nunca-bloquear</code> son probablemente los casos más comunes.
+    </p>
+    <p>
+      Para ayudarle con la documentación de la seguridad de los subprocesos, podría considerar usar:
+    </p>
+    <ul>
+      <li>
+        anotaciones, por ejemplo aquellas definidas por 
+        <a href="http://jcip.net.s3-website-us-east-1.amazonaws.com/annotations/doc/index.html">Brian Goetz</a>
+      </li>
+      <li>
+        La opción <code>-tag</code> de 
+        <a href="http://docs.oracle.com/javase/8/docs/technotes/guides/javadoc/index.html">javadoc</a>,  que le permite definir 
+        etiquetas simples personalizadas de javadoc
+      </li>
+    </ul>
+    <p>
+      Otra opción razonable es indicar en el resumen de javadoc que, a menos que se indique lo contrario, una clase debe 
+      considerarse <code>siempre-bloquear</code>.<br />
     </p>
     <p></p>
     <div class="topic-section" id="see-also-title">Vea También :</div>
     <div id="see-also" class="main-body">
-      <a href="..\patrones\patrones_29.html">Objetos inmutables
-      </a> <br> <a
-        href="..\practicascomunes\practicascomunes_60.html">Use javadoc generosamente</a> <br> <a
-        href="..\hilos\hilos_67.html">Sincronizado es detalle de implementación
-      </a> <br>
+      <a href="..\patrones\patrones_29.html">Objetos inmutables</a><br />
+      <a href="..\practicascomunes\practicascomunes_60.html">Use javadoc generosamente</a><br />
+      <a href="..\hilos\hilos_67.html">Sincronizado es detalle de implementación</a><br />
     </div>
-
     <footer id="footer" class="legalese">
-      <span id="app_name">Prácticas de Java</span> <span
-        id="app_version_number">3.001</span><br> © <span
-        id="copyright">2018 Hirondelle Systems</span><br> <a
-        href="http://www.javapractices.com/source/SourceAction.do">Código
-        Fuente</a> | <a href="mailto:webmaster@javapractices.com"
-                      rel="author">Contacto</a> | <a
-                      href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
-                      rel="license">Licencia</a> | <a
-                      href="http://www.javapractices.com/apps/cjp.rss"
-                      rel="alternate" type="application/rss+xml">RSS</a>
+      <span id="app_name">Prácticas de Java</span> 
+      <span id="app_version_number">3.001</span><br /> © 
+      <span id="copyright">2018 Hirondelle Systems</span><br /> 
+      <a href="http://www.javapractices.com/source/SourceAction.do">Código Fuente</a> | 
+      <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a> | 
+      <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/" rel="license">Licencia</a> | 
+      <a href="http://www.javapractices.com/apps/cjp.rss" rel="alternate" type="application/rss+xml">RSS</a>
       <!-- ukey="2AC36CD2" -->
       <!-- ckey="16DF3D87" -->
-      <br> Los trozos de código individual tienen una <a
-        href="http://www.javapractices.com/LICENSE.txt"
-        rel="license">licencia BSD</a><br> Sobre 1,000,000 de
-      IPs únicas el último año<br> Última actualización
-      <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
-      <br> - In Memoriam : Bill Dirani -
+      <br /> Los trozos de código individual tienen una 
+      <a href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia BSD</a><br /> 
+      Sobre 1,000,000 de IPs únicas el último año<br /> 
+      Última actualización <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time><br />
+      - In Memoriam : Bill Dirani -
     </footer>
   </body>
 </html>

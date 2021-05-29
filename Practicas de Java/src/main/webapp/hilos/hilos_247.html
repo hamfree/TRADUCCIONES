@@ -3,60 +3,54 @@
 <html lang="es">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="description"
-          content="Prácticas y técnicas de programación en Java.">
-    <meta name="keywords"
-          content="java,programación java,Prácticas de Java,idioma 
-          java,estilo java,patrones de diseño java,convenciones de codigo java">
+    <meta name="description" content="Prácticas y técnicas de programación en Java.">
+    <meta name="keywords" content="java, programación java, Prácticas de Java, idioma java, estilo java, patrones de diseño java, 
+          convenciones de codigo java">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prácticas de Java-&gt;Realizar N tareas en paralelo</title>
-    <link id="stylesheet" rel="stylesheet" type="text/css"
-          href="../css/stylesheet9.css" media="all">
+    <link id="stylesheet" rel="stylesheet" type="text/css" href="../css/stylesheet9.css" media="all">
     <link rel="icon" type="image/png" href="../img/favicon.png">
   </head>
   <body>
     <nav class="menu-bar" id="menu-bar">
-      <a href="../index.html" title="Tabla de Contenido" style="float: left;">Inicio</a>
-      &nbsp;&nbsp;
-      <form method="GET" action="https://www.google.com/search"
-            class="search-form" style="float: right;">
-        <input type="text" name="q" size="15" maxlength="255" value=""
-               placeholder=""> <input type="submit" name="btnG"
-               value="Search"> <input type="hidden" name="sitesearch"
-               value="www.javapractices.com">
+      <a href="../index.html" title="Tabla de Contenido" style="float: left;">Inicio</a> &nbsp;&nbsp;
+      <form method="GET" action="https://www.google.com/search" class="search-form" style="float: right;">
+        <input type="text" name="q" size="15" maxlength="255" value="" placeholder=""/> 
+        <input type="submit" name="btnG" value="Search" /> 
+        <input type="hidden" name="sitesearch" value="www.javapractices.com" />
       </form>
     </nav>
     <div class="page-title">Realizar N tareas en paralelo</div>
-
-    <br>There are some cases in which performing tasks in parallel can
-    be useful. This option is especially attractive when:
+    <br />
+    Hay algunos casos en los que las tareas que se realizan en paralelo pueden ser útiles. Esta opción es especialmente atractiva 
+    cuando:
     <ul>
-      <li>the tasks are independent of each other, but do essentially
-        the same thing</li>
-      <li>the tasks are limited by slow operations - typically, network
-        access or disk access</li>
+      <li>las tareas son independientes unas de otras, poer hacen esencialmente la misma cosa</li>
+      <li>las tareas están limitadas por operaciones lentas - habitualmente, acceso a la red o acceso al disco</li>
     </ul>
-
-    <p>A good example of this comes from web site administration.
-      Administrators need to monitor a set of N web sites, so they might
-      send a 'ping' of some sort to each site, to see if a healthy response
-      is returned in each case. Note that these pings fit the above criteria
-      - each ping is independent of the others, and yet is essentially the
-      same task.</p>
-    <p>Below is an example implementation of this idea. For purposes of
-      comparison, this example actually has 3 different implementations:</p>
+    <p>
+      Un buen ejemplo de esto viene de la administración de un sitio web. Los administradoers necesitan monitorizar un conjunto 
+      de N sitios web, así que ellos podrían enviar un 'ping' de alguna clase a cada sitio, para ver si se devuelve una respuesta 
+      saludable en cada caso. Tenga en cuenta que estos pings se ajustan a los criterios anteriores: cada ping es independiente 
+      de los demás y, sin embargo, es esencialmente la misma tarea.
+    </p>
+    <p>
+      Abajo hay una implementación de ejemplo de esta idea. Para el propósito de la comparación, este ejemplo en realidad tiene 3 
+      diferentes implementaciones:
+    </p>
     <ul>
-      <li>execute tasks in parallel, and report the result of each task
-        as soon as it completes.</li>
-      <li>execute tasks in parallel, but report the results of all
-        tasks only at the end, after they have all completed.</li>
-      <li>execute tasks serially, one after the other, and all within a
-        single thread; report each task as it completes.</li>
+      <li>ejecutar tareas en paralelo, e informar el resultado de cada tarea tan pronto como esta se complet</li>
+      <li>
+        ejecutar tareas en paralelo, pero informar de los resultados de todas las tareas sólo al final , después de que todas 
+        ellas se hayan completado.
+      </li>
+      <li>
+        ejecutar las tareas en serie, una después de otra, y todas dentro de un único hilo; informar de cada tarea cuando esta 
+        se completa.
+      </li>
     </ul>
-
-    You can compare the performance of these 3 implementations, to see
-    which works best for you.
-    <br>
+    Puede comparar el rendimiento de estas 3 implementaciones, para ver que trabaja mejor para usted.
+    <br />
     <pre>
 <span class="keyword">import</span> java.io.IOException;
 <span class="keyword">import</span> java.net.MalformedURLException;
@@ -76,51 +70,51 @@
 <span class="keyword">import</span> java.util.concurrent.Future;
 
 <span class="comment">/** 
- Ping N web sites in parallel.
- The ping simply does a GET, and looks at the first header line.
- This example could be applied to many sorts of similar tasks.
- &lt;P&gt;No time-out is used here. As usual, be wary of warm-up 
- of the just-in-time compiler. You might want to use -Xint.
+  Ping N sitios web en paralelo.
+ El ping simplemente hace un GET, y mira en la primera línea de cabecera.
+ Este ejemplo podría ser aplicado a muchas clases de tareas similares.
+ Aquí no se utiliza ningún tiempo muerto. Como de costumbre, tenga cuidado con el calentamiento.
+  del compilador just-in-time. Es posible que desee utilizar -Xint.
 */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
 			class="keyword">class</span> CheckSites {
   
-  <span class="comment">/** Run this tool. */</span>
+  <span class="comment">/** Ejecuta esta herramienta. */</span>
   <span class="keyword">public</span> <span class="keyword">static</span> <span
 			class="keyword">final</span> <span class="keyword">void</span> main(String... aArgs) {
     CheckSites checker = <span class="keyword">new</span> CheckSites();
     <span class="keyword">try</span> {
-      log(<span class="literal">"Parallel, report each as it completes:"</span>);
+      log(<span class="literal">"Paralelamente, informe cada uno a medida que se complete:"</span>);
       checker.pingAndReportEachWhenKnown();
       
-      log(<span class="literal">"Parallel, report all at end:"</span>);
+      log(<span class="literal">"Paralelamente, informe todo al final:"</span>);
       checker.pingAndReportAllAtEnd();
       
-      log(<span class="literal">"Sequential, report each as it completes:"</span>);
+      log(<span class="literal">"Secuencial, informa cada uno a medida que se complete:"</span>);
       checker.pingAndReportSequentially();
     }
     <span class="keyword">catch</span>(InterruptedException ex){
       Thread.currentThread().interrupt();
     }
     <span class="keyword">catch</span>(ExecutionException ex){
-      log(<span class="literal">"Problem executing worker: "</span> + ex.getCause());
+      log(<span class="literal">"Problema ejecutando el worker: "</span> + ex.getCause());
     }
     <span class="keyword">catch</span>(MalformedURLException ex){
-      log(<span class="literal">"Bad URL: "</span> + ex.getCause());
+      log(<span class="literal">"URL Errónea : "</span> + ex.getCause());
     }
     log(<span class="literal">"Done."</span>);
   }
 
   <span class="comment">/** 
-   Check N sites, in parallel, using up to 4 threads. 
-   Report the result of each 'ping' as it comes in. 
-   (This is likely the style most would prefer.)
+    Comprueba N sitios, en paralelo, usando hasta 4 hilos.
+    Informa del resultado de cada 'ping' a medida que ingresa.
+   (Este es probablemente el estilo que la mayoría preferiría.)
   */</span> 
   <span class="keyword">void</span> pingAndReportEachWhenKnown()  <span
 			class="keyword">throws</span> InterruptedException, ExecutionException  {
     <span class="keyword">int</span> numThreads = URLs.size() &gt; <span
 			class="literal">4</span> ? <span class="literal">4</span> : URLs.size(); <span
-			class="comment">//max 4 threads
+			class="comment">//máximo 4 hilos
 </span>    ExecutorService executor = Executors.newFixedThreadPool(numThreads);
     CompletionService&lt;PingResult&gt; compService = <span
 			class="keyword">new</span> ExecutorCompletionService&lt;&gt;(executor);
@@ -132,12 +126,12 @@
       Future&lt;PingResult&gt; future = compService.take();
       log(future.get());
     }
-    executor.shutdown(); <span class="comment">//always reclaim resources
+    executor.shutdown(); <span class="comment">//siempre reclamar los recursos
 </span>  }
   
   <span class="comment">/** 
-   Check N sites, in parallel, using up to 4 threads. 
-   Report the results only when all have completed. 
+   Comrprueba N sitios, en paralelo, usando hasta 4 hilos.
+   Informe los resultados solo cuando todos hayan finalizado.
   */</span> 
   <span class="keyword">void</span> pingAndReportAllAtEnd() <span
 			class="keyword">throws</span> InterruptedException, ExecutionException {
@@ -155,12 +149,12 @@
       PingResult pingResult = result.get();
       log(pingResult);
     }
-    executor.shutdown(); <span class="comment">//always reclaim resources
+    executor.shutdown(); <span class="comment">//siempre reclamar los recursos
 </span>  }
 
   <span class="comment">/**
-   Check N sites, but sequentially, not in parallel. 
-   Does not use multiple threads at all. 
+   Comprueba N sitios, pero secuencialmente, no en paralelo.
+   No utiliza varios subprocesos en absoluto.
   */</span>
   <span class="keyword">void</span> pingAndReportSequentially() <span
 			class="keyword">throws</span> MalformedURLException {
@@ -170,7 +164,7 @@
     }
   }
   
-  <span class="comment">// PRIVATE 
+  <span class="comment">// PRIVADO
 </span>  
   <span class="keyword">private</span> <span class="keyword">static</span> <span
 			class="keyword">final</span> List&lt;String&gt; URLs = Arrays.asList(
@@ -185,13 +179,13 @@
     System.out.println(Objects.toString(aMsg));
   }
   
-  <span class="comment">/** Try to ping a URL. Return true only if successful. */</span>
+  <span class="comment">/** Intenta hacer ping a una URL. Devuelve verdadero solo si tiene exito. */</span>
   <span class="keyword">private</span> <span class="keyword">final</span> <span
 			class="keyword">class</span> Task <span class="keyword">implements</span> Callable&lt;PingResult&gt; {
     Task(String aURL){
       fURL = aURL;
     }
-    <span class="comment">/** Access a URL, and see if you get a healthy response. */</span>
+    <span class="comment">/** Accede a una URL, y ve si tiene una respuesta saludable */</span>
     <span class="keyword">@Override</span> <span class="keyword">public</span> PingResult call() <span
 			class="keyword">throws</span> Exception {
       <span class="keyword">return</span> pingAndReportStatus(fURL);
@@ -215,45 +209,40 @@
       result.TIMING = end - start;
     }
     <span class="keyword">catch</span>(IOException ex){
-      <span class="comment">//ignore - fails
+      <span class="comment">//ignorar - falla.
 </span>    }
     <span class="keyword">return</span> result;
   }
 
-  <span class="comment">/** Simple struct to hold all the data related to a ping. */</span>
+  <span class="comment">/** Estructura simple que contiene todos los datos relacionados con un ping. */</span>
   <span class="keyword">private</span> <span class="keyword">static</span> <span
 			class="keyword">final</span> <span class="keyword">class</span> PingResult {
     String URL;
     Boolean SUCCESS;
     Long TIMING;
     <span class="keyword">@Override</span> <span class="keyword">public</span> String toString(){
-      <span class="keyword">return</span> <span class="literal">"Result:"</span> + SUCCESS + <span
+      <span class="keyword">return</span> <span class="literal">"Resultado:"</span> + SUCCESS + <span
 			class="literal">" "</span> + TIMING + <span class="literal">" msecs "</span> + URL;
     }
   }
 } 
     </pre>
-
     <p></p>
     <footer id="footer" class="legalese">
-      <span id="app_name">Prácticas de Java</span> <span
-        id="app_version_number">3.001</span><br> © <span id="copyright">2018
-        Hirondelle Systems</span><br> <a
-        href="http://www.javapractices.com/source/SourceAction.do">Código
-        Fuente</a> | <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a>
-      | <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
-           rel="license">Licencia</a> | <a
-           href="http://www.javapractices.com/apps/cjp.rss" rel="alternate"
-           type="application/rss+xml">RSS</a>
+      <span id="app_name">Prácticas de Java</span> 
+      <span id="app_version_number">3.001</span><br /> © 
+      <span id="copyright">2018 Hirondelle Systems</span><br /> 
+      <a href="http://www.javapractices.com/source/SourceAction.do">Código Fuente</a> | 
+      <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a> | 
+      <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/" rel="license">Licencia</a> | 
+      <a href="http://www.javapractices.com/apps/cjp.rss" rel="alternate" type="application/rss+xml">RSS</a>
       <!-- ukey="2AC36CD2" -->
       <!-- ckey="16DF3D87" -->
-      <br> Los trozos de código individual tienen una <a
-        href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia
-        BSD</a><br> Sobre 1,000,000 de IPs únicas el último año<br>
-      Última actualización
-      <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
-      <br> - In Memoriam : Bill Dirani -
+      <br /> Los trozos de código individual tienen una 
+      <a href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia BSD</a><br /> 
+      Sobre 1,000,000 de IPs únicas el último año<br /> 
+      Última actualización <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time><br />
+      - In Memoriam : Bill Dirani -
     </footer>
-
   </body>
 </html>

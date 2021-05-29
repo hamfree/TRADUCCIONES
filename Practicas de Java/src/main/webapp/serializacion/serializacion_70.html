@@ -22,119 +22,119 @@
     </nav>
     <div class="page-title">Serialización y generación de subclases</div>
     <br />
-    Interfaces and classes designed for inheritance should rarely implement
-    <code><a href="https://docs.oracle.com/javase/10/docs/api/java/io/Serializable.html">Serializable</a></code>, since this would 
-    force a significant (and often unwanted) task on their implementors and subclasses.
+    Las interfaces y clases diseñadas para la herencia raramente deberían implementar 
+    <code><a href="https://docs.oracle.com/javase/10/docs/api/java/io/Serializable.html">Serializable</a></code>, ya que esto 
+    forzaría una tarea significativa (y a menudo no deseada) en sus implementadores y subclases.
     <p>
-      However, even though most abstract classes don't implement <code>Serializable</code>, they may still need to allow their 
-      subclasses to do so, if desired.
+      Sin embargo, aunque la mayoría de las clases abstractas no implementan <code>Serializable</code>, es posible que deban 
+      permitir que sus subclases lo hagan, si así lo desean.
     </p>
     <p>
-      There are two cases. If the abstract class has no state, then it can simply provide a no-argument constructor to its 
-      subclasses. If the abstract class has state, however, then there's more work to be done, as demonstrated in the following
-      example.
+      Hay dos casos. Si la clase abstracta no tiene estado, entonces puede simplemente proporcionar un constructor sin argumentos a 
+      sus subclases. Si la clase abstracta tiene estado, sin embargo, entonces hay más trabajo que hacer, como se demuestra en el 
+      siguiente ejemplo.
     </p>
     <p>
-      <b>Example</b><br />
+      <b>Ejemplo</b><br />
     </p>
     <pre>
-		<span class="keyword">public</span> <span class="keyword">abstract</span> <span
+<span class="keyword">public</span> <span class="keyword">abstract</span> <span
             class="keyword">class</span> Government {
 
   <span class="keyword">public</span> Government(String aWinningParty) {
     init(aWinningParty);
-    <span class="comment">//never invoke an overridable method in a constructor
+    <span class="comment">//nunca invoque un método sobreescribible en un constructor
 </span>  }
 
   <span class="keyword">public</span> <span class="keyword">final</span> <span
             class="keyword">void</span> raiseTaxes() {
-    validateInit(); <span class="comment">//always called by public methods
-</span>    <span class="comment">//..elided
+    validateInit(); <span class="comment">//llamado siempre por métodos públicos
+</span>    <span class="comment">//..omitido
 </span>  }
 
   <span class="keyword">public</span> <span class="keyword">final</span> <span
             class="keyword">void</span> lowerTaxes() {
     validateInit();
-    <span class="comment">//..elided
+    <span class="comment">//..omitido
 </span>  }
 
   <span class="comment">/**
-  * A template method which calls a protected abstract method, to
-  * be overridden by subclasses.
+  * Un método de plantilla que llama a un método abstracto protegido, para 
+  * ser sobreescrito por las subclases.
   */</span>
   <span class="keyword">public</span> <span class="keyword">boolean</span> makeLaw(){
     validateInit();
-    String bill = draftLegislation(); <span class="comment">//protected, abstract method
+    String bill = draftLegislation(); <span class="comment">//método abstracto y protegido
 </span>    <span class="keyword">return</span> vote(bill);
   }
 
-  <span class="comment">// PROTECTED
+  <span class="comment">// PROTEGIDO
 </span>
   <span class="comment">/**
-  * Each governament will draft legislation in a particular way.
-  * A tyranny, for example, would not have wide debate between its
-  * citizens.
+  * Cada gobierno redactará la legislación de una manera particular.
+  * Una tiranía, por ejemplo, no tendría un amplio debate entre sus
+  * ciudadanos.
   */</span>
   <span class="keyword">protected</span> <span class="keyword">abstract</span> String draftLegislation();
 
   <span class="comment">/**
-  * This no-argument constructor is needed by subclass's Serialization
-  * mechanism.
+  * Este constructor sin argumentos es necesitado por el mecanismo de Serialización de 
+  * las subclases
   */</span>
   <span class="keyword">protected</span> Government() {
-    <span class="comment">//empty
+    <span class="comment">//vacío
 </span>  }
 
   <span class="comment">/**
-  * Called by both this class's public constructor, and by a subclass's
-  * readObject method. Note this method is final.
+  * Llamado tanto por el constructor público de esta clase como por el método 
+  * readObject de una subclase. Tenga en cuenta que este método es definitivo.
   */</span>
   <span class="keyword">protected</span> <span class="keyword">final</span> <span
             class="keyword">void</span> init(String aWinningParty){
     <span class="keyword">if</span> (fIsInitialized) {
       <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span
-            class="literal">"Cannot call init twice."</span>);
+            class="literal">"No se puede llamar a init dos veces."</span>);
     }
     fWinningParty = aWinningParty;
     fIsInitialized = <span class="keyword">true</span>;
   }
 
   <span class="comment">/**
-  * Subclass will need access to the superclass's internal state,
-  * either through public or protected gets. Note that the
-  * get needs to be final.
+  * La subclase necesitará acceso al estado interno de la superclase, 
+  * ya sea a través de gets públicos o protegidos. Tenga en cuenta que get 
+  * debe ser final
   */</span>
   <span class="keyword">protected</span> <span class="keyword">final</span> String getWinningParty() {
     <span class="keyword">return</span> fWinningParty;
   }
 
-  <span class="comment">// PRIVATE
+  <span class="comment">// PRIVADO
 </span>  <span class="keyword">private</span> String fWinningParty;
   <span class="keyword">private</span> <span class="keyword">boolean</span> fIsInitialized = <span
             class="keyword">false</span>;
 
   <span class="comment">/**
-  * Must be called by public methods.
+  * Debe ser llamado por métodos públicos.
   */</span>
   <span class="keyword">private</span> <span class="keyword">void</span> validateInit() <span
             class="keyword">throws</span> IllegalStateException {
     <span class="keyword">if</span> (!fIsInitialized) {
       <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span
-            class="literal">"Uninitialized object"</span>);
+            class="literal">"Objeto no inicializado"</span>);
     }
   }
 
   <span class="keyword">private</span> <span class="keyword">boolean</span> vote(String aBill){
     <span class="keyword">return</span> <span class="keyword">true</span>; <span
-            class="comment">//toy implentation
+            class="comment">//implementación de juguete
 </span>  }
 } 
     </pre>
     <br />
     <pre>
-		<span class="keyword">import</span> java.io.*;
+<span class="keyword">import</span> java.io.*;
 
-<span class="comment">/** A Serializable subclass. */</span>
+<span class="comment">/** Una subclase Serializable. */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
             class="keyword">class</span> Tyranny <span class="keyword">extends</span> Government <span
             class="keyword">implements</span> Serializable {
@@ -143,33 +143,33 @@
     <span class="keyword">super</span>(aWinningParty);
   }
 
-  <span class="comment">// PROTECTED
+  <span class="comment">// PROTEGIDO
 </span>
   <span class="keyword">protected</span> String draftLegislation() {
-    <span class="keyword">return</span> <span class="literal">"Forbid all use of C++."</span>;
+    <span class="keyword">return</span> <span class="literal">"Prohibir todo uso de C ++."</span>;
   }
 
-  <span class="comment">// PRIVATE
+  <span class="comment">// PRIVADO
 </span>
   <span class="comment">/**
-  * Custom deserialization is needed.
+  * Se necesita deserialización personalizada.
   */</span>
   <span class="keyword">private</span> <span class="keyword">void</span> readObject(
     ObjectInputStream aStream
   ) <span class="keyword">throws</span> IOException, ClassNotFoundException {
     aStream.defaultReadObject();
-    <span class="comment">//manually deserialize and init superclass
+    <span class="comment">//deserializa manualmente e inicia la superclase
 </span>    String winningParty = (String)aStream.readObject();
     init(winningParty);
   }
 
   <span class="comment">/**
-  * Custom serialization is needed.
+  * Se necesita serialización personalizada.
   */</span>
   <span class="keyword">private</span> <span class="keyword">void</span> writeObject(ObjectOutputStream aStream) <span
             class="keyword">throws</span> IOException {
     aStream.defaultWriteObject();
-    <span class="comment">//manually serialize superclass
+    <span class="comment">//serializa manualmente la superclase
 </span>    aStream.writeObject(getWinningParty());
   }
 } 

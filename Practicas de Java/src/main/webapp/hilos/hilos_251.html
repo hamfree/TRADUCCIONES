@@ -3,120 +3,98 @@
 <html lang="es">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="description"
-          content="Prácticas y técnicas de programación en Java.">
-    <meta name="keywords"
-          content="java,programación java,Prácticas de Java,idioma 
-          java,estilo java,patrones de diseño java,convenciones de codigo java">
+    <meta name="description" content="Prácticas y técnicas de programación en Java.">
+    <meta name="keywords" content="java, programación java, Prácticas de Java, idioma java, estilo java, patrones de diseño java, 
+          convenciones de codigo java">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prácticas de Java-&gt;Manejar la InterruptedException</title>
-    <link id="stylesheet" rel="stylesheet" type="text/css"
-          href="../css/stylesheet9.css" media="all">
-    <link rel="icon" type="image/png"
-          href="../img/favicon.png">
+    <link id="stylesheet" rel="stylesheet" type="text/css" href="../css/stylesheet9.css" media="all">
+    <link rel="icon" type="image/png" href="../img/favicon.png">
   </head>
   <body>
     <nav class="menu-bar" id="menu-bar">
-      <a href="../index.html"
-         title="Tabla de Contenido" style="float: left;">Inicio</a> &nbsp;&nbsp;
-      <form method="GET" action="https://www.google.com/search"
-            class="search-form" style="float: right;">
-        <input type="text" name="q" size="15" maxlength="255" value=""
-               placeholder=""> <input type="submit" name="btnG"
-               value="Search"> <input type="hidden" name="sitesearch"
-               value="www.javapractices.com">
+      <a href="../index.html" title="Tabla de Contenido" style="float: left;">Inicio</a> &nbsp;&nbsp;
+      <form method="GET" action="https://www.google.com/search" class="search-form" style="float: right;">
+        <input type="text" name="q" size="15" maxlength="255" value="" placeholder=""/> 
+        <input type="submit" name="btnG" value="Search" /> 
+        <input type="hidden" name="sitesearch" value="www.javapractices.com" />
       </form>
     </nav>
     <div class="page-title">Manejar la InterruptedException</div>
-
-    <br> In thread-related code, you will often need to handle an
-    <code>
-      <a
-        href="https://docs.oracle.com/javase/10/docs/api/java/lang/InterruptedException.html">InterruptedException</a>
-    </code>
-    . There are two common ways of handling it:
+    <br /> 
+    En código relacionado con hilos, a menudo necesitará manejar una 
+    <code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/InterruptedException.html">InterruptedException</a></code>. 
+    Hay dos formas comunes de manejarla:
     <ul>
-      <li>just throw the exception up to the caller (perhaps after
-        doing some clean up)</li>
-      <li>call the <code>
-          <a
-            href="https://docs.oracle.com/javase/10/docs/api/java/lang/Thread.html#interrupt()">interrupt</a>
-        </code> method on the current thread
+      <li>simplemente lance la excepción hacia arriba al llamador (tal vez después de hacer una limpieza)</li>
+      <li>
+        llame al método 
+        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Thread.html#interrupt()">interrupt</a></code> en el hilo 
+        actual
       </li>
     </ul>
-
-    <p>In the second case, the standard style is:</p>
-    <pre>try {
-  <i>...thread-related code...</i>
+    <p>
+      En el segundo caso, el estilo estándar es:
+    </p>
+    <pre>
+try {
+  <i>...código relacionado-con-el-hilo...</i>
 }
 catch(InterruptedException ex){
-  <i>...perhaps some error handling here...</i>
-  //re-interrupt the current thread
+  <i>...quizás algún manejo del error aquí...</i>
+  //re-interrupir el hilo actual
   Thread.currentThread().<a
 			href="https://docs.oracle.com/javase/10/docs/api/java/lang/Thread.html#interrupt()">interrupt</a>();
-}</pre>
-
-    <h3>Background</h3>
-    In multi-threaded code, threads can often
-    <i>block</i>; the thread pauses execution until some external condition
-    is met, such as :
-    <ul>
-      <li>a lock is released</li>
-      <li>another thread completes an operation</li>
-      <li>some I/O operation completes</li>
-      <li>and so on...</li>
-    </ul>
-
-    <p>
-      Threads can be <i>interrupted</i>. An interrupt asks a thread to stop
-      what it's doing in an orderly fashion. However, the exact response to
-      the interrupt depends on the thread's state, and how the thread is
-      implemented:
-    </p>
-    <pre>if the thread is currently <i>blocking</i> 
-  stop blocking early
-  throw InterruptedException
-else thread is doing real work
-  thread's interrupted status is set to true
-  if thread polls isInterrupted() periodically
-    (which is preferred)
-    orderly cleanup and stop execution
-    throw InterruptedException
-  else 
-    regular execution continues
+}
     </pre>
 
-    The main idea here is that an interrupt should not shutdown a thread
-    immediately, in the middle of a computation. Rather, a thread and it's
-    caller communicate with each other to allow for an orderly shutdown.
-
+    <h3>Antecedentes</h3>
+    En código multihilo, los hilos pueden a menudo <i>bloquearse</i>; los hilos pausan la ejecución hasta que se cumpla alguna 
+    condición externa, tal como:
+    <ul>
+      <li>se libera un bloqueo</li>
+      <li>otro hilo completa una operación</li>
+      <li>se completa alguna operación de E/S</li>
+      <li>y así...</li>
+    </ul>
     <p>
-      See also this <a
-        href="http://www.ibm.com/developerworks/java/library/j-jtp05236/index.html">article
-        by Brian Goetz</a>.
-
+      Los hilos pueden ser <i>interrumpidos</i>. Una interrupción pide a un hilo que pare lo que está haciendo de una forma 
+      ordenada. Sin embargo, la respuesta exacta a la interrupción depende del estado del hilo, y cómo se implementó el hilo:
+    </p>
+    <pre>
+si el hilo está actualmente <i>bloqueado</i> 
+  dejar de bloquear temprano
+  lanzar InterruptedException
+si no, el hilo está haciendo un trabajo real 
+  el estado interrumpido del hilo se establece en verdadero
+  si el hilo consulta isInterrupted() periódicamente
+    (lo cual se prefiere)
+    limpiar ordenadamente y detener la ejecución
+    lanzar InterruptedException
+  si no
+    la ejecución regular continúa
+    </pre>
+    La idea principal aquí es que una interrupción no debería apagar un hilo inmediatamente, en medio de un cálculo. Más bien, un 
+    hilo y su llamador se comunican entre sí para permitir un apagado ordenado.
+    <p>
+      Vea también este <a href="http://www.ibm.com/developerworks/java/library/j-jtp05236/index.html">artículo de Brian Goetz</a>.
     </p>
     <p></p>
     <footer id="footer" class="legalese">
-      <span id="app_name">Prácticas de Java</span> <span
-        id="app_version_number">3.001</span><br> © <span
-        id="copyright">2018 Hirondelle Systems</span><br> <a
-        href="http://www.javapractices.com/source/SourceAction.do">Código
-        Fuente</a> | <a href="mailto:webmaster@javapractices.com"
-                      rel="author">Contacto</a> | <a
-                      href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
-                      rel="license">Licencia</a> | <a
-                      href="http://www.javapractices.com/apps/cjp.rss"
-                      rel="alternate" type="application/rss+xml">RSS</a>
+      <span id="app_name">Prácticas de Java</span> 
+      <span id="app_version_number">3.001</span><br /> © 
+      <span id="copyright">2018 Hirondelle Systems</span><br /> 
+      <a href="http://www.javapractices.com/source/SourceAction.do">Código Fuente</a> | 
+      <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a> | 
+      <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/" rel="license">Licencia</a> | 
+      <a href="http://www.javapractices.com/apps/cjp.rss" rel="alternate" type="application/rss+xml">RSS</a>
       <!-- ukey="2AC36CD2" -->
       <!-- ckey="16DF3D87" -->
-      <br> Los trozos de código individual tienen una <a
-        href="http://www.javapractices.com/LICENSE.txt"
-        rel="license">licencia BSD</a><br> Sobre 1,000,000 de
-      IPs únicas el último año<br> Última actualización
-      <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
-      <br> - In Memoriam : Bill Dirani -
+      <br /> Los trozos de código individual tienen una 
+      <a href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia BSD</a><br /> 
+      Sobre 1,000,000 de IPs únicas el último año<br /> 
+      Última actualización <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time><br />
+      - In Memoriam : Bill Dirani -
     </footer>
-
   </body>
 </html>
