@@ -21,59 +21,63 @@
       </form>
     </nav>
     <div class="page-title">Las contraseñas nunca en texto claro</div>
-    <br /> Applications should not refer to the clear text versions of passwords - not in the database, not when logging, nor in 
-    any other area. The clear text version of the password should be the end user's secret. It should never be directly repeated or 
-    stored by an application.
+    <br /> 
+    Las aplicaciones no deben referirse a versiones en texto sin cifrar de las contraseñas - ni en la base de datos, ni cuando se 
+    inicia sesión, ni en ninguna otra área. La versión de texto sin cifrar de la contraseña debe ser el secreto del usuario final. 
+    Nunca debe ser repetida o almacenada directamente por una aplicación.
     <p>
-      <b>Clear Text Versus Hash</b><br /> A user inputs a password in its original, unaltered form - that is, in "clear text". 
-      However, a database should never store passwords in clear text. Instead, the value stored by the database should be 
-      calculated as </p>
-    <pre>stored-value = hash(clear-text-password + salt-value)</pre>
-    <b>The intent here is to store text which cannot be easily reverse-engineered back into the original password.</b> The 
-    <code>salt-value</code> is a random string added to the password. It's added to prevent simple dictionary-style reverse 
-    engineering of the hashed value of the plain text password.
+      <b>Texto Sin Cifrar Contra Resumen (Hash)</b><br /> Un usuario introduce una contraseña en su forma original, inalterada - es 
+      decir, en "texto claro". Sin embargo, una base de datos nunca debe almacenar las contraseñas en texto claro (sin cifrar). En 
+      su lugar, el valor almacenado por la base de datos debe ser calculado como 
+    </p>
+    <pre>valor-almacenado = funcion-hash(contraseña-texto-sin-cifrar + valor-de-sal)</pre>
+    <b>La intención aquí es almacenar texto que no se puede revertir fácilmente a la contraseña original.</b> El 
+    <code>valor-de-sal</code> es una cadena aleatoria agregada a la contraseña. Se agrega para evitar la ingeniería inversa al 
+    estilo de un diccionario simple del valor hash de la contraseña de texto sin formato.
     <p>
-      (Regarding Tomcat5: its implementation of form-based login doesn't allow for the salt value.)
+      (Con respecto a Tomcat 5: su implementación de inicio de sesión basado en formularios no permite el valor-de-sal.)
     </p>
     <p>
-      <b>Hash Functions</b><br /> SHA-1, SHA-256, SHA-384, and SHA-512 are all examples of hash functions. A hash function is also 
-      called a <a href="https://docs.oracle.com/javase/10/docs/api/java/security/MessageDigest.html"><code>MessageDigest</code></a>.
-      (The MD5 hash has been shown to be defective, and should usually be avoided.)
+      <b>Funciones Resumen (Hash)</b><br /> SHA-1, SHA-256, SHA-384, y SHA-512 son todos ejemplos de funciones resumen. Una función 
+      resumen (<b>Nota del Traductor:</b> hash function, en inglés) es también llamada una 
+      <a href="https://docs.oracle.com/javase/10/docs/api/java/security/MessageDigest.html"><code>MessageDigest</code></a>.
+      (Se ha demostrado que la función resumen MD5 es defectuosa y, por lo general, debe evitarse).
     </p>
     <p>
-      <i>A <a href="http://en.wikipedia.org/wiki/Cryptographic_hash_function">hash function</a> is not an encryption</i>. Encrypted 
-      items are always meant for eventual <em>decryption</em>. A hash function, on the other hand, is meant only as a 
-      <em>one-way operation</em>. The whole idea of a hash function is that it should be very difficult to calculate the original 
-      input value, given the hash value.
+      <i>Una <a href="https://es.wikipedia.org/wiki/Funci%C3%B3n_hash">función resumen</a> no es un cifrado</i>. Los elementos 
+      cifrados siempre están destinados a un eventual <em>descifrado</em>. Una función resumen, por otro lado, se entiende solo como 
+      una <em>operación unidireccional</em>. La idea general de una función resumen es que debería ser muy difícil calcular el valor de 
+      entrada original, dado el valor resumen.
     </p>
     <p>
-      If
-      <code>y = hash(x)</code> is a hash function, and <code>y</code> and <code>x</code> both represent text strings, then
+      Si 
+      <code>y = hash(x)</code> es una función resumen, y <code>y</code> e <code>x</code> representan ambas cadenas de texto, 
+      entonces
     </p>
     <ul>
-      <li>given the output <code>y</code>, it's very hard to deduce the original input <code>x</code></li>
-      <li>similar inputs will give markedly different outputs</li>
-      <li>input <code>x</code> can have <em>arbitrary</em> length</li>
-      <li>output <code>y</code> will have <em>fixed</em> length</li>
-      <li>there is only a trivial chance of "collisions", where different inputs give the same output</li>
+      <li>dada la salida <code>y</code>, es muy difícil deducir la entrada original <code>x</code></li>
+      <li>entradas similares darán salidas marcadamente diferentes</li>
+      <li>la entrada <code>x</code> puede tener una longitud <em>arbitraria</em></li>
+      <li>la salida <code>y</code> tendrá longitud <em>fija</em></li>
+      <li>solo hay una posibilidad ínfima de "colisiones", donde diferentes entradas dan la misma salida</li>
     </ul>
     <p>
-      The above properties allow for passwords (or pass phrases) of arbitrary length, while still letting the underlying database 
-      column which stores the hash value to be of fixed width.
+      Las propiedades anteriores permiten contraseñas (o frases de paso) de longitud arbitraria, al mismo tiempo que permiten que la 
+      columna de la base de datos subyacente que almacena el valor hash sea de ancho fijo.
     </p>
     <p>
-      <b>Example</b>
+      <b>Ejemplo</b>
     </p>
     <p>
-      This example uses 
-      <a href="https://docs.oracle.com/javase/10/docs/api/java/security/MessageDigest.html"><code>MessageDigest</code></a> and the 
-      SHA-1 hash function:<br />
+      Este ejemplo usa  
+      <a href="https://docs.oracle.com/javase/10/docs/api/java/security/MessageDigest.html"><code>MessageDigest</code></a> y la 
+      función resumen SHA-1:<br />
     </p>
     <pre>
 <span class="keyword">import</span> java.security.MessageDigest;
 <span class="keyword">import</span> java.security.NoSuchAlgorithmException;
 
-<span class="comment">/** Example hash function values.*/</span>
+<span class="comment">/** Ejemplo de valores de función resumen.*/</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
 			class="keyword">class</span> HashExamples {
   
@@ -84,14 +88,14 @@
 			class="literal">"SHA-1"</span>);
       <span class="keyword">byte</span>[] hashOne = sha.digest(<span
 			class="literal">"color"</span>.getBytes());
-      log(<span class="literal">"Hash of 'color':  "</span> + hexEncode(hashOne));
+      log(<span class="literal">"Resumen de 'color':  "</span> + hexEncode(hashOne));
       sha.reset();
       <span class="keyword">byte</span>[]  hashTwo = sha.digest(<span
 			class="literal">"colour"</span>.getBytes());
-      log(<span class="literal">"Hash of 'colour': "</span> + hexEncode(hashTwo));
+      log(<span class="literal">"Resumen de 'colour': "</span> + hexEncode(hashTwo));
     }
     <span class="keyword">catch</span> (NoSuchAlgorithmException ex){
-      log(<span class="literal">"No such algorithm found in JRE."</span>);
+      log(<span class="literal">"No se encuentra tal algoritmo en el EEJ."</span>);
     }
   }
   
@@ -101,12 +105,12 @@
   }
 
   <span class="comment">/**
-  * The byte[] returned by MessageDigest does not have a nice
-  * textual representation, so some form of encoding is usually performed.
+  * La matriz de byte[] devuelta por MessageDigest no tiene una representación 
+  * textual agradable, por lo que generalmente se realiza alguna forma de codificación.
   *
-  * This implementation follows the example of David Flanagan's book
-  * "Java In A Nutshell", and converts a byte array into a String
-  * of hex characters.
+  * Esta implementación sigue el ejemplo del libro de David Flanagan
+  * "Java en Pocas Palabras", y convierte una matriz de bytes en una String 
+  * de caracteres hexadecimales.
   */</span>
   <span class="keyword">static</span> <span class="keyword">private</span> String hexEncode( <span
 			class="keyword">byte</span>[] aInput){
@@ -132,11 +136,11 @@
 }
  
     </pre>
-    Example run:
+    Ejemplo de ejecución:
     <p></p>
     <pre>
-Hash of 'color':  6dd0fe8001145bec4a12d0e22da711c4970d000b
-Hash of 'colour': 79d41a47e8fec55856a6a6c5ba53c2462be4852e
+Resumen de 'color':  6dd0fe8001145bec4a12d0e22da711c4970d000b
+Resumen de 'colour': 79d41a47e8fec55856a6a6c5ba53c2462be4852e
     </pre>
     <br />
     <p></p>

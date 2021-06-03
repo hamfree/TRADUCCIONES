@@ -22,32 +22,33 @@
     </nav>
     <div class="page-title">Tenga cuidado con DecimalFormat</div>
     <br />
-    Parsing user input into numbers (especially numbers representing money) is a very common task. Such parsing is often implemented 
-    with <code><a href="https://docs.oracle.com/javase/10/docs/api/java/text/DecimalFormat.html">DecimalFormat</a></code>. However, 
-    parsing with <code>DecimalFormat</code> should be done with care. You may even want to consider an alternative.
-    Here's why:
+    Analizar la entrada del usuario en números (especialmente números que representan dinero) es una tarea muy común. Tal análisis 
+    es a menudo implementado con 
+    <code><a href="https://docs.oracle.com/javase/10/docs/api/java/text/DecimalFormat.html">DecimalFormat</a></code>. Sin embargo, 
+    analizar con <code>DecimalFormat</code> debe ser hecho con cuidado. Puede incluso considerar una alternativa. Aquí está el 
+    porqué:
     <ul>
       <li>
-        surprisingly, a <code><a href="https://docs.oracle.com/javase/10/docs/api/java/text/Format.html">Format</a></code> does 
-        not need to parse <em>all</em> of its input. That is, if it finds a match at the <em>start</em> of an input 
-        <code>String</code>, it will cease parsing, and return a value. When parsing user input, this kind of behavior is not 
-        usually desired. To accomodate this behavior, an extra step is needed - a 
-        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/text/ParsePosition.html">ParsePosition</a></code> object 
-        needs to be passed as an <a href="practicascomunes_37.html">output parameter</a> to 
+        sorprendentemente, un <code><a href="https://docs.oracle.com/javase/10/docs/api/java/text/Format.html">Format</a></code> no 
+        necesita analizar <em>toda</em> su entrada. Es decir, si encuentra una coincidencia al <em>inicio</em> de una 
+        <code>String</code> de entrada, cesará el análisis, y devuelve un valor. Cuando se analiza una entrada de usuario, esta clase 
+        de comportamiento no se desea habitualmente. Para acomodar este comportamiento, se necesita un paso extra - un objeto 
+        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/text/ParsePosition.html">ParsePosition</a></code> necesita 
+        ser pasado como un <a href="practicascomunes_37.html">parámetro de salida</a> a 
         <code>DecimalFormat</code>.</li>
-      <li>the class seems to be rather <a href="https://bugs.java.com/bugdatabase/">buggy</a>.</li>
-      <li>the class is harder than most to understand.</li>
+      <li>la clase parece tener bastantes <a href="https://bugs.java.com/bugdatabase/">errores</a>.</li>
+      <li>la clase es más difícil de entender que la mayoría.</li>
     </ul>
     <p>
-      Here's an example of parsing with <code>DecimalFormat</code>. An example run appears below. As you can see,
+      Aquí hay un ejemplo de análisis con <code>DecimalFormat</code>. Una ejecución de ejemplo aparece debajo. Como puede ver,
     </p>
     <ul>
       <li>
-        parsing user input will always require the caller to use 
-        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/text/ParsePosition.html">ParsePosition</a></code> to detect 
-        if the whole input has been parsed.
+        analizar la entrada de usuarios siempre requerirá que el llamador use 
+        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/text/ParsePosition.html">ParsePosition</a></code> para 
+        detectar si la entrada completa ha sido analizada.
       </li>
-      <li>there are cases when the parsing seems just plain <em>wrong</em>.</li>
+      <li>hay casos en los que el análisis parece simplemente <em>incorrecto</em>.</li>
     </ul>
     <br />
     <pre>
@@ -57,7 +58,7 @@
 			class="keyword">class</span> BewareDecimalFormat {
   
   <span class="comment">/**
-  * parseUserInput DecimalFormat.
+  * analiza la entrada de usuario con DecimalFormat.
   */</span> 
   <span class="keyword">public</span> <span class="keyword">static</span> <span
 			class="keyword">void</span> main (String... aArguments) {
@@ -81,17 +82,17 @@
     parseUserInput(<span class="literal">"1,0000,0000.00"</span>, patternOne);
 
     String patternTwo= <span class="literal">"#,###0.00"</span>; <span
-			class="comment">//group every 4 digits, not 3
+			class="comment">//agrupa cada 4 dígitos, no 3
 </span>    log(<span class="literal">" "</span>);
-    log(<span class="literal">"Format : "</span> + patternTwo);
+    log(<span class="literal">"Formato : "</span> + patternTwo);
     parseUserInput(<span class="literal">"1000.00"</span>, patternTwo);
     parseUserInput(<span class="literal">"1,000.00"</span>, patternTwo);
     parseUserInput(<span class="literal">"1,0000.00"</span>, patternTwo);
     parseUserInput(<span class="literal">"1,00000.00"</span>, patternTwo);
-    log(<span class="literal">"Done."</span>);
+    log(<span class="literal">"Hecho."</span>);
   }
 
-  <span class="comment">// PRIVATE
+  <span class="comment">// PRIVADO
 </span>
   <span class="keyword">private</span> <span class="keyword">static</span> <span
 			class="keyword">void</span> parseUserInput(String aValue, String aDecimalFormatPattern) {
@@ -101,18 +102,18 @@
     Object object = format.parse(aValue, parsePosition);
 
     <span class="keyword">if</span>(object == <span class="keyword">null</span>) {
-      log(<span class="literal">"Failed to parse: "</span> + aValue);
+      log(<span class="literal">"Falló al analizar: "</span> + aValue);
     }
     <span class="keyword">else</span> <span class="keyword">if</span>(parsePosition.getIndex() &lt; aValue.length()) {
       log(
-        aValue + <span class="literal">" parsed OK (not whole input) ParsePos:"</span> + 
-        parsePosition.getIndex() + <span class="literal">", Parse Result: "</span> + object 
+        aValue + <span class="literal">" analizado OK (no la entrada completa) ParsePos:"</span> + 
+        parsePosition.getIndex() + <span class="literal">", Resultado del Análisis: "</span> + object 
       );
     }
     <span class="keyword">else</span> {
       log(
-        aValue + <span class="literal">" parsed OK. ParsePos: "</span> + parsePosition.getIndex() + 
-        <span class="literal">", Parse Result: "</span> + object
+        aValue + <span class="literal">" analizado OK. ParsePos: "</span> + parsePosition.getIndex() + 
+        <span class="literal">", Resultado del Análisis: "</span> + object
       );
     } 
   }
@@ -125,32 +126,32 @@
     </pre>
 
     <br />
-    Example run:
+    Ejemplo de ejecución:
     <pre>
 &gt;java -cp . BewareDecimalFormat
-Format : #,##0.00
-1000 parsed OK. ParsePos: 4, Parse Result: 1000
-1,000.00 parsed OK. ParsePos: 8, Parse Result: 1000
-1000.33 parsed OK. ParsePos: 7, Parse Result: 1000.33
-.20 parsed OK. ParsePos: 3, Parse Result: 0.2
-.2 parsed OK. ParsePos: 2, Parse Result: 0.2
-.222 parsed OK. ParsePos: 4, Parse Result: 0.222
-.222333444 parsed OK. ParsePos: 10, Parse Result: 0.222333444
-100.222333444 parsed OK. ParsePos: 13, Parse Result: 100.222333444
-.22A parsed OK (not whole input) ParsePos:3, Parse Result: 0.22
-.22BlahA parsed OK (not whole input) ParsePos:3, Parse Result: 0.22
-22Blah parsed OK (not whole input) ParsePos:2, Parse Result: 22
-Failed to parse: Blah22
-100000,000.00 parsed OK. ParsePos: 13, Parse Result: 100000000
-10,0000,000.00 parsed OK. ParsePos: 14, Parse Result: 100000000
-1,0000,0000.00 parsed OK. ParsePos: 14, Parse Result: 100000000
+Formato : #,##0.00
+1000 analizado OK. ParsePos: 4, Resultado del Análisis: 1000
+1,000.00 analizado OK. ParsePos: 8, Resultado del Análisis: 1000
+1000.33 analizado OK. ParsePos: 7, Resultado del Análisis: 1000.33
+.20 analizado OK. ParsePos: 3, Resultado del Análisis: 0.2
+.2 analizado OK. ParsePos: 2, Resultado del Análisis: 0.2
+.222 analizado OK. ParsePos: 4, Resultado del Análisis: 0.222
+.222333444 analizado OK. ParsePos: 10, Resultado del Análisis: 0.222333444
+100.222333444 analizado OK. ParsePos: 13, Resultado del Análisis: 100.222333444
+.22A analizado OK (no la entrada completa) ParsePos:3, Resultado del Análisis: 0.22
+.22BlahA analizado OK (no la entrada completa) ParsePos:3, Resultado del Análisis: 0.22
+22Blah analizado OK (no la entrada completa) ParsePos:2, Resultado del Análisis: 22
+Falló al analizar: Blah22
+100000,000.00 analizado OK. ParsePos: 13, Resultado del Análisis: 100000000
+10,0000,000.00 analizado OK. ParsePos: 14, Resultado del Análisis: 100000000
+1,0000,0000.00 analizado OK. ParsePos: 14, Resultado del Análisis: 100000000
 
-Format : #,###0.00
-1000.00 parsed OK. ParsePos: 7, Parse Result: 1000
-1,000.00 parsed OK. ParsePos: 8, Parse Result: 1000
-1,0000.00 parsed OK. ParsePos: 9, Parse Result: 10000
-1,00000.00 parsed OK. ParsePos: 10, Parse Result: 100000
-Done.</pre>
+Formato : #,###0.00
+1000.00 analizado OK. ParsePos: 7, Resultado del Análisis: 1000
+1,000.00 analizado OK. ParsePos: 8, Resultado del Análisis: 1000
+1,0000.00 analizado OK. ParsePos: 9, Resultado del Análisis: 10000
+1,00000.00 analizado OK. ParsePos: 10, Resultado del Análisis: 100000
+Hecho.</pre>
     <br />
     <p></p>
     <footer id="footer" class="legalese">
