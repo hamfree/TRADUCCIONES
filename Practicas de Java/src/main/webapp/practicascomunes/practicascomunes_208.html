@@ -22,68 +22,74 @@
     </nav>
     <div class="page-title">Intente alternativas a ResourceBundle</div>
     <br />
-    There are some rather disturbing problems with 
+    Hay algunos problemas bastantes inquietantes con 
     <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/ResourceBundle.html">ResourceBundle</a></code>:
     <ul>
       <li>
-        if the translations are stored in a database, there is no way for an application to create a new localization without code 
-        changes (that is, without creating a new database-backed <code>ResourceBundle</code> class for each new 
-        <code>Locale</code>).
+        Si las traducciones se almacenan en una base de datos, no hay forma de que una aplicación cree una nuev ubicación sin 
+        cambios en el código (es decir, sin crear una nueva clase <code>ResourceBundle</code> respaldada por la base de datos para 
+        cada nueva <code>Locale</code>).
       </li>
-      <li>prior to JDK 6, there is no way of refreshing the underlying data at runtime.</li>
+      <li>antes del KDJ 6, no había forma de refrescar los datos subyacentes en tiempo de ejecución.</li>
     </ul>
     <p>
-      <em>These are serious defects.</em>
+      <em>Estos son defectos serios.</em>
     </p>
     <p>
-      In addition, there are many nuisances associated with using <code>ResourceBundle</code>s and their associated properties files:
+      Además, hay muchas molestias asociadas con el uso de <code>ResourceBundle</code> y sus archivos de propiedades asociados:
     </p>
     <ul>
       <li>
-        prior to JDK 9, the encoding used in a properties file is ISO-8859-1, not UTF-8. If the app is using a language which does 
-        not use ISO-8859-1, then the <code>native2ascii</code> tool must be used to process the files. (Rather impolite for an 
-        internationalization mechanism, is it not?)
+        antes del KDJ 9, la codificación utilizada en un fichero de propiedades era ISO-8859-1, no UTF-8. Si la aplicación estaba 
+        usando un idioma que no usaba ISO-8859-1, entonces se tenía que usar la herramienta <code>native2ascii</code> para procesar 
+        los ficheros. (Bastante descortés para un mecanismo de internacionalización, ¿no es así?)
       </li>
       <li>
-        natural text keys versus coder keys: from the point of the caller, using a natural text lookup key has the advantage that it
-        increases legibility. However, such a lookup key appears as <code>blah=blah</code> in a properties file. Such duplication 
-        makes most programmers justifiably nervous. (If a database is used, a <code>ResultSet</code> having the same 
-        <code>blah=blah</code> structure can be easily created, but without any actual data repeated in the underlying tables.)
+        claves de texto natural versus claves de codificador: desde el punto de vista del llamador, usar una clave de búsqueda por 
+        texto natural tiene la ventaja de que incrementa la legibilidad. Sin embargo, tal clave de búsqueda aparece como 
+        <code>blah=blah</code> en un archivo de propiedades. Tal duplicación hace que la mayoría de los programadores se pongan 
+        justificablemente nerviosos. (Si se usa una base de datos, un <code>ResultSet</code> teniendo la misma estructura ame 
+        <code>blah=blah</code> puede ser fácilmente creado, pero sin ningún dato real repetido en las tablas subyacentes).
       </li>
       <li>
-        in a properties file, there is no easy way to find duplicates. In general, there is <em>no easy way to perform any sort of 
-          query</em> on the data (as there is in a database).
+        en un archivo de propiedades, no hay una forma fácil de encontrar duplicados. En general, no hay <em>una forma fácil de 
+        realizar ninguna clase de consulta</em> sobre los datos (como sí la hay en una base de datos).
       </li>
       <li>
-        mailing raw properties files to translators does not seem desirable, but building a front end tool for such files is not 
-        easy - so it never gets done</li>
-      <li>if an item has more than one line, then the line continuation character "\\" must be appended to each line</li>
-      <li>
-        apostrophe characters are a problem: the 
-        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/text/MessageFormat.html">MessageFormat</a></code> class 
-        treats apostrophes as special characters. If an apostrophe appears in a pattern passed to a <code>MessageFormat</code>, it 
-        must be escaped, or else a nice little <code>RuntimeException</code> is thrown. If you send properties files to translators, 
-        the probabilty of errors related to apostrophes is <em>very</em> high. If a database is used instead of properties files, 
-        however, then it's fairly easy to build a front end tool which can do the necessary validations. (Building such a tool is 
-        especially attractive when it can be used with multiple projects.)
+        enviar archivos de propiedades sin formato a los traductores no parece deseable, pero crear una herramienta de interfaz 
+        para dichos archivos no es fácil, por lo que nunca se hace
       </li>
       <li>
-        use of module names: the <code>ResourceBundle</code> mechanism allows the caller to specify a module name, which is mapped
-        into a corresponding class name or properties file name. It's possible to seriously question this design. In general, 
-        <em>a method should not know the identity of its caller</em>.
+        si un elemento tiene más de una línea, entonces el caracter de continuación de línea "\\" debe ser agregado a cada línea
+      </li>
+      <li>
+        los caracteres de apóstrofe son un problema: la clase 
+        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/text/MessageFormat.html">MessageFormat</a></code> trata los 
+        apóstrofes como caracteres especiales. Si un apóstrofe aparece en un patrón pasado a un <code>MessageFormat</code>, este se 
+        debe escapar, o si no se lanza una pequeña y bonita <code>RuntimeException</code>. Si envía archivos de propiedades a los 
+        traductores, la probabilidad de errores relacionados con los apóstrofes is <em>muy</em> alta. Si se usa una base de datos 
+        en vez de archivos de propiedades, sin embargo, entonces es bastante fácil construir una herramienta de interfaz que pueda 
+        hacer las necesarias validaciones (Construir tal herramienta es especialmente atractivo cuando se puede usar con múltiples 
+        proyectos).
+      </li>
+      <li>
+        uso de nombres de módulo: el mecanismo <code>ResourceBundle</code> permite al llamador especificar un nombre de módulo, que 
+        es vinculado a su nombre de clase correspondiente o nombre del archivo de propiedades. Es posible cuestionar seriamente 
+        este diseño. En general, <em>un método no debe saber la identidad de su llamador</em>.
       </li>
     </ul>
     <p>
-      In summary, it seems that <code>ResourceBundle</code> was intended originally for desktop applications and properties files,
-      and that its design is not robust enough for easy use in the context of a web application backed by a database.
+      En resumen, parece que <code>ResourceBundle</code> se diseñó originalmene para aplicaciones de escritorio y archivos de 
+      propiedades, y que su diseño no es suficientemente robusto para un uso fácil en el contexto de una aplicación web respaldada 
+      por una base de datos.
     </p>
     <p>
-      Fortunately, text translation is not a difficult task, and creating an alternative to <code>ResourceBundle</code> is actually 
-      fairly easy. For an example, please see the 
+      Afortunadamente, la traducción de texto no es una tarea difícil, y crear una alternativa a <code>ResourceBundle</code> es 
+      en realidad bastante fácil. Para un ejemplo, por favor vea el paquete 
       <a href="http://www.javapractices.com/apps/web4j/javadoc/hirondelle/web4j/ui/translate/package-summary.html">
-        hirondelle.web4j.ui.translate</a> package of the 
-        <a href="http://www.javapractices.com/topic/TopicAction.do?Id=188">WEB4J</a> tool. It uses a technique called "last second 
-        localization".
+        hirondelle.web4j.ui.translate</a> de la herramienta 
+        <a href="http://www.javapractices.com/topic/TopicAction.do?Id=188">WEB4J</a>. Este usa una técnica llamada "localización 
+        de último segundo".
     </p>
     <p></p>
     <div class="topic-section" id="see-also-title">Vea También :</div>
