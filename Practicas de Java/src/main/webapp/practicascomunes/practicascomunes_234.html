@@ -23,29 +23,32 @@
     <div class="page-title">Usar un reloj de sistema falso</div>
     <br />
     <p>
-      When testing an application, it's often useful to define a <i>fake system clock</i> in order to exercise code that uses dates 
-      and times. 
+      Cuando se prueba una aplicación, es a menudo útil definir una <i>reloj de sistema falso</i> para ejercitar el código que usa 
+      fechas y horas.
     </p>
     <p>
-      While it's always possible to change the system clock <i>directly</i>, many view that style as undesirable: 
+      Mientras es siempre posible cambiar el reloj del sistema <i>directamente</i>, muchos ven ese estilo como indeseable:
     </p>
     <ul>
-      <li>it affects <i>all</i> programs running on a machine, and not just the application being tested </li>
-      <li>it can be time consuming and annoying to repeatedly change the system clock</li>
+      <li>
+        afecta a <i>todos</i> los programas que se ejecutan en una máquina, y no simplemente la aplicación que está siendo 
+        comprobada
+      </li>
+      <li>puede llevar mucho tiempo y ser molesto cambiar rápidamente el reloj del sistema</li>
     </ul>
     <p>
-      Instead of changing the system clock, it's possible to define a <i>fake</i> system clock just for your application. In 
-      production, the fake system clock returns normal time. During testing, the fake system clock is changed to return any time you 
-      need for effective test coverage.
+      en lugar de cambiar el reloj del sistema, es posible definir un reloj del sistema <i>falso</i> simplemente para su 
+      aplicación. En producción el reloj del sistema falso devuelve el tiempo normal. Durante la comprobación, el reloj del sistema 
+      falso se cambia para devolver cualquier hora que necesite para una cobertura de prueba efectiva.
     </p>
     <p>
-      For this to work, you need to define various different clock implementations, and be able to swap them easily. Many would 
-      choose to use a dependency-injection tool for this, or perhaps a 
-      <a href="../patrones/patrones_237.html">plug-in mechanism</a>.
+      Para este trabajo, necesita definir varias implementaciones de reloj diferentes, y ser capaz de intercambiarlos fácilmente. 
+      Muchos elijirían usar una herramienta de inyección de dependencias para esto, o quizás un 
+      <a href="../patrones/patrones_237.html">mecanismo de plug-in</a>.
     </p>
     <p>
-      For this to work, <b>you must never reference the default system clock and time zone directly</b>, by avoiding methods such 
-      as: 
+      Para que esto funcione, <b>nunca debe hacer referencia al reloj del sistema predeterminado y la zona horaria directamente</b>, 
+      evitando métodos tales como:
     </p>
     <ul>
       <li>
@@ -55,47 +58,48 @@
       </li>
       <li>
         <code><a href="https://docs.oracle.com/javase/10/docs/api/java/time/LocalDateTime.html#now()">LocalDateTime.now()</a></code> 
-        (and similar)
+        (y similares)
       </li>
       <li>
-        the default constructor for the 
-        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/Date.html#Date()">Date</a></code> class (which in turn 
-        uses <code>System.currentTimeMillis()</code>)
+        el constructor predeterminado para la clase 
+        <code><a href="https://docs.oracle.com/javase/10/docs/api/java/util/Date.html#Date()">Date</a></code> (que a su vez usa 
+        <code>System.currentTimeMillis()</code>)
       </li>
     </ul>
-    <b>This requires some discipline</b>, because so many code examples use the default system clock (and time zone), and because 
-    calling the above methods has become habitual.
-    <p
-      >Possible behaviors for a fake clock include:
+    <b>Esto requiere algo de disciplina</b>, porque muchos ejemplos de código usan el reloj del sistema predeterminado (y la zona 
+    horaria), y porque llamar a los métodos anteriores se ha vuelto habitual.
+    <p>
+      Posibles comportamientos para un reloj falso incluye:
     </p>
     <ul>
-      <li>skip ahead to the future</li>
-      <li>go back to the past</li>
-      <li>use a fixed date, and a fixed time</li>
-      <li>use a fixed date, but still let the time vary</li>
-      <li>increment by one second each time you 'look' at the clock</li>
-      <li>change the <i>rate</i> at which time passes, by speeding up or slowing down by a certain factor</li>
-      <li>use the normal system clock without alteration</li>
+      <li>saltar hacia el futuro</li>
+      <li>volver al pasado</li>
+      <li>usar una fecha fija y una hora fija</li>
+      <li>usar una fecha fija, pero dejar que el tiempo varíe</li>
+      <li>incrementar en un segundo cada vez que 'mires' el rejol</li>
+      <li>cambiar la <i>tasa</i> en la que pasa el tiempo, acelerando o desacelerando en un cierto factor</li>
+      <li>utilizar el reloj normal del sistema sin alteraciones</li>
     </ul>
     <p>
-      According to your needs, you may have to use the fake system clock in some or all of these places:
+      De acuerdo a sus necesidades, puede tener que usar el reloj del sistema falso en alguno o todas estos lugares:
     </p>
     <ul>
-      <li>your application code</li>
-      <li>your code that interacts with the database</li>
-      <li>your logging output</li>
-      <li>your framework classes</li>
+      <li>su código de aplicación</li>
+      <li>su código que interactua con la base de datos</li>
+      <li>su salida de registro</li>
+      <li>sus clases del marco de trabajo</li>
     </ul>
     <p>
-      <b>Examples for Java 8</b>
+      <b>Ejemplos para Java 8</b>
     </p>
     <p>
-      The <code><a href="https://docs.oracle.com/javase/10/docs/api/java/time/Clock.html">Clock</a></code> class of the 
-      <code>java.time</code> package lets you create a fake system clock. Its
+      La clase <code><a href="https://docs.oracle.com/javase/10/docs/api/java/time/Clock.html">Clock</a></code> del paquete 
+      <code>java.time</code> le permite crear un reloj de sistema falso. Es un método 
       <code>
-        <a href="https://docs.oracle.com/javase/10/docs/api/java/time/Clock.html#fixed(java.time.Instant,java.time.ZoneId)">fixed</a>
-      </code> method lets you quickly create a common type of fake <code>Clock</code>, which simply returns a fixed value in a 
-      given time zone. In general, you'll need to extend the abstract <code>Clock</code> class, and implement its abstract methods.
+        <a href="https://docs.oracle.com/javase/10/docs/api/java/time/Clock.html#fixed(java.time.Instant,java.time.ZoneId)">fijo</a>
+      </code> que le permite crear rápidamente un tipo común de falso <code>Clock</code>, que simplemente devuelve un valor fijo en 
+      una zona horaria dada. En general, necesitará extender la clase abstracta <code>Clock</code>, e implementar sus métodos 
+      abstractos.
       <br />
     </p>
     <pre>
@@ -105,10 +109,10 @@
 <span class="keyword">import</span> java.util.Objects;
 
 <span class="comment">/** 
- Increment by 1 second each time you look at the clock.
- Starts with the default system clock's instant and time-zone.
+ Incrementar en 1 segundo cada vez que mira el reloj.
+ Comienza con el instante y la zona horaria del reloj del sistema predeterminado.
  
- Example output:
+ Salida de ejemplo:
   2018-05-26T14:00:12.778Z
   2018-05-26T14:00:13.778Z
   2018-05-26T14:00:14.778Z
@@ -120,7 +124,7 @@
 <span class="keyword">public</span> <span class="keyword">final</span> <span
 			class="keyword">class</span> ClockTicker <span class="keyword">extends</span> Clock {
   
-  <span class="comment">/** Simple demo of the behaviour of this class. */</span>
+  <span class="comment">/** Demostración simple del comportamiento de esta clase. */</span>
   <span class="keyword">public</span> <span class="keyword">static</span> <span
 			class="keyword">void</span> main(String... args) {
     ClockTicker ticker = <span class="keyword">new</span> ClockTicker();
@@ -147,7 +151,7 @@
     <span class="keyword">return</span> nextInstant();
   }
   
-  <span class="comment">//PRIVATE 
+  <span class="comment">//PRIVADO
 </span>  <span class="keyword">private</span> <span class="keyword">final</span> Instant WHEN_STARTED = Instant.now();
   <span class="keyword">private</span> <span class="keyword">final</span> ZoneId DEFAULT_TZONE = ZoneId.systemDefault();
   <span class="keyword">private</span> <span class="keyword">long</span> count = <span
@@ -169,21 +173,21 @@
 <span class="keyword">import</span> java.util.Objects;
 
 <span class="comment">/** 
- Set the starting date-time and time-zone, but then 
- let the time vary normally.
+ Establece la fecha-hora de inicio y la zona horaria, pero después
+ permite que el tiempo varía normalmente.
  
- Example output:
+ Salida de ejemplo:
   2018-12-25T05:00:00Z
-  Sleep for 5 seconds...
+  Dormir por 5 segundos...
   2018-12-25T05:00:05.005Z
-  Done.
+  Hecho.
 
  @since Java 8.
 */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
 			class="keyword">class</span> ClockTimeTravel <span class="keyword">extends</span> Clock {
   
-  <span class="comment">/** Simple demo of the behaviour of this class. */</span>
+  <span class="comment">/** Demostración simple del comportamiento de esta clase. */</span>
   <span class="keyword">public</span> <span class="keyword">static</span> <span
 			class="keyword">void</span> main(String[] args) <span class="keyword">throws</span> InterruptedException {
     ClockTimeTravel timeTravel = <span class="keyword">new</span> ClockTimeTravel(
@@ -191,10 +195,10 @@
 			class="literal">"-05:00"</span>)
     );
     log(timeTravel.instant());
-    log(<span class="literal">"Sleep for 5 seconds..."</span>);
+    log(<span class="literal">"Dormir por 5 segundos..."</span>);
     Thread.currentThread().sleep(<span class="literal">5000</span>);
     log(timeTravel.instant());
-    log(<span class="literal">"Done."</span>);
+    log(<span class="literal">"Hecho."</span>);
   }
   
   <span class="keyword">private</span> <span class="keyword">static</span> <span
@@ -213,7 +217,7 @@
     <span class="keyword">return</span> zoneOffset;
   }
   
-  <span class="comment">/** The caller needs to actually pass a ZoneOffset object here. */</span>
+  <span class="comment">/** El llamador necesita en realidad pasar un objeto ZoneOffset aquí. */</span>
   <span class="keyword">@Override</span> <span class="keyword">public</span> Clock withZone(ZoneId zone) {
     <span class="keyword">return</span> <span class="keyword">new</span> ClockTimeTravel(t0LocalDateTime, (ZoneOffset)zone);
   }
@@ -222,9 +226,9 @@
     <span class="keyword">return</span> nextInstant();
   }
   
-  <span class="comment">//PRIVATE
+  <span class="comment">//PRIVADO
 </span>  
-  <span class="comment">/** t0 is the moment this clock object was created in Java-land. */</span>
+  <span class="comment">/** t0 es el momento que este objeto clock fue creado en Java-land. */</span>
   <span class="keyword">private</span> <span class="keyword">final</span> Instant t0Instant;
   <span class="keyword">private</span> <span class="keyword">final</span> LocalDateTime t0LocalDateTime;
   
@@ -232,9 +236,9 @@
   <span class="keyword">private</span> <span class="keyword">final</span> Instant whenObjectCreatedInstant;
   
   <span class="comment">/** 
-   Figure out how much time has elapsed between the moment this 
-   object was created, and the moment when this method is being called.
-   Then, apply that diff to t0. 
+   Averigüe cuánto tiempo ha transcurrido entre el momento en que 
+   se creó este objeto y el momento en que se llama a este método.
+   Después, aplica esa diferencia a t0.
   */</span>
   <span class="keyword">private</span> Instant nextInstant() {
     Instant now = Instant.now();
@@ -244,26 +248,26 @@
 } 
     </pre>
     <p>
-      <b>Example for Java &lt; 8</b>
+      <b>Ejemplo para Java &lt; 8</b>
     </p>
     <p>
-      The <code>TimeSource</code> interface allows you to define various implementations of a fake system clock:<br />
+      La interfaz <code>TimeSource</code> le permite definir varias implementaciones de un reloj del sistema falso:<br />
     </p>
     <pre>
 <span class="keyword">public</span> <span class="keyword">interface</span> TimeSource {
 
-  <span class="comment">/** Return the system time. */</span>  
+  <span class="comment">/** Devuelve la hora del sistema. */</span>  
   <span class="keyword">long</span> currentTimeMillis();
 
 } 
     </pre>
-    This implementation mimics a system clock running one day in advance:
+    Esta implementación imita un reloj del sistema que se ejecuta con un día de anticipación:
     <br />
     <pre>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
 			class="keyword">class</span> TimeSrc <span class="keyword">implements</span> TimeSource {
 
-  <span class="comment">/** One day in advance of the actual time.*/</span>
+  <span class="comment">/** Un día antes de la hora real.*/</span>
   <span class="keyword">@Override</span> <span class="keyword">public</span> <span
 			class="keyword">long</span> currentTimeMillis() {
     <span class="keyword">return</span> System.currentTimeMillis() + ONE_DAY;
@@ -276,11 +280,12 @@
 
 } 
     </pre>
-    Using various <code>TimeSource</code> implementations, you can mimic any desired behavior for a system clock.
+    Usando varias implementaciones <code>TimeSource</code>, puede imitar cualquier comportamiento deseados para un reloj de 
+    sistema.
     <p>
-      It's simple to configure the JDK logger to use your fake system clock. A simple custom 
-      <a href="https://docs.oracle.com/javase/10/docs/api/java/util/logging/Formatter.html"><code>Formatter</code></a> can use your
-      <code>TimeSource</code> to alter the time of the <code>LogRecord</code>:<br />
+      Es simple configurar el logger del KDJ para usar su reloj de sistema falso. Una personalización simple de 
+      <a href="https://docs.oracle.com/javase/10/docs/api/java/util/logging/Formatter.html"><code>Formatter</code></a> puede usar 
+      su <code>TimeSource</code> para alterar el tiempo de <code>LogRecord</code>:<br />
     </p>
     <pre>
 <span class="keyword">import</span> java.util.logging.LogRecord;
