@@ -22,68 +22,71 @@
     </nav>
     <div class="page-title">La concatenación de String no escala</div>
     <br />
-    To build <code>String</code>s dynamically, one may use either the <code>String</code> concatenation operator <code>+</code>
-    or the <code>StringBuilder</code> class. 
-    (<code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/StringBuilder.html">StringBuilder</a></code> is generally 
-    preferred over <code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/StringBuffer.html">StringBuffer</a></code>, 
-    since it avoids internal synchronization costs.) In the great majority of cases, only a few items are concatenated, and either
-    style may be used freely, according to taste, without concern for performance.
+    Para construir <code>String</code>s dinámicamente, uno puede usar o el operador de concatenación de <code>String</code> 
+    <code>+</code> o la clase <code>StringBuilder</code>.
+    (<code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/StringBuilder.html">StringBuilder</a></code> es 
+    generalmente preferida sobre 
+    <code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/StringBuffer.html">StringBuffer</a></code>, ya que evita 
+    los coste de sincronización internos). En la gran mayoría de los casos, solo unos pocos elementos se concatenan, y el estilo 
+    puede ser usado libremente, de acuerdo al gusto, sin preocuparse por el rendimiento.
     <p>
-      On relatively <i>rare</i> occasions, however, when performing <i>extensive</i> <code>String</code> manipulation, replacing
-      <code>+</code> with <code>StringBuilder.append</code> is likely recommended. Compilers often implement concatenation 
-      operations by creating&nbsp; intermediate objects in the background. Such intermediate objects are not needed by 
-      <code>StringBuilder</code>.
+      En relativamente <i>raras</i> ocasiones, sin embargo, cuando se realiza una manipulación <i>extensiva</i> de 
+      <code>String</code>, reemplazar <code>+</code> con <code>StringBuilder.append</code> es probablemente recomendado. Los 
+      compiladores a menudo implementan las operaciones de concatenación creando objetos intermedios en el segundo plano. Tales 
+      objetos intermedios no son necesitados por <code>StringBuilder</code>.
     </p>
     <p>
-      Cases in which <code>+</code> is very likely acceptable:
+      Los casos en los cuales <code>+</code> es muy probable que sea aceptable:
     </p>
     <ul>
       <li>
-        if concatenating only a small number of items together, then the difference in relative performance is very small, and 
-        possibly not even measurable (<i>the great majority of use cases of the concatenation operator fall into this category</i>).
+        si se concatenan solo un pequeño número de elementos juntos, entonces la diferencia en rendimiento relativa es muy pequeña, 
+        y posiblemente incluso no mensurable (<i>la gran mayoría de los casos de usos del operador de concatenación caen en esta 
+        categoría</i>).
       </li>
       <li>
-        in branches of code which represent a failure in the system - for example, a lost database connection, or an invalid method 
-        parameter. Since these branches are very rarely exercised, the speed at which the system fails is usually not important.
+        en ramas de código que representan un fallo en el sistema - por ejemplo, una conexión perdida a la base de datos, o un 
+        parámetro no válido de un método. Ya que estas ramas se ejecutarán muy raramente, la velocidad a la que el sistema falla no 
+        es habitualmente importante.
       </li>
     </ul>
-    Here's an illustration of the difference in execution speed between + and <code>StringBuilder.append</code>, when performing 
-    many concatenations. Clearly, even the + operator is quite fast, and the difference is not going to be noticeable in the great 
-    majority of cases encountered in practice.
+    Aquí tiene una ilustración de la diferencia en velocidad de ejecución entre + y <code>StringBuilder.append</code>, cuando 
+    realiza muchas concatenaciones. Claramente, incluso el operador + es bastante rápido, y la diferencia no se va a notar en la 
+    gran mayoría de los casos encontrados en la práctica.
     <p>
-      Example runs (class appears below):
+      Ejecuciones de ejemplo (la clase aparece a continuación):
     </p>
     <p>
-      Here, 
+      Aquí, 
       <code><a href="https://docs.oracle.com/javase/8/docs/technotes/tools/windows/java.html#BABHDABI"
-               title="Non-standard options for java interpreter">-Xint</a></code> was used to turn off the HotSpot compiler. This 
-      ensures the program is always interpreted, and will execute in a uniform environment from start to finish, without any 
-      compilation into native code.)
+               title="Non-standard options for java interpreter">-Xint</a></code> se usó para no usar el compilador HotSpot. Esto 
+               asegura que el programa es siempre interpretado, y ejecutará en un entorno uniforme de principio a fin, si ninguna 
+               compilación en código nativo).
     </p>
     <pre>
-Num iterations: 10
-Task using + operator:          175,351 nanoseconds
-Task using StringBuilder.append: 35,057 nanoseconds
+Num iteraciones: 10
+Tarea usando el operador +:         175,351 nanosegundos
+Tarea usando StringBuilder.append:  35,057 nanosegundos
 
-Num iterations: 1000
-Task using + operator:          18,295,297 nanoseconds
-Task using StringBuilder.append: 1,200,376 nanoseconds
+Num iteraciones: 1000
+Tarea usando el operador +:         18,295,297 nanosegundos
+Tarea usando StringBuilder.append:  1,200,376 nanosegundos
 
-Num iterations: 10000
-Task using + operator:       1,134,679,975 nanoseconds
-Task using StringBuilder.append: 8,757,343 nanoseconds
+Num iteraciones: 10000
+Tarea usando el operador +:         1,134,679,975 nanosegundos
+Tarea usando StringBuilder.append:  8,757,343 nanosegundos
     </pre>
     <br />
     <pre>
 <span class="comment">/**
-* Illustrates the speed difference between + operator and
-* StringBuilder.append, when performing many concatenations.
+* Ilustra la diferencia de velocidad entre el operador + y 
+* StringBuilder.append, cuando se realizan muchas concatenaciones.
 */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
             class="keyword">class</span> AvoidConcatenation {
 
   <span class="comment">/**
-  * Takes a single argument : the number of iterations to perform.
+  * Toma un único argumento: el número de iteraciones a realizar.
   */</span>
   <span class="keyword">public</span> <span class="keyword">static</span> <span
             class="keyword">void</span> main (String... arguments) {
@@ -93,11 +96,11 @@ Task using StringBuilder.append: 8,757,343 nanoseconds
     doWithConcatenationOperator();
     <span class="keyword">long</span> finish = System.nanoTime();
 
-    System.out.println(<span class="literal">"Num iterations: "</span> + fNumIterations);
+    System.out.println(<span class="literal">"Num iteraciones: "</span> + fNumIterations);
     StringBuilder message = <span class="keyword">new</span> StringBuilder();
-    message.append(<span class="literal">"Task using + operator: "</span>);
+    message.append(<span class="literal">"Tarea usando el operador +: "</span>);
     message.append( finish - start );
-    message.append(<span class="literal">" nanoseconds"</span>);
+    message.append(<span class="literal">" nanosegundos"</span>);
     System.out.println(message);
 
     start = System.nanoTime();
@@ -105,18 +108,18 @@ Task using StringBuilder.append: 8,757,343 nanoseconds
     finish = System.nanoTime();
 
     message = <span class="keyword">new</span> StringBuilder(<span
-            class="literal">"Task using StringBuilder.append: "</span>);
+            class="literal">"Tarea usando StringBuilder.append: "</span>);
     message.append( finish - start );
-    message.append(<span class="literal">" nanoseconds"</span>);
+    message.append(<span class="literal">" nanosegundos"</span>);
     System.out.println(message);
   }
 
-  <span class="comment">// PRIVATE
+  <span class="comment">// PRIVADO
 </span>  <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">int</span> fNumIterations;
 
   <span class="keyword">private</span> <span class="keyword">static</span> String doWithConcatenationOperator() {
-    String result = <span class="literal">"start"</span>;
+    String result = <span class="literal">"inicio"</span>;
     <span class="keyword">for</span> (<span class="keyword">int</span> idx = <span
             class="literal">0</span>; idx &lt; fNumIterations; idx++) {
       result = result + <span class="literal">"blah"</span>;
@@ -126,7 +129,7 @@ Task using StringBuilder.append: 8,757,343 nanoseconds
 
   <span class="keyword">private</span> <span class="keyword">static</span> String doWithStringBuilder() {
     StringBuilder result = <span class="keyword">new</span> StringBuilder(<span
-            class="literal">"start"</span>);
+            class="literal">"inicio"</span>);
     <span class="keyword">for</span> (<span class="keyword">int</span> idx = <span
             class="literal">0</span>; idx &lt; fNumIterations; idx++) {
       result.append(<span class="literal">"blah"</span>);
