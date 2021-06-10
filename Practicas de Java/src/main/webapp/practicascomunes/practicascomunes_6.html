@@ -23,39 +23,40 @@
     </nav>
     <div class="page-title">Validar el estado con invariantes de clase</div>
     <br />
-    Class invariants are methods which check the validity of an object's state (its data). The idea is to define validation methods
-    for fields, and to perform these validations whenever the fields change. As usual, this should be done without repeating any 
-    code.
+    Las clases invariantes son métodos que comprueban la validez del estado de un objeto (sus datos). La idea es definir métodos de
+    validación para los campos, y realizar estas validaciones siempre que los campos cambien. Como es usual, esto debería ser 
+    realizado sin repetir ningún código.
     <p>
-      An object's state may become invalid for various reasons:
+      Un estado de objeto puede convertirse en inválido por varios razones:
     </p>
     <p>
-      <b>An invalid argument is passed by the caller.</b> <br>To ensure that the caller fulfills the requirements of a method or
-      constructor, all <a href="http://www.javapractices.com/topic/TopicAction.do?Id=5">arguments to non-private methods should be 
-        explicitly checked</a>. An exception should be thrown if a problem is detected. A special case is 
-        <a href="http://www.javapractices.com/topic/TableOfContents.cjp#Serialization">deserialization</a>, which should treat
-      <code>readObject</code> like a constructor. (Assertions 
-      <a href="http://www.javapractices.com/topic/TopicAction.do?Id=100">should not be used</a> for these types of checks.)
+      <b>Se pasa un argumento no válido por el llamador.</b> <br>Para asegurar que el llamador cumple con los requisitos de un 
+      método o constructor, todos los <a href="practicascomunes_5.html">argumentos a los métodos no 
+        privados deben ser explícitamente comprobados</a>. Una excepción debe ser lanzada si un problema se detecta. Un caso 
+        especial es la <a href="../index.html#Serialization">deserialización</a>, que debe
+        tratar <code>readObject</code> como un constructor. (Las aserciones 
+        <a href="../aserciones/aserciones_100.html">no se deben usar</a> para estos tipos de comprobaciones).
     </p>
     <p>
-      <b>The implementation of the class is defective.</b> <br>As a defensive measure, a method which changes the state of an
-      object can include an <a href="http://www.javapractices.com/topic/TableOfContents.cjp#Assertions">assertion</a> at its end, 
-      to check that the object has indeed remained in a valid state. Here, such assertions verify correctness of internal 
-      implementation details - they do not check arguments.
+      <b>La implementación de la clase es defectuosa.</b> <br />
+      Como medida defensiva, un método que cambia el estado de un objeto puede incluir una 
+      <a href="../index.html#Assertions">aserción</a> en su final, para comprobar que el objeto de hecho permaneció en un estado 
+      válido. Aquí, tales aserciones verifican la exactitud de los detalles de implementación interna, no verifican los argumentos.
     </p>
     <p>
-      <b>Example 1</b>
+      <b>Ejemplo 1</b>
     </p>
     <p>
-      <code>Resto</code> is an immutable <a href="http://www.javapractices.com/topic/TopicAction.do?Id=187">Model Object</a> (MO). 
-      Its class invariant is defined by the <code>validateState</code> method. In this particular case, if validation fails a 
-      checked exception is thrown, and the end user is presented with their original input, along with associated error messages.
+      <code>Resto</code> es un <a href="../patrones/patrones_187.html">Modelo de Objetos</a> (MO) 
+      inmutable. Esta clase invariante se define por el método <code>validateState</code>. En este caso particular, si la 
+      validación falla una excepción comprobada se lanza, y el usuario final se presenta con su entrada original, junto con los 
+      mensajes de error asociados.
     </p>
     <p>
-      Such immutable classes represent the simplest case, since validation is performed only once, during construction (and
-      deserialization, if necessary). By definition, an <a href="http://www.javapractices.com/topic/TopicAction.do?Id=29">immutable
-        object</a> cannot change state after construction, so performing validations at other times in the object's life is never
-      necessary. <br />
+      Tales clases inmutables representan el caso más simple, ya que la validación se realizó solo una vez, durante la construcción
+      (y la deserialización, si es necesario). Por definición, un 
+      <a href="http://www.javapractices.com/topic/TopicAction.do?Id=29">objeto inmutable</a> no puede cambiar el estado después 
+      de la construcción, por lo que nunca es necesario realizar validaciones en otros momentos de la vida del objeto.<br />
     </p>
     <pre>
 <span class="keyword">package</span> hirondelle.fish.main.resto;
@@ -70,18 +71,18 @@
 <span class="keyword">import</span> hirondelle.web4j.model.Validator;
 <span class="keyword">import</span> <span class="keyword">static</span> hirondelle.web4j.util.Consts.FAILS;
 
-<span class="comment">/** Model Object for a Restaurant. */</span>
+<span class="comment">/** Modelo de Objetos para un Restaurante. */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
             class="keyword">class</span> Resto {
 
   <span class="comment">/**
-   Full constructor.
+   Constructore completo.
     
-   @param aId underlying database internal identifier (optional) 1..50 characters
-   @param aName of the restaurant (required), 2..50 characters
-   @param aLocation street address of the restaurant (optional), 2..50 characters
-   @param aPrice of the fish and chips meal (optional) $0.00..$100.00
-   @param aComment on the restaurant in general (optional) 2..50 characters
+   @param aId identificador interno de la base de datos subyacente (opcional) 1..50 carácteres
+   @param aName del restaurante (requerido), 2..50 caracteres
+   @param aLocation dirección de la calle del restaurante (opcional), 2..50 caracteres
+   @param aPrice de la comida de pescado y patatas (opcional) $0.00..$100.00
+   @param aComment sobre el restaurante en general (opcional) 2..50 caracteres
   */</span>
   <span class="keyword">public</span> Resto(
     Id aId, SafeText aName, SafeText aLocation, Decimal aPrice, SafeText aComment
@@ -129,7 +130,7 @@
     <span class="keyword">return</span> fHashCode;
   }
   
-  <span class="comment">// PRIVATE 
+  <span class="comment">// PRIVADO
 </span>  <span class="keyword">private</span> <span class="keyword">final</span> Id fId;
   <span class="keyword">private</span> <span class="keyword">final</span> SafeText fName;
   <span class="keyword">private</span> <span class="keyword">final</span> SafeText fLocation;
@@ -146,24 +147,24 @@
     ModelCtorException ex = <span class="keyword">new</span> ModelCtorException();
     <span class="keyword">if</span> (FAILS == Check.optional(fId, Check.range(<span
             class="literal">1</span>,<span class="literal">50</span>))) {
-      ex.add(<span class="literal">"Id is optional, 1..50 chars."</span>);
+      ex.add(<span class="literal">"Id es opcional, 1..50 caracteres."</span>);
     }
     <span class="keyword">if</span> (FAILS == Check.required(fName, Check.range(<span
             class="literal">2</span>,<span class="literal">50</span>))) {
-      ex.add(<span class="literal">"Restaurant Name is required, 2..50 chars."</span>);
+      ex.add(<span class="literal">"Se requiere el nombre del Restaurante, 2..50 caracteres."</span>);
     }
     <span class="keyword">if</span> (FAILS == Check.optional(fLocation, Check.range(<span
             class="literal">2</span>,<span class="literal">50</span>))) {
-      ex.add(<span class="literal">"Location is optional, 2..50 chars."</span>);
+      ex.add(<span class="literal">"La ubicación es opcional, 2..50 caracteres."</span>);
     }
     Validator[] priceChecks = {Check.range(ZERO, HUNDRED), Check.numDecimalsAlways(<span
             class="literal">2</span>)};
     <span class="keyword">if</span> (FAILS == Check.optional(fPrice, priceChecks)) {
-      ex.add(<span class="literal">"Price is optional, 0.00 to 100.00."</span>);
+      ex.add(<span class="literal">"El precio es opcional, 0.00 a 100.00."</span>);
     }
     <span class="keyword">if</span> (FAILS == Check.optional(fComment, Check.range(<span
             class="literal">2</span>,<span class="literal">50</span>))) {
-      ex.add(<span class="literal">"Comment is optional, 2..50 chars."</span>);
+      ex.add(<span class="literal">"El comentario es opcional, 2..50 caracteres."</span>);
     }
     <span class="keyword">if</span> ( ! ex.isEmpty() ) <span
             class="keyword">throw</span> ex;
@@ -176,18 +177,18 @@
  
     </pre>
     <br />
-    <b>Example 2</b>
+    <b>Ejemplo 2</b>
     <p></p>
     <p>
-      Here's an example of a mutable, <code>Serializable</code> class which defines class invariants.
+      Aquí tiene un ejemplo de una clase mutable, <code>Serializable</code> que define clases invariantes.
     </p>
     <p>
-      Items to note:
+      Elementos a tener en cuenta:
     </p>
     <ul>
-      <li>the assertion at the end of the <code>close</code> method</li>
-      <li>the call to <code>validateState</code> at the end of the <code>readObject</code> method</li>
-      <li>the implementation is significantly more complex, since the class is mutable</li>
+      <li>la aserción al final del método <code>close</code></li>
+      <li>la llamada a <code>validateState</code> al final del método <code>readObject</code></li>
+      <li>la implementación es significativamente más compleja, ya que la clase es mutable</li>
     </ul>
     <br />
     <pre>
@@ -196,13 +197,13 @@
 <span class="keyword">import</span> java.io.*;
 
 <span class="comment">/**
-* In this style of implementation, both the entire state of the object
-* anad its individual fields are validated without duplicating any code.
+* En este estilo de implementación, tanto el estado entero del objeto 
+* como sus campos individuales son validados sin duplicar ningún código.
 *
-* Argument validation usually has if's and thrown exceptions at the
-* start of a method. Here, these are replaced with a simple
-* call to validateXXX. Validation is separated cleanly from the
-* regular path of execution, improving legibility.
+* La validación de argumentos usualmente tiene if's y lanza excepciones al 
+* inicio de un método. Aquí, estas son reemplazadas con una llamada simple a 
+* validateXXX. La validación se separa claramente 
+* del camino regular de ejecución, mejorando la legibilidad.
 * JDK 7+.
 */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
@@ -210,23 +211,23 @@
             class="keyword">implements</span> Serializable {
 
    <span class="comment">/**
-   * @param aFirstName contains only letters, spaces, and apostrophes.
-   * @param aLastName contains only letters, spaces, and apostrophes.
-   * @param aAccountNumber is non-negative.
+   * @param aFirstName contiene solo letras, espacios, y apóstrofes.
+   * @param aLastName contiene solo letras, espacios, y apóstrofes.
+   * @param aAccountNumber es no negativo.
    *
-   * @throws IllegalArgumentException if any param does not comply.
+   * @throws IllegalArgumentException si cualquier parámetro no es correcto.
    */</span>
    <span class="keyword">public</span> BankAccount(String aFirstName, String aLastName, <span
             class="keyword">int</span> aAccountNumber) {
-      <span class="comment">//don't call an overridable method in a constructor
+      <span class="comment">//no llamar a un método sobreescribible en un cosntructor
 </span>      setFirstName(aFirstName);
       setLastName(aLastName);
       setAccountNumber(aAccountNumber);
    }
 
    <span class="comment">/**
-   * All "secondary" constructors call the "primary" constructor, such that
-   * validations are always performed.
+   * Todos los constructores "secundarios" llaman al constructor "primario", de forma que 
+   * las validaciones son realizadas siempre.
    */</span>
    <span class="keyword">public</span> BankAccount() {
       <span class="keyword">this</span>(<span class="literal">"FirstName"</span>, <span
@@ -246,23 +247,23 @@
    }
 
    <span class="comment">/**
-   * This method changes state internally, and may use an assert to
-   * implement a post-condition on the object's state.
+   * Este método cambia el estado internamente, y puede usar una aserción para 
+   * implementar una post-condición sobre el estado del objeto.
    */</span>
    <span class="keyword">public</span> <span class="keyword">void</span> close(){
-     <span class="comment">//valid:
+     <span class="comment">//válido:
 </span>     fAccountNumber = <span class="literal">0</span>;
 
-     <span class="comment">//this invalid value will fire the assertion:
+     <span class="comment">//este valor inválido dispará la aserción:
 </span>     <span class="comment">//fAccountNumber = -2;
 </span>
      assert hasValidState(): <span class="keyword">this</span>;
    }
 
    <span class="comment">/**
-   * Names must contain only letters, spaces, and apostrophes.
+   * Los nombres deben contener solo letras, espacios, y apóstrofes.
    *
-   * @throws IllegalArgumentException if any param does not comply.
+   * @throws IllegalArgumentException si cualquier parámetro no cumple.
    */</span>
    <span class="keyword">public</span> <span class="keyword">void</span> setFirstName(String aNewFirstName) {
       validateName(aNewFirstName);
@@ -270,9 +271,9 @@
    }
 
    <span class="comment">/**
-   * Names must contain only letters, spaces, and apostrophes.
+   * Los nombres deben contener solo letras, espacios, y apóstrofes.
    *
-   * @throws IllegalArgumentException if any param does not comply.
+   * @throws IllegalArgumentException si cualquier parámetro no cumple.
    */</span>
    <span class="keyword">public</span> <span class="keyword">void</span> setLastName (String aNewLastName) {
       validateName(aNewLastName);
@@ -280,9 +281,9 @@
    }
 
    <span class="comment">/**
-   * AccountNumber must be non-negative.
+   * AccountNumber debe ser no negativa.
    *
-   * @throws IllegalArgumentException if any param does not comply.
+   * @throws IllegalArgumentException si cualquier parámetro no cumple.
    */</span>
    <span class="keyword">public</span> <span class="keyword">void</span> setAccountNumber(<span
             class="keyword">int</span> aNewAccountNumber) {
@@ -291,8 +292,8 @@
    }
 
    <span class="comment">/**
-   * Can be used to easily pass object description to an assertion,
-   * using a "this" reference.
+   * Puede ser usada para pasar facilmente la descripción de un objeto a una aserción,
+   * usando una referencia "this".
    */</span>
    <span class="keyword">public</span> String toString(){
      <span class="keyword">final</span> StringBuilder result = <span
@@ -307,18 +308,18 @@
      <span class="keyword">return</span> result.toString();
    }
 
-   <span class="comment">// PRIVATE
+   <span class="comment">// PRIVADO
 </span>
    <span class="keyword">private</span> String fFirstName;
    <span class="keyword">private</span> String fLastName;
    <span class="keyword">private</span> <span class="keyword">int</span> fAccountNumber;
 
    <span class="comment">/**
-   * Verify that all fields of this object take permissible values; that is,
-   * this method defines the class invariant.
+   * Verifica que todos los campos de este objeto toman valores permisibles; es decir,
+   * este método define la clase invariante.
    *
-   * Call after deserialization.
-   * @throws IllegalArgumentException if any field takes an unpermitted value.
+   * Llamar después de la deserialización.
+   * @throws IllegalArgumentException si cualquier campo toma un valor no permitido.
    */</span>
    <span class="keyword">private</span> <span class="keyword">void</span> validateState() {
       validateAccountNumber(fAccountNumber);
@@ -327,18 +328,18 @@
    }
 
    <span class="comment">/**
-   * Return true if &lt;code&gt;validateState&lt;/code&gt; does not throw
-   * an IllegalArgumentException, otherwise return false.
+   * Devuelve verdadero si &lt;code&gt;validateState&lt;/code&gt; no lanza 
+   * una IllegalArgumentException, de otra forma devuelve falso.
    *
-   * Call at the end of any public method which has changed
-   * state (any "mutator" method). This is usually done in
-   * an assertion, since it corresponds to a post-condition.
-   * For example,
+   * Llamar al final de cualquier método público que ha cambiado el 
+   * estado (cualquier método "mutador"). Esto es usualmente hecho en 
+   * una aserción, ya que corresponde a una post condición.
+   * Por ejemplo,
    * &lt;pre&gt;
    * assert hasValidState() : this;
    * &lt;/pre&gt;
-   * This method is provided since &lt;code&gt;validateState&lt;/code&gt; cannot be used
-   * in an assertion.
+   * Este método es proporcionado desde &lt;code&gt;validateState&lt;/code&gt; no puede ser usada 
+   * en una aserción.
    */</span>
    <span class="keyword">private</span> <span class="keyword">boolean</span> hasValidState() {
      <span class="keyword">boolean</span> result = <span class="keyword">true</span>;
@@ -352,9 +353,9 @@
    }
 
    <span class="comment">/**
-   * Ensure names contain only letters, spaces, and apostrophes.
+   * Asegurar los nombres contiene solo letras, espacios, y apóstrofes.
    *
-   * @throws IllegalArgumentException if argument does not comply.
+   * @throws IllegalArgumentException si un argumento no cumple.
    */</span>
    <span class="keyword">private</span> <span class="keyword">void</span> validateName(String aName){
      <span class="keyword">boolean</span> nameHasContent = (aName != <span
@@ -362,7 +363,7 @@
             class="literal">""</span>));
      <span class="keyword">if</span> (!nameHasContent){
        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
-            class="literal">"Names must be non-null and non-empty."</span>);
+            class="literal">"Los nombres deben ser no nulos y no vacíos."</span>);
      }
      StringCharacterIterator iterator = <span class="keyword">new</span> StringCharacterIterator(aName);
      <span class="keyword">char</span> character =  iterator.current();
@@ -371,10 +372,10 @@
                              || Character.isSpaceChar(character)
                              || character ==<span class="literal">'\''</span>);
        <span class="keyword">if</span> (isValidChar) {
-         <span class="comment">//do nothing
+         <span class="comment">//no hace nada
 </span>       }
        <span class="keyword">else</span> {
-         String message = <span class="literal">"Names can contain only letters, spaces, and apostrophes."</span>;
+         String message = <span class="literal">"Los nombres pueden contener solo letras, espacios, y apóstrofes."</span>;
          <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(message);
        }
        character = iterator.next();
@@ -382,15 +383,15 @@
   }
 
   <span class="comment">/**
-  * AccountNumber must be non-negative.
+  * AccountNumber debe ser no negativo.
   *
-  * @throws IllegalArgumentException if argument does not comply.
+  * @throws IllegalArgumentException si el argumento no cumple.
   */</span>
    <span class="keyword">private</span> <span class="keyword">void</span> validateAccountNumber(<span
             class="keyword">int</span> aAccountNumber){
       <span class="keyword">if</span> (aAccountNumber &lt; <span
             class="literal">0</span>) {
-        String message = <span class="literal">"Account Number must be greater than or equal to 0."</span>;
+        String message = <span class="literal">"El Número de Cuenta debe ser mayor que o igual a 0."</span>;
         <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(message);
       }
    }
@@ -400,33 +401,33 @@
             class="literal">7526472295622776147L</span>;
 
    <span class="comment">/**
-   * Always treat de-serialization as a full-blown constructor, by
-   * validating the final state of the de-serialized object.
+   * Siempre trata la deserialización como un constructor en toda regla, al 
+   * validar el estado final del objeto deserializado.
    */</span>
    <span class="keyword">private</span> <span class="keyword">void</span> readObject(ObjectInputStream aInputStream)
                                 <span class="keyword">throws</span> ClassNotFoundException, IOException {
-     <span class="comment">//always perform the default de-serialization first
+     <span class="comment">//siempre realiza la deserialización predeterminada primero
 </span>     aInputStream.defaultReadObject();
 
-     <span class="comment">//ensure that object state has not been corrupted or
-</span>     <span class="comment">//tampered with maliciously
+     <span class="comment">//asegura que el estado de objeto no ha sido corrompido o 
+</span>     <span class="comment">//manipulado maliciosamente
 </span>     validateState();
   }
 
-  <span class="comment">/** Test harness.  */</span>
+  <span class="comment">/** Prueba simple.  */</span>
   <span class="keyword">public</span> <span class="keyword">static</span> <span
             class="keyword">void</span> main (String... aArguments) {
     BankAccount account = <span class="keyword">new</span> BankAccount(<span
             class="literal">"Joe"</span>, <span class="literal">"Strummer"</span>, <span
             class="literal">532</span>);
-    <span class="comment">//exercise specific validations.
+    <span class="comment">//ejercer validaciones específicas.
 </span>    account.setFirstName(<span class="literal">"John"</span>);
     account.setAccountNumber(<span class="literal">987</span>);
-    <span class="comment">//exercise the post-condition assertion
-</span>    <span class="comment">//requires enabled assertions: "java -ea"
+    <span class="comment">//ejercitar la afirmación posterior a la condición
+</span>    <span class="comment">//requiere que se habiliten las aserciones: "java -ea"
 </span>    account.close();
 
-    <span class="comment">//exercise the serialization
+    <span class="comment">//ejercita la serialización
 </span>    <span class="keyword">try</span> (
       OutputStream file = <span class="keyword">new</span> FileOutputStream(<span
             class="literal">"account.ser"</span>);
@@ -439,7 +440,7 @@
       System.err.println(exception);
     }
 
-    <span class="comment">//exercise the deserialization
+    <span class="comment">//ejercita la deserialización
 </span>    <span class="keyword">try</span> (
       InputStream file = <span class="keyword">new</span> FileInputStream(<span
             class="literal">"account.ser"</span>);
@@ -447,7 +448,7 @@
       ObjectInput input = <span class="keyword">new</span> ObjectInputStream(buffer);
     ){
       BankAccount recoveredAccount = (BankAccount)input.readObject();
-      System.out.println(<span class="literal">"Recovered account: "</span> + recoveredAccount);
+      System.out.println(<span class="literal">"Cuenta recuperada: "</span> + recoveredAccount);
     }
     <span class="keyword">catch</span>(IOException | ClassNotFoundException exception ){
       System.err.println(exception);
