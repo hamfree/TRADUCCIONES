@@ -21,57 +21,60 @@
     </nav>
     <div class="page-title">Seguridad de los hilos en las aplicaciones web</div>
     <br /> 
-    In a web application, you should verify that the following items are safe for operation in a multi-threaded environment:
+    En una aplicación web, debe verificar que los elementos siguientes son seguros para operar en un entorno multiproceso:
     <ul>
-      <li>servlet classes</li>
-      <li>servlet filter classes</li>
-      <li>items placed in application scope</li>
-      <li>items placed in session scope</li>
+      <li>clases servlet</li>
+      <li>clases filtro servlet</li>
+      <li>elementos colocados en el alcance de la aplicación</li>
+      <li>elementos colocados en el alcance de la sesión</li>
     </ul>
     <p>
-      Many applications use a framework. Frameworks usually define the servlet class, and the thread-safety of those servlets will 
-      be explicitly stated by a well-documented framework. Many frameworks require the application developer to define 
-      <em>actions</em> or <em>controllers</em> for implementing features. In this case, the framework owns the servlet, and the 
-      servlet in turn uses your action/controller objects. Some frameworks will create your action objects on the fly, on the single 
-      thread assigned to handle a single request. This in turn means that your actions will be confined to a single thread; thus, in 
-      this case, your action classes will have no need for thread-safety.
+      Muchas aplicaciones usan un marco de trabajo. Los marcos de trabajo generalmente definen la clase de servlet, y la seguridad 
+      de los subprocesos de esos servlets se indicará explícitamente en un marco de trabajo bien documentado. Muchos marcos de 
+      trabajo requieren que el desarrollador de la aplicación defina <em>acciones</em> o <em>controladores</em> para implementar las 
+      funcionalidades. En este caso, el marco de trabajo es el propietario del servlet y, a su vez, el servlet usa sus objetos 
+      acción/controlador. Algunos marcos de trabajo crearán sus objetos de acción al vuelo, en el único subproceso asignado a 
+      manejar una única petición. Esto, a su vez, significa que sus acciones se limitarán a un solo hilo; por lo tanto, en este 
+      caso, sus clases de acción no necesitarán seguridad de subprocesos.
     </p>
     <p>
-      An example of a framework which violates this rule is Struts 1. In Struts 1, your actions must be designed for operation in a
-      multi-threaded environment. This can be considered a defect, since <b>ensuring a class is thread-safe is both non-trivial to 
-        implement and easy to forget</b>.
+      Un ejemplo de un marco de trabajo que viola esta regla es Struts 1. En Strutst 1, sus acciones deben ser diseñadas para la 
+      operación en un entorno multiproceso. Esto puede ser considerado un defecto, ya que <b>garantizar que una clase sea segura 
+        para subprocesos no es trivial de implementar y fácil de olvidar</b>.
     </p>
     <p>
-      A second example of a framework that can insist on thread-safety is Spring. In Spring, <em>by default</em>, objects managed by
-      the Dependency Injection container are singletons, and need to be thread-safe. If this bothers you, then at least you have the
-      choice in Spring of changing the "scope" in which objects are used.
+      Un segundo ejemplo de un marco de trabajo que puede insistir en la seguridad de los subprocesos es Spring. En Spring, 
+      <em>de forma predeterminada</em>, los objetos gestionados por el contenedor de Inyección de Dependencias son singletons, y 
+      deben ser seguros para subprocesos. Si esto le molesta, al menos tiene la opción en Spring de cambiar el "alcance" en el que 
+      se utilizan los objetos.
     </p>
     <p>
-      In the case of servlet filters, a framework is not usually used when defining them. In this case, you have to be careful that 
-      your servlet filter class is indeed safe for operation in a multi-threaded environment.
+      En el caso de los filtros servlet, no se usa un marco de trabajo habitualmente cuando se definen. En este caso, debe tener 
+      cuidado de que su clase de filtro servlet sea de hecho segura para operar en un entorno de subprocesos múltiples.
     </p>
     <p>
-      For objects placed in either application scope or session scope, the simplest design is to ensure that the object is 
-      <a href="http://www.javapractices.com/topic/TopicAction.do?Id=29">immutable</a>, such that external synchronization is never 
-      necessary.
+      Para los objetos colocados en el alcance de aplicación o de sesión, el diseño más simple es asegurar que el objeto es 
+      <a href="..\patrones\patrones_29.html">inmutable</a>, de modo que la sincronización externa nunca 
+      sea necesaria.
     </p>
     <p>
-      It's clear to most people that objects placed in application scope will be accessed by more than one thread. However, even
-      objects placed in <i>session</i> scope can also be used by more than one thread. From the Servlet Specification:
+      Para la mayoría de las personas, está claro que más de un hilo accederá a los objetos colocados en el ámbito de la 
+      aplicación. Sin embargho, incluso los objetos colocados en el alcance de <i>sesión</i> pueden ser usados por más de un 
+      subproceso. De la Especificación Servlet:
     </p>
     <p>
-      <i>"Multiple servlets executing request threads may have active access to a single session object at the same time. The 
-        Developer has the responsibility for synchronizing access to session resources as appropriate."</i>
+      <i>"Varios servlets que ejecutan subprocesos de solicitud pueden tener acceso activo a un solo objeto de sesión al mismo 
+        tiempo. El Desarrollador tiene la responsabilidad de sincronizar el acceso a los recursos de sesión como sea apropiado."</i>
     </p>
     <p>
-      Here are some ways in which multiple threads might access the same session:
+      Aquí tiene algunas formas en las que subprocesos múltiples podrían acceder a la misma sesión:
     </p>
     <ul>
-      <li>web apps containing multiple servlets can share access to the same session</li>
-      <li>Ajax requests from a single client</li>
-      <li>multiple browser windows on a single client</li>
-      <li>repeated clicks on a submit button</li>
-      <li>using HTML frames to request multiple pages at the same time</li>
+      <li>aplicaciones web que contienen múltiples servlets pueden compartir el acesso a la misma sesión</li>
+      <li>las peticiones Ajax de un único cliente</li>
+      <li>múltiples ventanas del navegador en un único cliente</li>
+      <li>clicks repetidos en un botón Enviar</li>
+      <li>usar marcos de HTML para solicitar muchas páginas al mismo tiempo</li>
     </ul>
     <br />
     <p></p>
