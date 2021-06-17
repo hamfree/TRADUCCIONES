@@ -21,58 +21,61 @@
     </nav>
     <div class="page-title">Forward versus redirect</div>
     <br />
-    A <code>Controller</code> (in this context, an implementation of <code>
-      <a href="http://docs.oracle.com/javaee/7/api/javax/servlet/http/HttpServlet.html">HttpServlet</a></code>) may perform either a 
-      forward or a redirect operation at the end of processing a request. It's important to understand the difference between these 
-      two cases, in particular with respect to browser reloads of web pages.
-    <p>Forward</p>
+    Un <code>Controller</code> (en este contexto, una implementación de 
+    <code><a href="http://docs.oracle.com/javaee/7/api/javax/servlet/http/HttpServlet.html">HttpServlet</a></code>) puede realizar 
+    una operación de reenvío o redirección al final del procesado de una petición. Es importante entender la diferencia entre estos 
+    dos casos, en particular con respecto a las recargas de páginas web de los navegadores.
+    <p>Forward (Reenvío)</p>
     <ul>
-      <li>a forward is performed internally by the servlet</li>
-      <li>the browser is completely unaware that it has taken place, so its original URL remains intact</li>
-      <li>any browser reload of the resulting page will simple repeat the original request, with the original URL</li>
+      <li>un reenvío lo realiza internamente el servlet</li>
+      <li>el navegador desconoce por completo que ha tenido lugar, por lo que su URL original permanece intacta</li>
+      <li>
+        cualquier recarga del navegador de la página resultante simplemente repetirá la solicitud original, con la URL original
+      </li>
     </ul>
-    Redirect
+    Redirect (Redirección)
     <ul>
       <li>
-        a redirect is a two step process, where the web application instructs the browser to fetch a second URL, which differs from 
-        the original
+        una redirección es un proceso de dos pasos, donde la aplicación web indica al navegador que busque una segunda URL, que 
+        difiere de la original
       </li>
       <li>
-        a browser reload of the second URL will not repeat the <i>original</i> request, but will rather fetch the <i>second</i> URL
+        una recarga del navegador de la segunda URL no repetirá la solicitud <i>original</i>, sino que buscará la <i>segunda</i> URL
       </li>
-      <li>redirect is marginally slower than a forward, since it requires two browser requests, not one</li>
-      <li>objects placed in the <i>original</i> request scope are not available to the second request</li>
+      <li>el redireccionamiento es ligeramente más lento que un reenvío, ya que requiere dos solicitudes del navegador, no una.</li>
+      <li>los objetos colocados en el alcance de petición <i>original</i> no están disponibles para la segunda petición</li>
     </ul>
-    In general, a forward should be used if the operation can be safely repeated upon a browser reload of the resulting web page; 
-    otherwise, redirect must be used.
-    <span class="highlight">Typically, if the operation performs an edit on the datastore, then a redirect, not a forward, is 
-      required.</span> This is simply to avoid the possibility of inadvertently duplicating an edit to the database.
+    En general, un reenvío se debe usar si la operación se puede repetir de manera segura al volver a cargar el navegador de la 
+    página web resultante; de lo contrario, se debe usar la redirección.
+    <span class="highlight">Normalmente, si la operación realiza una edición en el almacén de datos, se requiere un 
+      redireccionamiento, no un reenvío.</span> Esto es simplemente para evitar la posibilidad de duplicar inadvertidamente una 
+      edición en la base de datos.
     <p>
-      More explicitly (in terms of common <a href="http://en.wikipedia.org/wiki/SQL">SQL</a> operations):
+      Más explícitamente (en términos de operaciones comunes <a href="http://en.wikipedia.org/wiki/SQL">SQL</a>):
     </p>
     <ul>
-      <li>for <code>SELECT</code> operations, use a forward</li>
-      <li>for <code>INSERT</code>, <code>UPDATE</code>, or <code>DELETE</code> operations, use a redirect</li>
+      <li>para operaciones <code>SELECT</code>, use un reenvío</li>
+      <li>para operaciones <code>INSERT</code>, <code>UPDATE</code>, o <code>DELETE</code>, use una redirección</li>
     </ul>
-    In HTML, a <code>&lt;FORM&gt;</code> tag can either
-    <a href="http://www.w3.org/TR/html4/interact/forms.html#submit-format"><code>GET</code> or <code>POST</code></a> its data. In 
-    this context, a <code>GET</code> corresponds to a <code>SELECT</code>-then-forward, and a <code>POST</code> corresponds to an 
-    edit-then-redirect. 
+    En HTML, una etiqueta <code>&lt;FORM&gt;</code> puede 
+    <a href="http://www.w3.org/TR/html4/interact/forms.html#submit-format"><code>GET</code> o <code>POST</code></a> sus datos. En 
+    este contexto, un <code>GET</code> corresponde a una <code>SELECT</code>-después-reenviar, y un <code>POST</code> corresponde 
+    a una edición-despues-redirigir.
     <p>
-      It's strongly recommended that forms for the input of search criteria should use <code>GET</code>, while forms for editing 
-      database records should use <code>POST</code>.
+      Se recomienda encarecidamente que los formularios para la introducción de criterios de búsqueda utilizen <code>GET</code>, 
+      mientras que los formularios par editar registros de la base de datos usen <code>POST</code>.
     </p>
     <p>
-      The most <a href="http://www.theserverside.com/news/1365146/Redirect-After-Post">common symptom</a> of not using 
-      forward/redirect properly is a warning message in a browser, asking the user if they really wish to <code>POST</code> their 
-      form data a second time.
+      El mayor <a href="http://www.theserverside.com/news/1365146/Redirect-After-Post">síntoma común</a> de no usar el 
+      reenvío/redirección correctamente es un mensaje de advertencia en el navegador, preguntando al usuario si realmente desea 
+      hacer <code>POST</code> (publicar) sus datos del formulario por segunda vez.
     </p>
     <p>
-      <b>Example</b>
+      <b>Ejemplo</b>
     </p>
     <p>
-      This example is after the style of the <a href="http://www.web4j.com/">WEB4J</a> Controller class. The important methods of 
-      the Servlet API are: 
+      Este ejemplo sigue el estilo de la clase Controller  de <a href="http://www.web4j.com/">WEB4J</a>. Los métodos importantes de 
+      la IPA Servlet son:
     </p>
     <ul>
       <li><code>
@@ -102,7 +105,7 @@
 <span class="keyword">public</span> <span class="keyword">class</span> RedirectForward <span
             class="keyword">extends</span> HttpServlet {
   
-  <span class="comment">//..many items elided
+  <span class="comment">//..muchos elementos omitidos
 </span>
   <span class="keyword">@Override</span> <span class="keyword">public</span> <span
             class="keyword">final</span> <span class="keyword">void</span> doGet(
@@ -119,7 +122,7 @@
   }
 
   <span class="comment">/**
-  * Handle all HTTP &lt;tt&gt;GET&lt;/tt&gt; and &lt;tt&gt;POST&lt;/tt&gt; requests.
+  * Maneja todas las peticiones HTTP &lt;tt&gt;GET&lt;/tt&gt; y &lt;tt&gt;POST&lt;/tt&gt;.
   */</span>
   <span class="keyword">protected</span> <span class="keyword">void</span> processRequest(
     HttpServletRequest aRequest, HttpServletResponse aResponse
@@ -136,16 +139,16 @@
       }
     }
     <span class="keyword">catch</span> (BadRequestException ex){
-      <span class="comment">//..elided
-</span>      <span class="comment">//use Response.sendError()
+      <span class="comment">//..omitido
+</span>      <span class="comment">//usa Response.sendError()
 </span>    }
     <span class="keyword">catch</span> (Throwable ex) {
-      <span class="comment">//..elided
-</span>      <span class="comment">//use Response.sendError()
+      <span class="comment">//..omitido
+</span>      <span class="comment">//usa Response.sendError()
 </span>    }
   }
   
-  <span class="comment">// PRIVATE //
+  <span class="comment">// PRIVADO //
 </span>  
   <span class="keyword">private</span> <span class="keyword">void</span> redirect(
     ResponsePage aDestinationPage, HttpServletResponse aResponse
