@@ -21,38 +21,40 @@
     </nav>
     <div class="page-title">Considere Controladores para las redirecciones</div>
     <br />
-    HTTP provides <a href="http://en.wikipedia.org/wiki/URL_redirection#HTTP_status_codes_3xx">redirection headers</a>. A main use 
-    case for these headers is to instruct browsers that a page has moved to a new URL, either temporarily or permanently. When a 
-    page is moved, any links to the old URL will be broken, unless a redirect is provided.
+    HTTP proporciona <a href="http://en.wikipedia.org/wiki/URL_redirection#HTTP_status_codes_3xx">cabeceras de redirección</a>. El 
+    uso principal para estas cabeceras es instruir a los navegadores de que una página se ha movido a una nueva URL, ya sea 
+    temporalmente o permanentemente. Cuando se mueve una página, cualquier enlace a la vieja URL se romperá, a menos que se 
+    proporcione una redirección.
     <p>
-      Here's a snippet which performs a permanent redirection, using an <code>HttpServletResponse</code> object:
+      Aquí tiene un fragmento que realiza una redirección permanente, usando un objeto <code>HttpServletResponse</code>:
     </p>
     <pre>
 aResponse.<a href="https://docs.oracle.com/javaee/7/api/javax/servlet/http/HttpServletResponse.html#setStatus-int-">setStatus</a>(HttpServletResponse.SC_MOVED_PERMANENTLY);
 aResponse.<a href="https://docs.oracle.com/javaee/7/api/javax/servlet/http/HttpServletResponse.html#setHeader-java.lang.String-java.lang.String-">setHeader</a>("Location", "www.javapractices.com/source/SourceAction.do");
     </pre>
-    In the case of a <em>temporary</em> redirection, another style can be used instead, if desired:
+    En el caso de una redirección <em>temporal</em>, se puede usar otro estilo en cambio, si se desea:
     <pre>
 aResponse.<a href="https://docs.oracle.com/javaee/7/api/javax/servlet/http/HttpServletResponse.html#sendRedirect-java.lang.String-">sendRedirect</a>("www.javapractices.com/source/SourceAction.do");
     </pre>
     <p>
-      Using a Controller servlet to perform redirections is often an attractive option.
+      Usar un servlet Controlador para realizar redirecciones es a menudo una opción atractiva.
     </p>
     <p>
-      <b>Example</b>
+      <b>Ejemplo</b>
     </p>
     <p>
-      The Servlet API allows for <code>welcome-file</code> entries in <code>web.xml</code>. These items handle requests which 
-      specify only a <em>directory</em>, instead of a specific file or action.
+      La IPA de Servlet permite las entradas <code>welcome-file</code> en <code>web.xml</code>. Estos elementos manejan peticiones 
+      en las cuales se especifican solo un <em>directorio</em>, en vez de un fichero específico o acción.
     </p>
     <p>
-      A common requirement is to serve welcome files using a servlet instead of a static page. It's true that a static page can 
-      indeed perform a redirect. However, that style seems to be slower. As well, it forces the quick display of an intermediate 
-      page before the "real" one, which seems to be a less pleasing experience for the user.
+      Un requerimiento común es servir ficheros de bienvenida usando un servlet en vez de una página estática. Es verdad que una 
+      página estática puede realizar una redirección. Sin embargo, este estilo parece ser más lento. Además, obliga a la 
+      visualización rápida de una página intermedia antes que la "real", lo que parece ser una experiencia menos agradable para el 
+      usuario.
     </p>
     <p>
-      The javapractices.com site uses a redirection Controller to serve its home page. Here are the relevant entries in its 
-      <code>web.xml</code>:
+      El sitio javapractices.com usa un Controlador de redirección para servir su página de inicio. Aquí tiene las entradas 
+      relevantes en su <code>web.xml</code>:
     </p>
     <pre>
 &lt;servlet&gt;
@@ -81,7 +83,7 @@ aResponse.<a href="https://docs.oracle.com/javaee/7/api/javax/servlet/http/HttpS
  &lt;welcome-file&gt;welcome&lt;/welcome-file&gt;
 &lt;/welcome-file-list&gt;
     </pre>
-    The actual Controller class is fairly simple. Note that it reads in the <code>Destination</code> setting from 
+    La clase Controller real es bastante simple. Tenga en cuenta que lee en la configuración <code>Destination</code> del 
     <code>web.xml</code>:
     <br />
     <pre>
@@ -97,11 +99,11 @@ aResponse.<a href="https://docs.oracle.com/javaee/7/api/javax/servlet/http/HttpS
 <span class="keyword">import</span> javax.servlet.http.HttpServletResponse;
 
 <span class="comment">/**
-* Redirect requests for the home page to a specific Action.
+* Redirige las peticiones para la página de inicio a una Action específica.
 * 
-* &lt;P&gt;Configuration in web.xml :&lt;br&gt;
-* This Controller servlet is mapped to '/welcome', and a corresponding welcome-file entry 
-* is listed as 'welcome', without the leading slash.
+* &lt;P&gt;Configuración en web.xml :&lt;br&gt;
+* Este servlet Controller está asociado a '/welcome', y una entrada welcome-file correspondiente
+* está listada como 'welcone', sin la barra inicial.
 */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
             class="keyword">class</span> WelcomeFileController  <span
@@ -111,28 +113,28 @@ aResponse.<a href="https://docs.oracle.com/javaee/7/api/javax/servlet/http/HttpS
             class="keyword">void</span> init(ServletConfig aConfig) <span
             class="keyword">throws</span> ServletException {
     <span class="keyword">super</span>.init(aConfig);
-    fLogger.config(<span class="literal">"WelcomeFile Controller - starting."</span>);
+    fLogger.config(<span class="literal">"WelcomeFile Controller - iniciando."</span>);
     fDestination = aConfig.getInitParameter(<span class="literal">"Destination"</span>);
     <span class="keyword">if</span> ( ! Util.textHasContent(fDestination) ) {
-      fLogger.severe(<span class="literal">"Destination URL needed, but not configured in web.xml."</span>);
+      fLogger.severe(<span class="literal">"Se necesita URL Destination, pero no está configurada en web.xml."</span>);
     }
   }
   
   <span class="keyword">@Override</span> <span class="keyword">public</span> <span
             class="keyword">void</span> destroy(){
-    fLogger.config(<span class="literal">"WelcomeFile Controller - ending."</span>);
+    fLogger.config(<span class="literal">"WelcomeFile Controller - finalizando."</span>);
   }
   
   <span class="keyword">@Override</span> <span class="keyword">protected</span> <span
             class="keyword">void</span> doGet(
     HttpServletRequest aRequest, HttpServletResponse aResponse
   ) <span class="keyword">throws</span> ServletException, IOException {
-    fLogger.fine(<span class="literal">"Redirecting directory request to new location : "</span> + fDestination);
+    fLogger.fine(<span class="literal">"Redirigir la solicitud de directorio a una nueva ubicación: "</span> + fDestination);
     aResponse.setContentType(<span class="literal">"text/html"</span>);
     aResponse.sendRedirect(fDestination);
   }
   
-  <span class="comment">// PRIVATE //
+  <span class="comment">// PRIVADO //
 </span>  <span class="keyword">private</span> String fDestination;
   <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">final</span> Logger fLogger = Util.getLogger(WelcomeFileController.<span

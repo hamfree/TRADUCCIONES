@@ -21,34 +21,38 @@
     </nav>
     <div class="page-title">Encapsule las peticiones de subida de fichero</div>
     <br /> 
-    Support for file uploads was added relatively late to the Servlet Specification, starting with version 3.0. Earlier versions
-    of the spec have poor support for file uploads. The following applies to such earlier versions.
+    El soporte para la subida de archivos fue agregado relativamente tarde a la Especificación de Servlet, empezando con la versión 
+    3.0. Las versiones anteriores de la especificación tenían poca compatibilidad con la carga de archivos. Lo siguiente aplica a 
+    dichas versiones anteriores.
     <p>
-      If a form contains one or more <a href="https://www.w3.org/TR/html5/forms.html#file-upload-state-(type=file)">file upload</a> 
-      controls, the format of the underlying HTTP request changes dramatically. Unless special steps are taken, it's likely that
+      Si un formulario contiene uno o más controles de 
+      <a href="https://www.w3.org/TR/html5/forms.html#file-upload-state-(type=file)">file upload</a>, el formato de la petición HTTP 
+      subyacente cambia dramáticamente. A menos que se tomen pasos especiales, es probable que 
       <code>
         request.<a href="https://docs.oracle.com/javaee/7/api/javax/servlet/ServletRequest.html#getParameter-java.lang.String-">getParameter</a>(String)
       </code>
-      will return <code>null</code> for <em>all</em> parameters (both regular parameters and file upload parameters).
+      devuelva <code>null</code> para <em>todos</em> los parámetros (tanto parámetros regulares como parámetros de carga de 
+      archivos).
     </p>
     <p>
-      Reminder - if a form includes a file upload control, then it must have:
+      Recordatorio - si un formulario incluye un control de carga de archivo, entonces debe tener:
     </p>
     <ul>
       <li><code>method='POST'</code></li>
       <li><code>enctype='multipart/form-data'</code></li>
     </ul>
     <p>
-      One technique for handling file upload requests uses a <em>wrapper</em> for the underlying request, such that 
-      <code>request.getParameter(String)</code> and related methods may be used in the usual way.
+      Una técnica para manejar las peticiones de carga de archivos usa un <em>encapsulador</em> para la petición subyacente, tal que 
+      <code>request.getParameter(String)</code> y los métodos relacionados puedan utilizarse de la forma habitual.
     </p>
     <p>
-      <b>Example</b>
+      <b>Ejemplo</b>
     </p>
     <p>
-      The following wrapper uses the Apache Commons <a href="http://commons.apache.org/fileupload/">FileUpload</a> tool to parse the 
-      request into both regular parameters and file upload parameters. An action class may use this class as it would any request, 
-      with one exception: to access the methods related specifically to files, a cast is necessary.<br />
+      El siguiente encapsulador usa la herramienta de Apache Commons <a href="http://commons.apache.org/fileupload/">FileUpload</a> 
+      para analizar la petición tanto de parámetros regulares como parámetros de carga de archivos. Una clase de acción puede usar 
+      esta clase como lo haría con cualquier solicitud, con una excepción: para acceder a los métodos relacionados específicamente 
+      con los archivos, se necesita una conversión.<br />
     </p>
     <pre>
 <span class="keyword">import</span> java.util.*;
@@ -61,12 +65,12 @@
 <span class="keyword">import</span> org.apache.commons.fileupload.FileItem;
 
 <span class="comment">/**
-* Wrapper for a file upload request (before Servlet 3.0).
+* Envoltura para una petición de carga de archivos (antes de Servlet 3.0).
 * 
-* &lt;P&gt;This class uses the Apache Commons 
-* &lt;a href='http://commons.apache.org/fileupload/'&gt;File Upload tool&lt;/a&gt;.
-* The generous Apache License will very likely allow you to use it in your 
-* applications as well. 
+* &lt;P&gt;Esta clase usa la 
+* &lt;a href='http://commons.apache.org/fileupload/'&gt;herramienta de Carga de Archivos&lt;/a&gt;.
+* de Apache Commons. La generosa Licencia de Apache License probablemente le permitirá usarla 
+* en sus aplicaciones también. 
 */</span>
 <span class="keyword">public</span> <span class="keyword">class</span> FileUploadWrapper <span
             class="keyword">extends</span> HttpServletRequestWrapper {
@@ -83,13 +87,13 @@
     }
     <span class="keyword">catch</span>(FileUploadException ex){
       <span class="keyword">throw</span> <span class="keyword">new</span> IOException(<span
-            class="literal">"Cannot parse underlying request: "</span> + ex.toString());
+            class="literal">"No puedo analizar la petición subyacente: "</span> + ex.toString());
     }
   }
   
   <span class="comment">/**
-  * Return all request parameter names, for both regular controls and file upload 
-  * controls.
+  * Devuelve todos los nombres de parámetros de la petición, tanto controles regulares como controles de carga de 
+  * archivos.
   */</span>
   <span class="keyword">@Override</span> <span class="keyword">public</span> Enumeration&lt;String&gt; getParameterNames() {
     Set&lt;String&gt; allNames = <span class="keyword">new</span> LinkedHashSet&lt;&gt;();
@@ -99,36 +103,36 @@
   }
   
   <span class="comment">/**
-  * Return the parameter value. Applies only to regular parameters, not to 
-  * file upload parameters. 
+  * Devuelve el valor del parámetro. Aplica solo a parámetros regulares, no a parámetros de 
+  * de carga de archivos. 
   * 
-  * &lt;P&gt;If the parameter is not present in the underlying request, 
-  * then &lt;tt&gt;null&lt;/tt&gt; is returned.
-  * &lt;P&gt;If the parameter is present, but has no  associated value, 
-  * then an empty string is returned.
-  * &lt;P&gt;If the parameter is multivalued, return the first value that 
-  * appears in the request.  
+  * &lt;P&gt;Si el parámetro no está presente en la petición subyacente, 
+  * entonces se devuelve &lt;tt&gt;null&lt;/tt&gt;.
+  * &lt;P&gt;Si el parámetro está presente, pero no tiene valor asociado, 
+  * entonces se devuelve una cadena vacía.
+  * &lt;P&gt;Si el parámetro es multivalor, devuelve el primer valor que aparece en la 
+  * petición.  
   */</span>
   <span class="keyword">@Override</span> <span class="keyword">public</span> String getParameter(String aName) {
     String result = <span class="keyword">null</span>;
     List&lt;String&gt; values = fRegularParams.get(aName);
     <span class="keyword">if</span>(values == <span class="keyword">null</span>){
-      <span class="comment">//you might try the wrappee, to see if it has a value 
+      <span class="comment">//puede probar la envoltura, para ver si tiene un valor
 </span>    }
     <span class="keyword">else</span> <span class="keyword">if</span> (values.isEmpty()) {
-      <span class="comment">//param name known, but no values present
+      <span class="comment">//nombre de parámetro conocido, pero no hay valores presentes
 </span>      result = <span class="literal">""</span>;
     }
     <span class="keyword">else</span> {
-      <span class="comment">//return first value in list
+      <span class="comment">//devuelve el primer valor en la lista
 </span>      result = values.get(FIRST_VALUE);
     }
     <span class="keyword">return</span> result;
   }
   
   <span class="comment">/**
-  * Return the parameter values. Applies only to regular parameters, 
-  * not to file upload parameters.
+  * Devuelve los valores del parámetro. Se aplica solo a parámetros regulares, 
+  * no a parámetros de carga de archivos.
   */</span>
   <span class="keyword">@Override</span> <span class="keyword">public</span> String[] getParameterValues(String aName) {
     String[] result = <span class="keyword">null</span>;
@@ -140,37 +144,37 @@
   }
   
   <span class="comment">/**
-  * Return a {@code Map&lt;String, List&lt;String&gt;&gt;} for all regular parameters.
-  * Does not return any file upload parameters at all. 
+  * Devuelve una {@code Map&lt;String, List&lt;String&gt;&gt;} de todos los parámetros regulares.
+  * No devuelve ningún parámetro de carga de archivos en absoluto. 
   */</span>
   <span class="keyword">@Override</span> <span class="keyword">public</span> Map&lt;String, List&lt;String&gt;&gt; getParameterMap() {
     <span class="keyword">return</span> Collections.unmodifiableMap(fRegularParams);
   }
   
   <span class="comment">/**
-  * Return a {@code List&lt;FileItem&gt;}, in the same order as they appear
-  *  in the underlying request.
+  * Devuelve una {@code List&lt;FileItem&gt;}, en el mismo orden en que aparece 
+  *  en la petición subyacente.
   */</span>
   <span class="keyword">public</span> List&lt;FileItem&gt; getFileItems(){
     <span class="keyword">return</span> <span class="keyword">new</span> ArrayList&lt;FileItem&gt;(fFileParams.values());
   }
   
   <span class="comment">/**
-  * Return the {@link FileItem} of the given name.
-  * &lt;P&gt;If the name is unknown, then return &lt;tt&gt;null&lt;/tt&gt;.
+  * Devuelve el {@link FileItem} del nombre dado.
+  * &lt;P&gt;Si el nombre es desconocido, entonces devuelve &lt;tt&gt;null&lt;/tt&gt;.
   */</span>
   <span class="keyword">public</span> FileItem getFileItem(String aFieldName){
     <span class="keyword">return</span> fFileParams.get(aFieldName);
   }
   
   
-  <span class="comment">// PRIVATE
+  <span class="comment">// PRIVADO
 </span>  
-  <span class="comment">/** Store regular params only. May be multivalued (hence the List).  */</span>
+  <span class="comment">/** Almacena solo parámetros regulares. Puede ser multivalor (de ahí la List).  */</span>
   <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, List&lt;String&gt;&gt; fRegularParams = <span
             class="keyword">new</span> LinkedHashMap&lt;&gt;();
 
-  <span class="comment">/** Store file params only. */</span>
+  <span class="comment">/** Almacena solo parámetros de archivo. */</span>
   <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, FileItem&gt; fFileParams = <span
             class="keyword">new</span> LinkedHashMap&lt;&gt;();
   <span class="keyword">private</span> <span class="keyword">static</span> <span
@@ -214,7 +218,7 @@
   }
 } 
     </pre>
-    The wrapper is in turn used by a <code>Filter</code>:<br />
+    El contenedor es a su vez utilizado por un <code>Filter</code>:<br />
     <pre>
 <span class="keyword">import</span> java.io.*;
 <span class="keyword">import</span> javax.servlet.Filter;
@@ -226,10 +230,10 @@
 <span class="keyword">import</span> javax.servlet.http.HttpServletRequest;
 
 <span class="comment">/**
-* Filter that wraps an underlying file upload request (before Servlet 3.0). 
+* Filtro que encapsula una petición de carga de archivo subyacente (antes de Servlet 3.0). 
 * 
-* &lt;P&gt;This filter should be configured only for those operations that use a 
-* file upload request.
+* &lt;P&gt;Este filtro debe ser configurado solo para aquellas operaciones que usen una 
+* petición de carga de archivos.
 */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
             class="keyword">class</span> FileUploadFilter <span
@@ -237,11 +241,11 @@
 
   <span class="keyword">public</span> <span class="keyword">void</span> init(FilterConfig aConfig) <span
             class="keyword">throws</span> ServletException {
-    <span class="comment">//do nothing
+    <span class="comment">//no hace nada
 </span>  }
   
   <span class="keyword">public</span> <span class="keyword">void</span> destroy() {
-    <span class="comment">//do nothing
+    <span class="comment">//no hace nada
 </span>  }
   
   <span class="keyword">public</span> <span class="keyword">void</span> doFilter(
@@ -266,7 +270,7 @@
 }
  
     </pre>
-    The <code>Filter</code> is configured in <code>web.xml</code> to handle specific URLs:
+    El <code>Filter</code> se configura en <code>web.xml</code> para manejar URLs específicas:
     <p></p>
     <pre>
 &lt;web-app&gt;
@@ -274,9 +278,9 @@
    &lt;filter-name&gt;FileUpload&lt;/filter-name&gt;
    &lt;display-name&gt;File Upload&lt;/display-name&gt;
    &lt;description&gt;
-     Applied to file upload requests.
-     Wraps the request, allowing it to be used as a regular request, 
-     'as if' it were parsed by the Servlet API.
+     Aplicado a las peticiones de carga de archivos.
+     Encapsula la petición, permitiéndose que se use como una petición regular, 
+     'como si' fuera analizada por la IPA de Servlet.
    &lt;/description&gt;
    &lt;filter-class&gt;com.blah.FileUploadFilter&lt;/filter-class&gt;
   &lt;/filter&gt;
@@ -286,7 +290,7 @@
    &lt;url-pattern&gt;/someurl/*&lt;/url-pattern&gt;
   &lt;/filter-mapping&gt;
 
-  &lt;!-- Required by the Apache FileUpload tool. --&gt;
+  &lt;!-- Se requiere la herramienta Apache FileUpload. --&gt;
   &lt;listener&gt;
     &lt;listener-class&gt;
      org.apache.commons.fileupload.servlet.FileCleanerCleanup
@@ -295,36 +299,37 @@
 &lt;/web-app&gt;
     </pre>
     <p>
-      There's a variation regarding the 
+      Hay una variación con respecto al método 
       <code>
         request.<a href="https://docs.oracle.com/javaee/7/api/javax/servlet/ServletRequest.html#getParameter-java.lang.String-">getParameter</a>(String)
-      </code> method which can be important here. This method takes a path argument, and that path can contain query parameters 
-      <em>not present in the original request</em>. Therefore, the above wrapper will not 'see' such query parameters unless special
-      measures are taken. For example, <code>getParameter(String)</code> might be modified along these lines:
+      </code> que puede ser importante aquí. Este método toma un argumento de ruta, y esa ruta puede contener parámetros de consulta 
+      <em>no presentes en la petición original</em>. Por lo tanto, el contenedor anterior no 'verá' tales parámetros de consulta 
+      a menos que se tomen medidas especiales. Por ejemplo, <code>getParameter(String)</code> podría ser modificada siguiendo estas 
+      líneas:
     </p>
     <pre>
   @Override public String getParameter(String aName) {
   String result = null;
   List&lt;string&gt; values = fRegularParams.get(aName);
   if(values == null){
-    //see if the 'wrappee' has a value
+    //ver si el 'encapsulador' tiene un valor
     String superValue = super.getParameter(aName);
     if(Util.textHasContent(superValue)) {
       result = superValue;
     }
   }
-  ...elided...
+  ...omitido...
 }
 
     </pre>
     <p>
-      Finally, for a second example of a file upload request wrapper,
-      see this <a href="http://www.javaworld.com/jw-06-2001/jw-0622-filters.html?page=5">article</a> by Jason Hunter.<br />
+      Finalmente, para un segundo ejemplo de un encapsulador de petición de carga de archivos, vea este 
+      <a href="http://www.javaworld.com/jw-06-2001/jw-0622-filters.html?page=5">artículo</a> de Jason Hunter.<br />
     </p>
     <p></p>
     <div class="topic-section" id="see-also-title">Vea También:</div>
     <div id="see-also" class="main-body">
-      <a href="..\servlets\servlets_218.html">Entender los detalles de las etiquetas FORM</a><br />
+      <a href="../servlets/servlets_218.html">Entender los detalles de las etiquetas FORM</a><br />
     </div>
     <footer id="footer" class="legalese">
       <span id="app_name">Prácticas de Java</span> 
