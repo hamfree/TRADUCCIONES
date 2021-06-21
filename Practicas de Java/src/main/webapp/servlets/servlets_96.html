@@ -22,8 +22,8 @@
     <div class="page-title">Escape los caracteres especiales</div>
     <br />
     <p>
-      In an HTML document, outside of an HTML tag, you should always "escape" 
-      <a href="https://www.w3.org/International/questions/qa-escapes#use">these three characters</a>:
+      En un documento HTML, fuera de una etiqueta HTML, debería siempre "escapar" 
+      <a href="https://www.w3.org/International/questions/qa-escapes#use">estos tres caracteres</a>:
     </p>
     <ul>
       <li>&lt;</li>
@@ -31,21 +31,22 @@
       <li>&amp;</li>
     </ul>
     <p>
-      In this context, <em>escaping</em> means to replace them with HTML 
-      <a href="http://www.w3.org/TR/html401/sgml/entities.html">character entities</a>. For example, <code>&lt;</code> can be 
-      replaced with <code>&amp;lt;</code>. Another character entity that's occasionally useful is <code>&amp;nbsp;</code> (the 
-      non-breaking space).
+      En este contexto, <em>escapar</em> significa reemplazarlos con 
+      <a href="http://www.w3.org/TR/html401/sgml/entities.html">entidades de carácter</a> de HTML. Por ejemplo, <code>&lt;</code> 
+      puede ser reemplazado con <code>&amp;lt;</code>. Otra entidad de carácter que es ocasionamente útil es <code>&amp;nbsp;</code> 
+      (el espacio que no rompe).
     </p>
     <p>
-      When you <a href="http://www.javapractices.com/topic/TopicAction.do?Id=206">use UTF-8 as your character encoding</a>, then, 
-      most of the time, the only escaping you need (for the visible text seen by a human) is for the above 3 characters 
-      <em>and only those characters</em>. For example, the copyright symbol © can (and should) be used directly in the text; there's 
-      no need to use the corresponding character entity <code>&amp;copy;</code>.
+      Cuando usted <a href="http://www.javapractices.com/topic/TopicAction.do?Id=206">usa UTF-8 como su codificación de caracteres</a>, 
+      entonces, la mayor parte del tiempo, el único escape que necesita (para el texto visible visto por un humano) es para los 3 
+      caracteres de arriba <em>y solo esos caracteres</em>. Por ejemplo, el símbilo del copyright © puede (y debería) ser usado 
+      directamente en el texto; no hay necesidad de usar la entidad de carácter correspondiente <code>&amp;copy;</code>.
     </p>
     <p>
-      Arbitrary text <em>placed in an HTML tag</em> also often needs to be escaped, to ensure that the resulting HTML remains valid.
+      El texto arbitrario <em>colocado en una etiqueta HTML</em> también a menudo necesita ser escapado, para asegurar que el HTML 
+      resultante permanezca válido.
     </p>
-    <p>Problem characters can include:</p>
+    <p>Los problemas con los caracteres pueden incluir:</p>
     <ul>
       <li>&lt;</li>
       <li>&gt;</li>
@@ -55,19 +56,21 @@
       <li>&amp;</li>
     </ul>
     <p>
-      Query strings (<code>Blah=1&amp;Name=Bob</code>) often need to be escaped as well. If the query string contains special 
-      characters, it will need to be "URL encoded". (See the javadoc for the 
-      <a href="https://docs.oracle.com/javase/10/docs/api/java/net/URLEncoder.html">URLEncoder</a> class for further information.) 
-      This will ensure the query string conforms with valid HTTP.
+      Las cadenas de consulta (<code>Blah=1&amp;Name=Bob</code>) a menudo necesitan ser escapadas también. Si la cadena de consulta 
+      contiene caracteres especiales, necesita ser "codificada como URL". (Vea el javadoc para la clase 
+      <a href="https://docs.oracle.com/javase/10/docs/api/java/net/URLEncoder.html">URLEncoder</a> para información posterior).
+      Esto asegurará que la cadena de búsqueda sea conforme con HTTP válido.
     </p>
     <p>
-      There's often another issue, however, with regard to query strings. If a query string is placed in an <code>HREF</code> 
-      attribute, then even a URL encoded query string is often not of valid form. This is because <code>URLEncoder</code> produces 
-      valid <i>HTTP</i>, but it doesn't in general produce text which is a valid <i>HTML attribute</i> - the ampersand character 
-      needs to be replaced by the corresponding character entity <code>&amp;amp;</code>.
+      Hay a menudo otro problema, sin embargo, respecto a las cadenas de búsqueda. Si una cadena de búsqueda se coloca en un 
+      atributo <code>HREF</code>, entonces incluso una cadena de búsqueda codificada como URL no es a menudo una forma válida. Esto 
+      es porque <code>URLEncoder</code> produce <i>HTTP</i> válido, pero no produce texto que en general sea un 
+      <i>atributo de HTML</i> válido - el carácter ampersand necesita ser reemplazado por la entidad de carácter correspondiente 
+      <code>&amp;amp;</code>.
     </p>
     <p>
-      Here is an example of a utility class which escapes special characters for HTML, XML, regular expressions, and so on.<br />
+      Aquí tiene un ejemplo de una clase de utilidad que escapa los caracteres especiales para HTML, XML, expresiones regulares, y 
+      así.<br />
     </p>
     <pre>
 <span class="keyword">package</span> hirondelle.web4j.util;
@@ -87,49 +90,48 @@
 <span class="keyword">import</span> hirondelle.web4j.database.Report;
 
 <span class="comment">/**
- Convenience methods for escaping special characters related to HTML, XML, 
- and regular expressions.
+ Métodos de conveniencia para escapar caracteres especiales relacionados con HTML, XML, 
+ y expresiones regulares.
+  
+ &lt;P&gt;Para mantenerle seguro por defecto, WEB4j va a realizar algún esfuerzo por escapar
+ caracteres en sus datos cuando sea apropiado, de forma que usted &lt;em&gt;usualmente&lt;/em&gt;
+ no necesite pensar demasiado sobre el escapado de caracteres especiales. Así, usted 
+ no necesita usar &lt;em&gt;directamente&lt;/em&gt; los servicios de esta clase muy a menudo.
  
- &lt;P&gt;To keep you safe by default, WEB4J goes to some effort to escape 
- characters in your data when appropriate, such that you &lt;em&gt;usually&lt;/em&gt;
- don't need to think too much about escaping special characters. Thus, you
-  shouldn't need to &lt;em&gt;directly&lt;/em&gt; use the services of this class very often. 
+ &lt;P&gt;&lt;span class='highlight'&gt;Para Modelos de Objetso que contienen entrada libre de usuario , 
+ es altamente recomendable que use {@link SafeText}, no &lt;tt&gt;String&lt;/tt&gt;&lt;/span&gt;.
+ La entrada libre del usuario está abierta al uso malicioso, tales como ataques de 
+ &lt;a href='http://www.owasp.org/index.php/Cross_Site_Scripting'&gt;Scripting Entre Sitios&lt;/a&gt;. 
+ Usar &lt;tt&gt;SafeText&lt;/tt&gt; le protegerá de tales ataques, escapando siempre 
+ los caracteres especiales automáticamente en su método &lt;tt&gt;toString()&lt;/tt&gt;.   
  
- &lt;P&gt;&lt;span class='highlight'&gt;For Model Objects containing free form user input, 
- it is highly recommended that you use {@link SafeText}, not &lt;tt&gt;String&lt;/tt&gt;&lt;/span&gt;.
- Free form user input is open to malicious use, such as
- &lt;a href='http://www.owasp.org/index.php/Cross_Site_Scripting'&gt;Cross Site Scripting&lt;/a&gt;
- attacks. 
- Using &lt;tt&gt;SafeText&lt;/tt&gt; will protect you from such attacks, by always escaping 
- special characters automatically in its &lt;tt&gt;toString()&lt;/tt&gt; method.   
- 
- &lt;P&gt;The following WEB4J classes will automatically escape special characters 
- for you, when needed : 
+ &lt;P&gt;Las siguientes clases de WEB4J escaparán automáticamente los caracteres especiales por 
+ usted, cuando se necesite: 
  &lt;ul&gt;
- &lt;li&gt;the {@link SafeText} class, used as a building block class for your 
- application's Model Objects, for modeling all free form user input
- &lt;li&gt;the {@link Populate} tag used with forms
- &lt;li&gt;the {@link Report} class used for creating quick reports
- &lt;li&gt;the {@link Text}, {@link TextFlow}, and {@link Tooltips} custom tags used 
- for translation
+ &lt;li&gt;la clase {@link SafeText}, usada como clase de construcción de bloque para sus 
+ Modelos de Objetos de la aplicación, para modelar toda la entrada libre del usuario
+  &lt;li&gt;la etiqueta {@link Populate} usada con los formularios
+ &lt;li&gt;la clase {@link Report} usada para la creación de informes rápidos
+ &lt;li&gt;las etiquetas personalizadas {@link Text}, {@link TextFlow}, y {@link Tooltips} usadas 
+ para la traducción
  &lt;/ul&gt; 
 */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
             class="keyword">class</span> EscapeChars {
 
   <span class="comment">/**
-    Escape characters for text appearing in HTML markup.
+    Los caracteres de escape para el texto que aparece en el marcado HTML.
     
-    &lt;P&gt;This method exists as a defence against Cross Site Scripting (XSS) hacks.
-    The idea is to neutralize control characters commonly used by scripts, such that
-    they will not be executed by the browser. This is done by replacing the control
-    characters with their escaped equivalents.  
-    See {@link hirondelle.web4j.security.SafeText} as well.
+    &lt;P&gt;Este método existe como una defensa contra los trucos de Scripting Entre Sitios (XSS).
+    La idea es neutralizar los caracteres de control comunmente usados por scripts, tales como esos 
+    que no serán ejecutados por el navegador. Esto se hace reemplazando los caracteres de control 
+    con sus equivalentes escapados.
+    Vea {@link hirondelle.web4j.security.SafeText} también.
     
-    &lt;P&gt;The following characters are replaced with corresponding 
-    HTML character entities :
+    &lt;P&gt;Los caracteres siguientes son reemplazados con sus correspondientes 
+    entidades de carácter HTML:
     &lt;table border='1' cellpadding='3' cellspacing='0'&gt;
-    &lt;tr&gt;&lt;th&gt; Character &lt;/th&gt;&lt;th&gt;Replacement&lt;/th&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;th&gt; Carácter &lt;/th&gt;&lt;th&gt;Reemplazo&lt;/th&gt;&lt;/tr&gt;
     &lt;tr&gt;&lt;td&gt; &lt; &lt;/td&gt;&lt;td&gt; &amp;lt; &lt;/td&gt;&lt;/tr&gt;
     &lt;tr&gt;&lt;td&gt; &gt; &lt;/td&gt;&lt;td&gt; &amp;gt; &lt;/td&gt;&lt;/tr&gt;
     &lt;tr&gt;&lt;td&gt; &amp; &lt;/td&gt;&lt;td&gt; &amp;amp; &lt;/td&gt;&lt;/tr&gt;
@@ -165,8 +167,8 @@
     &lt;tr&gt;&lt;td&gt; ~ &lt;/td&gt;&lt;td&gt; &amp;#126;&lt;/td&gt;&lt;/tr&gt;
     &lt;/table&gt;
     
-    &lt;P&gt;Note that JSTL's {@code &lt;c:out&gt;} escapes &lt;em&gt;only the first 
-    five&lt;/em&gt; of the above characters.
+    &lt;P&gt;Tenga en cuenta que {@code &lt;c:out&gt;} de JSTL escapa &lt;em&gt;solo los primeros cinco&lt;/em&gt; 
+    de los caracteres de arriba.    
    */</span>
    <span class="keyword">public</span> <span class="keyword">static</span> String forHTML(String aText){
      <span class="keyword">final</span> StringBuilder result = <span
@@ -308,8 +310,8 @@
          addCharEntity(<span class="literal">126</span>, result);
        }
        <span class="keyword">else</span> {
-         <span class="comment">//the char is not a special one
-</span>         <span class="comment">//add it to the result as is
+         <span class="comment">//el carácter no es uno especial
+</span>         <span class="comment">//agrégalo al resultado tal como es
 </span>         result.append(character);
        }
        character = iterator.next();
@@ -319,22 +321,19 @@
   
 
   <span class="comment">/**
-   Escape all ampersand characters in a URL. 
-    
-   &lt;P&gt;Replaces all &lt;tt&gt;'&amp;'&lt;/tt&gt; characters with &lt;tt&gt;'&amp;amp;'&lt;/tt&gt;.
+   Escapa todos los caracteres ampersand en una URL.
+
+   &lt;P&gt;Reemplaza todos los caracteres &lt;tt&gt;'&amp;'&lt;/tt&gt; con &lt;tt&gt;'&amp;amp;'&lt;/tt&gt;.
    
-  &lt;P&gt;An ampersand character may appear in the query string of a URL.
-   The ampersand character is indeed valid in a URL.
-   &lt;em&gt;However, URLs usually appear as an &lt;tt&gt;HREF&lt;/tt&gt; attribute, and 
-   such attributes have the additional constraint that ampersands 
-   must be escaped.&lt;/em&gt;
+   &lt;P&gt;Un carácter ampersand puede aparacer en la cadena de búsqueda de una URL.
+   El carácter ampersand es de hecho válido en una URL. 
+   &lt;em&gt;Sin embargo, las URLS usualmente aparecen como un atributo &lt;tt&gt;HREF&lt;/tt&gt; attribute, y 
+   tales atributos tienen la restricción adicional de que esos ampersands deben ser escapados.&lt;/em&gt;
    
-   &lt;P&gt;The JSTL &lt;c:url&gt; tag does indeed perform proper URL encoding of 
-   query parameters. But it does not, in general, produce text which 
-   is valid as an &lt;tt&gt;HREF&lt;/tt&gt; attribute, simply because it does 
-   not escape the ampersand character. This is a nuisance when 
-   multiple query parameters appear in the URL, since it requires a little 
-   extra work.
+   &lt;P&gt;La etiqueta &lt;c:url&gt; de JSTL realiza la codificación URL apropiada de los 
+   parámetros de búsqueda. Pero no produce, en general, texto que sea 
+   válido como un atributo &lt;tt&gt;HREF&lt;/tt&gt;, simplemente porque no escapa al carácter ampersand. Esto es una molestia 
+   cuando aparecen varios parámetros de consulta en la URL, ya que requiere un poco de trabajo adicional.
   */</span>
   <span class="keyword">public</span> <span class="keyword">static</span> String forHrefAmpersand(String aURL){
     <span class="keyword">return</span> aURL.replace(<span
@@ -359,17 +358,17 @@
      }
      <span class="keyword">catch</span> (UnsupportedEncodingException ex){
        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span
-            class="literal">"UTF-8 not supported"</span>, ex);
+            class="literal">"UTF-8 no soportado"</span>, ex);
      }
      <span class="keyword">return</span> result;
    }
 
   <span class="comment">/**
-   Escape characters for text appearing as XML data, between tags.
+   Caracteres de escape para el texto que aparece como datos XML, entre etiquetas.
    
-   &lt;P&gt;The following characters are replaced with corresponding character entities :
+   &lt;P&gt;Los caracteres siguientes son reemplazados con las entidades de carácter correspondientes:
    &lt;table border='1' cellpadding='3' cellspacing='0'&gt;
-   &lt;tr&gt;&lt;th&gt; Character &lt;/th&gt;&lt;th&gt; Encoding &lt;/th&gt;&lt;/tr&gt;
+   &lt;tr&gt;&lt;th&gt; Carácter &lt;/th&gt;&lt;th&gt; Codificación &lt;/th&gt;&lt;/tr&gt;
    &lt;tr&gt;&lt;td&gt; &lt; &lt;/td&gt;&lt;td&gt; &amp;lt; &lt;/td&gt;&lt;/tr&gt;
    &lt;tr&gt;&lt;td&gt; &gt; &lt;/td&gt;&lt;td&gt; &amp;gt; &lt;/td&gt;&lt;/tr&gt;
    &lt;tr&gt;&lt;td&gt; &amp; &lt;/td&gt;&lt;td&gt; &amp;amp; &lt;/td&gt;&lt;/tr&gt;
@@ -377,10 +376,10 @@
    &lt;tr&gt;&lt;td&gt; ' &lt;/td&gt;&lt;td&gt; &amp;#039;&lt;/td&gt;&lt;/tr&gt;
    &lt;/table&gt;
    
-   &lt;P&gt;Note that JSTL's {@code &lt;c:out&gt;} escapes the exact same set of 
-   characters as this method. &lt;span class='highlight'&gt;That is, {@code &lt;c:out&gt;}
-    is good for escaping to produce valid XML, but not for producing safe 
-    HTML.&lt;/span&gt;
+   &lt;P&gt;Tenga en cuenta que {@code &lt;c:out&gt;} de JSTL escapa el mismo conjunto exacto de 
+   caracteres como este método. &lt;span class='highlight'&gt;Es decir, {@code &lt;c:out&gt;}
+   es bueno para escapar para producir XML válido, pero no para producir HTML 
+   seguro.&lt;/span&gt;
   */</span>
   <span class="keyword">public</span> <span class="keyword">static</span> String forXML(String aText){
     <span class="keyword">final</span> StringBuilder result = <span
@@ -410,8 +409,8 @@
          result.append(<span class="literal">"&amp;amp;"</span>);
       }
       <span class="keyword">else</span> {
-        <span class="comment">//the char is not a special one
-</span>        <span class="comment">//add it to the result as is
+        <span class="comment">//el carácter no es uno especial
+</span>        <span class="comment">//agréguelo al resultado tal como es 
 </span>        result.append(character);
       }
       character = iterator.next();
@@ -420,13 +419,11 @@
   }
   
   <span class="comment">/**
-   Escapes characters for text appearing as data in the 
-   &lt;a href='http://www.json.org/'&gt;Javascript Object Notation&lt;/a&gt;
-   (JSON) data interchange format.
+    Escapa los caracteres para aparecer como datos en el formato de intercambio de datos (JSON)
    
-   &lt;P&gt;The following commonly used control characters are escaped :
+   &lt;P&gt;Se escapan los siguientes caracteres de control de uso común:
    &lt;table border='1' cellpadding='3' cellspacing='0'&gt;
-   &lt;tr&gt;&lt;th&gt; Character &lt;/th&gt;&lt;th&gt; Escaped As &lt;/th&gt;&lt;/tr&gt;
+   &lt;tr&gt;&lt;th&gt; Carácter &lt;/th&gt;&lt;th&gt; Escapado Como &lt;/th&gt;&lt;/tr&gt;
    &lt;tr&gt;&lt;td&gt; " &lt;/td&gt;&lt;td&gt; \" &lt;/td&gt;&lt;/tr&gt;
    &lt;tr&gt;&lt;td&gt; \ &lt;/td&gt;&lt;td&gt; \\ &lt;/td&gt;&lt;/tr&gt;
    &lt;tr&gt;&lt;td&gt; / &lt;/td&gt;&lt;td&gt; \/ &lt;/td&gt;&lt;/tr&gt;
@@ -437,7 +434,7 @@
    &lt;tr&gt;&lt;td&gt; tab &lt;/td&gt;&lt;td&gt; \t &lt;/td&gt;&lt;/tr&gt;
    &lt;/table&gt;
    
-   &lt;P&gt;See &lt;a href='http://www.ietf.org/rfc/rfc4627.txt'&gt;RFC 4627&lt;/a&gt; for more information.
+   &lt;P&gt;Vea &lt;a href='http://www.ietf.org/rfc/rfc4627.txt'&gt;RFC 4627&lt;/a&gt; para más información.
   */</span>
   <span class="keyword">public</span> <span class="keyword">static</span> String forJSON(String aText){
     <span class="keyword">final</span> StringBuilder result = <span
@@ -478,8 +475,8 @@
         result.append(<span class="literal">"\\t"</span>);
       }
       <span class="keyword">else</span> {
-        <span class="comment">//the char is not a special one
-</span>        <span class="comment">//add it to the result as is
+        <span class="comment">//el carácter no es uno especial
+</span>        <span class="comment">//agréguelo al resultado tal como es 
 </span>        result.append(character);
       }
       character = iterator.next();
@@ -488,8 +485,8 @@
   }
 
   <span class="comment">/**
-   Return &lt;tt&gt;aText&lt;/tt&gt; with all &lt;tt&gt;'&lt;'&lt;/tt&gt; and &lt;tt&gt;'&gt;'&lt;/tt&gt; characters
-   replaced by their escaped equivalents.
+   Devuelve &lt;tt&gt;aText&lt;/tt&gt; con todos los caracteres &lt;tt&gt;'&lt;'&lt;/tt&gt; and &lt;tt&gt;'&gt;'&lt;/tt&gt; 
+   reemplazados con sus equivalentes escapados.
   */</span>
   <span class="keyword">public</span> <span class="keyword">static</span> String toDisableTags(String aText){
     <span class="keyword">final</span> StringBuilder result = <span
@@ -507,8 +504,8 @@
         result.append(<span class="literal">"&amp;gt;"</span>);
       }
       <span class="keyword">else</span> {
-        <span class="comment">//the char is not a special one
-</span>        <span class="comment">//add it to the result as is
+        <span class="comment">//el carácter no es uno especial
+</span>        <span class="comment">//agréguelo al resultado tal como es 
 </span>        result.append(character);
       }
       character = iterator.next();
@@ -518,20 +515,20 @@
   
 
   <span class="comment">/**
-   Replace characters having special meaning in regular expressions
-   with their escaped equivalents, preceded by a '\' character.
+   Reemplace los caracteres que tienen especial significado en las expresiones regulares
+   con sus escapados equivalentes, precedidos por un carácter '\'.
   
-   &lt;P&gt;The escaped characters include :
+   &lt;P&gt;Los caracteres escapados incluyen:
   &lt;ul&gt;
   &lt;li&gt;.
   &lt;li&gt;\
-  &lt;li&gt;?, * , and +
+  &lt;li&gt;?, * , y +
   &lt;li&gt;&amp;
   &lt;li&gt;:
-  &lt;li&gt;{ and }
-  &lt;li&gt;[ and ]
-  &lt;li&gt;( and )
-  &lt;li&gt;^ and $
+  &lt;li&gt;{ y }
+  &lt;li&gt;[ y ]
+  &lt;li&gt;( y )
+  &lt;li&gt;^ y $
   &lt;/ul&gt;
   */</span>
   <span class="keyword">public</span> <span class="keyword">static</span> String forRegex(String aRegexFragment){
@@ -544,7 +541,7 @@
     <span class="keyword">char</span> character =  iterator.current();
     <span class="keyword">while</span> (character != CharacterIterator.DONE ){
       <span class="comment">/*
-       All literals need to have backslashes doubled.
+       Todos los literales necesitan tener dobladas las barras invertidas.
       */</span>
       <span class="keyword">if</span> (character == <span
             class="literal">'.'</span>) {
@@ -607,8 +604,8 @@
         result.append(<span class="literal">"\\$"</span>);
       }
       <span class="keyword">else</span> {
-        <span class="comment">//the char is not a special one
-</span>        <span class="comment">//add it to the result as is
+        <span class="comment">//el carácter no es uno especial
+</span>        <span class="comment">//agréguelo al resultado tal como es 
 </span>        result.append(character);
       }
       character = iterator.next();
@@ -617,30 +614,30 @@
   }
   
   <span class="comment">/**
-   Escape &lt;tt&gt;'$'&lt;/tt&gt; and &lt;tt&gt;'\'&lt;/tt&gt; characters in replacement strings.
+   Escapar caracteres &lt;tt&gt;'$'&lt;/tt&gt; and &lt;tt&gt;'\'&lt;/tt&gt; en cadenasd de reemplazo.
    
-   &lt;P&gt;Synonym for &lt;tt&gt;Matcher.quoteReplacement(String)&lt;/tt&gt;.
+   &lt;P&gt;Sinónimo para &lt;tt&gt;Matcher.quoteReplacement(String)&lt;/tt&gt;.
    
-   &lt;P&gt;The following methods use replacement strings which treat 
-   &lt;tt&gt;'$'&lt;/tt&gt; and &lt;tt&gt;'\'&lt;/tt&gt; as special characters:
+   &lt;P&gt;Los métodos siguientes usan cadenas de reemplazo que tratan 
+   &lt;tt&gt;'$'&lt;/tt&gt; and &lt;tt&gt;'\'&lt;/tt&gt; como caracteres especiales:
    &lt;ul&gt;
    &lt;li&gt;&lt;tt&gt;String.replaceAll(String, String)&lt;/tt&gt;
    &lt;li&gt;&lt;tt&gt;String.replaceFirst(String, String)&lt;/tt&gt;
    &lt;li&gt;&lt;tt&gt;Matcher.appendReplacement(StringBuffer, String)&lt;/tt&gt;
    &lt;/ul&gt;
    
-   &lt;P&gt;If replacement text can contain arbitrary characters, then you 
-   will usually need to escape that text, to ensure special characters 
-   are interpreted literally.
+   &lt;P&gt;Si el texto de reemplazo puede contener caracteres arbitrarios, entonces 
+   habitualmente necesitará escapar ese texto, para asegurar que los caracteres especiales
+   son interpretados literalmente.
   */</span>
   <span class="keyword">public</span> <span class="keyword">static</span> String forReplacementString(String aInput){
     <span class="keyword">return</span> Matcher.quoteReplacement(aInput);
   }
   
   <span class="comment">/**
-   Disable all &lt;tt&gt;&lt;SCRIPT&gt;&lt;/tt&gt; tags in &lt;tt&gt;aText&lt;/tt&gt;.
+   Deshabilita todas las etiquetas &lt;tt&gt;&lt;SCRIPT&gt;&lt;/tt&gt; en &lt;tt&gt;aText&lt;/tt&gt;.
    
-   &lt;P&gt;Insensitive to case.
+   &lt;P&gt;Insensible a mayúsculas o minúsculas.
   */</span>  
   <span class="keyword">public</span> <span class="keyword">static</span> String forScriptTagsOnly(String aText){
     String result = <span class="keyword">null</span>;
@@ -651,10 +648,10 @@
     <span class="keyword">return</span> result;
   }
   
-  <span class="comment">// PRIVATE //
+  <span class="comment">// PRIVADO //
 </span>  
   <span class="keyword">private</span> EscapeChars(){
-    <span class="comment">//empty - prevent construction
+    <span class="comment">//vacío - evita la construcción
 </span>  }
   
   <span class="keyword">private</span> <span class="keyword">static</span> <span
@@ -677,7 +674,7 @@
       padding = <span class="literal">"0"</span>;
     }
     <span class="keyword">else</span> {
-      <span class="comment">//no prefix
+      <span class="comment">//sin prefijo
 </span>    }
     String number = padding + aIdx.toString();
     aBuilder.append(<span class="literal">"&amp;#"</span> + number + <span
@@ -691,8 +688,8 @@
     <p></p>
     <div class="topic-section" id="see-also-title">Vea También:</div>
     <div id="see-also" class="main-body">
-      <a href="..\tareascomunes\tareascomunes_80.html">Reemplazar una cadena</a><br /> 
-      <a href="..\servlets\servlets_201.html">Tenga cuidado de los ampersands doblemente escapados</a><br />
+      <a href="../tareascomunes/tareascomunes_80.html">Reemplazar una cadena</a><br /> 
+      <a href="../servlets/servlets_201.html">Tenga cuidado de los ampersands doblemente escapados</a><br />
     </div>
     <footer id="footer" class="legalese">
       <span id="app_name">Prácticas de Java</span> 
