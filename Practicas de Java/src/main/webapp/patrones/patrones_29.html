@@ -2,134 +2,102 @@
 <html lang="es">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="description"
-          content="Prácticas y técnicas de programación en Java.">
-    <meta name="keywords"
-          content="java,programación java,Prácticas de Java,idioma 
-          java,estilo java,patrones de diseño java,convenciones de codigo java">
+    <meta name="description" content="Prácticas y técnicas de programación en Java.">
+    <meta name="keywords" content="java, programación java, Prácticas de Java, idioma java, estilo java, patrones de diseño java, 
+          convenciones de codigo java">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prácticas de Java-&gt;Objetos inmutables</title>
-    <link id="stylesheet" rel="stylesheet" type="text/css"
-          href="../css/stylesheet9.css" media="all">
+    <link id="stylesheet" rel="stylesheet" type="text/css" href="../css/stylesheet9.css" media="all">
     <link rel="icon" type="image/png" href="../img/favicon.png">
   </head>
   <body>
     <nav class="menu-bar" id="menu-bar">
-      <a href="../index.html" title="Tabla de Contenido"
-         style="float: left;">Inicio</a> &nbsp;&nbsp;
-      <form method="GET" action="https://www.google.com/search"
-            class="search-form" style="float: right;">
-        <input name="q" size="15" maxlength="255" placeholder=""
-               type="text"> <input name="btnG" value="Search"
-               type="submit"> <input name="sitesearch"
-               value="www.javapractices.com" type="hidden">
+      <a href="../index.html" title="Tabla de Contenido" style="float: left;">Inicio</a> &nbsp;&nbsp;
+      <form method="GET" action="https://www.google.com/search" class="search-form" style="float: right;">
+        <input name="q" size="15" maxlength="255" placeholder="" type="text" />
+        <input name="btnG" value="Search" type="submit" /> 
+        <input name="sitesearch" value="www.javapractices.com" type="hidden" />
       </form>
     </nav>
-    <div class="page-title">Objetos inmutables</div>
-    <br />Immutable objects are simply objects whose state (the
-    object's data) cannot change after construction. Examples of
-    immutable objects from the JDK include
-    <code>
-      <a
-        href="https://docs.oracle.com/javase/10/docs/api/java/lang/String.html">String</a>
-    </code>
-    and
-    <code>
-      <a
-        href="https://docs.oracle.com/javase/10/docs/api/java/lang/Integer.html">Integer</a>
-    </code>
-    .
-    <p>Immutable objects greatly simplify your program, since they:</p>
+    <div class="page-title">
+      Objetos inmutables
+    </div>
+    <br />
+    Immutable objects are simply objects whose state (the object's data) cannot change after construction. Examples of immutable 
+    objects from the JDK include <code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/String.html">String</a></code>
+    and <code><a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Integer.html">Integer</a></code>.
+    <p>
+      Immutable objects greatly simplify your program, since they:
+    </p>
     <ul>
       <li>are simple to construct, test, and use</li>
-      <li>are automatically <a
-          href="http://www.javapractices.com/topic/TopicAction.do?Id=48">thread-safe</a>
-        and have no synchronization issues
+      <li>are automatically <a href="../hilos/hilos_48.html">thread-safe</a> and have no synchronization issues</li>
+      <li>don't need a <a href="../constructores/constructors_2.html">copy constructor</a></li>
+      <li>don't need an implementation of <code><a href="../objetos/objects_71.html">clone</a></code></li>
+      <li>
+        allow <code><a href="../objetos/objects_28.html">hashCode</a></code> to use 
+        <a href="patrones_34.html">lazy initialization</a>, and to cache its return value
       </li>
-      <li>don't need a <a
-          href="http://www.javapractices.com/topic/TopicAction.do?Id=12">copy
-          constructor</a></li>
-      <li>don't need an implementation of <code>
-          <a
-            href="http://www.javapractices.com/topic/TopicAction.do?Id=71">clone</a>
-        </code></li>
-      <li>allow <code>
-          <a
-            href="http://www.javapractices.com/topic/TopicAction.do?Id=28">hashCode</a>
-        </code> to use <a
-          href="http://www.javapractices.com/topic/TopicAction.do?Id=34">lazy
-          initialization</a>, and to cache its return value
+      <li>don't need to be <a href="../practicascomunes/practicascomunes_15.html">copieddefensively</a> when used as a field</li>
+      <li>
+        make good <code>Map</code> keys and <code>Set</code> elements (these objects must not change state while in the collection)
       </li>
-      <li>don't need to be <a
-          href="http://www.javapractices.com/topic/TopicAction.do?Id=15">copied
-          defensively</a> when used as a field
+      <li>
+        have their <a href="../practicascomunes/practicascomunes_6.html">class invariant</a> established once upon construction, and 
+        it never needs to be checked again
       </li>
-      <li>make good <code>Map</code> keys and <code>Set</code>
-        elements (these objects must not change state while in the
-        collection)
+      <li>
+        always have "failure atomicity" (a term used by Joshua Bloch): if an immutable object throws an exception, it's never left 
+        in an undesirable or indeterminate state
       </li>
-      <li>have their <a
-          href="http://www.javapractices.com/topic/TopicAction.do?Id=6">class
-          invariant</a> established once upon construction, and it
-        never needs to be checked again
-      </li>
-      <li>always have "failure atomicity" (a term used by Joshua
-        Bloch): if an immutable object throws an exception, it's
-        never left in an undesirable or indeterminate state</li>
     </ul>
-    <span class="highlight">Immutable objects have a very
-      compelling list of positive qualities. Without question, they
-      are among the simplest and most robust kinds of classes you can
-      possibly build. When you create immutable classes, entire
-      categories of problems simply disappear.</span>
-    <p>Make a class immutable by following these guidelines:</p>
+    <span class="highlight">
+      Immutable objects have a very compelling list of positive qualities. Without question, they are among the simplest and most 
+      robust kinds of classes you can possibly build. When you create immutable classes, entire categories of problems simply 
+      disappear.
+    </span>
+    <p>
+      Make a class immutable by following these guidelines:
+    </p>
     <ul>
-      <li>ensure the class cannot be overridden - make the class
-        <code>final</code>, or use static factories and keep
-        constructors private
+      <li>
+        ensure the class cannot be overridden - make the class <code>final</code>, or use static factories and keep constructors 
+        private
       </li>
       <li>make fields <code>private</code> and <code>final</code></li>
-      <li>force callers to construct an object completely in a
-        single step, instead of using a no-argument constructor
-        combined with subsequent calls to <code>setXXX</code>
-        methods (that is, <a
-          href="http://www.javapractices.com/topic/TopicAction.do?Id=84">avoid
-          the Java Beans convention</a>)
+      <li>
+        force callers to construct an object completely in a single step, instead of using a no-argument constructor combined with 
+        subsequent calls to <code>setXXX</code> methods (that is, 
+        <a href="../constructores/constructors_84.html">avoid the Java Beans convention</a>)
       </li>
-      <li>do not provide any methods which can change the state
-        of the object in any way - not just <code>setXXX</code>
-        methods, but any method which can change state
+      <li>
+        do not provide any methods which can change the state of the object in any way - not just <code>setXXX</code> methods, but 
+        any method which can change state
       </li>
-      <li>if the class has any mutable object fields, then they
-        must be <a
-          href="http://www.javapractices.com/topic/TopicAction.do?Id=15">defensively
-          copied</a> when they pass between the class and its caller
+      <li>
+        if the class has any mutable object fields, then they must be 
+        <a href="../practicascomunes/practicascomunes_15.html">defensively copied</a> when they pass between the class and its 
+        caller
       </li>
     </ul>
-    In
-    <i><a
-        href="http://www.amazon.com/exec/obidos/ASIN/0134685997/ref=nosim/javapractices-20">Effective
-        Java</a></i>, Joshua Bloch makes this compelling recommendation :
+    In <i><a href="http://www.amazon.com/exec/obidos/ASIN/0134685997/ref=nosim/javapractices-20">Effective Java</a></i>, Joshua 
+    Bloch makes this compelling recommendation:
     <p>
-      <b>"Classes should be immutable unless there's a very good
-        reason to make them mutable....If a class cannot be made
-        immutable, limit its mutability as much as possible."</b>
+      <b>
+        "Classes should be immutable unless there's a very good reason to make them mutable....If a class cannot be made immutable, 
+        limit its mutability as much as possible."
+      </b>
     </p>
     <p>
-      It's interesting to note that
-      <code>
-        <a
-          href="https://docs.oracle.com/javase/10/docs/api/java/math/BigDecimal.html">BigDecimal</a>
-      </code>
-      is technically <em>not</em> immutable, since it's not
-      <code>final</code>
-      .
+      It's interesting to note that 
+      <code><a href="https://docs.oracle.com/javase/10/docs/api/java/math/BigDecimal.html">BigDecimal</a></code> is technically 
+      <em>not</em> immutable, since it's not <code>final</code>.
     </p>
     <p>
-      <b>Example</b> <br />
+      <b>Example</b><br />
     </p>
     <pre>
-		<span class="keyword">import</span> java.util.Date;
+<span class="keyword">import</span> java.util.Date;
 
 <span class="comment">/**
 * Planet is an immutable class, since there is no way to change
@@ -221,63 +189,47 @@
 }
  
     </pre>
-    <br />Note that
-    <a
-      href="http://docs.oracle.com/javase/8/docs/technotes/tools/windows/javadoc.html#tag">javadoc
-      1.4</a> includes the
-    <code>-tag</code>
-    option, whereby simple custom tags may be defined. One might define
-    an
-    <code>@is.Immutable</code>
-    tag, for example, to document a class as being immutable.
+    <br />
+    Note that <a href="http://docs.oracle.com/javase/8/docs/technotes/tools/windows/javadoc.html#tag">javadoc 1.4</a> includes the
+    <code>-tag</code> option, whereby simple custom tags may be defined. One might define an <code>@is.Immutable</code> tag, for 
+    example, to document a class as being immutable.
     <p></p>
     <p>
-      You might also consider defining your own <a
-        href="http://www.javapractices.com/topic/TopicAction.do?Id=240">tag
-        interface</a> for immutable objects. <br />
+      You might also consider defining your own <a href="../practicascomunes/practicascomunes_240.html">tag interface</a> for 
+      immutable objects. <br />
     </p>
     <p></p>
-    <div class="topic-section" id="see-also-title">Vea También :</div>
+    <div class="topic-section" id="see-also-title">
+      Vea También :
+    </div>
     <div id="see-also" class="main-body">
-      <a href="..\practicascomunes\practicascomunes_6.html">Validar
-        el estado con invariantes de clase</a> <br /> <a
-        href="..\constructores\constructors_12.html">Constructores
-        de Copia</a> <br /> <a
-        href="..\practicascomunes\practicascomunes_15.html">Copia
-        defensiva </a> <br /> <a href="..\patrones\patrones_21.html">Métodos
-        Factoría</a> <br /> <a
-        href="..\practicascomunes\practicascomunes_23.html">Use
-        final generosamente </a> <br /> <a
-        href="..\objetos\objects_28.html">Implementar hashCode</a> <br />
-      <a href="..\patrones\patrones_34.html">Inicialización
-        perezosa </a> <br /> <a href="..\hilos\hilos_48.html">Documente
-        la seguridad del hilo</a> <br /> <a
-        href="..\constructores\constructors_84.html">Evite el
-        estilo JavaBeans de construcción</a> <br /> <a
-        href="..\patrones\patrones_187.html">Objetos de Modelo </a>
-      <br /> <a
-        href="..\practicascomunes\practicascomunes_240.html">Etiquete
-        o marque los interfaces</a> <br />
+      <a href="..\practicascomunes\practicascomunes_6.html">Validar el estado con invariantes de clase</a><br /> 
+      <a href="..\constructores\constructors_12.html">Constructores de Copia</a><br /> 
+      <a href="..\practicascomunes\practicascomunes_15.html">Copia defensiva </a><br /> 
+      <a href="..\patrones\patrones_21.html">Métodos Factoría</a><br /> 
+      <a href="..\practicascomunes\practicascomunes_23.html">Use final generosamente </a><br /> 
+      <a href="..\objetos\objects_28.html">Implementar hashCode</a><br />
+      <a href="..\patrones\patrones_34.html">Inicialización perezosa</a><br /> 
+      <a href="..\hilos\hilos_48.html">Documente la seguridad del hilo</a><br /> 
+      <a href="..\constructores\constructors_84.html">Evite el estilo JavaBeans de construcción</a><br /> 
+      <a href="..\patrones\patrones_187.html">Objetos de Modelo </a><br /> 
+      <a href="..\practicascomunes\practicascomunes_240.html">Etiquete o marque los interfaces</a><br />
     </div>
     <footer id="footer" class="legalese">
-      <span id="app_name">Prácticas de Java</span> <span
-        id="app_version_number">3.001</span><br /> © <span
-        id="copyright">2018 Hirondelle Systems</span><br /> <a
-        href="http://www.javapractices.com/source/SourceAction.do">Código
-        Fuente</a> | <a href="mailto:webmaster@javapractices.com"
-                      rel="author">Contacto</a> | <a
-                      href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
-                      rel="license">Licencia</a> | <a
-                      href="http://www.javapractices.com/apps/cjp.rss"
-                      rel="alternate" type="application/rss+xml">RSS</a>
+      <span id="app_name">Prácticas de Java</span> 
+      <span id="app_version_number">3.001</span><br /> © 
+      <span id="copyright">2018 Hirondelle Systems</span><br /> 
+      <a href="http://www.javapractices.com/source/SourceAction.do">Código Fuente</a> | 
+      <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a> | 
+      <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/" rel="license">Licencia</a> | 
+      <a href="http://www.javapractices.com/apps/cjp.rss" rel="alternate" type="application/rss+xml">RSS</a>
       <!-- ukey="2AC36CD2" -->
       <!-- ckey="16DF3D87" -->
-      <br /> Los trozos de código individual tienen una <a
-        href="http://www.javapractices.com/LICENSE.txt"
-        rel="license">licencia BSD</a><br /> Sobre 1,000,000 de
-      IPs únicas el último año<br /> Última actualización
-      <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
-      <br /> - In Memoriam : Bill Dirani -
+      <br /> Los trozos de código individual tienen una 
+      <a href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia BSD</a><br /> 
+      Sobre 1,000,000 de IPs únicas el último año<br /> 
+      Última actualización <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time><br />
+      - In Memoriam : Bill Dirani -
     </footer>
   </body>
 </html>
