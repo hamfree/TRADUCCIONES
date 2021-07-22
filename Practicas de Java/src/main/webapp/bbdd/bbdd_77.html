@@ -2,105 +2,68 @@
 <html lang="es">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="description"
-          content="Prácticas y técnicas de programación en Java.">
-    <meta name="keywords"
-          content="java,programación java,Prácticas de Java,idioma 
-          java,estilo java,patrones de diseño java,convenciones de codigo java">
+    <meta name="description" content="Prácticas y técnicas de programación en Java.">
+    <meta name="keywords" content="java, programación java, Prácticas de Java, idioma java, estilo java, patrones de diseño java, 
+          convenciones de codigo java">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prácticas Java-&gt;Encapsulado de la excepción de Datos</title>
-    <link id="stylesheet" rel="stylesheet" type="text/css"
-          href="../css/stylesheet9.css" media="all">
-    <link rel="icon" type="image/png"
-          href="../img/favicon.png">
+    <link id="stylesheet" rel="stylesheet" type="text/css" href="../css/stylesheet9.css" media="all">
+    <link rel="icon" type="image/png" href="../img/favicon.png">
   </head>
   <body>
     <nav class="menu-bar" id="menu-bar">
-      <a href="../index.html"
-         title="Tabla de Contenido" style="float: left;">Inicio</a>
+      <a href="../index.html" title="Tabla de Contenidos" style="float: left;">Inicio</a>
       &nbsp;&nbsp;
-      <form method="GET" action="https://www.google.com/search"
-            class="search-form" style="float: right;">
-        <input name="q" size="15" maxlength="255" placeholder=""
-               type="text"> <input name="btnG" value="Search"
-               type="submit"> <input name="sitesearch"
-               value="www.javapractices.com" type="hidden">
+      <form method="GET" action="https://www.google.com/search" class="search-form" style="float: right;">
+        <input name="q" size="15" maxlength="255" placeholder="" type="text" />
+        <input name="btnG" value="Buscar" type="submit" />
+        <input name="sitesearch" value="www.javapractices.com" type="hidden" />
       </form>
     </nav>
-    <div class="page-title">Encapsulado de la excepción de Datos</div>
-    <br />Data can be stored in various ways, for example:
+    <div class="page-title">
+      Encapsulado de la excepción de Datos
+    </div>
+    <br />
+    Data can be stored in various ways, for example:
     <ul>
       <li>a relational database</li>
       <li>text files</li>
-      <li>on the web (for example, fetching the weather forecast
-        from a web site)</li>
+      <li>on the web (for example, fetching the weather forecast from a web site)</li>
     </ul>
-    If the storage method changes, then the low level
-    <code>Exception</code>
-    objects thrown by the data access layer can also change. For
-    example, when the data store is moved from text files to a
-    relational database,
-    <code>IOException</code>
-    is replaced with
-    <code>SQLException.</code>
+    If the storage method changes, then the low level <code>Exception</code> objects thrown by the data access layer can also 
+    change. For example, when the data store is moved from text files to a relational database, <code>IOException</code> is 
+    replaced with <code>SQLException.</code>
     <p>
-      In order to prevent such a change from propagating to higher
-      layers, one can wrap such low level
-      <code>Exception</code>
-      s in a generic "data exception" wrapper, designed exclusively to
-      protect the higher layers from such changes.
+      In order to prevent such a change from propagating to higher layers, one can wrap such low level <code>Exception</code>s in a 
+      generic "data exception" wrapper, designed exclusively to protect the higher layers from such changes.
     </p>
     <p>
-      <code>
-        Throwable.<a
-          href="https://docs.oracle.com/javase/10/docs/api/java/lang/Throwable.html#getCause()">getCause()</a>
-      </code>
-      can always be used to extract the original exception, if
-      desired. (However, you sometimes need to <a
-        href="http://www.javapractices.com/topic/TopicAction.do?Id=235">be
-        careful</a> that both client and server know about the class of
-      an underlying exception.)
+      <code>Throwable.<a href="https://docs.oracle.com/javase/10/docs/api/java/lang/Throwable.html#getCause()">getCause()</a></code>
+      can always be used to extract the original exception, if desired. (However, you sometimes need to 
+      <a href="../excepciones/excepciones_235.html">be careful</a> that both client and server know about the  class of an 
+      underlying exception.)
     </p>
     <p>
       <b>Example</b>
     </p>
     <p>
-      When building applications with the WEB4J tool,
-      <code>DAOException</code>
-      is the only checked exception that should be emitted by an
-      application's data access layer. All occurrences of checked
-      exceptions are either handled within the data layer, or, if they
-      are thrown, translated into a
-      <code>DAOException</code>
-      .
+      When building applications with the WEB4J tool, <code>DAOException</code> is the only checked exception that should be emitted
+      by an application's data access layer. All occurrences of checked exceptions are either handled within the data layer, or, if 
+      they are thrown, translated into a <code>DAOException</code>.
     </p>
     <p>
-      In the following example,
-      <code>ConnectionSrc</code>
-      encapulates how an application creates or accesses
-      <code>Connection</code>
-      s. When an
-      <code>SQLException</code>
-      or a
-      <code>NamingException</code>
-      occurs in its implementation, it is always wrapped in a
-      <code>DAOException</code>
-      , and then re-thrown to the caller.
+      In the following example, <code>ConnectionSrc</code> encapsulates how an application creates or accesses 
+      <code>Connection</code>s. When an <code>SQLException</code> or a <code>NamingException</code> occurs in its implementation, 
+      it is always wrapped in a <code>DAOException</code>, and then re-thrown to the caller.
     </p>
     <p>
-      This example is particulary appropriate because of the
-      <code>NamingException</code>
-      . If the
-      <code>NamingException</code>
-      was <em>not</em> translated into an
-      <code>DAOException</code>
-      , and thrown as is, then it would be visible <em>directly</em>
-      to the caller. That is, the caller would know that the data
-      layer is implemented using JNDI - which is likely inappropriate.
+      This example is particulary appropriate because of the <code>NamingException</code>. If the <code>NamingException</code> was 
+      <em>not</em> translated into an <code>DAOException</code>, and thrown as is, then it would be visible <em>directly</em> to 
+      the caller. That is, the caller would know that the data layer is implemented using JNDI - which is likely inappropriate.
       <br />
     </p>
     <pre>
-        <span class="keyword">import</span> java.util.*;
+<span class="keyword">import</span> java.util.*;
 <span class="keyword">import</span> java.util.logging.*;
 <span class="keyword">import</span> java.sql.Connection;
 <span class="keyword">import</span> java.sql.SQLException;
@@ -163,38 +126,31 @@
     <br />
     <p></p>
     <p></p>
-    <div class="topic-section" id="see-also-title">Vea También :</div>
+    <div class="topic-section" id="see-also-title">
+      Vea También:
+    </div>
     <div id="see-also" class="main-body">
-      <a
-        href="..\bbdd\bbdd_66.html">Objetos de acceso a Datos
-      </a> <br /> <a
-        href="..\bbdd\bbdd_76.html">Reduzca la duplicación de código de la base de datos
-      </a> <br /> <a
-        href="..\excepciones\excepciones_120.html">Traducción de Excepciones
-      </a> <br /> <a
-        href="..\servlets\servlets_188.html">WEB4J, Un Marco de trabajo de Aplicaciones WEB
-      </a> <br /> <a
-        href="..\excepciones\excepciones_235.html">Cuidado con las causas raíz desconocidas
-      </a> <br />
+      <a href="../bbdd/bbdd_66.html">Objetos de acceso a Datos</a><br /> 
+      <a href="../bbdd/bbdd_76.html">Reduzca la duplicación de código de la base de datos</a><br /> 
+      <a href="../excepciones/excepciones_120.html">Traducción de Excepciones</a><br /> 
+      <a href="../servlets/servlets_188.html">WEB4J, Un Marco de trabajo de Aplicaciones WEB</a><br /> 
+      <a href="../excepciones/excepciones_235.html">Cuidado con las causas raíz desconocidas</a><br />
     </div>
     <footer id="footer" class="legalese">
-      <span id="app_name">Prácticas de Java</span> <span
-        id="app_version_number">3.001</span><br /> © <span id="copyright">2018
-        Hirondelle Systems</span><br /> <a
-        href="http://www.javapractices.com/source/SourceAction.do">Código
-        Fuente</a> | <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a>
-      | <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
-           rel="license">Licencia</a> | <a
-           href="http://www.javapractices.com/apps/cjp.rss" rel="alternate"
-           type="application/rss+xml">RSS</a>
+      <span id="app_name">Prácticas de Java</span> 
+      <span id="app_version_number">3.001</span><br /> © 
+      <span id="copyright">2018 Hirondelle Systems</span><br /> 
+      <a href="http://www.javapractices.com/source/SourceAction.do">Código Fuente</a> | 
+      <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a> | 
+      <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/" rel="license">Licencia</a> | 
+      <a href="http://www.javapractices.com/apps/cjp.rss" rel="alternate" type="application/rss+xml">RSS</a>
       <!-- ukey="2AC36CD2" -->
       <!-- ckey="16DF3D87" -->
-      <br /> Los trozos de código individual tienen una <a
-        href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia
-        BSD</a><br /> Sobre 1,000,000 de IPs únicas el último año<br />
-      Última actualización
-      <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
-      <br /> - In Memoriam : Bill Dirani -
+      <br /> Los trozos de código individual tienen una 
+      <a href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia BSD</a><br /> 
+      Sobre 1,000,000 de IPs únicas el último año<br /> 
+      Última actualización <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time><br />
+      - In Memoriam : Bill Dirani -
     </footer>
   </body>
 </html>

@@ -2,111 +2,84 @@
 <html lang="es">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="description"
-          content="Prácticas y técnicas de programación en Java.">
-    <meta name="keywords"
-          content="java,programación java,Prácticas de Java,idioma 
-          java,estilo java,patrones de diseño java,convenciones de codigo java">
+    <meta name="description" content="Prácticas y técnicas de programación en Java.">
+    <meta name="keywords" content="java, programación java, Prácticas de Java, idioma java, estilo java, patrones de diseño java, 
+          convenciones de codigo java">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prácticas Java-&gt;Hilos de Swing</title>
-    <link id="stylesheet" rel="stylesheet" type="text/css"
-          href="../css/stylesheet9.css" media="all">
+    <link id="stylesheet" rel="stylesheet" type="text/css" href="../css/stylesheet9.css" media="all">
     <link rel="icon" type="image/png" href="../img/favicon.png">
   </head>
   <body>
     <nav class="menu-bar" id="menu-bar">
-      <a href="../index.html" title="Tabla de Contenido"
-         style="float: left;">Inicio</a> &nbsp;&nbsp;
-      <form method="GET" action="https://www.google.com/search"
-            class="search-form" style="float: right;">
-        <input name="q" size="15" maxlength="255" placeholder=""
-               type="text"> <input name="btnG" value="Search"
-               type="submit"> <input name="sitesearch"
-               value="www.javapractices.com" type="hidden">
+      <a href="../index.html" title="Tabla de Contenido" style="float: left;">Inicio</a> &nbsp;&nbsp;
+      <form method="GET" action="https://www.google.com/search" class="search-form" style="float: right;">
+        <input type="text" name="q" size="15" maxlength="255" value="" placeholder=""/> 
+        <input type="submit" name="btnG" value="Search" /> 
+        <input type="hidden" name="sitesearch" value="www.javapractices.com" />
       </form>
     </nav>
-    <div class="page-title">Hilos de Swing</div>
+    <div class="page-title">
+      Hilos de Swing
+    </div>
     <br />
     <b>Event Dispatch Thread</b>
     <p>
-      In a Swing application, most of the processing takes place in a
-      single, special thread called the <a
-        href="http://docs.oracle.com/javase/tutorial/uiswing/concurrency/dispatch.html">event
-        dispatch thread</a> (EDT).
+      In a Swing application, most of the processing takes place in a single, special thread called the 
+      <a href="http://docs.oracle.com/javase/tutorial/uiswing/concurrency/dispatch.html">event dispatch thread</a> (EDT).
     </p>
     <p>
-      This thread becomes active after a component becomes <i>realized</i>:
-      either
-      <code>pack</code>
-      ,
-      <code>show</code>
-      , or
-      <code>setVisible(true)</code>
-      has been called. When a top level window is realized, all of its
-      components are also realized. Swing is mostly single-threaded: <span
-        class="highlight">almost all calls to realized
-        components should execute in the event dispatch thread</span>. The
+      This thread becomes active after a component becomes <i>realized</i>: either <code>pack</code>, <code>show</code>, or
+      <code>setVisible(true)</code> has been called. When a top level window is realized, all of its components are also realized. 
+      Swing is mostly single-threaded: 
+      <span class="highlight">almost all calls to realized components should execute in the event dispatch thread</span>. The 
       thread-safe exceptions are:
     </p>
     <ul>
-      <li>some methods of <code>
-          <a
-            href="https://docs.oracle.com/javase/10/docs/api/javax/swing/JComponent.html">JComponent</a>
-        </code>: <code>repaint</code>, <code>revalidate</code>, <code>invalidate</code></li>
-      <li>all <code>addXXXListener</code> and <code>removeXXXListener</code>
-        methods
+      <li>some methods of 
+        <code><a href="https://docs.oracle.com/javase/10/docs/api/javax/swing/JComponent.html">JComponent</a></code>: 
+        <code>repaint</code>, <code>revalidate</code>, <code>invalidate</code>
+      </li>
+      <li>
+        all <code>addXXXListener</code> and <code>removeXXXListener</code> methods
       </li>
       <li>all methods explicitly documented as thread-safe</li>
     </ul>
     <b>Worker Threads Keep GUIs Responsive</b>
     <p>
-      If a task needs a relatively long time to complete, then
-      performing that task in the event dispatch thread will cause the
-      user interface to become unresponsive for the duration of the
-      task - the GUI becomes "locked". Since this is undesirable, such
-      tasks are usually performed outside the event dispatch thread,
-      on what is commonly referred to as a <i>worker thread</i>.
+      If a task needs a relatively long time to complete, then performing that task in the event dispatch thread will cause the
+      user interface to become unresponsive for the duration of the task - the GUI becomes "locked". Since this is undesirable, such
+      tasks are usually performed outside the event dispatch thread, on what is commonly referred to as a <i>worker thread</i>.
     </p>
-    <p>When a worker thread completes its task, it needs a special
-      mechanism for updating realized GUI components, since, as stated
-      above, realized components almost always need to be updated only
-      from the event dispatch thread.</p>
+    <p>
+      When a worker thread completes its task, it needs a special mechanism for updating realized GUI components, since, as stated
+      above, realized components almost always need to be updated only from the event dispatch thread.
+    </p>
     <p>
       With modern JDK's, the most common way of doing this is the
-      <code>
-        <a
-          href="https://docs.oracle.com/javase/10/docs/api/javax/swing/SwingWorker.html">SwingWorker</a>
-      </code>
-      class, introduced in JSE 6. It should be used if available.
+      <code><a href="https://docs.oracle.com/javase/10/docs/api/javax/swing/SwingWorker.html">SwingWorker</a></code> class, 
+      introduced in JSE 6. It should be used if available.
     </p>
     <p>
-      For using timers, see this related <a
-        href="http://www.javapractices.com/topic/TopicAction.do?Id=160">topic</a>.
+      For using timers, see this related <a href="http://www.javapractices.com/topic/TopicAction.do?Id=160">topic</a>.
     </p>
     <p>
       <b>Example 1</b>
     </p>
     <p>
-      The <a
-        href="http://www.javapractices.com/apps/stocksmonitor/javadoc/src-html/hirondelle/stocks/quotes/FetchQuotesAction.html"><code>FetchQuotesAction</code></a>
-      fetches stock price information. This is a good example of an
-      operation which should be on a separate thread. Since it's not
-      known how long it will take, or even if a good web connection is
-      present, it's an operation which could very easily lock the GUI.
+      The 
+      <a href="http://www.javapractices.com/apps/stocksmonitor/javadoc/src-html/hirondelle/stocks/quotes/FetchQuotesAction.html">
+        <code>FetchQuotesAction</code></a> fetches stock price information. This is a good example of an operation which should be 
+      on a separate thread. Since it's not known how long it will take, or even if a good web connection is present, it's an 
+      operation which could very easily lock the GUI.
     </p>
     <p>
-      Below are the pertinent parts of its code. Note how a
-      <code>SwingWorker</code>
-      is divided into two parts:
-      <code>doInBackground</code>
-      does the main work and returns any needed data, and
-      <code>done</code>
-      first calls
-      <code>get</code>
-      to access the data, and then updates the user interface. <br />
+      Below are the pertinent parts of its code. Note how a <code>SwingWorker</code> is divided into two parts:
+      <code>doInBackground</code> does the main work and returns any needed data, and <code>done</code> first calls 
+      <code>get</code> to access the data, and then updates the user interface.<br />
     </p>
     <pre>
-		<span class="comment">/**
+<span class="comment">/**
 * Fetch current quote data for the {@link CurrentPortfolio} from a data 
 * source on the web.
 */</span>
@@ -182,87 +155,54 @@
       <b>JDK &lt; 6</b>
     </p>
     <p>
-      Other techniques are needed when using older versions of the
-      JDK. Two methods of the
-      <code>
-        <a
-          href="https://docs.oracle.com/javase/10/docs/api/java/awt/EventQueue.html">EventQueue</a>
-      </code>
-      class,
-      <code>invokeLater</code>
-      and
-      <code>invokeAndWait</code>
-      , are provided for this purpose (
-      <code>
-        <a
-          href="https://docs.oracle.com/javase/10/docs/api/javax/swing/SwingUtilities.html">SwingUtilities</a>
-      </code>
-      has synonymous methods as well). Sun recommends using
-      <code>invokeLater</code>
-      as the usual preferred style.
+      Other techniques are needed when using older versions of the JDK. Two methods of the
+      <code><a href="https://docs.oracle.com/javase/10/docs/api/java/awt/EventQueue.html">EventQueue</a></code> class, 
+      <code>invokeLater</code> and <code>invokeAndWait</code>, are provided for this purpose 
+      (<code><a href="https://docs.oracle.com/javase/10/docs/api/javax/swing/SwingUtilities.html">SwingUtilities</a></code> has 
+      synonymous methods as well). Sun recommends using <code>invokeLater</code> as the usual preferred style.
     </p>
     <p>
-      When using threads in this way, it is usually a good idea to use
-      <em>daemon</em> threads, not <em>user</em> threads, whenever
-      possible: daemon threads will not prevent an application from
-      terminating. Since threads are user threads by default, an
-      explicit call to
+      When using threads in this way, it is usually a good idea to use <em>daemon</em> threads, not <em>user</em> threads, whenever
+      possible: daemon threads will not prevent an application from terminating. Since threads are user threads by default, an
+      explicit call to 
       <code>
         Thread.<a
           href="https://docs.oracle.com/javase/10/docs/api/java/lang/Thread.html#setDaemon(boolean)">setDaemon</a>(true)
-      </code>
-      is required.
+      </code> is required.
     </p>
-    <p>The remaining examples use JSE 1.5.</p>
+    <p>
+      The remaining examples use JSE 1.5.
+    </p>
     <p>
       <b>Example 2</b>
     </p>
     <p>
-      The <a
-        href="http://www.javapractices.com/topic/TopicAction.do?Id=149">Splash
-        Screen</a> topic (and in particular its
-      <code>Launcher</code>
-      class) is a good example of using a worker thread. Here, the
-      status of the launch thread as a worker thread is exploited to
-      show a splash screen to the user, but only until the main window
-      has finished loading.
+      The <a href="http://www.javapractices.com/topic/TopicAction.do?Id=149">Splash Screen</a> topic (and in particular its
+      <code>Launcher</code> class) is a good example of using a worker thread. Here, the status of the launch thread as a worker 
+      thread is exploited to show a splash screen to the user, but only until the main window has finished loading.
     </p>
     <p>
       <b>Example 3</b>
     </p>
     <p>
-      The
-      <code>ColorTip</code>
-      class, shown below, changes the background color of a component
-      for a short, fixed interval of time, as a simple way of calling
-      attention to that component.
+      The <code>ColorTip</code> class, shown below, changes the background color of a component for a short, fixed interval of time,
+      as a simple way of calling attention to that component.
     </p>
     <p>
-      Its worker thread does not work very hard - it sleeps a lot. The
-      calls to
-      <code>sleep</code>
-      do not cause the GUI to become unresponsive, however, since
-      these calls do not take place in the event dispatch thread.
+      Its worker thread does not work very hard - it sleeps a lot. The calls to <code>sleep</code> do not cause the GUI to become 
+      unresponsive, however, since these calls do not take place in the event dispatch thread.
     </p>
     <p>
-      <code>ColorTip</code>
-      has three
-      <code>private</code>
-      ,
-      <code>Runnable</code>
-      nested classes :
+      <code>ColorTip</code> has three <code>private</code>, <code>Runnable</code> nested classes:
     </p>
     <ul>
-      <li><code>Worker</code> - inserts specific time intervals
-        between changing colors</li>
-      <li><code>ChangeColor</code> - updates the GUI by changing
-        the background color of a target component</li>
-      <li><code>RevertColor</code> - updates the GUI by changing
-        the background color back to its original color</li>
+      <li><code>Worker</code> - inserts specific time intervals between changing colors</li>
+      <li><code>ChangeColor</code> - updates the GUI by changing the background color of a target component</li>
+      <li><code>RevertColor</code> - updates the GUI by changing the background color back to its original color</li>
     </ul>
     <br />
     <pre>
-		<span class="keyword">package</span> hirondelle.stocks.quotes;
+<span class="keyword">package</span> hirondelle.stocks.quotes;
 
 <span class="keyword">import</span> hirondelle.stocks.util.Args;
 <span class="keyword">import</span> hirondelle.stocks.util.Consts;
@@ -428,30 +368,28 @@
     </pre>
     <br />
     <p></p>
-    <div class="topic-section" id="see-also-title">Vea También :</div>
+    <div class="topic-section" id="see-also-title">
+      Vea También:
+    </div>
     <div id="see-also" class="main-body">
-      <a href="..\swing\swing_149.html">Pantalla de Bienvenida</a> <br />
-      <a href="..\swing\swing_160.html">Temporizador</a> <br />
+      <a href="..\swing\swing_149.html">Pantalla de Bienvenida</a><br />
+      <a href="..\swing\swing_160.html">Temporizador</a><br />
     </div>
     <footer id="footer" class="legalese">
-      <span id="app_name">Prácticas de Java</span> <span
-        id="app_version_number">3.001</span><br /> © <span
-        id="copyright">2018 Hirondelle Systems</span><br /> <a
-        href="http://www.javapractices.com/source/SourceAction.do">Código
-        Fuente</a> | <a href="mailto:webmaster@javapractices.com"
-                      rel="author">Contacto</a> | <a
-                      href="http://creativecommons.org/licenses/by-nc-sa/1.0/"
-                      rel="license">Licencia</a> | <a
-                      href="http://www.javapractices.com/apps/cjp.rss"
-                      rel="alternate" type="application/rss+xml">RSS</a>
+      <span id="app_name">Prácticas de Java</span> 
+      <span id="app_version_number">3.001</span><br /> © 
+      <span id="copyright">2018 Hirondelle Systems</span><br /> 
+      <a href="http://www.javapractices.com/source/SourceAction.do">Código Fuente</a> | 
+      <a href="mailto:webmaster@javapractices.com" rel="author">Contacto</a> | 
+      <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/" rel="license">Licencia</a> | 
+      <a href="http://www.javapractices.com/apps/cjp.rss" rel="alternate" type="application/rss+xml">RSS</a>
       <!-- ukey="2AC36CD2" -->
       <!-- ckey="16DF3D87" -->
-      <br /> Los trozos de código individual tienen una <a
-        href="http://www.javapractices.com/LICENSE.txt"
-        rel="license">licencia BSD</a><br /> Sobre 1,000,000 de
-      IPs únicas el último año<br /> Última actualización
-      <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time>
-      <br /> - In Memoriam : Bill Dirani -
+      <br /> Los trozos de código individual tienen una 
+      <a href="http://www.javapractices.com/LICENSE.txt" rel="license">licencia BSD</a><br /> 
+      Sobre 1,000,000 de IPs únicas el último año<br /> 
+      Última actualización <time id="last_updated_on" datetime="2018-06-03">2018-06-03</time><br />
+      - In Memoriam : Bill Dirani -
     </footer>
   </body>
 </html>
