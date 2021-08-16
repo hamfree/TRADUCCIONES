@@ -21,49 +21,51 @@
     </nav>
     <div class="page-title">Recuperando recursos</div>
     <br />
-    Expensive resources should be reclaimed as soon as possible, by an explict call to a clean-up method defined for this purpose. 
-    If this is not done, then system performance can degrade. In the worst cases, the system can even fail entirely.
+    Los recursos costosos deben reclamarse lo antes posible, mediante una llamada explícita a un método de limpieza definido para 
+    este propósito. Si no se hace esto, el rendimiento del sistema puede degradarse. En el peor de los casos, el sistema puede 
+    incluso fallar por completo.
     <p>
-      Resources include:
+      Los recursos incluyen:
     </p>
     <ul>
-      <li>input-output streams</li>
-      <li>database result sets, statements, and connections</li>
-      <li>threads</li>
-      <li>graphic resources</li>
+      <li>flujos de entrada-salida</li>
+      <li>conjuntos de resultados de bases de datos, sentencias, y conexiones</li>
+      <li>subprocesos</li>
+      <li>recursos gráficos</li>
       <li>sockets</li>
     </ul>
-    Resources which are created locally within a method must be cleaned up within the same method, by calling a method appropriate 
-    to the resource itself, such as <code>close</code> or <code>dispose</code>. (The exact name of the method is arbitrary, but it 
-    usually has those conventional names.) This is usually done automatically, using the
-    <a href="http://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html">try-with-resources</a> feature, 
-    added in JDK 7.
+    Los recursos que se han creado localmente dentro de un método deben limpiarse dentro del mismo método, llamando a un método 
+    apropiado para el recurso en sí, como <code>close</code> o <code>dispose</code>. (El nombre exacto de este método es 
+    arbitrario, pero es habitualmente tienen esos convencionales nombres). Esto se hace habitualmente automáticamente, usando la 
+    característica 
+    <a href="http://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html">try-with-resources</a>, agregado en 
+    el KDJ 7.
     <p>
-      If try-with-resources isn't available, then you need to clean up resources explicitly, by calling a clean-up method in a
-      <code>finally</code> clause.
+      Si try-with-resources no está disponible, entonces necesita limpiar los recursos explícitamente, llamando a un método de 
+      limpieza en una cláusula <code>finally</code>.
     </p>
     <p>
-      For the case of a resource which is a <i>field</i>, however, there's more work to do:
+      Para el caso de un recurso que es un <i>campo</i>, sin embargo, hay más trabajo que hacer:
     </p>
     <ul>
       <li>
-        implement a clean-up method which the user must call when finished with the object, with a name such as 
-        <code>close</code> or <code>dispose</code>
+        implementar un método de limpieza que el usuario debe llamar cuando termine con el objeto, con un nombre tal como 
+        <code>close</code> o <code>dispose</code>
       </li>
-      <li>the caller should be able to query an object to see if its clean-up method has been executed</li>
+      <li>el llamador debe ser capaz de preguntar a un objeto para ver si su método de limpieza ha sido ejecutado</li>
       <li>
-        non-<code>private</code> methods (other than the clean-up method itself) should throw an 
-        <code>IllegalStateException</code> if the clean-up method has already been invoked
+        los métodos no <code>private</code> (distintos del propio método de limpieza) deberían lanzar una 
+        <code>IllegalStateException</code> si el método de limpieza ha sido ya invocado
       </li>
       <li>
-        as a safety net, implement <code>finalize</code> to call the clean-up method as well; if the user of the class neglects to 
-        call the clean-up method, then this may allow recovery of the resource by the system
+        como red de seguridad, implemente <code>finalize</code> para llamar también al método de limpieza; Si el usuario de la clase 
+        no llama al método de limpieza, esto puede permitir la recuperación del recurso por parte del sistema.
       </li>
-      <li><a href="http://www.javapractices.com/topic/TopicAction.do?Id=24">never rely</a> solely on <code>finalize</code></li>
+      <li><a href="../objetos/objects_24.html">nunca confíe</a> únicamenete en <code>finalize</code></li>
     </ul>
-    This example shows a class which retains a database connection during its lifetime. (This example is artificial. Actually 
-    writing such a class would not seem necessary in practice, since connection pools already perform such clean-up in the 
-    background. It's used merely to demonstrate the ideas mentioned above.)
+    Este ejemplo muestra una clase que retiene una conexión a una base de datos durante su vida. (Este ejemplo es artificial. En 
+    realidada escribir dicha clase no debería ser necesario en la práctica, ya que las agrupaciones de conexión ya realizan dicha 
+    limpieza en segundo plano. Se usa meramente para demostrar las ideas mencionadas arriba).
     <br />
     <pre>
 <span class="keyword">import</span> java.sql.*;
@@ -71,24 +73,24 @@
 <span class="keyword">import</span> java.util.*;
 
 <span class="comment">/**
-* This class has an enforced life cycle: after destroy is
-* called, no useful method can be called on this object
-* without throwing an IllegalStateException.
+* Esta clase tiene un ciclo de vida obligatorio: después de llamar a 
+* destruir, no se puede llamar a ningún método útil en este objeto
+* sin lanzar una IllegalStateException.
 */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
             class="keyword">class</span> DbConnection {
 
   <span class="keyword">public</span> DbConnection () {
-    <span class="comment">//build a connection and assign it to a field
-</span>    <span class="comment">//elided.. fConnection = ConnectionPool.getInstance().getConnection();
+    <span class="comment">//construir una conexión y asignarla a un campo
+</span>    <span class="comment">//omitido... fConnection = ConnectionPool.getInstance().getConnection();
 </span>  }
 
   <span class="comment">/**
-  * Ensure the resources of this object are cleaned up in an orderly manner.
+  * Asegura que los recursos de este objeto son limpiado de una manera ordenada.
   *
-  * The user of this class must call destroy when finished with
-  * the object. Calling destroy a second time is permitted, but is
-  * a no-operation.
+  * El usuario de esta clase debe llamar a destroy cuando termine con 
+  * el objeto. Llamar a destroy una segunda vez se permite, pero es 
+  * una no operación.
   */</span>
   <span class="keyword">public</span> <span class="keyword">void</span> destroy() <span
             class="keyword">throws</span> SQLException {
@@ -99,29 +101,29 @@
       <span class="keyword">if</span> (fConnection != <span
             class="keyword">null</span>) fConnection.close();
       fConnection = <span class="keyword">null</span>;
-      <span class="comment">//flag that destory has been called, and that
-</span>      <span class="comment">//no further calls on this object are valid
+      <span class="comment">//marca que se ha llamado a destroy, y que 
+</span>      <span class="comment">//ninguna llamada posterior en este objeto es válida
 </span>      fIsDestroyed = <span class="keyword">true</span>;
     }
   }
 
   <span class="comment">/**
-  * Fetches something from the db.
+  * Obtiene algo de la base de datos.
   *
-  * This is an example of a non-private method which must ensure that
-  * &lt;code&gt;destroy&lt;/code&gt; has not yet been called
-  * before proceeding with execution.
+  * Esto es un ejemplo de un método no privado que debe asegurar que 
+  * &lt;code&gt;destroy&lt;/code&gt; no ha sido ya llamado 
+  * antes de proceder con la ejecución.
   */</span>
   <span class="keyword">synchronized</span> <span class="keyword">public</span> Object fetchBlah(String aId) <span
             class="keyword">throws</span> SQLException {
     validatePlaceInLifeCycle();
-    <span class="comment">//..elided
+    <span class="comment">//...omitido
 </span>    <span class="keyword">return</span> <span class="keyword">null</span>;
   }
 
   <span class="comment">/**
-  * If the user fails to call &lt;code&gt;destroy&lt;/code&gt;, then implementing
-  * finalize will act as a safety net, but this is not foolproof.
+  * Si el usuario falla en llamar a &lt;code&gt;destroy&lt;/code&gt;, entonces implementa 
+  * finalize actuará como una red de seguridad, pero esto no es infalible.
   */</span>
   <span class="keyword">protected</span> <span class="keyword">void</span> finalize() <span
             class="keyword">throws</span> Throwable{
@@ -134,39 +136,39 @@
   }
 
   <span class="comment">/**
-  * Allow the user to determine if &lt;code&gt;destroy&lt;/code&gt; has been called.
+  * Permite al usuario a determinar si &lt;code&gt;destroy&lt;/code&gt; ha sido llamado.
   */</span>
   <span class="keyword">public</span> <span class="keyword">boolean</span> isDestoyed() {
     <span class="keyword">return</span> fIsDestroyed;
   }
 
-  <span class="comment">// PRIVATE
+  <span class="comment">// PRIVADO
 </span>
   <span class="comment">/**
-  * Connection which is constructed and managed by this object.
-  * The user of this class must call destroy in order to release this
-  * Connection resource.
+  * La conexión que se construyó y gestionó por este objeto.
+  * El usuario de esta clase debe llamar a destroy en orden a liberar este
+  * recurso de Connection.
   */</span>
   <span class="keyword">private</span> Connection fConnection;
 
   <span class="comment">/**
-  * This object has a specific "life cycle", such that methods must be called
-  * in the order: others + destroy. fIsDestroyed keeps track of the lifecycle,
-  * and non-private methods must check this value at the start of execution.
-  * If destroy is called more than once, a no-operation occurs.
+  * Este objeto tiene un "ciclo de vida" específico, por lo que los métodos deben llamarse
+  * en el orden: otros + destroy. fIs Destroyed realiza un seguimiento del ciclo de vida,
+  * y los métodos no privados deben comprobar este valor al inicio de la ejecución.
+  * Si se llama a destruir más de una vez, no se realiza ninguna operación.
   */</span>
   <span class="keyword">private</span> <span class="keyword">boolean</span> fIsDestroyed;
 
   <span class="comment">/**
-  * Once &lt;code&gt;destroy&lt;/code&gt; has been called, the services of this class
-  * are no longer available.
+  * Una vez ha sido llamado &lt;code&gt;destroy&lt;/code&gt;, los servicios de esta clase 
+  * ya no están disponibles.
   *
-  * @throws IllegalStateException if &lt;code&gt;destroy&lt;/code&gt; has
-  * already been called.
+  * @throws IllegalStateException si &lt;code&gt;destroy&lt;/code&gt; ha
+  * sido ya llamada.
   */</span>
   <span class="keyword">private</span> <span class="keyword">void</span> validatePlaceInLifeCycle(){
     <span class="keyword">if</span> (fIsDestroyed) {
-      String message = <span class="literal">"Method cannot be called after destroy has been called."</span>;
+      String message = <span class="literal">"No se puede llamar al método después de que se haya llamado a destroy."</span>;
       <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(message);
     }
   }
@@ -176,11 +178,11 @@
     <p></p>
     <div class="topic-section" id="see-also-title">Vea También :</div>
     <div id="see-also" class="main-body">
-      <a href="..\entradasalida\entradasalida_8.html">Cierre siempre los flujos</a> <br />
-      <a href="..\objetos\objects_24.html">Nunca confíe en finalize</a> <br /> 
-      <a href="..\excepciones\excepciones_25.html">Finally y catch</a> <br /> 
-      <a href="..\bbdd\bbdd_127.html">Obtener la conexión a la base de datos</a> <br /> 
-      <a href="..\hilos\hilos_250.html">Siempre cierre un ExecutorService</a> <br />
+      <a href="../entradasalida/entradasalida_8.html">Cierre siempre los flujos</a><br />
+      <a href="../objetos/objects_24.html">Nunca confíe en finalize</a><br /> 
+      <a href="../excepciones/excepciones_25.html">Finally y catch</a><br /> 
+      <a href="../bbdd/bbdd_127.html">Obtener la conexión a la base de datos</a><br /> 
+      <a href="../hilos/hilos_250.html">Siempre cierre un ExecutorService</a><br />
     </div>
     <footer id="footer" class="legalese">
       <span id="app_name">Prácticas de Java</span> 
