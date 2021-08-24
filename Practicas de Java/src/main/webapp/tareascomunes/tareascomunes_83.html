@@ -21,35 +21,35 @@
     </nav>
     <div class="page-title">Obtener el tamaño de un objeto en memoria</div>
     <br /> 
-    Occasionally, you may be interested in measuring (or estimating) the size of an object in memory. Here's a utility which
-    can help with that task, if the object's class has a no-argument constructor. It follows the style used by
-    <i>Java Platform Performance</i>, by Wilson and Kesselman. Given a class name, it will build a number of objects using the 
-    no-argument constructor, and measure the effect on JVM memory use. 
-    <em>Thus, it measures the size of 'empty' objects containing  no data.</em>
+    Ocasionalmente, puede estar interesado en medir (o estimar) el tamaño de un objeto en memoria. Aquí tiene una utilidad que 
+    puede ayudar con esa tarea, si la clase del objeto tiene un constructor sin argumento. Sigue el estilo usado por 
+    <i>Rendimiento de la Plataforma Java</i>, por Wilson y Kesselman. Dado un nombre de clase, construirá un número de objetos 
+    usando el constructor sin argumentos, y mide el efecto en el uso de memoria de la JVM.
+    <em>Por lo tanto, mide el tamaño de los objetos "vacíos" que no contienen datos.</em>
     <p>
-      To measure the size of a particular object containing data, a similar technique can easily be used: measure JVM memory use
-      before and after building the object.
+      Para medir el tamaño de un objeto particular que contiene datos, se puede usar una técnica similar facilmente: mide el uso 
+      de memoria de la JVM antes y después de construir el objeto.
     </p>
     <p>
-      In addition, JDK 1.5 has added an
+      Además, el KDJ 1.5 ha agragado una interfaz 
       <code>
         <a href="https://docs.oracle.com/javase/10/docs/api/java/lang/instrument/Instrumentation.html">Instrumentation</a>
-      </code> interface, which includes a method named
+      </code>, que incluye un método llamado 
       <code>
         <a href="https://docs.oracle.com/javase/10/docs/api/java/lang/instrument/Instrumentation.html#getObjectSize(java.lang.Object)">getObjectSize</a>
-      </code> method. However, this method seems to be intended for tool makers.<br />
+      </code>. Sin embargo, este método parece estar dirigido para constructores de herramientas.<br />
     </p>
     <pre>
 <span class="comment">/**
-* Measures the approximate size of an object in memory, given a Class which
-* has a no-argument constructor.
+* Mide el tamaño aproximado de un objeto en memoria, dada una Class que 
+* tiene un constructor sin argumentos.
 */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
             class="keyword">class</span> ObjectSizer {
 
   <span class="comment">/**
-  * First and only argument is the package-qualified name of a class
-  * which has a no-argument constructor.
+  * El primer y único argumento es el nombre calificado por paquete de una clase 
+  * que tiene un constructor sin argumentos..
   */</span>
   <span class="keyword">public</span> <span class="keyword">static</span> <span
             class="keyword">void</span> main(String... aArguments){
@@ -58,40 +58,40 @@
       theClass = Class.forName(aArguments[<span class="literal">0</span>]);
     }
     <span class="keyword">catch</span> (Exception ex) {
-      log(<span class="literal">"Cannot build a Class object: "</span> + aArguments[<span
+      log(<span class="literal">"No puedo construir un objeto Class: "</span> + aArguments[<span
             class="literal">0</span>]);
-      log(<span class="literal">"Use a package-qualified name, and check classpath."</span>);
+      log(<span class="literal">"Use un nombre con cualificación de paquete, y compruebe la ruta de clases."</span>);
     }
     ObjectSizer sizer = <span class="keyword">new</span> ObjectSizer();
     <span class="keyword">long</span> size = sizer.getObjectSize(theClass);
-    log(<span class="literal">"Approximate size of "</span> + theClass + <span
-            class="literal">" objects :"</span> + size);
+    log(<span class="literal">"Tamaño aproximado de  los objetos "</span> + theClass + <span
+            class="literal">" :"</span> + size);
   }
 
   <span class="comment">/**
-  * Return the approximate size in bytes, and return zero if the class
-  * has no default constructor.
+  * Devuelve el tamaño aproximado en bytes y devuelve cero si la clase
+  * no tiene un constructor por defecto.
   *
-  * @param aClass refers to a class which has a no-argument constructor.
+  * @param aClass se refiere a una clase que tiene un constructor sin argumento.
   */</span>
   <span class="keyword">public</span> <span class="keyword">long</span> getObjectSize(Class aClass){
     <span class="keyword">long</span> result = <span class="literal">0</span>;
 
-    <span class="comment">//if the class does not have a no-argument constructor, then
-</span>    <span class="comment">//inform the user and return 0.
+    <span class="comment">//si la clase no tiene un constructor sin argumentos, entonces 
+</span>    <span class="comment">//informa al usuario y devuelve 0.
 </span>    <span class="keyword">try</span> {
       aClass.getConstructor(<span class="keyword">new</span> Class[]{});
     }
     <span class="keyword">catch</span> (NoSuchMethodException ex) {
-      log(aClass + <span class="literal">" does not have a no-argument constructor."</span>);
+      log(aClass + <span class="literal">" no tiene un constructor sin argumentos."</span>);
       <span class="keyword">return</span> result;
     }
 
-    <span class="comment">//this array will simply hold a bunch of references, such that
-</span>    <span class="comment">//the objects cannot be garbage-collected
+    <span class="comment">//esta matriz mantendrá simplemente un montón de referencias, de forma que 
+</span>    <span class="comment">//los objetos no puedan ser recolectados para la basura
 </span>    Object[] objects = <span class="keyword">new</span> Object[fSAMPLE_SIZE];
 
-    <span class="comment">//build a bunch of identical objects
+    <span class="comment">//construye un montón de objetos idénticos
 </span>    <span class="keyword">try</span> {
       Object throwAway = aClass.newInstance();
 
@@ -107,12 +107,12 @@
       result = Math.round(approximateSize);
     }
     <span class="keyword">catch</span> (Exception ex) {
-      log(<span class="literal">"Cannot create object using "</span> + aClass);
+      log(<span class="literal">"No puede crear un objeto usando "</span> + aClass);
     }
     <span class="keyword">return</span> result;
   }
 
-  <span class="comment">// PRIVATE
+  <span class="comment">// PRIVADO
 </span>  <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">int</span> fSAMPLE_SIZE = <span
             class="literal">100</span>;
@@ -153,65 +153,64 @@
     </pre>
     <p></p>
     <p>
-      <code>ObjectSizer</code> can be easily placed in an interactive console application.
+      <code>ObjectSizer</code> puede ser colocada fácilmente en una aplicación de consola interactiva.
     </p>
     <p>
-      An example run gives:
+      Una ejecución de ejemplo da:
     </p>
     <p>
       <code>&gt;java -cp . Console ObjectSizeInterpreter</code><br />
-      <code>Please enter a class name&gt;java.blah</code><br />
-      <code>Invalid.
-        Example:"java.lang.String"&gt;java.util.ArrayList</code><br />
-      <code>Approximate size of class java.util.ArrayList objects in bytes: 80</code><br />
-      <code>Please enter a class name&gt;java.util.Vector</code><br />
-      <code>Approximate size of class java.util.Vector objects in bytes: 80</code><br />
-      <code>Please enter a class name&gt;java.util.HashMap</code><br />
-      <code>Approximate size of class java.util.HashMap objects in bytes: 104</code><br />
-      <code>Please enter a class name&gt;java.lang.Long</code><br />
-      <code>class java.lang.Long does not have a no-argument constructor.</code><br />
-      <code>Please enter a class name&gt;exit</code>
+      <code>Ingrese un nombre de clase&gt;java.blah</code><br />
+      <code>Invalido. Ejemplo:"java.lang.String"&gt;java.util.ArrayList</code><br />
+      <code>Tamaño aproximado de los objetos de la clase java.util.ArrayList en bytes: 80</code><br />
+      <code>Ingrese un nombre de clase&gt;java.util.Vector</code><br />
+      <code>Tamaño aproximado de los objetos de la clase java.util.Vector en bytes: 80</code><br />
+      <code>Ingrese un nombre de clase&gt;java.util.HashMap</code><br />
+      <code>Tamaño aproximado de los objetos de la clase java.util.HashMap en bytes: 104</code><br />
+      <code>Ingrese un nombre de clase&gt;java.lang.Long</code><br />
+      <code>La clase java.lang.Long no tiene un constructor sin argumentos.</code><br />
+      <code>Ingrese un nombre de clase&gt;exit</code>
     </p>
     <p>
-      <code>Bye.</code>
+      <code>Adios.</code>
     </p>
     <p>
-      Here is the <code>Interpreter</code> class: <br />
+      Aquí está la clase <code>Interpreter</code>: <br />
     </p>
     <pre>
 <span class="keyword">import</span> java.util.*;
 <span class="keyword">import</span> java.text.MessageFormat;
 
 <span class="comment">/**
-* Given a package-qualified class name, return the approximate size of
-* the object in bytes.
+* Dado un nombre de clase cualificado de paquete, devuelve el tamaño aproximado del 
+* objeto en bytes.
 */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
             class="keyword">class</span> ObjectSizeInterpreter <span
             class="keyword">implements</span> Interpreter {
 
   <span class="comment">/**
-  * @param aLine is a non-null, package-qualified name of a class.
-  * @param aResult is a non-null, empty List which acts as an "out"
-  * parameter; when returned, aResult must contain a non-null, non-empty
-  * List containing a description of the size of the object.
+  * @param aLine es el nombre cualificado de paqute no nulo de una clase.
+  * @param aResult es una List vacía, no nula que actúa como un parámetro de 
+  *  "salida"; cuando se devuelve, aResult debe contener una List 
+  * no nula y no vacía que contiene una descripción del tamaño del objeto.
   *
-  * @return true only if the user has requested to quit the Interpreter.
-  * @exception IllegalArgumentException if a param does not comply.
+  * @return true solo si el usuario ha solicitado salir de Interpreter.
+  * @exception IllegalArgumentException si un parámeto no cumple.
   */</span>
   <span class="keyword">public</span> <span class="keyword">boolean</span> parseInput(String  aLine, <span
             class="keyword">final</span> List&lt;Object&gt; aResult) {
     <span class="keyword">if</span> (aResult == <span class="keyword">null</span>) {
       <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
-            class="literal">"Result param cannot be null."</span>);
+            class="literal">"El parámetro Result no puede ser nulo."</span>);
     }
     <span class="keyword">if</span> (!aResult.isEmpty()){
       <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
-            class="literal">"Result param must be empty."</span>);
+            class="literal">"El parámetro Result debe estar vacío."</span>);
     }
     <span class="keyword">if</span> (aLine == <span class="keyword">null</span>) {
       <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
-            class="literal">"Line must not be null."</span>);
+            class="literal">"Line no puede ser nula."</span>);
     }
 
     <span class="keyword">boolean</span> hasRequestedQuit = 
@@ -220,7 +219,7 @@
     ;
 
     <span class="keyword">if</span> (hasRequestedQuit) {
-      <span class="comment">//display only a blank line
+      <span class="comment">//visualiza solo una linea en blanco
 </span>      aResult.add(fNEW_LINE);
     }
     <span class="keyword">else</span> {
@@ -238,7 +237,7 @@
         aResult.add(fDEFAULT_PROMPT);
       }
       <span class="keyword">catch</span> (ClassNotFoundException ex){
-        <span class="comment">//recover by asking the user for corrected input
+        <span class="comment">//Recupera pidiendo al usuario la entrada corregida
 </span>        aResult.clear();
         aResult.add(fERROR_PROMPT);
       }
@@ -246,31 +245,31 @@
 
     <span class="keyword">if</span> (aResult.isEmpty()) {
       <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span
-            class="literal">"Result must be non-empty."</span>);
+            class="literal">"Result no debe estar vacío."</span>);
     }
     <span class="keyword">return</span> hasRequestedQuit;
   }
 
   <span class="comment">/**
-  * Return the text to be displayed upon start-up of the Interpreter.
+  * Devuelve el texto que se mostrará al iniciar el interprete.
   */</span>
   <span class="keyword">public</span> String getHelloPrompt() {
     <span class="keyword">return</span> fHELLO_PROMPT;
   }
 
-  <span class="comment">// PRIVATE
+  <span class="comment">// PRIVADO
 </span>  <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">final</span> String fHELLO_PROMPT = <span
-            class="literal">"Please enter a class name&gt;"</span>;
+            class="literal">"Ingrese un nombre de clase&gt;"</span>;
   <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">final</span> String fDEFAULT_PROMPT = <span
-            class="literal">"Please enter a class name&gt;"</span>;
+            class="literal">"Ingrese un nombre de clase&gt;"</span>;
   <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">final</span> String fERROR_PROMPT = <span
-            class="literal">"Invalid.  Example:\"java.lang.String\"&gt;"</span>;
+            class="literal">"Inválido. Ejemplo:\"java.lang.String\"&gt;"</span>;
   <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">final</span> String fPATTERN = <span
-            class="literal">"Approximate size of {0} objects in bytes: {1}"</span>;
+            class="literal">"Tamaño aproximado de {0} objetos en bytes: {1}"</span>;
   <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">final</span> String fQUIT = <span
             class="literal">"quit"</span>;
@@ -289,8 +288,8 @@
       Vea También :
     </div>
     <div id="see-also" class="main-body">
-      <a href="..\tareascomunes\tareascomunes_36.html">Mide el rendimiento de la aplicación</a> <br />
-      <a href="..\entradasalida\entradasalida_79.html">Entrada en la Consola</a> <br />
+      <a href="../tareascomunes/tareascomunes_36.html">Mide el rendimiento de la aplicación</a> <br />
+      <a href="../entradasalida/entradasalida_79.html">Entrada en la Consola</a> <br />
     </div>
     <footer id="footer" class="legalese">
       <span id="app_name">Prácticas de Java</span> 
