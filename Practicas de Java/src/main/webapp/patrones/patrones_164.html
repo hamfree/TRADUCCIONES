@@ -23,24 +23,26 @@
       Método Template
     </div>
     <br />
-    Template methods:
+    Los métodos Template (Plantilla, en español):
     <ul>
-      <li>are used in most abstract base classes</li>
-      <li>are perhaps the most commonly used of all design patterns</li>
+      <li>se usan en la mayoría de las clases base abstractas</li>
+      <li>son quizás los más utilizados de todos los patrones de diseño</li>
       <li>
-        define the general steps of a method, while deferring the implementation of at least one of the steps to a concrete subclass
+        define los pasos generales de un método, mientras pospone la implementación de al menos uno de los pasos a una subclase 
+        concreta
       </li>
     </ul>
-    <b>Example</b>
+    <b>Ejemplo</b>
     <p>
-      <code>TxTemplate</code> is an abstract base class which defines a template method for executing multiple database operations 
-      within a transaction. It's useful to define these steps in one place. The alternative is to repeat the same structure every 
-      time a transaction is required. As usual, such code repetition should always be aggressively eliminated.
+      <code>TxTemplate</code> es una clase base abstracta que define un método template para ejecutar múltiples operaciones en 
+      base de datos dentro de una abstracción. Es útil definir estos pasos en un lugar. La alternativa es repetir la misma 
+      estructura cada vez que se requiere una transacción. Como es habitual, dicha repetición de código debería siempre ser 
+      eliminada agresivamente.
     </p>
     <p>
-      The <code>executeTx</code> method is the template method. It's <code>final</code>, and defines the general outline of how to 
-      execute a database transaction. The specific database actions to be taken are implemented by calling the <code>abstract</code>
-      method <code>executeMultipleSqls</code>.<br />
+      El método <code>executeTx</code> es el método template. Es <code>final</code>, y define el esquema general de cómo ejecutar 
+      una transacción de base de datos. Las acciones específicas de base de datos que se deben tomar se implementan llamando al 
+      método <code>abstract</code> <code>executeMultipleSqls</code>.<br />
     </p>
     <pre>
 <span class="keyword">import</span> java.sql.*;
@@ -51,28 +53,28 @@
 <span class="keyword">import</span> hirondelle.web4j.util.Consts;
 
 <span class="comment">/** 
-* Template for executing a local, non-distributed transaction versus a 
-* single database, using a single connection.
+* Plantilla para ejecutar una transacción local, no distribuida contra una 
+* única base de datos, usando una conexión única.
 *
-* &lt;P&gt;This abstract base class implements the template method design pattern.
+* &lt;P&gt;Esta clase base abstracta implementa el patrón de diseño de método template.
 */</span>
 <span class="keyword">public</span> <span class="keyword">abstract</span> <span
             class="keyword">class</span> TxTemplate <span
             class="keyword">implements</span> Tx {
   
-  <span class="comment">//..elided
+  <span class="comment">//..omitido
 </span>  
   <span class="comment">/**
-  * &lt;b&gt;Template&lt;/b&gt; method calls the abstract method {@link #executeMultipleSqls}.
-  * &lt;P&gt;Returns the same value as &lt;tt&gt;executeMultipleSqls&lt;/tt&gt;.
+  * El método &lt;b&gt;Template&lt;/b&gt; llama al método abstracto {@link #executeMultipleSqls}.
+  * &lt;P&gt;Devuelve el mismo valor como &lt;tt&gt;executeMultipleSqls&lt;/tt&gt;.
   *
-  * &lt;P&gt;A &lt;tt&gt;rollback&lt;/tt&gt; is performed if &lt;tt&gt;executeMultipleSqls&lt;/tt&gt; fails.
+  * &lt;P&gt;Se realiza un &lt;tt&gt;rollback&lt;/tt&gt; si &lt;tt&gt;executeMultipleSqls&lt;/tt&gt; falla.
   */</span>
   <span class="keyword">public</span> <span class="keyword">final</span> <span
             class="keyword">int</span> executeTx() <span class="keyword">throws</span> DAOException {
     <span class="keyword">int</span> result = <span class="literal">0</span>;
     fLogger.fine(
-      <span class="literal">"Editing within a local transaction, with isolation level : "</span> + fTxIsolationLevel
+      <span class="literal">"Edición dentro de una transacción local, con nivel de aislamiento: "</span> + fTxIsolationLevel
     );
     ConnectionSource connSource = BuildImpl.forConnectionSource();
     <span class="keyword">if</span>(Util.textHasContent(fDatabaseName)){
@@ -89,10 +91,10 @@
       endTx(result);
     }
     <span class="keyword">catch</span>(SQLException rootCause){
-      fLogger.fine(<span class="literal">"Transaction throws SQLException."</span>);
+      fLogger.fine(<span class="literal">"Transacción lanza SQLException."</span>);
       rollbackTx();
       String message = 
-        <span class="literal">"Cannot execute edit. ErrorId code : "</span> +  rootCause.getErrorCode() + 
+        <span class="literal">"No se puede ejecutar la edición. Código de errorId : "</span> +  rootCause.getErrorCode() + 
         Consts.SPACE + rootCause
       ;
       <span class="keyword">if</span> (rootCause.getErrorCode() == DbConfig.getErrorCodeForDuplicateKey().intValue()){
@@ -101,7 +103,7 @@
       <span class="keyword">throw</span> <span class="keyword">new</span> DAOException(message, rootCause);
     }
     <span class="keyword">catch</span> (DAOException ex){
-      fLogger.fine(<span class="literal">"Transaction throws DAOException."</span>);
+      fLogger.fine(<span class="literal">"Transacción lanza DAOException."</span>);
       rollbackTx();
       <span class="keyword">throw</span> ex;
     }
@@ -109,21 +111,21 @@
       DbUtil.logWarnings(fConnection);
       DbUtil.close(fConnection);
     }
-    fLogger.fine(<span class="literal">"Total number of edited records: "</span> + result);
+    fLogger.fine(<span class="literal">"Número total de registros editados: "</span> + result);
     <span class="keyword">return</span> result;
   }
 
   <span class="comment">/**
-  * Execute multiple SQL operations in a single local transaction.
+  * Ejecute múltiples operaciones SQL en una sola transacción local.
   *
-  * &lt;P&gt;This method returns the number of records edited. 
+  * &lt;P&gt;Este método devuelve el número de registros editados.
   */</span>
   <span class="keyword">public</span> <span class="keyword">abstract</span> <span
             class="keyword">int</span> executeMultipleSqls(
     Connection aConnection
   ) <span class="keyword">throws</span> SQLException, DAOException;
   
-  <span class="comment">// PRIVATE
+  <span class="comment">// PRIVADO
 </span>  
   <span class="keyword">private</span> Connection fConnection;
   <span class="keyword">private</span> String fDatabaseName;
@@ -148,11 +150,11 @@
   <span class="keyword">private</span> <span class="keyword">void</span> endTx(<span
             class="keyword">int</span> aNumEdits) <span class="keyword">throws</span> SQLException, DAOException {
     <span class="keyword">if</span> ( BUSINESS_RULE_FAILURE == aNumEdits ) {
-      fLogger.severe(<span class="literal">"Business rule failure occured. Cannot commit transaction."</span>);
+      fLogger.severe(<span class="literal">"Ocurrió una falla en las reglas comerciales. No se puede confirmar la transacción."</span>);
       rollbackTx();
     }
     <span class="keyword">else</span> {
-      fLogger.fine(<span class="literal">"Commiting transaction."</span>);
+      fLogger.fine(<span class="literal">"Realizando transacción."</span>);
       fConnection.commit();
       fConnection.setAutoCommit(fON);
     }
@@ -160,32 +162,32 @@
   
   <span class="keyword">private</span> <span class="keyword">void</span> rollbackTx() <span
             class="keyword">throws</span> DAOException {
-    fLogger.severe(<span class="literal">"ROLLING BACK TRANSACTION."</span>);
+    fLogger.severe(<span class="literal">"SE REVIERTE LA TRANSACCIÓN."</span>);
     <span class="keyword">try</span> {
       fConnection.rollback();
     }
     <span class="keyword">catch</span>(SQLException ex){
       <span class="keyword">throw</span> <span class="keyword">new</span> DAOException(<span
-            class="literal">"Cannot rollback transaction"</span>, ex);
+            class="literal">"No se puede revertir la transacción"</span>, ex);
     }
   }
 }
  
     </pre>
     <br />
-    Here's an example of using <code>TxTemplate</code>. It alters the set of roles attached to an end user, first by deleting all 
-    existing roles, and then by adding the new roles one at a time.
+    Aquí tiene un ejemplo usando <code>TxTemplate</code>. Altera el conjunto de roles vinculados a un usuario final, borrando 
+    primero todos los roles existentes, y después agregando los nuevos roles de una vez.
     <br />
     <pre>
 <span class="keyword">final</span> <span class="keyword">class</span> RoleDAO {
 
-  <span class="comment">//..elided  
+  <span class="comment">//..omitido  
 </span>
   <span class="comment">/**
-  * Update all roles attached to a user.
+  * Actualiza todos los roles vinculados a un usuario.
   * 
-  * &lt;P&gt;This implementation will treat all edits to user roles as 
-  * '&lt;tt&gt;DELETE-ALL&lt;/tt&gt;, then &lt;tt&gt;ADD-ALL&lt;/tt&gt;' operations. 
+  * &lt;P&gt;Esta implementación tratará todas las ediciones a los roles del usuario como operaciones 
+  * '&lt;tt&gt;DELETE-ALL&lt;/tt&gt;, y después &lt;tt&gt;ADD-ALL&lt;/tt&gt;'. 
   */</span>
   <span class="keyword">boolean</span> change(UserRole aUserRole) <span
             class="keyword">throws</span> DAOException {
@@ -193,9 +195,9 @@
     <span class="keyword">return</span> Util.isSuccess(update.executeTx());
   }
   
-  <span class="comment">// PRIVATE //
+  <span class="comment">// PRIVADO //
 </span>  
-  <span class="comment">/** Cannot be a {@link hirondelle.web4j.database.TxSimple}, since there is looping. */</span>
+  <span class="comment">/** No puede ser un {@link hirondelle.web4j.database.TxSimple}, ya que hay bucles. */</span>
   <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">final</span> <span class="keyword">class</span> UpdateTransaction <span
             class="keyword">extends</span> TxTemplate {
@@ -207,7 +209,7 @@
       Connection aConnection
     ) <span class="keyword">throws</span> SQLException, DAOException {
       <span class="keyword">int</span> result = <span class="literal">0</span>;
-      <span class="comment">//perform edits using a shared connection
+      <span class="comment">//realizar ediciones usando una conexión compartida
 </span>      result = result + DbTx.edit(aConnection, ROLES_DELETE, fUserRole.getUserName());
       <span class="keyword">for</span>(Id roleId : fUserRole.getRoles()){
         result = result + DbTx.edit(aConnection,ROLES_ADD,fUserRole.getUserName(),roleId);
@@ -226,9 +228,9 @@
       Vea También :
     </div>
     <div id="see-also" class="main-body">
-      <a href="..\herencia\inheritance_72.html">"Considere la composición en lugar de hacer subclases"</a><br /> 
-      <a href="..\patrones\patrones_139.html">Objetos Command</a><br /> 
-      <a href="..\patrones\patrones_258.html">Envoltorio (Decorador)</a><br />
+      <a href="../herencia/inheritance_72.html">"Considere la composición en lugar de hacer subclases"</a><br /> 
+      <a href="../patrones/patrones_139.html">Objetos Command</a><br /> 
+      <a href="../patrones/patrones_258.html">Envoltorio (Decorador)</a><br />
     </div>
     <footer id="footer" class="legalese">
       <span id="app_name">Prácticas de Java</span> 
