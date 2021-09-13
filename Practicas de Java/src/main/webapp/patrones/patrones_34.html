@@ -23,41 +23,42 @@
       Inicialización perezosa
     </div>
     <br />
-    Lazy initialization is a performance optimization. It's used when data is deemed to be 'expensive' for some reason. For example:
+    La inicialización perezosa es una optimización de rendimiento. Se usa cuando los datos se consideran "costosos" por algún 
+    motivo. Por ejemplo:
     <ul>
       <li>
-        if the <code>hashCode</code> value for an object might not actually be needed by its caller, always calculating the 
-        <code>hashCode</code> for all instances of the object may be felt to be unnecessary.
+        si el valor <code>hashCode</code> para un objeto podría no ser en realida necesitado por su llamador, calcula siempre el 
+        <code>hashCode</code> para todas las instancias del objeto puede parecer innecesario.
       </li>
       <li>
-        since accessing a file system or network is relatively slow, such operations should be put off until they are absolutely 
-        required.
+        ya que acceder a un sistema de ficheros o red es relativamente lento, dichas operaciones deben posponerse hasta que sean 
+        absolutamente necesarias.
       </li>
     </ul>
-    Lazy initialization has two objectives:
+    La inicialización perezosa tiene dos objetivos:
     <ul>
-      <li><i>delay</i> an expensive operation until it's absolutely necessary</li>
-      <li><i>store</i> the result of that expensive operation, such that you won't need to repeat it again</li>
+      <li><i>demorar</i> una operación expensiva hasta que sea absolutamnete necesaria</li>
+      <li><i>almacenar</i> el resultado de esa operación expensiva, de forma que no necesitará repetirlo de nuevo</li>
     </ul>
     <p>
-      As usual, the size of any performance gain, if any, is highly dependent on the problem, and in many cases may not be 
-      significant. As with any optimization, this technique should be used only if there is a clear and significant benefit.
+      Como es habitual, el tamaño de cualquier aumento de rendimiento, si lo hay, depende en gran medida del problema y, en muchos 
+      casos, puede no ser significativo. Al igual que con cualquier optimización, esta técnica debe usarse solo si existe un 
+      beneficio claro y significativo.
     </p>
     <p>
-      To avoid a <code>NullPointerException</code>, a class must 
-      <a href="../practicascomunes/practicascomunes_92.html">self-encapsulate</a> fields that have lazy initialization. That is, a 
-      class cannot refer <em>directly</em> to such fields, but must access them through a method.
+      Para evitar una <code>NullPointerException</code>, una clase debe 
+      <a href="../practicascomunes/practicascomunes_92.html">autoencapsular</a> los campos que tienen inicialización perezosa. Es 
+      decir, una clase no puede referirse <em>directamente</em> a dichos campos, pero debe accederlos a través de un método.
     </p>
     <p>
-      The <a href="../objetos/objects_28.html">hashCode</a> method of an 
-      <a href="patrones_29.html">immutable</a> Model Object is a common candidate for lazy 
-      initialization.
+      El método <a href="../objetos/objects_28.html">hashCode</a> de un Objeto de Modelo 
+      <a href="patrones_29.html">immutable</a> es un candidato común para la inicialización perezosa.
     </p>
     <p>
-      <b>Example 1</b>
+      <b>Ejemplo 1</b>
     </p>
     <p>
-      In this example, there are two fields with lazy initialization - <code>fHashCode</code> and <code>fAwards</code>.<br />
+      En este ejemplo, hay dos campos con inicialización perezosa - <code>fHashCode</code> y <code>fAwards</code>.<br />
     </p>
     <pre>
 <span class="keyword">import</span> java.util.*;
@@ -66,38 +67,38 @@
 			class="keyword">class</span> Athlete {
 
   <span class="keyword">public</span> Athlete(<span class="keyword">int</span> aId){
-    <span class="comment">//a toy implementation:
+    <span class="comment">//una implementación de juguete:
 </span>    fId = aId;
     fName = <span class="literal">"Roger Bannister"</span>;
-    <span class="comment">//fAwards is not set here!
+    <span class="comment">//fAwards no se establece aquí!
 </span>  }
 
-  <span class="comment">//..elided
+  <span class="comment">//..omitido
 </span>
   <span class="comment">/**
-   Lazy initialization is used here; this assumes that awards
-   may not always be of interest to the caller,
-   and that for some reason it is particularly expensive to
-   fetch the List of Awards.
+   La inicialización perezosa se usa aquí; esto asume que los premios
+   puede no ser siempre del interés del llamador, 
+   y que, por alguna razón, resulta especialmente caro 
+   conseguir la Lista de Awards.
   */</span>
   <span class="keyword">public</span> List&lt;String&gt; getAwards(){
     <span class="keyword">if</span> (fAwards == <span class="keyword">null</span>) {
-      <span class="comment">//the fAwards field has not yet been populated
-</span>      <span class="comment">//Here is a toy implementation
+      <span class="comment">//el campo fAwards aun no ha sido rellenado
+</span>      <span class="comment">//Aquí una implementación de juguete
 </span>      List&lt;String&gt; awards = <span class="keyword">new</span> ArrayList&lt;&gt;();
-      awards.add(<span class="literal">"Gold Medal 2006"</span>);
-      awards.add(<span class="literal">"Bronze Medal 1998"</span>);
+      awards.add(<span class="literal">"Medalla de Oro de 2006"</span>);
+      awards.add(<span class="literal">"Medalla de Bronce 1998"</span>);
       fAwards = awards;
     }
     <span class="keyword">return</span> fAwards;
   }
 
   <span class="comment">/**
-   This style applies only if the object is immutable.
+   Este estilo se aplica solo si el objeto es inmutable.
    
-   Another alternative is to calculate the hashCode once, when the 
-   object is initially constructed (again, applies only when object is 
-   immutable).
+   Otra alternativa es calcular el hashCode una vez, cuando el 
+   objeto es inicialmente construído (de nuevo, aplicada solo cuando el objeto es 
+   inmutable).
   */</span>
   <span class="keyword">@Override</span> <span class="keyword">public</span> <span
 			class="keyword">int</span> hashCode(){
@@ -105,14 +106,14 @@
      fHashCode = HashCodeUtil.SEED;
      fHashCode = HashCodeUtil.hash(fHashCode, fId);
      fHashCode = HashCodeUtil.hash(fHashCode, fName);
-     <span class="comment">//self-encapusulated: fAwards is not referenced directly, 
-</span>     <span class="comment">//since it may be null:
+     <span class="comment">//autoencapsulado: fAwards no se referencia directamente, 
+</span>     <span class="comment">//ya que puede ser nulo:
 </span>     fHashCode = HashCodeUtil.hash(fHashCode, getAwards());
     }
     <span class="keyword">return</span> fHashCode;
   }
 
-  <span class="comment">// PRIVATE
+  <span class="comment">// PRIVADO
 </span>  <span class="keyword">private</span> <span class="keyword">int</span> fId;
   <span class="keyword">private</span> String fName;
   <span class="keyword">private</span> List&lt;String&gt; fAwards;
@@ -121,10 +122,10 @@
     </pre>
     <p></p>
     <p>
-      <b>Example 2</b>
+      <b>Ejemplo 2</b>
     </p>
     <p>
-      Here, the look up of the printers available to a desktop PC is treated as an expensive operation.<br />
+      Aquí, la búsqueda de las impresoras disponibles para un PC de escritorio se trata como una operación expensiva.<br />
     </p>
     <pre>
 <span class="keyword">import</span> java.util.Arrays;
@@ -138,24 +139,24 @@
 <span class="keyword">import</span> javax.print.attribute.standard.OrientationRequested;
 <span class="keyword">import</span> javax.print.attribute.standard.Sides;
 
-<span class="comment">/** Printing services available to a desktop client. */</span>
+<span class="comment">/** Los servicios de impresión disponibles a un cliente de escritorio. */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
 			class="keyword">class</span> Printers {
 
-  <span class="comment">/** Print some plain text (perhaps internally converted to PDF). */</span>
+  <span class="comment">/** Imprime algún texto plano (quizás internamente convertido a PDF). */</span>
   <span class="keyword">void</span> printSomething(String aText, PrintService aPrinter) {
-    <span class="comment">//...elided
+    <span class="comment">//...omitido
 </span>  }
 
-  <span class="comment">/** Return the list of printers that can print PDFs (double-sided, portrait).*/</span>
+  <span class="comment">/** Devuelve la lista de impresoras que puede imprimir PDFs (a doble cara, retrato).*/</span>
   List&lt;PrintService&gt; listAvailablePrinters(){
     <span class="keyword">if</span>(fAvailablePrinters == <span
 			class="keyword">null</span>){
-      <span class="comment">//double-sided, portrait, for PDF files.
+      <span class="comment">//a doble cara, retrato, para los archivos PDF.
 </span>      PrintRequestAttributeSet attrs = <span class="keyword">new</span> HashPrintRequestAttributeSet();
       attrs.add(Sides.DUPLEX);
       attrs.add(OrientationRequested.PORTRAIT);
-      <span class="comment">//Expensive operation! This can take several seconds in some environments:
+      <span class="comment">//¡Operación costosa! Esto puede tomar varios segundo en algunos entornos:
 </span>      fAvailablePrinters = Arrays.asList(
         PrintServiceLookup.lookupPrintServices(DocFlavor.INPUT_STREAM.PDF, attrs)
       );
@@ -163,45 +164,45 @@
     <span class="keyword">return</span> fAvailablePrinters;
   }
   
-  <span class="comment">// PRIVATE
+  <span class="comment">// PRIVADO
 </span>  
   <span class="comment">/**
-   Looked up once, the first time it's needed, and then stored using a 
-   static reference. If it was a non-static reference, then 
-   the list of available printers would not be looked up just once, 
-   but perhaps many times (once per 'Printers' object, and not once per 
-   loaded 'Printers' class).
+   Se busca una vez, la primera vez que se necesita y luego se almacena con una
+   referencia estática. Si era una referencia no estática, entonces
+   la lista de impresoras disponibles no se buscaría una sola vez,
+   pero tal vez muchas veces (una vez por cada objeto "Printers", y no una vez por
+   la clase cargada 'Printers').
    
-   Self-encapsulate :
-   If this class's implementation needs to reference this item, it must do 
-   so indirectly, by calling listAvailablePrinters().  
+   Autoencapsulado :
+   Si esta implementación de la clase necesita referenciar este elemento, debe hacerlo 
+   indirectamente, llamando a listAvailablePrinters().  
   */</span>
   <span class="keyword">private</span> <span class="keyword">static</span> List&lt;PrintService&gt; fAvailablePrinters;
   
 }  
     </pre>
     <br />
-    <b>Example 3</b>
+    <b>Ejemplo 3</b>
     <p></p>
     <p>
-      Lazy initialization is particularly useful for GUIs which take a long time to construct.
+      La inicialización perezosa es particularmente útil para los IGUs que toman mucho tiempo en construirse.
     </p>
     <p>
-      There are several policies for GUI construction which a design may follow:
+      Hay varias políticas para la construcción de IGU que puede seguir un diseño:
     </p>
     <ul>
-      <li>always build - construct the window many times, whenever it's demanded, and do not cache the result.</li>
+      <li>siempre construir: construir la ventana muchas veces, cuando sea necesario, y no almacena en caché el resultado.</li>
       <li>
-        first-request build - construct the window once, when first requested. Cache the result for any further requests, should 
-        they occur.
+        compilación de primera solicitud: construye la ventana una vez, cuando se solicita por primera vez. Almacena el resultado 
+        en caché para cualquier solicitud adicional, en caso de que ocurra.
       </li>
       <li>
-        background build - construct the window once, in a low priority worker thread, when the system is initialized. Cache the 
-        result for any requests, should they occur.
+        compilación en segundo plano: construye la ventana una vez, en un hilo de trabajo de baja prioridad, cuando se inicializa 
+        el sistema. Almacene en caché el resultado de cualquier solicitud, en caso de que ocurra.
       </li>
     </ul>
-    Here's an example of the first-request style, in which the <code>fEditor</code> field has lazy initialization (see the
-    <code>actionPerformed</code> method).<br />
+    Aquí tiene un ejemplo del estilo de la primera petición, en el cual el campo <code>fEditor</code> tiene inicialización perezosa 
+    (vea el método <code>actionPerformed</code>).<br />
     <pre>
 <span class="keyword">package</span> hirondelle.stocks.preferences;
 
@@ -217,20 +218,18 @@
 <span class="keyword">import</span> hirondelle.stocks.util.Util;
 
 <span class="comment">/**
-* Present dialog to allow update of user preferences.
+* Presenta el diálogo para permitir la actualización de preferencias de usuario.
 *
-* &lt;P&gt;Related preferences are grouped together and placed in 
-* a single pane of a &lt;tt&gt;JTabbedPane&lt;/tt&gt;, which corresponds to an 
-* implementation of {@link PreferencesEditor}. Values are pre-populated with 
-* current values for preferences.
+* &lt;P&gt;Las preferencias relacionadas se agrupan juntas y colocadas en 
+* un panel único de un &lt;tt&gt;JTabbedPane&lt;/tt&gt;, que corresponda a una 
+* implementación de {@link PreferencesEditor}. Los valores son pre-rellenados con 
+* los valores actuales de las preferencias. Si es así, se proporciona un botón 
+* &lt;tt&gt;Restaurar los valores predeterminados&lt;/tt&gt; para ese conjunto 
+* de preferencias relacionadas.
 *
-*&lt;P&gt;Most preferences have default values. If so, a  
-* &lt;tt&gt;Restore Defaults&lt;/tt&gt; button is provided for that set of related 
-* preferences.
-*
-*&lt;P&gt;Preferences are not changed until the &lt;tt&gt;OK&lt;/tt&gt; button is pressed. 
-* Exception: the logging preferences take effect immediately, without the need 
-* for hitting &lt;tt&gt;OK&lt;/tt&gt;.
+*&lt;P&gt;Las preferencias no se cambian hasta que se presione el botón &lt;tt&gt;OK&lt;/tt&gt;. 
+* Excepción: las preferencias de rastreo toma efecto inmediatamente, sin la necesidad de 
+* pulsar &lt;tt&gt;OK&lt;/tt&gt;.
 */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
 			class="keyword">class</span> EditUserPreferencesAction <span
@@ -239,35 +238,35 @@
   <span class="comment">/**
   * Constructor.
   *  
-  * @param aFrame parent window to which this dialog is attached.
-  * @param aPrefEditors contains implementations of {@link PreferencesEditor}, 
-  * each of which is placed in a pane of a &lt;tt&gt;JTabbedPane&lt;/tt&gt;.
+  * @param aFrame ventana padre a la cual este diálogo se adjunta.
+  * @param aPrefEditors contiene las implementaciones de {@link PreferencesEditor}, 
+  * cada una de las cuales se coloca en un panel de un &lt;tt&gt;JTabbedPane&lt;/tt&gt;.
   */</span>
   <span class="keyword">public</span> EditUserPreferencesAction (JFrame aFrame, List&lt;PreferencesEditor&gt; aPrefEditors) {
-    <span class="keyword">super</span>(<span class="literal">"Preferences..."</span>, UiUtil.getEmptyIcon()); 
+    <span class="keyword">super</span>(<span class="literal">"Preferencias..."</span>, UiUtil.getEmptyIcon()); 
     Args.checkForNull(aFrame);
     Args.checkForNull(aPrefEditors);
     fFrame = aFrame;
-    putValue(SHORT_DESCRIPTION, <span class="literal">"Update user preferences"</span>);
-    putValue(LONG_DESCRIPTION, <span class="literal">"Allows user input of preferences."</span>);
+    putValue(SHORT_DESCRIPTION, <span class="literal">"Actualizar las preferencias del usuario"</span>);
+    putValue(LONG_DESCRIPTION, <span class="literal">"Permite al usuario ingresar sus preferencias."</span>);
     putValue(MNEMONIC_KEY, <span class="keyword">new</span> Integer(KeyEvent.VK_P));    
     fPrefEditors = aPrefEditors;
   }
 
-  <span class="comment">/** Display the user preferences dialog.  */</span>
+  <span class="comment">/** Visualiza las preferencias de usuario del diálogo.  */</span>
   <span class="keyword">@Override</span> <span class="keyword">public</span> <span
 			class="keyword">void</span> actionPerformed(ActionEvent event) {
-    fLogger.info(<span class="literal">"Showing user preferences dialog."</span>);
-    <span class="comment">//lazy construction: fEditor is created only once, when this action 
-</span>    <span class="comment">//is explicitly invoked
+    fLogger.info(<span class="literal">"Mostrar el cuadro de diálogo de preferencias del usuario."</span>);
+    <span class="comment">//construcción perezosa: fEditor se crea una sola vez, cuando esta acción
+</span>    <span class="comment">//se invoca explícitamente
 </span>    <span class="keyword">if</span> (fEditor == <span class="keyword">null</span>) {
       fEditor = <span class="keyword">new</span> Editor(<span
-			class="literal">"Edit Preferences"</span>, fFrame);
+			class="literal">"Editar preferencias"</span>, fFrame);
     }
     fEditor.showDialog();
   }
   
-  <span class="comment">// PRIVATE 
+  <span class="comment">// PRIVADO
 </span>  <span class="keyword">private</span> JFrame fFrame;
   <span class="keyword">private</span> java.util.List&lt;PreferencesEditor&gt; fPrefEditors;
   <span class="keyword">private</span> <span class="keyword">static</span> <span
@@ -275,15 +274,15 @@
 			class="keyword">class</span>);  
   
   <span class="comment">/**
-  * Specifying this as a field allows for "lazy" creation and use of the GUI, which is 
-  * of particular importance for a preferences dialog, since they are usually heavyweight, 
-  * and have a large number of components.
+  * Especificar esto como un campo siempre para la creación "perezosa" y uso del IGU, el cual es 
+  * de particular importancia para un diálogo de preferencias, ya que suelen ser de peso pesado, 
+  * y tienen un gran número de componentes.
   */</span>
   <span class="keyword">private</span> Editor fEditor;
   
   <span class="comment">/**
-  * Return GUI for editing all preferences, pre-populated with current 
-  * values.
+  * Devuelve un IGU para editar todas las preferencias, pre-rellenado con los valores 
+  * actuales.
   */</span>
   <span class="keyword">private</span> JComponent getPrefEditors(){
     JTabbedPane content = <span class="keyword">new</span> JTabbedPane();
@@ -299,21 +298,21 @@
     <span class="keyword">return</span> content;
   }
   
-  <span class="comment">/** Called only when the user hits the OK button.  */</span>
+  <span class="comment">/** Se llama solo cuando el usuario presiona el botón Aceptar.  */</span>
   <span class="keyword">private</span> <span class="keyword">void</span> saveSettings(){
-    fLogger.fine(<span class="literal">"User selected OK. Updating table preferences."</span>);
+    fLogger.fine(<span class="literal">"El usuario seleccionó Aceptar. Actualizar las preferencias de la tabla."</span>);
     <span class="keyword">for</span>(PreferencesEditor prefEditor: fPrefEditors) {
       prefEditor.savePreferences();
     }
   }
   
   <span class="comment">/**
-  * An example of a nested class which is nested because it is attached only 
-  * to the enclosing class, and it cannot act as superclass since multiple 
-  * inheritance of implementation is not possible. 
+  * Un ejemplo de una clase anidada que está anidada porque está adjuntada solo 
+  * a la clase que la contiene, y no puede actuar como una superclase ya que la herencia 
+  * múltiple de una implementación no es posible. 
   * 
-  * The implementation of this nested class is kept short by calling methods 
-  * of the enclosing class.
+  * La implementación de esta clase anidada se mantiene corta llamando a métodos
+  * de la clase envolvente.
   */</span>
   <span class="keyword">private</span> <span class="keyword">final</span> <span
 			class="keyword">class</span> Editor <span class="keyword">extends</span> StandardEditor { 
@@ -342,10 +341,10 @@
       Vea También :
     </div>
     <div id="see-also" class="main-body">
-      <a href="..\constructores\constructors_11.html">Constructores en general</a><br /> 
-      <a href="..\objetos\objects_28.html">Implementar hashCode</a><br /> 
-      <a href="..\practicascomunes\practicascomunes_92.html">Campos autoencapsulados</a><br /> 
-      <a href="..\swing\swing_150.html">Diálogos Estandarizados</a><br />
+      <a href="../constructores/constructors_11.html">Constructores en general</a><br /> 
+      <a href="../objetos/objects_28.html">Implementar hashCode</a><br /> 
+      <a href="../practicascomunes/practicascomunes_92.html">Campos autoencapsulados</a><br /> 
+      <a href="../swing/swing_150.html">Diálogos Estandarizados</a><br />
     </div>
     <footer id="footer" class="legalese">
       <span id="app_name">Prácticas de Java</span> 
