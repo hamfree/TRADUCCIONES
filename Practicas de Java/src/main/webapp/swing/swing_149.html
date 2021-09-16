@@ -21,27 +21,30 @@
     </nav>
     <div class="page-title">Pantalla de Bienvenida</div>
     <br />
-    <a href="http://docs.oracle.com/javase/tutorial/uiswing/misc/splashscreen.html">Splash screens</a> are simple graphics which 
-    load quickly upon startup, and assure the user that the application is loading promptly. The 
-    <code><a href="https://docs.oracle.com/javase/10/docs/api/java/awt/SplashScreen.html">SplashScreen</a></code> class was added 
-    to JSE 6, and should be used if available. 
+    Las <a href="http://docs.oracle.com/javase/tutorial/uiswing/misc/splashscreen.html">Pantallas de bienvenida</a> son gráficos 
+    simples que se cargan rápidamente durante el arranque, y asegurarle al usuario que la aplicación se está cargando rápidamente. 
+    La clase <code><a href="https://docs.oracle.com/javase/10/docs/api/java/awt/SplashScreen.html">SplashScreen</a></code> fue 
+    agregada a JSE 6, y debe usarse si está disponible.
     <p>
-      If JSE 6 is not available, then the following technique is provided as an alternative.
+      Si JSE 6 no está disponible, entonces la técnica siguiente se proporciona como alternativa.
     </p>
     <p>
-      Various policies for controlling the appearance and disappearance of the splash screen are possible. Here, the splash screen 
-      disappears when a main window has finished loading.
+      Son posibles varias políticas para controlar la aparición y desaparición de la pantalla de bienvenida. Aquí, la pantalla de 
+      bienvenida desaparece cuando una ventana principal se ha terminado de cargar.
     </p>
     <p>
-      This example is also of interest since it demonstrates clearly that the launch thread is unusual - it's distinct from the 
-      event dispatch thread, where most of the work of a Swing application takes place:
+      Este ejemplo también es de interés ya que demuestra claramente que el subproceso de lanzamiento es inusual - es distinto del 
+      subproceso de despacho de eventos, donde tiene lugar la mayor parte del trabajo de una aplicación Swing:
     </p>
     <ul>
-      <li>upon launch, the launch thread shows a splash screen, which activates the event dispatch thread</li>
       <li>
-        once the splash screen is showing (or, more precisely, is "realized"), the launch thread acts as a "worker thread", and can 
-        only close the splash screen indirectly, using <code>EventQueue.invokeLater</code> to properly inject an event into the 
-        event dispatch thread
+        al iniciarse, el subproceso de lanzamiento muestra una pantalla de bienvenida, que activa el subproceso de despacho de 
+        eventos
+      </li>
+      <li>
+        una vez se muestra la pantalla de bienvenida (o, más precisamente, se "realiza"), el subproceso de lanzamiento actúa como 
+        un "subproceso de trabajo", y puede solo cerrar la pantalla de bienvenida indirectamente, usando 
+        <code>EventQueue.invokeLater</code> para inyectar correctamente un evento en el hilo de envío de eventos
       </li>
     </ul>
     <br />
@@ -53,50 +56,51 @@
 <span class="keyword">import</span> java.awt.image.ImageObserver;
 
 <span class="comment">/**
-* Present a simple graphic to the user upon launch of the application, to 
-* provide a faster initial response than is possible with the main window.
+* Presenta un gráfico simple al usuario hasta el lanzamiento de la aplicación, para 
+* proporcionar una respuesta inicial más rápida que la que es posible con 
+* la ventana principal.
 * 
-* &lt;P&gt;Adapted from an 
-* &lt;a href=http://developer.java.sun.com/developer/qow/archive/24/index.html&gt;item&lt;/a&gt; 
-* on Sun's Java Developer Connection.
+* &lt;P&gt;Adaptado de un 
+* &lt;a href=http://developer.java.sun.com/developer/qow/archive/24/index.html&gt;elemento&lt;/a&gt; 
+* en Sun's Java Developer Connection.
 *
-* &lt;P&gt;This splash screen appears within about 2.5 seconds on a development 
-* machine. The main screen takes about 6.0 seconds to load, so use of a splash 
-* screen cuts down the initial display delay by about 55 percent.
+* &lt;P&gt;Esta pantalla de bienvenida aparece en unos 2.5 segundos en una máquina 
+* de desarrollo. La pantalla principal toma alrededor de 6.0 segundos en cargarse, así que el uso de la pantalla 
+* de bienvenida reduce el retraso de visualización inicial en aproximadamente un 55 por ciento.
 * 
-* &lt;P&gt;When JDK 6+ is available, its java.awt.SplashScreen class should be used instead 
-* of this class.
+* &lt;P&gt;Cuando el KDJ 6+ está disponible, se debe usar su clase java.awt.SplashScreen en vez 
+* de esta clase.
 */</span>
 <span class="keyword">final</span> <span class="keyword">class</span> SplashScreen <span
             class="keyword">extends</span> Frame {
 
   <span class="comment">/**
-  * Construct using an image for the splash screen.
+  * Construya usando una imagen para la pantalla de presentación.
   *  
-  * @param aImageId must have content, and is used by  
-  * {@link Class#getResource(java.lang.String)} to retrieve the splash screen image.
+  * @param aImageId debe tener contenido, y se usa por 
+  * {@link Class#getResource(java.lang.String)} para recuperar la imagen de la pantalla de bienvenida.
   */</span>
   SplashScreen(String aImageId) {
     <span class="comment">/* 
-    * Implementation Note
-    * Args.checkForContent is not called here, in an attempt to minimize 
-    * class loading.
+    * Nota de Implementación
+    * Args.checkForContent no se llama aquí, en un intento de minimizar 
+    * la carga de la clase.
     */</span>
     <span class="keyword">if</span> (aImageId == <span class="keyword">null</span> || aImageId.trim().length() == <span
             class="literal">0</span>){
       <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span
-            class="literal">"Image Id does not have content."</span>);
+            class="literal">"El ID de la imagen no tiene contenido."</span>);
     }
     fImageId = aImageId;
   }
    
   <span class="comment">/**
-  * Show the splash screen to the end user.
+  * Muestra la pantalla de presentación al usuario final.
   *
-  * &lt;P&gt;Once this method returns, the splash screen is realized, which means 
-  * that almost all work on the splash screen should proceed through the event 
-  * dispatch thread. In particular, any call to &lt;tt&gt;dispose&lt;/tt&gt; for the 
-  * splash screen must be performed in the event dispatch thread.
+  * &lt;P&gt;Una vez que este método regresa, se realiza la pantalla de presentación, lo que significa 
+  * que casi todo el trabajo en la pantalla de presentación debe continuar a través del hilo de envío 
+  * de eventos. En particular, cualquier llamada a &lt;tt&gt;dispose&lt;/tt&gt; para la 
+  * pantalla de presentación debe realizarse en el subproceso de envío de eventos.
   */</span>
   <span class="keyword">void</span> splash(){
     initImageAndTracker();
@@ -113,7 +117,7 @@
             class="keyword">this</span>,fImage);
   }
   
-  <span class="comment">// PRIVATE
+  <span class="comment">// PRIVADO
 </span>  <span class="keyword">private</span> <span class="keyword">final</span> String fImageId;
   <span class="keyword">private</span> MediaTracker fMediaTracker;
   <span class="keyword">private</span> Image fImage;
@@ -132,12 +136,12 @@
   }
 
   <span class="comment">/**
-  * Centers the frame on the screen.
+  * Centra el marco en la pantalla.
   *
-  *&lt;P&gt;This centering service is more or less in {@link hirondelle.stocks.util.ui.UiUtil}; 
-  * this duplication is justified only because the use of  
-  * {@link hirondelle.stocks.util.ui.UiUtil} would entail more class loading, which is 
-  * not desirable for a splash screen.
+  *&lt;P&gt;Este servicio de centrado está más o menos en {@link hirondelle.stocks.util.ui.UiUtil}; 
+  * esta duplicación se justifica solo porque el uso de 
+  * {@link hirondelle.stocks.util.ui.UiUtil} implicaría más carga de clases, lo que no es 
+  * deseable para una pantalla de presentación.
   */</span>
   <span class="keyword">private</span> <span class="keyword">void</span> center(){
     Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -170,8 +174,8 @@
   }
   
   <span class="comment">/**
-  * Developer test harness shows the splash screen for a fixed length of 
-  * time, without launching the full application.
+  * La prueba del desarrollador muestra la pantalla de inicio durante un período de tiempo fijo, 
+  * sin iniciar la aplicación completa.
   */</span>
   <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">void</span> main(String... aArgs){
@@ -190,7 +194,7 @@
  
     </pre>
     <br />
-    Here's an example of a class which launches an application using the above <code>SplashScreen</code>:
+    Aquí tiene un ejemplo de una clase que lanza una aplicación usando <code>SplashScreen</code>:
     <br />
     <pre>
 <span class="keyword">package</span> hirondelle.stocks.main;
@@ -201,51 +205,51 @@
 <span class="keyword">import</span> hirondelle.stocks.util.Consts;
 
 <span class="comment">/**
-* Launch the application using an older version of a splash screen.
+* Lanza la aplicación usando una versión más antigua de la pantalla de bienvenida.
 *
-*&lt;P&gt;Perform tasks in this order :
+*&lt;P&gt;Realiza las tareas en este orden:
 *&lt;ul&gt;
-* &lt;li&gt;log basic system information 
-* &lt;li&gt;promptly show a splash screen upon startup
-* &lt;li&gt;show the main screen
-* &lt;li&gt;remove the splash screen once the main screen is shown
+* &lt;li&gt;registra información básica del sistema 
+* &lt;li&gt;muestra rápidamente una pantalla de bienvenida al inicio
+* &lt;li&gt;muestra la pantalla principal
+* &lt;li&gt;elimina la pantalla de bienvenida una vez que se muestra la pantalla principal
 *&lt;/ul&gt;
 *
-* These tasks are performed in a thread-safe manner.
+* Estas tareas se realizan de forma segura para subprocesos.
 */</span>
 <span class="keyword">public</span> <span class="keyword">final</span> <span
             class="keyword">class</span> Launcher { 
 
   <span class="comment">/**
-  * Launch the application and display the main window.
+  * Inicia la aplicación y muestra la ventana principal.
   *
-  * @param aArgs are ignored by this application, and may take any value.
+  * @param aArgs son ignorados por esta aplicación, y pueden tomar cualquier valor.
   */</span>
   <span class="keyword">public</span> <span class="keyword">static</span> <span
             class="keyword">void</span> main (String... aArgs) {
     
     <span class="comment">/*
-    * Implementation Note:
+    * Nota de implementación:
     *
-    * Note that the launch thread of any GUI application is in effect an initial 
-    * worker thread - it is not the event dispatch thread, where the bulk of processing
-    * takes place. Thus, once the launch thread realizes a window, then the launch 
-    * thread should almost always manipulate such a window through 
-    * EventQueue.invokeLater. (This is done for closing the splash 
-    * screen, for example.)
+    * Tenga en cuenta que el hilo de inicio de cualquier aplicación GUI es, en efecto, 
+    * un hilo de trabajo inicial; no es el hilo de despacho de eventos, donde tiene lugar 
+    * la mayor parte del procesamiento. Por lo tanto, una vez que el subproceso de lanzamiento se da cuenta de una ventana, 
+    * entonces el subproceso de lanzamiento casi siempre debería manipular dicha ventana a través 
+    * de EventQueue.invokeLater. (Esto se hace para cerrar la pantalla de 
+    * bienvenida, por ejemplo).
     */</span>
     
-    <span class="comment">//verifies that assertions are on:
+    <span class="comment">//verifica que las afirmaciones estén en:
 </span>    <span class="comment">//  assert(false) : "Test";
 </span>    
     logBasicSystemInfo();
     showSplashScreen();
     showMainWindow();
     EventQueue.invokeLater(<span class="keyword">new</span> SplashScreenCloser());
-    fLogger.info(<span class="literal">"Launch thread now exiting..."</span>);
+    fLogger.info(<span class="literal">"Subproceso de de lanzamiento ahora saliendo..."</span>);
   }
 
-  <span class="comment">// PRIVATE 
+  <span class="comment">// PRIVADO
 </span>  
   <span class="keyword">private</span> <span class="keyword">static</span> SplashScreen fSplashScreen;
   <span class="keyword">private</span> <span class="keyword">static</span> <span
@@ -256,66 +260,66 @@
             class="literal">"StocksMonitor.gif"</span>;
 
   <span class="comment">/**
-  * Show a simple graphical splash screen, as a quick preliminary to the main screen.
+  * Muestra una pantalla de presentación gráfica simple, como preliminar rápido a la pantalla principal.
   */</span>
   <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">void</span> showSplashScreen(){
-    fLogger.info(<span class="literal">"Showing the splash screen."</span>);
+    fLogger.info(<span class="literal">"Mostrando la pantalla de bienvenida."</span>);
     fSplashScreen = <span class="keyword">new</span> SplashScreen(SPLASH_IMAGE);
     fSplashScreen.splash();
   }
   
   <span class="comment">/**
-  * Display the main window of the application to the user.
+  * Muestra la ventana principal de la aplicación al usuario.
   */</span>
   <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">void</span> showMainWindow(){
-    fLogger.info(<span class="literal">"Showing the main window."</span>);
+    fLogger.info(<span class="literal">"Mostrando la pantalla principal."</span>);
     StocksMonitorMainWindow mainWindow = <span class="keyword">new</span> StocksMonitorMainWindow();
   }
 
   <span class="comment">/** 
-  * Removes the splash screen. 
+  * Elimina la pantalla de presentación. 
   *
-  * Invoke this &lt;tt&gt;Runnable&lt;/tt&gt; using 
-  * &lt;tt&gt;EventQueue.invokeLater&lt;/tt&gt;, in order to remove the splash screen
-  * in a thread-safe manner.
+  * Invoca esta &lt;tt&gt;Runnable&lt;/tt&gt; usando 
+  * &lt;tt&gt;EventQueue.invokeLater&lt;/tt&gt;, para eliminar la pantalla de bienvenido
+  * de una manera segura para el procesado multiproceso.
   */</span>
   <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">final</span> <span class="keyword">class</span> SplashScreenCloser <span
             class="keyword">implements</span> Runnable {
     <span class="keyword">@Override</span> <span class="keyword">public</span> <span
             class="keyword">void</span> run(){
-      fLogger.fine(<span class="literal">"Closing the splash screen.'"</span>);
+      fLogger.fine(<span class="literal">"Cerrando la pantalla de presentación.'"</span>);
       fSplashScreen.dispose();
     }
   }
   
   <span class="keyword">private</span> <span class="keyword">static</span> <span
             class="keyword">void</span> logBasicSystemInfo() {
-    fLogger.info(<span class="literal">"Launching the application..."</span>);
+    fLogger.info(<span class="literal">"Lanzando la aplicación..."</span>);
     fLogger.config(
       <span class="literal">"Operating System: "</span> + System.getProperty(<span
             class="literal">"os.name"</span>) + <span class="literal">" "</span> + 
       System.getProperty(<span class="literal">"os.version"</span>)
     );
-    fLogger.config(<span class="literal">"JRE: "</span> + System.getProperty(<span
+    fLogger.config(<span class="literal">"EEJ: "</span> + System.getProperty(<span
             class="literal">"java.version"</span>));
-    fLogger.info(<span class="literal">"Java Launched From: "</span> + System.getProperty(<span
+    fLogger.info(<span class="literal">"Java Lanzado Desde: "</span> + System.getProperty(<span
             class="literal">"java.home"</span>));
-    fLogger.config(<span class="literal">"Class Path: "</span> + System.getProperty(<span
+    fLogger.config(<span class="literal">"Ruta de Clases: "</span> + System.getProperty(<span
             class="literal">"java.class.path"</span>));
-    fLogger.config(<span class="literal">"Library Path: "</span> + System.getProperty(<span
+    fLogger.config(<span class="literal">"Ruta de Librerías: "</span> + System.getProperty(<span
             class="literal">"java.library.path"</span>));
-    fLogger.config(<span class="literal">"Application Name: "</span> + Consts.APP_NAME + <span
+    fLogger.config(<span class="literal">"Nombre de la Aplicación: "</span> + Consts.APP_NAME + <span
             class="literal">"/"</span> + Consts.APP_VERSION);
-    fLogger.config(<span class="literal">"User Home Directory: "</span> + System.getProperty(<span
+    fLogger.config(<span class="literal">"Directorio Inicial del Usuario: "</span> + System.getProperty(<span
             class="literal">"user.home"</span>));
-    fLogger.config(<span class="literal">"User Working Directory: "</span> + System.getProperty(<span
+    fLogger.config(<span class="literal">"Directorio de Trabajo del Usuario: "</span> + System.getProperty(<span
             class="literal">"user.dir"</span>));
-    fLogger.info(<span class="literal">"Test INFO logging."</span>);
-    fLogger.fine(<span class="literal">"Test FINE logging."</span>);
-    fLogger.finest(<span class="literal">"Test FINEST logging."</span>);
+    fLogger.info(<span class="literal">"Prueba registro INFO."</span>);
+    fLogger.fine(<span class="literal">"Prueba de registro FINE."</span>);
+    fLogger.finest(<span class="literal">"Prueba el registro FINEST."</span>);
   }
 } 
     </pre>
@@ -325,7 +329,7 @@
       Vea También :
     </div>
     <div id="see-also" class="main-body">
-      <a href="..\swing\swing_153.html">Hilos de Swing</a><br />
+      <a href="../swing/swing_153.html">Hilos de Swing</a><br />
     </div>
     <footer id="footer" class="legalese">
       <span id="app_name">Prácticas de Java</span> 
