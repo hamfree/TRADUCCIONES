@@ -759,3 +759,64 @@
     exception to your version of the library, but you are not obligated to
     do so.  If you do not wish to do so, delete this exception statement
     from your version.
+
+---
+
+    Ciertos archivos fuente distribuidos por Oracle America, Inc. y / o 
+    sus afiliados están sujetos a la siguiente aclaración y excepción 
+    especial a la GPLv2, basada en la excepción del Proyecto GNU para 
+    sus bibliotecas Classpath, conocida como GNU Classpath Exception, pero 
+    solo donde Oracle ha incluido expresamente en el encabezado del archivo 
+    fuente en particular las palabras "Oracle designa este archivo en 
+    particular como sujeto a la excepción" Classpath "proporcionada por 
+    Oracle en el archivo de LICENCIA que acompaña a este código".
+
+    También debe tener en cuenta que Oracle incluye varios programas 
+    independientes en este paquete de software. Algunos de esos programas 
+    se proporcionan bajo licencias que la Free Software Foundation y 
+    otros consideran incompatibles con la GPLv2. Por ejemplo, el paquete 
+    incluye programas con licencia de Apache License, Versión 2.0. 
+    Dichos programas se le otorgan bajo sus licencias originales.
+
+    Oracle facilita su distribución adicional de este paquete agregando 
+    la Classpath Exception a las partes necesarias de su código GPLv2, 
+    lo que le permite usar ese código en combinación con otros módulos  
+    independientes sin licencia bajo la GPLv2. Sin embargo, tenga en 
+    cuenta que esto no le permitiría combinar código bajo una licencia 
+    incompatible con el código con licencia GPLv2 de Oracle, por ejemplo, 
+    cortando y pegando dicho código en un archivo que también contenga 
+    el código con licencia GPLv2 de Oracle y luego distribuyendo el 
+    resultado. Además, si eliminara Classpath Exception de cualquiera 
+    de los archivos a los que se aplica y distribuye el resultado, es 
+    probable que deba licenciar parte o todo el otro código de esa 
+    distribución también bajo la GPLv2, y dado que la GPLv2 es 
+    incompatible con los términos de licencia de algunos elementos 
+    incluidos en la distribución de Oracle, por lo que eliminar la 
+    Excepción Classpath podría comprometer efectivamente su capacidad 
+    para distribuir más el paquete.
+
+    Proceda con precaución y le recomendamos que obtenga el asesoramiento 
+    de un abogado experto en asuntos de código abierto antes de eliminar 
+    la Excepción Classpath o realizar modificaciones en este paquete 
+    que pueden redistribuirse posteriormente y / o implicar el uso de 
+    software de terceros.
+
+    EXCEPCIÓN DE LA RUTA DE CLASES
+    Vincular esta biblioteca de forma estática o dinámica con otros 
+    módulos es hacer un trabajo combinado basado en esta biblioteca. 
+    Por lo tanto, los términos y condiciones de la licencia pública 
+    general GNU versión 2 cubren toda la combinación.
+
+    Como excepción especial, los titulares de los derechos de autor 
+    de esta biblioteca le dan permiso para vincular esta biblioteca 
+    con módulos independientes para producir un ejecutable, 
+    independientemente de los términos de licencia de estos módulos 
+    independientes, y para copiar y distribuir el ejecutable 
+    resultante bajo los términos de su elección. siempre que también 
+    cumpla, para cada módulo independiente vinculado, los términos 
+    y condiciones de la licencia de ese módulo. Un módulo 
+    independiente es un módulo que no se deriva ni se basa en esta 
+    biblioteca. Si modifica esta biblioteca, puede extender esta 
+    excepción a su versión de la biblioteca, pero no está obligado 
+    a hacerlo. Si no desea hacerlo, elimine esta declaración de 
+    excepción de su versión.
