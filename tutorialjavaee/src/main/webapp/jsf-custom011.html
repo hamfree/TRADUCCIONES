@@ -49,33 +49,55 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            A JavaServer Faces converter class converts strings to objects and objects to strings as required. Several standard converters are provided by JavaServer Faces for this purpose. See <a href="jsf-page-core001.html#BNAST">Usando los Convertidores Estándar</a> for more information on these included converters.
+            Una clase convertidora de JavaServer Faces convierte cadenas en objetos y los objetos en cadenas 
+            según sea necesario. JavaServer Faces proporciona varios convertidores estándar para este 
+            propósito. Consulte <a href="jsf-page-core001.html#BNAST">Usando los Convertidores Estándar</a> 
+            para obtener más información sobre estos convertidores incluidos.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            As explained in <a href="jsf-intro005.html#BNAQI">Modelo de Conversión</a>, if the standard converters included with JavaServer Faces cannot perform the data conversion that you need, you can create a custom converter to perform this specialized conversion. This implementation, at a minimum, must define how to convert data both ways between the two views of the data described in <a href="jsf-intro005.html#BNAQI">Modelo de Conversión</a>.
+            Como se explica en <a href="jsf-intro005.html#BNAQI">Modelo de Conversión</a>, si los 
+            convertidores estándar incluidos con JavaServer Faces no pueden realizar la conversión de datos 
+            que necesita, puede crear un convertidor personalizado para realizar esta conversión 
+            especializada. Esta implementación, como mínimo, debe definir cómo convertir datos en ambos 
+            sentidos entre las dos vistas de los datos descritos en 
+            <a href="jsf-intro005.html#BNAQI">Modelo de Conversión</a>.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            All custom converters must implement the <code>javax.faces.convert.Converter</code> interface. This section explains how to implement this interface to perform a custom data conversion.
+            Todos los convertidores personalizados deben implementar la interfaz 
+            <code>javax.faces.convert.Converter</code>. Esta sección explica cómo implementar esta interfaz 
+            para realizar una conversión de datos personalizada.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            The Duke's Bookstore case study uses a custom <code>Converter</code> implementation, located in tut-install`/examples/case-studies/dukes-bookstore/src/java/dukesbookstore/converters/CreditCardConverter.java`, to convert the data entered in the Credit Card Number field on the <code>bookcashier.xhtml</code> page. It strips blanks and hyphens from the text string and formats it so that a blank space separates every four characters.
+            El caso de estudio de Duke's Bookstore utiliza una implementación personalizada de 
+            <code>Converter</code>, ubicada en 
+            tut-install`/examples/case-studies/dukes-bookstore/src/java/dukesbookstore/converters/
+            CreditCardConverter.java`, para convertir los datos ingresados en el campo Número de tarjeta de 
+            crédito en la página <code>bookcashier.xhtml</code>. Elimina los espacios en blanco y los guiones 
+            de la cadena de texto y la formatea de modo que un espacio en blanco se separe cada cuatro 
+            caracteres.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            Another common use case for a custom converter is in a list for a nonstandard object type. In the Duke's Tutoring case study, the <code>Student</code> and <code>Guardian</code> entities require a custom converter so that they can be converted to and from a <code>UISelectItems</code> input component.
+            Otro caso de uso común para un convertidor personalizado está en una lista para un tipo de objeto 
+            no estándar. En el caso de estudio de Duke's Tutoring, las entidades <code>Student</code> y 
+            <code>Guardian</code> requieren un convertidor personalizado para que puedan convertirse hacia y 
+            desde un componente de entrada <code>UISelectItems</code>.
           </p>
         </div>
         <div class="sect2" id="GLPHB">
           <h3 id="creating-a-custom-converter">Creando un Convertidor Personalizado</h3>
           <div class="paragraph">
-            <p>The <code>CreditCardConverter</code> custom converter class is created as follows:</p>
+            <p>
+              La clase de convertidor personalizado <code>CreditCardConverter</code> se crea de la siguiente 
+              manera:
+            </p>
           </div>
           <div class="listingblock">
             <div class="content">
@@ -89,12 +111,20 @@ public class CreditCardConverter implements Converter {
           </div>
           <div class="paragraph">
             <p>
-              The <code>@FacesConverter</code> annotation registers the custom converter class as a converter with the name of <code>ccno</code> with the JavaServer Faces implementation. Alternatively, you can register the converter with entries in the application configuration resource file, as shown in <a href="jsf-configure009.html#BNAXE">Registrando un Convertidor Personalizado</a>.
+              La anotación <code>@FacesConverter</code> registra la clase de convertidor personalizado como un 
+              convertidor con el nombre de <code>ccno</code> con la implementación de JavaServer Faces. 
+              Alternativamente, puede registrar el convertidor con entradas en el archivo de recursos de 
+              configuración de la aplicación, como se muestra en 
+              <a href="jsf-configure009.html#BNAXE">Registrando un Convertidor Personalizado</a>.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              To define how the data is converted from the presentation view to the model view, the <code>Converter</code> implementation must implement the <code>getAsObject(FacesContext, UIComponent, String)</code> method from the <code>Converter</code> interface. Here is the implementation of this method from <code>CreditCardConverter</code>:
+              Para definir cómo se convierten los datos de la vista de presentación a la vista de modelo, la 
+              implementación de <code>Converter</code> debe implementar el método 
+              <code>getAsObject(FacesContext, UIComponent, String)</code> del interfaz 
+              <code>Converter</code>. Aquí está la implementación de este método de 
+              <code>CreditCardConverter</code>:
             </p>
           </div>
           <div class="listingblock">
@@ -128,12 +158,22 @@ public Object getAsObject(FacesContext context,
           </div>
           <div class="paragraph">
             <p>
-              During the Apply Request Values phase, when the components' <code>decode</code> methods are processed, the JavaServer Faces implementation looks up the component's local value in the request and calls the <code>getAsObject</code> method. When calling this method, the JavaServer Faces implementation passes in the current <code>FacesContext</code> instance, the component whose data needs conversion, and the local value as a <code>String</code>. The method then writes the local value to a character array, trims the hyphens and blanks, adds the rest of the characters to a <code>String</code>, and returns the <code>String</code>.
+              Durante la fase Aplicar Valores de Solicitud, cuando se procesan los métodos <code>decode</code> 
+              de los componentes, la implementación de JavaServer Faces busca el valor local del componente en 
+              la solicitud y llama al método <code>getAsObject</code>. Al llamar a este método, la 
+              implementación de JavaServer Faces pasa la instancia actual de <code>FacesContext</code>, el 
+              componente cuyos datos necesitan conversión y el valor local como <code>String</code>. Luego, el 
+              método escribe el valor local en una matriz de caracteres, recorta los guiones y los espacios en 
+              blanco, agrega el resto de los caracteres a un <code>String</code> y devuelve el 
+              <code>String</code>.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              To define how the data is converted from the model view to the presentation view, the <code>Converter</code> implementation must implement the <code>getAsString(FacesContext, UIComponent, Object)</code> method from the <code>Converter</code> interface. Here is an implementation of this method:
+              Para definir cómo se convierten los datos de la vista de modelo a la vista de presentación, la 
+              implementación de <code>Converter</code> debe implementar el método 
+              <code>getAsString(FacesContext, UIComponent, Object)</code> de la interfaz 
+              <code>Converter</code>. Aquí hay una implementación de este método:
             </p>
           </div>
           <div class="listingblock">
@@ -178,22 +218,35 @@ public String getAsString(FacesContext context,
           </div>
           <div class="paragraph">
             <p>
-              During the Render Response phase, in which the components' <code>encode</code> methods are called, the JavaServer Faces implementation calls the <code>getAsString</code> method in order to generate the appropriate output. When the JavaServer Faces implementation calls this method, it passes in the current <code>FacesContext</code>, the <code>UIComponent</code> whose value needs to be converted, and the bean value to be converted. Because this converter does a <code>String</code>-to-<code>String</code> conversion, this method can cast the bean value to a <code>String</code>.
+              Durante la fase Respuesta de Procesamiento, en la que se llaman los métodos <code>encode</code> 
+              de los componentes, la implementación de JavaServer Faces llama al método 
+              <code>getAsString</code> para generar la salida adecuada. Cuando la implementación de JavaServer 
+              Faces llama a este método, pasa el <code>FacesContext</code> actual, el <code>UIComponent</code> 
+              cuyo valor debe convertirse y el valor del bean que debe convertirse. Debido a que este 
+              convertidor realiza una conversión de <code>String</code> -a- <code>String</code>, este método 
+              puede convertir el valor del bean en un <code>String</code>.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              If the value cannot be converted to a <code>String</code>, the method throws an exception, passing an error message from the resource bundle that is registered with the application. <a href="jsf-configure006.html#BNAXB">Registrando Mensajes de Aplicación</a> explains how to register custom error messages with the application.
+              Si el valor no se puede convertir en un <code>String</code>, el método genera una excepción y 
+              pasa un mensaje de error del paquete de recursos que está registrado con la aplicación. 
+              <a href="jsf-configure006.html#BNAXB">Registrando Mensajes de Aplicación</a> explica cómo 
+              registrar mensajes de error personalizados con la aplicación.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              If the value can be converted to a <code>String</code>, the method reads the <code>String</code> to a character array and loops through the array, adding a space after every four characters.
+              Si el valor se puede convertir en un <code>String</code>, el método lee el <code>String</code> 
+              en una matriz de caracteres y recorre la matriz, agregando un espacio después de cada cuatro 
+              caracteres.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              You can also create a custom converter with a <code>@FacesConverter</code> annotation that specifies the <code>forClass</code> attribute, as shown in the following example from the Duke's Tutoring case study:
+              También puede crear un convertidor personalizado con una anotación <code>@FacesConverter</code> 
+              que especifica el atributo <code>forClass</code>, como se muestra en el siguiente ejemplo del 
+              caso de estudio de Duke's Tutoring:
             </p>
           </div>
           <div class="listingblock">
@@ -206,12 +259,19 @@ public class GuardianConverter extends EntityConverter implements Converter { ..
           </div>
           <div class="paragraph">
             <p>
-              The <code>forClass</code> attribute registers the converter as the default converter for the <code>Guardian</code> class. Therefore, whenever that class is specified by a <code>value</code> attribute of an input component, the converter is invoked automatically.
+              El atributo <code>forClass</code> registra el convertidor como el convertidor predeterminado 
+              para la clase <code>Guardian</code>. Por lo tanto, siempre que esa clase sea especificada por un 
+              atributo <code>value</code> de un componente de entrada, el convertidor se invoca 
+              automáticamente.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              A converter class can be a separate Java POJO class, as in the Duke's Bookstore case study. If it needs to access objects defined in a managed bean class, however, it can be a subclass of a JavaServer Faces managed bean, as in the <code>address-book</code> persistence example, in which the converters use an enterprise bean that is injected into the managed bean class.
+              Una clase de conversor puede ser una clase POJO de Java separada, como en el caso de estudio de 
+              Duke's Bookstore. Sin embargo, si necesita acceder a objetos definidos en una clase de bean 
+              administrado, puede ser una subclase de un bean administrado de JavaServer Faces, como en el 
+              ejemplo de persistencia <code>address-book</code>, en el que los convertidores utilizan una bean 
+              que se inyecta en la clase de bean gestionado.
             </p>
           </div>
         </div>
@@ -219,29 +279,40 @@ public class GuardianConverter extends EntityConverter implements Converter { ..
           <h3 id="using-a-custom-converter">Usando un Convertidor Personalizado</h3>
           <div class="paragraph">
             <p>
-              To apply the data conversion performed by a custom converter to a particular component's value, you must do one of the following.
+              Para aplicar la conversión de datos realizada por un convertidor personalizado al valor de un 
+              componente en particular, debe realizar una de las siguientes acciones.
             </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
-                <p>Reference the converter from the component tag's <code>converter</code> attribute.</p>
+                <p>
+                  Haga referencia al convertidor desde el atributo <code>converter</code> de la etiqueta de 
+                  componente.
+                </p>
               </li>
               <li>
                 <p>
-                  Nest an <code>f:converter</code> tag inside the component's tag and reference the custom converter from one of the <code>f:converter</code> tag's attributes.
+                  Anida una etiqueta <code>f:converter</code> dentro de la etiqueta del componente y haga 
+                  referencia al convertidor personalizado desde uno de los atributos de la etiqueta 
+                  <code>f:converter</code>.
                 </p>
               </li>
             </ul>
           </div>
           <div class="paragraph">
             <p>
-              If you are using the component tag's <code>converter</code> attribute, this attribute must reference the <code>Converter</code> implementation's identifier or the fully-qualified class name of the converter. <a href="#BNAUS">Creando y Usando un Convertidor Personalizado</a> explains how to implement a custom converter.
+              Si está utilizando el atributo <code>converter</code> de la etiqueta de componente, este 
+              atributo debe hacer referencia al identificador de implementación del <code>Converter</code> o 
+              al nombre de clase completo del conversor. 
+              <a href="#BNAUS">Creando y Usando un Convertidor Personalizado</a> explica cómo implementar un 
+              convertidor personalizado.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              The identifier for the credit card converter class is <code>ccno</code>, the value specified in the <code>@FacesConverter</code> annotation:
+              El identificador para la clase de conversión de tarjetas de crédito es <code>ccno</code>, el 
+              valor especificado en la anotación <code>@FacesConverter</code>:
             </p>
           </div>
           <div class="listingblock">
@@ -255,7 +326,8 @@ public class CreditCardConverter implements Converter {
           </div>
           <div class="paragraph">
             <p>
-              Therefore, the <code>CreditCardConverter</code> instance can be registered on the <code>ccno</code> component as shown in the following example:
+              Por lo tanto, la instancia de <code>CreditCardConverter</code> se puede registrar en el 
+              componente <code>ccno</code> como se muestra en el siguiente ejemplo:
             </p>
           </div>
           <div class="listingblock">
@@ -274,19 +346,29 @@ public class CreditCardConverter implements Converter {
           </div>
           <div class="paragraph">
             <p>
-              By setting the <code>converter</code> attribute of a component's tag to the converter's identifier or its class name, you cause that component's local value to be automatically converted according to the rules specified in the <code>Converter</code> implementation.
+              Al establecer el atributo <code>converter</code> de la etiqueta de un componente en el 
+              identificador del convertidor o su nombre de clase, hace que el valor local de ese componente se 
+              convierta automáticamente de acuerdo con las reglas especificadas en la implementación de 
+              <code>Converter</code>.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              Instead of referencing the converter from the component tag's <code>converter</code> attribute, you can reference the converter from an <code>f:converter</code> tag nested inside the component's tag. To reference the custom converter using the <code>f:converter</code> tag, you do one of the following.
+              En lugar de hacer referencia al convertidor desde el atributo <code>converter</code> de la 
+              etiqueta del componente, puede hacer referencia al convertidor desde una etiqueta 
+              <code>f:converter</code> anidada dentro de la etiqueta del componente. Para hacer referencia al 
+              convertidor personalizado mediante la etiqueta <code>f:converter</code>, realice una de las 
+              siguientes acciones.
             </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
                 <p>
-                  Set the <code>f:converter</code> tag's <code>converterId</code> attribute to the <code>Converter</code> implementation's identifier defined in the <code>@FacesConverter</code> annotation or in the application configuration resource file. This method is shown in <code>bookcashier.xhtml</code>:
+                  Establezca el atributo <code>converterId</code> de la etiqueta <code>f:converter</code> en 
+                  el identificador de implementación de <code>Converter</code> definido en la anotación 
+                  <code>@FacesConverter</code> o en la archivo de recursos de configuración de la aplicación. 
+                  Este método se muestra en <code>bookcashier.xhtml</code>:
                 </p>
                 <div class="listingblock">
                   <div class="content">
@@ -306,19 +388,31 @@ public class CreditCardConverter implements Converter {
               </li>
               <li>
                 <p>
-                  Bind the <code>Converter</code> implementation to a managed bean property using the <code>f:converter</code> tag's <code>binding</code> attribute, as described in <a href="jsf-custom014.html#BNATM">Enlazando Convertidores, Oyentes, y Validadores a Propiedades de un Bean Gestionado</a>.
+                  Vincule la implementación de <code>Converter</code> a una propiedad de bean administrada 
+                  utilizando el atributo <code>binding</code> de la etiqueta <code>f:converter</code>, como se 
+                  describe en 
+                  <a href="jsf-custom014.html#BNATM">
+                    Enlazando Convertidores, Oyentes, y Validadores a Propiedades de un Bean Gestionado 
+                  </a>.
                 </p>
               </li>
             </ul>
           </div>
           <div class="paragraph">
             <p>
-              The JavaServer Faces implementation calls the converter's <code>getAsObject</code> method to strip spaces and hyphens from the input value. The <code>getAsString</code> method is called when the <code>bookcashier.xhtml</code> page is redisplayed; this happens if the user orders more than $100 worth of books.
+              La implementación de JavaServer Faces llama al método <code>getAsObject</code> del convertidor 
+              para eliminar espacios y guiones del valor de entrada. El método <code>getAsString</code> se 
+              llama cuando se vuelve a mostrar la página <code>bookcashier.xhtml</code>; esto sucede si el 
+              usuario pide más de 100$ en libros.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              In the Duke's Tutoring case study, each converter is registered as the converter for a particular class. The converter is automatically invoked whenever that class is specified by a <code>value</code> attribute of an input component. In the following example, the <code>itemValue</code> attribute (highlighted in bold) calls the converter for the <code>Guardian</code> class:
+              En el caso de estudio de Duke's Tutoring, cada convertidor se registra como convertidor para una 
+              clase en particular. El convertidor se invoca automáticamente siempre que esa clase se 
+              especifica mediante un atributo <code>value</code> de un componente de entrada. En el siguiente 
+              ejemplo, el atributo <code>itemValue</code> (resaltado en negrita) llama al convertidor para la 
+              clase <code>Guardian</code>:
             </p>
           </div>
           <div class="listingblock">
