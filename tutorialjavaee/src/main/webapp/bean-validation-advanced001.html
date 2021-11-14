@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
   <head>
@@ -19,7 +18,6 @@
   </tr>
 </table>
 <hr />
-
 <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
 	<colgroup>
 		<col width="12%"/>
@@ -33,14 +31,12 @@
 			<span style="position:relative;top:-2px;">Anterior</span>
 		</a>
 		</td>
-
 		<td align="left">
 		<a href="bean-validation-advanced002.html">
 			<span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
 			<span style="position:relative;top:-2px;">Siguiente</span>
 		</a>
 		</td>
-
 		<td align="right">
 		<a href="toc.html">
 			<span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
@@ -49,8 +45,6 @@
 		</td>
 	</tr>
 </table>
-
-
 <div class="sect1" id="">
 <h2 id="creating-custom-constraints">Creating Custom Constraints</h2>
 <div class="sectionbody">
@@ -91,7 +85,6 @@ applied to component attributes with a single annotation.</p>
 <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">@Pattern.List({
   /* A number of format “+1-NNN-NNN-NNNN” */
 @Pattern(regexp = “\\+1-\\d{3}-\\d{3}-\\d{4})
-
 @Constraint(validatedBy = {})
 @Documented
 @Target({ElementType.METHOD,
@@ -103,14 +96,9 @@ applied to component attributes with a single annotation.</p>
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(List.class)
 public @interface USPhoneNumber {
-
 String message() default "Not a valid US Phone Number";
-
 Class&lt;?&gt;[] groups() default {};
-
 Class&lt;? extends Payload&gt;[] payload() default {};
-
-
   @Target({ElementType.METHOD,
      ElementType.FIELD,
      ElementType.ANNOTATION_TYPE,
@@ -121,9 +109,7 @@ Class&lt;? extends Payload&gt;[] payload() default {};
 @Documented
 @interface List {
 USPhoneNumber[] value();
-
 }
-
 }</code></pre>
 </div>
 </div>
@@ -198,15 +184,12 @@ ValidatorFactory factory = Validation
        .byDefaultProvider().configure()
           .clockProvider( new CustomClockProvider() )
           .buildValidatorFactory();
-
 //Retrieve and use the custom Clock Provider and Clock in the Validator implementation
 public class CustomConstraintValidator implements ConstraintValidator&lt;CustomConstraint, Object&gt; {
-
     public boolean isValid(Object value, ConstraintValidatorContext context){
         java.time.Clock clock = context.getClockProvider().getClock();
         ...
         ...
-
     }
 }</code></pre>
 </div>
@@ -225,19 +208,15 @@ public class CustomConstraintValidator implements ConstraintValidator&lt;CustomC
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">public class Employee extends Person {
-
   @USPhoneNumber
   protected String phone;
-
   public Employee(String name, String phone, int age){
     super(name, age);
     this.phone = phone;
   }
-
   public String getPhone() {
     return phone;
   }
-
   public void setPhone(String phone) {
     this.phone = phone;
   }</code></pre>
@@ -283,24 +262,17 @@ In the sample, another constraint <code>@Pattern</code> is used to validate the 
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">public class StatsCalculator&lt;T extends Person&gt; {
-
   /* Cascading validation as well as @NotNull constraint */
   private List&lt;@NotNull @Valid T&gt; members = new ArrayList&lt;T&gt;();
-
-
   public void addMember(T member) {
     members.add(member);
   }
-
   public boolean removeMember(T member) {
     return members.remove(member);
   }
-
   public int getAverageAge() {
-
     if (members.size() == 0)
       return 0;
-
     short sum = 0;
     for (T member : members) {
       if(member != null) {
@@ -309,10 +281,8 @@ In the sample, another constraint <code>@Pattern</code> is used to validate the 
     }
     return sum / members.size();
   }
-
   public int getOldest() {
     int oldest = -1;
-
     for (T member : members) {
       if(member != null) {
         if (member.getAge() &gt; oldest) {
@@ -334,19 +304,15 @@ In the sample, another constraint <code>@Pattern</code> is used to validate the 
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">public class StatisticsPrinter {
     private StatsCalculator&lt;@Valid Employee&gt; calculator;
-
     public StatisticsPrinter(StatsCalculator&lt;Employee&gt; statsCalculator){
       this.calculator = statsCalculator;
     }
-
     public void displayStatistics(){
       //Use StatsCalculator, get stats, format and display them.
     }
-
     public void printStatistics(){
       //Use StatsCalculator, get stats, format and print them.
     }
-
   }</code></pre>
 </div>
 </div>
@@ -356,7 +322,6 @@ In the sample, another constraint <code>@Pattern</code> is used to validate the 
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">public class ExtractorForStatsCalculator implements ValueExtractor&lt;StatsCalculator&lt;@ExtractedValue ?&gt;&gt;{
-
     @Override
     public void extractValues(StatsCalculator&lt;@ExtractedValue ?&gt; statsCalculator,
         ValueReceiver valueReceiver) {
@@ -374,12 +339,9 @@ In the sample, another constraint <code>@Pattern</code> is used to validate the 
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">ValidatorFactory validatorFactory = Validation
         .buildDefaultValidatorFactory();
-
     ValidatorContext context = validatorFactory.
         usingContext()
         .addValueExtractor(new ExtractorForStatsCalculator());
-
-
     Validator validator = context.getValidator();</code></pre>
 </div>
 </div>
@@ -412,9 +374,7 @@ In the sample, another constraint <code>@Pattern</code> is used to validate the 
 </div>
 </div>
 </div>
-
 <hr />
-
 <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
 	<colgroup>
 		<col width="12%"/>
@@ -428,14 +388,12 @@ In the sample, another constraint <code>@Pattern</code> is used to validate the 
 			<span style="position:relative;top:-2px;">Anterior</span>
 		</a>
 		</td>
-
 		<td align="left">
 		<a href="bean-validation-advanced002.html">
 			<span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
 			<span style="position:relative;top:-2px;">Siguiente</span>
 		</a>
 		</td>
-
 		<td align="right">
 		<a href="toc.html">
 			<span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
@@ -444,14 +402,11 @@ In the sample, another constraint <code>@Pattern</code> is used to validate the 
 		</td>
 	</tr>
 </table>
-
 <span id="copyright">
 	<a href="img/cpyr.adoc">
 		<img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
 		<span>Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;derechos&nbsp;reservados.</span>
 	</a>
 </span>
-
-
 </body>
 </html>
