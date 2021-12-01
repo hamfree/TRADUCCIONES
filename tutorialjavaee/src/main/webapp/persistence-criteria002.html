@@ -45,22 +45,24 @@
       </tr>
     </table>
     <div class="sect1" id="">
-      <h2 id="using-the-metamodel-api-to-model-entity-classes">Using the Metamodel API to Model Entity Classes</h2>
+      <h2 id="using-the-metamodel-api-to-model-entity-classes">
+        Using the Metamodel API to Model Entity Classes
+      </h2>
       <div class="sectionbody">
         <div class="paragraph">
-          <p>Use the Metamodel API to create a metamodel of the managed entities in a
-            particular persistence unit. For each entity class in a particular
-            package, a metamodel class is created with a trailing underscore and
-            with attributes that correspond to the persistent fields or properties
-            of the entity class.</p>
+          <p>
+            Use the Metamodel API to create a metamodel of the managed entities in a particular persistence unit. For each entity class in a particular package, a metamodel class is created with a trailing underscore and with attributes that correspond to the persistent fields or properties of the entity class.
+          </p>
         </div>
         <div class="paragraph">
-          <p>The following entity class, <code>com.example.Pet</code>, has four persistent
-            fields: <code>id</code>, <code>name</code>, <code>color</code>, and <code>owners</code>:</p>
+          <p>
+            The following entity class, <code>com.example.Pet</code>, has four persistent fields: <code>id</code>, <code>name</code>, <code>color</code>, and <code>owners</code>:
+          </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">package com.example;
+            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+package com.example;
 ...
 @Entity
 public class Pet {
@@ -71,7 +73,8 @@ public class Pet {
     @ManyToOne
     protected Set&lt;Person&gt; owners;
     ...
-}</code></pre>
+}
+            </code></pre>
           </div>
         </div>
         <div class="paragraph">
@@ -79,7 +82,8 @@ public class Pet {
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">package com.example;
+            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+package com.example;
 ...
 @Static Metamodel(Pet.class)
 public class Pet_ {
@@ -87,34 +91,38 @@ public class Pet_ {
     public static volatile SingularAttribute&lt;Pet, String&gt; name;
     public static volatile SingularAttribute&lt;Pet, String&gt; color;
     public static volatile SetAttribute&lt;Pet, Person&gt; owners;
-}</code></pre>
+}
+            </code></pre>
           </div>
         </div>
         <div class="paragraph">
-          <p>Criteria queries use the metamodel class and its attributes to refer to
-            the managed entity classes and their persistent state and relationships.</p>
+          <p>
+            Criteria queries use the metamodel class and its attributes to refer to the managed entity classes and their persistent state and relationships.
+          </p>
         </div>
         <div class="sect2" id="">
           <h3 id="using-metamodel-classes">Using Metamodel Classes</h3>
           <div class="paragraph">
-            <p>Metamodel classes that correspond to entity classes are of the following
-              type:</p>
+            <p>Metamodel classes that correspond to entity classes are of the following type:</p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">javax.persistence.metamodel.EntityType&lt;T&gt;</code></pre>
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+javax.persistence.metamodel.EntityType&lt;T&gt;
+              </code></pre>
             </div>
           </div>
           <div class="paragraph">
-            <p>Annotation processors typically generate metamodel classes either at
-              development time or at runtime. Developers of applications that use
-              Criteria queries may do either of the following:</p>
+            <p>
+              Annotation processors typically generate metamodel classes either at development time or at runtime. Developers of applications that use Criteria queries may do either of the following:
+            </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
-                <p>Generate static metamodel classes by using the persistence provider's
-                  annotation processor</p>
+                <p>
+                  Generate static metamodel classes by using the persistence provider's annotation processor
+                </p>
               </li>
               <li>
                 <p>Obtain the metamodel class by doing one of the following:</p>
@@ -124,8 +132,9 @@ public class Pet_ {
                       <p>Call the <code>getModel</code> method on the query root object</p>
                     </li>
                     <li>
-                      <p>Obtain an instance of the <code>Metamodel</code> interface and then pass the
-                        entity type to the instance's <code>entity</code> method</p>
+                      <p>
+                        Obtain an instance of the <code>Metamodel</code> interface and then pass the entity type to the instance's <code>entity</code> method
+                      </p>
                     </li>
                   </ul>
                 </div>
@@ -133,29 +142,33 @@ public class Pet_ {
             </ul>
           </div>
           <div class="paragraph">
-            <p>The following code snippet shows how to obtain the <code>Pet</code> entity's
-              metamodel class by calling <code>Root&lt;T&gt;.getModel</code>:</p>
+            <p>
+              The following code snippet shows how to obtain the <code>Pet</code> entity's metamodel class by calling <code>Root&lt;T&gt;.getModel</code>:
+            </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">EntityManager em = ...;
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+EntityManager em = ...;
 CriteriaBuilder cb = em.getCriteriaBuilder();
 CriteriaQuery cq = cb.createQuery(Pet.class);
 Root&lt;Pet&gt; pet = cq.from(Pet.class);
-EntityType&lt;Pet&gt; Pet_ = pet.getModel();</code></pre>
+EntityType&lt;Pet&gt; Pet_ = pet.getModel();
+              </code></pre>
             </div>
           </div>
           <div class="paragraph">
-            <p>The following code snippet shows how to obtain the <code>Pet</code> entity's
-              metamodel class by first obtaining a metamodel instance by using
-              <code>EntityManager.getMetamodel</code> and then calling <code>entity</code> on the metamodel
-              instance:</p>
+            <p>
+              The following code snippet shows how to obtain the <code>Pet</code> entity's metamodel class by first obtaining a metamodel instance by using <code>EntityManager.getMetamodel</code> and then calling <code>entity</code> on the metamodel instance:
+            </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">EntityManager em = ...;
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+EntityManager em = ...;
 Metamodel m = em.getMetamodel();
-EntityType&lt;Pet&gt; Pet_ = m.entity(Pet.class);</code></pre>
+EntityType&lt;Pet&gt; Pet_ = m.entity(Pet.class);
+              </code></pre>
             </div>
           </div>
           <table class="tableblock frame-all grid-all spread">
@@ -164,17 +177,18 @@ EntityType&lt;Pet&gt; Pet_ = m.entity(Pet.class);</code></pre>
             </colgroup>
             <tbody>
               <tr>
-                <td class="tableblock halign-left valign-top"><div><div class="paragraph">
+                <td class="tableblock halign-left valign-top">
+                  <div>
+                    <div class="paragraph">
                       <p>Note:</p>
                     </div>
                     <div class="paragraph">
-                      <p>The most common use case is to generate typesafe static metamodel
-                        classes at development time. Obtaining the metamodel classes
-                        dynamically, by calling <code>Root&lt;T&gt;.getModel</code> or
-                        <code>EntityManager.getMetamodel</code> and then the <code>entity</code> method, doesn't allow
-                        for type safety and doesn't allow the application to call persistent
-                        field or property names on the metamodel class.</p>
-                    </div></div></td>
+                      <p>
+                        The most common use case is to generate typesafe static metamodel classes at development time. Obtaining the metamodel classes dynamically, by calling <code>Root&lt;T&gt;.getModel</code> or <code>EntityManager.getMetamodel</code> and then the <code>entity</code> method, doesn't allow for type safety and doesn't allow the application to call persistent field or property names on the metamodel class.
+                      </p>
+                    </div>
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
