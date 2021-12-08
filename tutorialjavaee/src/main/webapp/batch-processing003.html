@@ -48,18 +48,19 @@
       <h2 id="simple-use-case">Simple Use Case</h2>
       <div class="sectionbody">
         <div class="paragraph">
-          <p>This section demonstrates how to define a simple job using the Job
-            Specification Language (JSL) and how to implement the corresponding
-            batch artifacts. Refer to the rest of the sections in this chapter for
-            detailed descriptions of the elements in the batch framework.</p>
+          <p>
+            This section demonstrates how to define a simple job using the Job Specification Language (JSL) and how to implement the corresponding batch artifacts. Refer to the rest of the sections in this chapter for detailed descriptions of the elements in the batch framework.
+          </p>
         </div>
         <div class="paragraph">
-          <p>The following job definition specifies a chunk step and a task step as
-            follows:</p>
+          <p>
+            The following job definition specifies a chunk step and a task step as follows:
+          </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;job id="simplejob" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
                     version="1.0"&gt;
   &lt;properties&gt;
@@ -77,34 +78,37 @@
     &lt;batchlet ref="MyBatchlet"&gt;&lt;/batchlet&gt;
     &lt;end on="COMPLETED"/&gt;
   &lt;/step&gt;
-&lt;/job&gt;</code></pre>
+&lt;/job&gt;
+            </code></pre>
           </div>
         </div>
         <div class="sect2" id="">
           <h3 id="chunk-step">Chunk Step</h3>
           <div class="paragraph">
-            <p>In most cases, you have to implement a checkpoint class for
-              chunk-oriented steps. The following class just keeps track of the line
-              number in a text file:</p>
+            <p>
+              In most cases, you have to implement a checkpoint class for chunk-oriented steps. The following class just keeps track of the line number in a text file:
+            </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">public class MyCheckpoint implements Serializable {
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+public class MyCheckpoint implements Serializable {
     private long lineNum = 0;
     public void increase() { lineNum++; }
     public long getLineNum() { return lineNum; }
-}</code></pre>
+}
+              </code></pre>
             </div>
           </div>
           <div class="paragraph">
-            <p>The following item reader implementation continues reading the input
-              file from the provided checkpoint if the job was restarted. The items
-              consist of each line in the text file (in more complex scenarios, the
-              items are custom Java types and the input source can be a database):</p>
+            <p>
+              The following item reader implementation continues reading the input file from the provided checkpoint if the job was restarted. The items consist of each line in the text file (in more complex scenarios, the items are custom Java types and the input source can be a database):
+            </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">@Dependent
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Dependent
 @Named("MyReader")
 public class MyReader implements javax.batch.api.chunk.ItemReader {
     private MyCheckpoint checkpoint;
@@ -133,17 +137,19 @@ public class MyReader implements javax.batch.api.chunk.ItemReader {
         String line = breader.readLine();
         return line;
     }
-}</code></pre>
+}
+              </code></pre>
             </div>
           </div>
           <div class="paragraph">
-            <p>In the following case, the item processor only converts the line to
-              uppercase. More complex examples can process items in different ways or
-              transform them into custom output Java types:</p>
+            <p>
+              In the following case, the item processor only converts the line to uppercase. More complex examples can process items in different ways or transform them into custom output Java types:
+            </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">@Dependent
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Dependent
 @Named("MyProcessor")
 public class MyProcessor implements javax.batch.api.chunk.ItemProcessor {
     public MyProcessor() {}
@@ -152,7 +158,8 @@ public class MyProcessor implements javax.batch.api.chunk.ItemProcessor {
         String line = (String) obj;
         return line.toUpperCase();
     }
-}</code></pre>
+}
+              </code></pre>
             </div>
           </div>
           <table class="tableblock frame-all grid-all spread">
@@ -161,24 +168,30 @@ public class MyProcessor implements javax.batch.api.chunk.ItemProcessor {
             </colgroup>
             <tbody>
               <tr>
-                <td class="tableblock halign-left valign-top"><div><div class="paragraph">
+                <td class="tableblock halign-left valign-top">
+                  <div>
+                    <div class="paragraph">
                       <p>Note:</p>
                     </div>
                     <div class="paragraph">
-                      <p>The batch processing API does not support generics. In most cases, you
-                        need to cast items to their specific type before processing them.</p>
-                    </div></div></td>
+                      <p>
+                        The batch processing API does not support generics. In most cases, you need to cast items to their specific type before processing them.
+                      </p>
+                    </div>
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
           <div class="paragraph">
-            <p>The item writer writes the processed items to the output file. It
-              overwrites the output file if no checkpoint is provided; otherwise, it
-              resumes writing at the end of the file. Items are written in chunks:</p>
+            <p>
+              The item writer writes the processed items to the output file. It overwrites the output file if no checkpoint is provided; otherwise, it resumes writing at the end of the file. Items are written in chunks:
+            </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">@Dependent
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Dependent
 @Named("MyWriter")
 public class MyWriter implements javax.batch.api.chunk.ItemWriter {
     private BufferedWriter bwriter;
@@ -202,20 +215,22 @@ public class MyWriter implements javax.batch.api.chunk.ItemWriter {
     @Override
     public Serializable checkpointInfo() throws Exception {
         return new MyCheckpoint();
-}</code></pre>
+}
+              </code></pre>
             </div>
           </div>
         </div>
         <div class="sect2" id="">
           <h3 id="task-step">Task Step</h3>
           <div class="paragraph">
-            <p>The task step displays the length of the output file. In more complex
-              scenarios, task steps perform any task that does not fit the chunk
-              processing programming model:</p>
+            <p>
+              The task step displays the length of the output file. In more complex scenarios, task steps perform any task that does not fit the chunk processing programming model:
+            </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">@Dependent
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Dependent
 @Named("MyBatchlet")
 public class MyBatchlet implements javax.batch.api.chunk.Batchlet {
     @Inject
@@ -227,7 +242,8 @@ public class MyBatchlet implements javax.batch.api.chunk.Batchlet {
         System.out.println(""+(new File(fileName)).length());
         return "COMPLETED";
     }
-}</code></pre>
+}
+              </code></pre>
             </div>
           </div>
         </div>
