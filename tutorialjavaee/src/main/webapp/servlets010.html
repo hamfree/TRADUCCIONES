@@ -49,30 +49,46 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            The web container may determine that a servlet should be removed from service (for example, when a container wants to reclaim memory resources or when it is being shut down). In such a case, the container calls the <code>destroy</code> method of the <code>Servlet</code> interface. In this method, you release any resources the servlet is using and save any persistent state. The <code>destroy</code> method releases the database object created in the <code>init</code> method.
+            El contenedor web puede determinar que un servlet debe retirarse del servicio (por ejemplo, cuando 
+            un contenedor desea recuperar recursos de memoria o cuando se está cerrando). En tal caso, el 
+            contenedor llama al método <code>destroy</code> de la interfaz <code>Servlet</code>. En este 
+            método, libera cualquier recurso que esté usando el servlet y guarda cualquier estado persistente. 
+            El método <code>destroy</code> libera el objeto de base de datos creado en el método 
+            <code>init</code>.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            A servlet's service methods should all be complete when a servlet is removed. The server tries to ensure this by calling the <code>destroy</code> method only after all service requests have returned or after a server-specific grace period, whichever comes first. If your servlet has operations that may run longer than the server's grace period, the operations could still be running when <code>destroy</code> is called. You must make sure that any threads still handling client requests complete.
+            Todos los métodos de servicio de un servlet deben estar completos cuando se elimina un servlet. El 
+            servidor intenta garantizar esto llamando al método <code>destroy</code> solo después de que todas 
+            las solicitudes de servicio hayan regresado o después de un período de gracia específico del 
+            servidor, lo que ocurra primero. Si su servlet tiene operaciones que pueden ejecutarse por más 
+            tiempo que el período de gracia del servidor, las operaciones aún podrían estar ejecutándose 
+            cuando se llame a <code>destroy</code>. Debe asegurarse de que todos los subprocesos que todavía 
+            manejan las solicitudes de los clientes estén completos.
           </p>
         </div>
         <div class="paragraph">
-          <p>The remainder of this section explains how to do the following.</p>
+          <p>El resto de esta sección explica cómo hacer lo siguiente.</p>
         </div>
         <div class="ulist">
           <ul>
             <li>
-              <p>Keep track of how many threads are currently running the <code>service</code> method.</p>
-            </li>
-            <li>
               <p>
-                Provide a clean shutdown by having the <code>destroy</code> method notify long-running threads of the shutdown and wait for them to complete.
+                Realizar un seguimiento de cuántos subprocesos están ejecutando actualmente el método 
+                <code>service</code>.
               </p>
             </li>
             <li>
               <p>
-                Have the long-running methods poll periodically to check for shutdown and, if necessary, stop working, clean up, and return.
+                Proporcionar un cierre limpio haciendo que el método <code>destroy</code> notifique el cierre 
+                a los subprocesos de ejecución prolongada y espere a que se completen.
+              </p>
+            </li>
+            <li>
+              <p>
+                Hacer que los métodos de ejecución prolongada realicen un sondeo periódico para verificar el 
+                apagado y, si es necesario, dejar de funcionar, limpiar y regresar.
               </p>
             </li>
           </ul>
@@ -80,17 +96,19 @@
         <div class="sect2" id="BNAGT">
           <h3 id="tracking-service-requests">Seguimiento de Solicitudes de Servicio</h3>
           <div class="paragraph">
-            <p>To track service requests:</p>
+            <p>Para realizar un seguimiento de las solicitudes de servicio:</p>
           </div>
           <div class="olist arabic">
             <ol class="arabic">
               <li>
                 <p>
-                  Include a field in your servlet class that counts the number of service methods that are running.
+                  Incluir un campo en su clase de servlet que cuente la cantidad de métodos de servicio que se 
+                  están ejecutando.
                 </p>
                 <div class="paragraph">
                   <p>
-                    The field should have synchronized access methods to increment, decrement, and return its value:
+                    El campo debe tener métodos de acceso sincronizados para incrementar, disminuir y devolver 
+                    su valor:
                   </p>
                 </div>
                 <div class="listingblock">
@@ -100,7 +118,7 @@
 public class ShutdownExample extends HttpServlet {
     private int serviceCounter = 0;
     ...
-    // Access methods for serviceCounter
+    // Métodos de acceso para serviceCounter
     protected synchronized void enteringServiceMethod() {
         serviceCounter++;
     }
@@ -117,7 +135,11 @@ public class ShutdownExample extends HttpServlet {
                 </div>
                 <div class="paragraph">
                   <p>
-                    The <code>service</code> method should increment the service counter each time the method is entered and should decrement the counter each time the method returns. This is one of the few times that your <code>HttpServlet</code> subclass should override the <code>service</code> method. The new method should call <code>super.service</code> to preserve the functionality of the original <code>service</code> method:
+                    El método <code>service</code> debe incrementar el contador de servicio cada vez que se 
+                    ingresa en el método y debe disminuir el contador cada vez que el método regresa. Esta es 
+                    una de las pocas veces que su subclase <code>HttpServlet</code> debe anular el método 
+                    <code>service</code>. El nuevo método debería llamar a <code>super.service</code> para 
+                    conservar la funcionalidad del método <code>service</code> original:
                   </p>
                 </div>
                 <div class="listingblock">
@@ -146,19 +168,21 @@ protected void service(HttpServletRequest req,
           <h3 id="notifying-methods-to-shut-down">Métodos de Notificación para Apagar</h3>
           <div class="paragraph">
             <p>
-              To ensure a clean shutdown, your <code>destroy</code> method should not release any shared resources until all the service requests have completed:
+              Para garantizar un apagado limpio, su método <code>destroy</code> no debe liberar ningún recurso 
+              compartido hasta que se hayan completado todas las solicitudes de servicio:
             </p>
           </div>
           <div class="olist arabic">
             <ol class="arabic">
               <li>
-                <p>Check the service counter.</p>
+                <p>Consultar el contador de servicio.</p>
               </li>
               <li>
-                <p>Notify long-running methods that it is time to shut down.</p>
+                <p>Notificar a los métodos de ejecución prolongada que es hora de cerrar.</p>
                 <div class="paragraph">
                   <p>
-                    For this notification, another field is required. The field should have the usual access methods:
+                    Para esta notificación, se requiere otro campo. El campo debe tener los métodos de acceso 
+                    habituales:
                   </p>
                 </div>
                 <div class="listingblock">
@@ -168,7 +192,7 @@ protected void service(HttpServletRequest req,
 public class ShutdownExample extends HttpServlet {
     private boolean shuttingDown;
     ...
-    //Access methods for shuttingDown
+    //Métodos de acceso para shuttingDown
     protected synchronized void setShuttingDown(boolean flag) {
         shuttingDown = flag;
     }
@@ -182,7 +206,8 @@ public class ShutdownExample extends HttpServlet {
                 </div>
                 <div class="paragraph">
                   <p>
-                    Here is an example of the <code>destroy</code> method using these fields to provide a clean shutdown:
+                    Aquí hay un ejemplo del método <code>destroy</code> usando estos campos para proporcionar 
+                    un apagado limpio:
                   </p>
                 </div>
                 <div class="listingblock">
@@ -190,12 +215,12 @@ public class ShutdownExample extends HttpServlet {
                     <pre class="prettyprint highlight">
                       <code class="language-oac_no_warn" data-lang="oac_no_warn">
 public void destroy() {
-    /* Check to see whether there are still service methods /*
-    /* running, and if there are, tell them to stop. */
+    /* Comprobar si todavía hay métodos de servicio /*
+    /* corriendo, y si los hay, decirles que se detengan. */
     if (numServices()&gt; 0) {
         setShuttingDown(true);
     }
-    /* Wait for the service methods to stop. */
+    /* Esperar a que se detengan los métodos de servicio. */
     while (numServices()&gt; 0) {
         try {
             Thread.sleep(interval);
@@ -215,7 +240,10 @@ public void destroy() {
           <h3 id="creating-polite-long-running-methods">Creando Métodos Educados de Larga Duración</h3>
           <div class="paragraph">
             <p>
-              The final step in providing a clean shutdown is to make any long-running methods behave politely. Methods that might run for a long time should check the value of the field that notifies them of shutdowns and should interrupt their work, if necessary:
+              El paso final para proporcionar un apagado limpio es hacer que los métodos de ejecución 
+              prolongada se comporten de manera cortés. Los métodos que pueden ejecutarse durante mucho tiempo 
+              deben verificar el valor del campo que les notifica las paradas y deben interrumpir su trabajo, 
+              si es necesario:
             </p>
           </div>
           <div class="listingblock">

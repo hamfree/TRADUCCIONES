@@ -49,43 +49,63 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            Web containers in application servers normally use a server thread per client request. Under heavy load conditions, containers need a large amount of threads to serve all the client requests. Scalability limitations include running out of memory or exhausting the pool of container threads. To create scalable web applications, you must ensure that no threads associated with a request are sitting idle, so the container can use them to process new requests.
+            Los contenedores web en los servidores de aplicaciones normalmente usan un subproceso de servidor 
+            por solicitud del cliente. En condiciones de carga pesada, los contenedores necesitan una gran 
+            cantidad de subprocesos para atender todas las solicitudes de los clientes. Las limitaciones de 
+            escalabilidad incluyen quedarse sin memoria o agotar el conjunto de subprocesos del contenedor. 
+            Para crear aplicaciones web escalables, debe asegurarse de que ningún subproceso asociado con una 
+            solicitud esté inactivo, de modo que el contenedor pueda usarlos para procesar nuevas solicitudes.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            There are two common scenarios in which a thread associated with a request can be sitting idle.
+            Hay dos escenarios comunes en los que un subproceso asociado con una solicitud puede estar 
+            inactivo.
           </p>
         </div>
         <div class="ulist">
           <ul>
             <li>
               <p>
-                The thread needs to wait for a resource to become available or process data before building the response. For example, an application may need to query a database or access data from a remote web service before generating the response.
+                El subproceso debe esperar a que un recurso esté disponible o procesar datos antes de generar 
+                la respuesta. Por ejemplo, una aplicación puede necesitar consultar una base de datos o 
+                acceder a datos desde un servicio web remoto antes de generar la respuesta.
               </p>
             </li>
             <li>
               <p>
-                The thread needs to wait for an event before generating the response. For example, an application may have to wait for a JMS message, new information from another client, or new data available in a queue before generating the response.
+                El subproceso debe esperar un evento antes de generar la respuesta. Por ejemplo, una 
+                aplicación puede tener que esperar un mensaje JMS, nueva información de otro cliente o nuevos 
+                datos disponibles en una cola antes de generar la respuesta.
               </p>
             </li>
           </ul>
         </div>
         <div class="paragraph">
           <p>
-            These scenarios represent blocking operations that limit the scalability of web applications. Asynchronous processing refers to assigning these blocking operations to a new thread and retuning the thread associated with the request immediately to the container.
+            Estos escenarios representan operaciones de bloqueo que limitan la escalabilidad de las 
+            aplicaciones web. El procesamiento asíncrono se refiere a la asignación de estas operaciones de 
+            bloqueo a un nuevo subproceso y el retorno del subproceso asociado con la solicitud inmediatamente 
+            al contenedor.
           </p>
         </div>
         <div class="sect2" id="sthref103">
           <h3 id="asynchronous-processing-in-servlets">Procesamiento Asincrónico en los Servlets</h3>
           <div class="paragraph">
             <p>
-              Java EE provides asynchronous processing support for servlets and filters. If a servlet or a filter reaches a potentially blocking operation when processing a request, it can assign the operation to an asynchronous execution context and return the thread associated with the request immediately to the container without generating a response. The blocking operation completes in the asynchronous execution context in a different thread, which can generate a response or dispatch the request to another servlet.
+              Java EE proporciona soporte de procesamiento asíncrono para servlets y filtros. Si un servlet o 
+              un filtro alcanza una operación potencialmente bloqueante al procesar una solicitud, puede 
+              asignar la operación a un contexto de ejecución asíncrona y devolver el hilo asociado con la 
+              solicitud inmediatamente al contenedor sin generar una respuesta. La operación de bloqueo se 
+              completa en el contexto de ejecución asincrónica en un subproceso diferente, que puede generar 
+              una respuesta o enviar la solicitud a otro servlet.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              To enable asynchronous processing on a servlet, set the parameter <code>asyncSupported</code> to <code>true</code> on the <code>@WebServlet</code> annotation as follows:
+              Para habilitar el procesamiento asíncrono en un servlet, establezca el parámetro 
+              <code>asyncSupported</code> en <code>true</code> en la anotación <code>@WebServlet</code> de la 
+              siguiente manera:
             </p>
           </div>
           <div class="listingblock">
@@ -100,7 +120,10 @@ public class AsyncServlet extends HttpServlet { ... }
           </div>
           <div class="paragraph">
             <p>
-              The <code>javax.servlet.AsyncContext</code> class provides the functionality that you need to perform asynchronous processing inside service methods. To obtain an instance of <code>AsyncContext</code>, call the <code>startAsync()</code> method on the request object of your service method; for example:
+              La clase <code>javax.servlet.AsyncContext</code> proporciona la funcionalidad que necesita para 
+              realizar el procesamiento asíncrono dentro de los métodos de servicio. Para obtener una 
+              instancia de <code>AsyncContext</code>, llame al método <code>startAsync()</code> en el objeto 
+              de solicitud de su método de servicio; por ejemplo:
             </p>
           </div>
           <div class="listingblock">
@@ -118,19 +141,22 @@ public void doGet(HttpServletRequest req, HttpServletResponse resp) {
           </div>
           <div class="paragraph">
             <p>
-              This call puts the request into asynchronous mode and ensures that the response is not committed after exiting the service method. You have to generate the response in the asynchronous context after the blocking operation completes or dispatch the request to another servlet.
+              Esta llamada pone la solicitud en modo asíncrono y garantiza que la respuesta no se confirme 
+              después de salir del método de servicio. Debe generar la respuesta en el contexto asíncrono 
+              después de que se complete la operación de bloqueo o enviar la solicitud a otro servlet.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              <a href="#BEICFIEC">Table 18-3</a> describes the basic functionality provided by the <code>AsyncContext</code> class.
+              <a href="#BEICFIEC">La Tabla 18-3</a> describe la funcionalidad básica proporcionada por la 
+              clase <code>AsyncContext</code>.
             </p>
           </div>
           <div class="paragraph">
             <p><a id="sthref104"></a><a id="BEICFIEC"></a></p>
           </div>
           <div class="paragraph">
-            <p><strong>Table 18-3 Functionality Provided by the AsyncContext Class</strong></p>
+            <p><strong>Tabla 18-3 Funcionalidad Proporcionada por la Clase AsyncContext</strong></p>
           </div>
           <table class="tableblock frame-all grid-all" style="width: 90%;">
             <colgroup>
@@ -140,7 +166,7 @@ public void doGet(HttpServletRequest req, HttpServletResponse resp) {
             <tbody>
               <tr>
                 <td class="tableblock halign-left valign-top">
-                  <p class="tableblock"><strong>Method Signature</strong></p></td>
+                  <p class="tableblock"><strong>Firma del Método</strong></p></td>
                 <td class="tableblock halign-left valign-top">
                   <p class="tableblock"><strong>Descripción</strong></p></td>
               </tr>
@@ -151,13 +177,16 @@ public void doGet(HttpServletRequest req, HttpServletResponse resp) {
                   <div>
                     <div class="paragraph">
                       <p>
-                        The container provides a different thread in which the blocking operation can be 
-                        processed.
+                        El contenedor proporciona un subproceso diferente en el que se puede procesar la 
+                        operación de bloqueo.
                       </p>
                     </div>
                     <div class="paragraph">
                       <p>
-                        You provide code for the blocking operation as a class that implements the <code>Runnable</code> interface. You can provide this class as an inner class when calling the <code>start</code> method or use another mechanism to pass the <code>AsyncContext</code> instance to your class.
+                       Proporcione código para la operación de bloqueo como una clase que implementa la 
+                       interfaz <code>Runnable</code>. Puede proporcionar esta clase como una clase interna al 
+                       llamar al método <code>start</code> o usar otro mecanismo para pasar la instancia de 
+                       <code>AsyncContext</code> a su clase.
                       </p>
                     </div>
                   </div>
@@ -170,12 +199,14 @@ public void doGet(HttpServletRequest req, HttpServletResponse resp) {
                   <div>
                     <div class="paragraph">
                       <p>
-                        Returns the request used to initialize this asynchronous context. In the example above, the request is the same as in the service method.
+                        Devuelve la solicitud utilizada para inicializar este contexto asíncrono. En el 
+                        ejemplo anterior, la solicitud es la misma que en el método de servicio.
                       </p>
                     </div>
                     <div class="paragraph">
                       <p>
-                        You can use this method inside the asynchronous context to obtain parameters from the request.
+                        Puede usar este método dentro del contexto asíncrono para obtener parámetros de la 
+                        solicitud.
                       </p>
                     </div>
                   </div>
@@ -188,12 +219,14 @@ public void doGet(HttpServletRequest req, HttpServletResponse resp) {
                   <div>
                     <div class="paragraph">
                       <p>
-                        Returns the response used to initialize this asynchronous context. In the example above, the response is the same as in the service method.
+                        Devuelve la respuesta utilizada para inicializar este contexto asíncrono. En el 
+                        ejemplo anterior, la respuesta es la misma que en el método de servicio.
                       </p>
                     </div>
                     <div class="paragraph">
                       <p>
-                        You can use this method inside the asynchronous context to write to the response with the results of the blocking operation.
+                        Puede usar este método dentro del contexto asíncrono para escribir en la respuesta con 
+                        los resultados de la operación de bloqueo.
                       </p>
                     </div>
                   </div>
@@ -206,12 +239,14 @@ public void doGet(HttpServletRequest req, HttpServletResponse resp) {
                   <div>
                     <div class="paragraph">
                       <p>
-                        Completes the asynchronous operation and closes the response associated with this asynchronous context.
+                        Completa la operación asíncrona y cierra la respuesta asociada con este contexto 
+                        asíncrono.
                       </p>
                     </div>
                     <div class="paragraph">
                       <p>
-                        You call this method after writing to the response object inside the asynchronous context.
+                        Llamar a este método después de escribir en el objeto de respuesta dentro del contexto 
+                        asíncrono.
                       </p>
                     </div>
                   </div>
@@ -224,11 +259,12 @@ public void doGet(HttpServletRequest req, HttpServletResponse resp) {
                 <td class="tableblock halign-left valign-top">
                   <div>
                     <div class="paragraph">
-                      <p>Dispatches the request and response objects to the given path.</p>
+                      <p>Envía los objetos de solicitud y respuesta a la ruta dada.</p>
                     </div>
                     <div class="paragraph">
                       <p>
-                        You use this method to have another servlet write to the response after the blocking operation completes.
+                        Utilice este método para que otro servlet escriba en la respuesta después de que se 
+                        complete la operación de bloqueo.
                       </p>
                     </div>
                   </div>
@@ -241,26 +277,29 @@ public void doGet(HttpServletRequest req, HttpServletResponse resp) {
           <h3 id="waiting-for-a-resource">Esperando por un Recurso</h3>
           <div class="paragraph">
             <p>
-              This section demonstrates how to use the functionality provided by the <code>AsyncContext</code> class for the following use case:
+              Esta sección demuestra cómo usar la funcionalidad proporcionada por la clase 
+              <code>AsyncContext</code> para el siguiente caso de uso:
             </p>
           </div>
           <div class="olist arabic">
             <ol class="arabic">
               <li>
-                <p>A servlet receives a parameter from a GET request.</p>
+                <p>Un servlet recibe un parámetro de una solicitud GET.</p>
               </li>
               <li>
                 <p>
-                  The servlet uses a resource, such as a database or a web service, to retrieve information based on the value of the parameter. The resource can be slow at times, so this may be a blocking operation.
+                  El servlet utiliza un recurso, como una base de datos o un servicio web, para recuperar 
+                  información basada en el valor del parámetro. El recurso puede ser lento a veces, por lo que 
+                  esta puede ser una operación de bloqueo.
                 </p>
               </li>
               <li>
-                <p>The servlet generates a response using the result from the resource.</p>
+                <p>El servlet genera una respuesta utilizando el resultado del recurso.</p>
               </li>
             </ol>
           </div>
           <div class="paragraph">
-            <p>The following code shows a basic servlet that does not use asynchronous processing:</p>
+            <p>El siguiente código muestra un servlet básico que no utiliza procesamiento asíncrono:</p>
           </div>
           <div class="listingblock">
             <div class="content">
@@ -279,7 +318,7 @@ public class SyncServlet extends HttpServlet {
       response.setContentType("text/html;charset=UTF-8");
       String param = request.getParameter("param");
       String result = resource.process(param);
-      /* ... print to the response ... */
+      /* ... imprimir a la respuesta ... */
    }
 }
                 </code>
@@ -287,7 +326,7 @@ public class SyncServlet extends HttpServlet {
             </div>
           </div>
           <div class="paragraph">
-            <p>The following code shows the same servlet using asynchronous processing:</p>
+            <p>El siguiente código muestra el mismo servlet usando procesamiento asíncrono:</p>
           </div>
           <div class="listingblock">
             <div class="content">
@@ -295,7 +334,7 @@ public class SyncServlet extends HttpServlet {
                 <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @WebServlet(urlPatterns={"/asyncservlet"}, asyncSupported=true)
 public class AsyncServlet extends HttpServlet {
-   /* ... Same variables and init method as in SyncServlet ... */
+   /* ... Mismas variables y método de inicio que en SyncServlet ... */
    @Override
    public void doGet(HttpServletRequest request,
                      HttpServletResponse response) {
@@ -306,7 +345,7 @@ public class AsyncServlet extends HttpServlet {
             String param = acontext.getRequest().getParameter("param");
             String result = resource.process(param);
             HttpServletResponse response = acontext.getResponse();
-            /* ... print to the response ... */
+            /* ... imprimir a la respuesta ... */
             acontext.complete();
    }
 }
@@ -316,31 +355,38 @@ public class AsyncServlet extends HttpServlet {
           </div>
           <div class="paragraph">
             <p>
-              <code>AsyncServlet</code> adds <code>asyncSupported=true</code> to the <code>@WebServlet</code> annotation. The rest of the differences are inside the service method.
+              <code>AsyncServlet</code> agrega <code>asyncSupported=true</code> a la anotación 
+              <code>@WebServlet</code>. El resto de las diferencias están dentro del método de servicio.
             </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
                 <p>
-                  <code>request.startAsync()</code> causes the request to be processed asynchronously; the response is not sent to the client at the end of the service method.
+                  <code>request.startAsync()</code> hace que la solicitud se procese de forma asíncrona; la 
+                  respuesta no se envía al cliente al final del método de servicio.
                 </p>
               </li>
               <li>
                 <p>
-                  <code>acontext.start(new Runnable() {&#8230;&#8203;})</code> gets a new thread from the container.
+                  <code>acontext.start(new Runnable() {&#8230;&#8203;})</code> obtiene un nuevo hilo del 
+                  contenedor.
                 </p>
               </li>
               <li>
                 <p>
-                  The code inside the <code>run()</code> method of the inner class executes in the new thread. The inner class has access to the asynchronous context to read parameters from the request and write to the response. Calling the <code>complete()</code> method of the asynchronous context commits the response and sends it to the client.
+                  El código dentro del método <code>run()</code> de la clase interna se ejecuta en el nuevo 
+                  hilo. La clase interna tiene acceso al contexto asíncrono para leer parámetros de la 
+                  solicitud y escribir en la respuesta. Llamar al método <code>complete()</code> del contexto 
+                  asincrónico confirma la respuesta y la envía al cliente.
                 </p>
               </li>
             </ul>
           </div>
           <div class="paragraph">
             <p>
-              The service method of <code>AsyncServlet</code> returns immediately, and the request is processed in the asynchronous context.
+              El método de servicio de <code>AsyncServlet</code> regresa inmediatamente y la solicitud se 
+              procesa en el contexto asíncrono.
             </p>
           </div>
         </div>

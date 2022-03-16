@@ -49,7 +49,11 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            The <code>dukeetf</code> example application, located in the tut-install`/examples/web/dukeetf/` directory, demonstrates how to use asynchronous processing in a servlet to provide data updates to web clients. The example resembles a service that provides periodic updates on the price and trading volume of an electronically traded fund (ETF).
+            La aplicación de ejemplo <code>dukeetf</code>, ubicada en el directorio 
+            tut-install`/examples/web/dukeetf/`, demuestra cómo utilizar el procesamiento asíncrono en un 
+            servlet para proporcionar actualizaciones de datos a los clientes web. El ejemplo se asemeja a un 
+            servicio que proporciona actualizaciones periódicas sobre el precio y el volumen de negociación de 
+            un fondo negociado electrónicamente (ETF).
           </p>
         </div>
         <div class="paragraph">
@@ -71,35 +75,47 @@
           </h3>
           <div class="paragraph">
             <p>
-              The <code>dukeetf</code> example application consists of a servlet, an enterprise bean, and an HTML page.
+              La aplicación de ejemplo <code>dukeetf</code> consta de un servlet, un bean empresarial y una 
+              página HTML.
             </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
                 <p>
-                  The servlet puts requests in asynchronous mode, stores them in a queue, and writes the responses when new data for price and trading volume becomes available.
+                  El servlet pone las solicitudes en modo asíncrono, las almacena en una cola y escribe las 
+                  respuestas cuando hay nuevos datos disponibles para el precio y el volumen de operaciones.
                 </p>
               </li>
               <li>
-                <p>The enterprise bean updates the price and volume information once every second.</p>
+                <p>El Enterprise bean actualiza la información de precio y volumen una vez por segundo.</p>
               </li>
               <li>
                 <p>
-                  The HTML page uses JavaScript code to make requests to the servlet for new data, parse the response from the servlet, and update the price and volume information without reloading the page.
+                  La página HTML utiliza código JavaScript para realizar solicitudes al servlet de nuevos 
+                  datos, analizar la respuesta del servlet y actualizar la información de precio y volumen sin 
+                  recargar la página.
                 </p>
               </li>
             </ul>
           </div>
           <div class="paragraph">
             <p>
-              The <code>dukeetf</code> example application uses a programming model known as long polling. In the traditional HTTP request and response model, the user must make an explicit request (such as clicking a link or submitting a form) to get any new information from the server, and the page has to be reloaded. Long polling provides a mechanism for web applications to push updates to clients using HTTP without the user making an explicit request. The server handles connections asynchronously, and the client uses JavaScript to make new connections. In this model, clients make a new request immediately after receiving new data, and the server keeps the connection open until new data becomes available.
+              La aplicación de ejemplo <code>dukeetf</code> utiliza un modelo de programación conocido como 
+              sondeo largo. En el modelo tradicional de solicitud y respuesta HTTP, el usuario debe realizar 
+              una solicitud explícita (como hacer clic en un enlace o enviar un formulario) para obtener 
+              información nueva del servidor, y la página debe volver a cargarse. El sondeo largo proporciona 
+              un mecanismo para que las aplicaciones web envíen actualizaciones a los clientes mediante HTTP 
+              sin que el usuario realice una solicitud explícita. El servidor maneja las conexiones de forma 
+              asincrónica y el cliente usa JavaScript para realizar nuevas conexiones. En este modelo, los 
+              clientes realizan una nueva solicitud inmediatamente después de recibir nuevos datos y el 
+              servidor mantiene abierta la conexión hasta que haya nuevos datos disponibles.
             </p>
           </div>
           <div class="sect3" id="sthref111">
             <h4 id="the-servlet">El Servlet</h4>
             <div class="paragraph">
-              <p>The <code>DukeETFServlet</code> class uses asynchronous processing:</p>
+              <p>La clase <code>DukeETFServlet</code> utiliza procesamiento asíncrono:</p>
             </div>
             <div class="listingblock">
               <div class="content">
@@ -115,7 +131,10 @@ public class DukeETFServlet extends HttpServlet {
             </div>
             <div class="paragraph">
               <p>
-                In the following code, the <code>init</code> method initializes a queue to hold client requests and registers the servlet with the enterprise bean that provides the price and volume updates. The <code>send</code> method gets called once per second by the <code>PriceVolumeBean</code> to send updates and close the connection:
+                En el siguiente código, el método <code>init</code> inicializa una cola para contener 
+                solicitudes de clientes y registra el servlet con el bean empresarial que proporciona las 
+                actualizaciones de precio y volumen. El método <code>send</code> es llamado una vez por 
+                segundo por el <code>PriceVolumeBean</code> para enviar actualizaciones y cerrar la conexión:
               </p>
             </div>
             <div class="listingblock">
@@ -124,22 +143,22 @@ public class DukeETFServlet extends HttpServlet {
                   <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Override
 public void init(ServletConfig config) {
-   /* Queue for requests */
+   /* Cola de solicitudes */
    requestQueue = new ConcurrentLinkedQueue&lt;&gt;();
-   /* Register with the enterprise bean that provides price/volume updates */
+   /* Regístrese con el bean empresarial que proporciona actualizaciones de precio/volumen */
    pvbean.registerServlet(this);
 }
-/* PriceVolumeBean calls this method every second to send updates */
+/* PriceVolumeBean llama a este método cada segundo para enviar actualizaciones */
 public void send(double price, int volume) {
-   /* Send update to all connected clients */
+   /* Envía la actualización a todos los clientes conectados */
    for (AsyncContext acontext : requestQueue) {
       try {
          String msg = String.format("%.2f / %d", price, volume);
          PrintWriter writer = acontext.getResponse().getWriter();
          writer.write(msg);
-         logger.log(Level.INFO, "Sent: {0}", msg);
-         /* Close the connection
-          * The client (JavaScript) makes a new one instantly */
+         logger.log(Level.INFO, "Enviado: {0}", msg);
+         /* Cierra la conexión
+          * El cliente (JavaScript) hace una nueva instantáneamente*/
          acontext.complete();
       } catch (IOException ex) {
          logger.log(Level.INFO, ex.toString());
@@ -152,7 +171,11 @@ public void send(double price, int volume) {
             </div>
             <div class="paragraph">
               <p>
-                The service method puts client requests in asynchronous mode and adds a listener to each request. The listener is implemented as an anonymous class that removes the request from the queue when the servlet finishes writing a response or when there is an error. Finally, the service method adds the request to the request queue created in the <code>init</code> method. The service method is the following:
+                El método de servicio pone las solicitudes de los clientes en modo asíncrono y agrega un 
+                oyente a cada solicitud. El oyente se implementa como una clase anónima que elimina la 
+                solicitud de la cola cuando el servlet termina de escribir una respuesta o cuando hay un 
+                error. Finalmente, el método de servicio agrega la solicitud a la cola de solicitudes creada 
+                en el método <code>init</code>. El método de servicio es el siguiente:
               </p>
             </div>
             <div class="listingblock">
@@ -163,9 +186,9 @@ public void send(double price, int volume) {
 public void doGet(HttpServletRequest request,
                   HttpServletResponse response) {
    response.setContentType("text/html");
-   /* Put request in async mode */
+   /* Pone la solicitud en modo asíncrono */
    final AsyncContext acontext = request.startAsync();
-   /* Remove from the queue when done */
+   /* Elimina de la cola cuando haya terminado */
    acontext.addListener(new AsyncListener() {
       public void onComplete(AsyncEvent ae) throws IOException {
          requestQueue.remove(acontext);
@@ -178,7 +201,7 @@ public void doGet(HttpServletRequest request,
       }
       public void onStartAsync(AsyncEvent ae) throws IOException {}
    });
-   /* Add to the queue */
+   /* Añade a la cola */
    requestQueue.add(acontext);
 }
                   </code>
@@ -190,7 +213,9 @@ public void doGet(HttpServletRequest request,
             <h4 id="the-enterprise-bean">El Enterprise Bean</h4>
             <div class="paragraph">
               <p>
-                The <code>PriceVolumeBean</code> class is an enterprise bean that uses the timer service from the container to update the price and volume information and call the servlet's <code>send</code> method once every second:
+                La clase <code>PriceVolumeBean</code> es un bean empresarial que utiliza el servicio de 
+                temporizador del contenedor para actualizar la información de precio y volumen y llamar al 
+                método <code>send</code> del servlet una vez por segundo:
               </p>
             </div>
             <div class="listingblock">
@@ -200,24 +225,24 @@ public void doGet(HttpServletRequest request,
 @Startup
 @Singleton
 public class PriceVolumeBean {
-    /* Use the container's timer service */
+    /* Usa el servicio de temporizador del contenedor */
     @Resource TimerService tservice;
     private DukeETFServlet servlet;
     ...
     @PostConstruct
     public void init() {
-        /* Initialize the EJB and create a timer */
+        /* Inicializa el EJB y crea un temporizador */
         random = new Random();
         servlet = null;
         tservice.createIntervalTimer(1000, 1000, new TimerConfig());
     }
     public void registerServlet(DukeETFServlet servlet) {
-        /* Associate a servlet to send updates to */
+        /* Asociar un servlet para enviarle actualizaciones */
         this.servlet = servlet;
     }
     @Timeout
     public void timeout() {
-        /* Adjust price and volume and send updates */
+        /* Ajusta el precio y el volumen y envía las actualizaciones */
         price += 1.0*(random.nextInt(100)-50)/100.0;
         volume += random.nextInt(5000) - 2500;
         if (servlet != null)
@@ -230,7 +255,10 @@ public class PriceVolumeBean {
             </div>
             <div class="paragraph">
               <p>
-                See <a href="ejb-basicexamples005.html#BNBOY">Usando el Servicio de Temporizador</a> in <a href="ejb-basicexamples.html#GIJRB">Capítulo 37, "Ejecutando los Ejemplos de Enterprise Bean"</a> for more information on the timer service.
+                Vea <a href="ejb-basicexamples005.html#BNBOY">Usando el Servicio de Temporizador</a> en 
+                <a href="ejb-basicexamples.html#GIJRB">
+                  Capítulo 37, "Ejecutando los Ejemplos de Enterprise Bean"</a> para obtener más información 
+                  sobre el servicio de temporizador.
               </p>
             </div>
           </div>
@@ -238,7 +266,8 @@ public class PriceVolumeBean {
             <h4 id="the-html-page">La Página HTML</h4>
             <div class="paragraph">
               <p>
-                The HTML page consists of a table and some JavaScript code. The table contains two fields referenced from JavaScript code:
+                La página HTML consta de una tabla y algo de código JavaScript. La tabla contiene dos campos a 
+                los que se hace referencia desde el código JavaScript:
               </p>
             </div>
             <div class="listingblock">
@@ -264,7 +293,11 @@ public class PriceVolumeBean {
             </div>
             <div class="paragraph">
               <p>
-                The JavaScript code uses the <code>XMLHttpRequest</code> API, which provides functionality for transferring data between a client and a server. The script makes an asynchronous request to the servlet and designates a callback method. When the server provides a response, the callback method updates the fields in the table and makes a new request. The JavaScript code is the following:
+                El código JavaScript utiliza la IPA de <code>XMLHttpRequest</code>, que proporciona 
+                funcionalidad para transferir datos entre un cliente y un servidor. El script realiza una 
+                solicitud asíncrona al servlet y designa un método de devolución de llamada. Cuando el 
+                servidor proporciona una respuesta, el método de devolución de llamada actualiza los campos de 
+                la tabla y realiza una nueva solicitud. El código JavaScript es el siguiente:
               </p>
             </div>
             <div class="listingblock">
@@ -293,12 +326,15 @@ function makeAjaxRequest() {
             </div>
             <div class="paragraph">
               <p>
-                The <code>XMLHttpRequest</code> API is supported by most modern browsers, and it is widely used in Ajax web client development (Asynchronous JavaScript and XML).
+                La IPA de <code>XMLHttpRequest</code> es compatible con la mayoría de los navegadores modernos 
+                y se usa ampliamente en el desarrollo de clientes web Ajax (JavaScript asíncrono y XML).
               </p>
             </div>
             <div class="paragraph">
               <p>
-                See <a href="websocket011.html#BABGCEHE">La Aplicación de Ejemplo dukeetf2</a> in <a href="websocket.html#GKJIQ5">Capítulo 19, "IPA de Java para WebSocket"</a> for an equivalent version of this example implemented using a WebSocket endpoint.
+                Vea <a href="websocket011.html#BABGCEHE">La Aplicación de Ejemplo dukeetf2</a> en 
+                <a href="websocket.html#GKJIQ5">Capítulo 19, "IPA de Java para WebSocket"</a> para obtener una 
+                versión equivalente de este ejemplo implementado mediante un punto final de WebSocket.
               </p>
             </div>
           </div>
@@ -307,7 +343,8 @@ function makeAjaxRequest() {
           <h3 id="running-the-dukeetf-example-application">Ejecutando la Aplicación de Ejemplo dukeetf</h3>
           <div class="paragraph">
             <p>
-              This section describes how to run the <code>dukeetf</code> example application using NetBeans IDE and from the command line.
+              Esta sección describe cómo ejecutar la aplicación de ejemplo <code>dukeetf</code> utilizando el 
+              EID de NetBeans y desde la línea de comandos.
             </p>
           </div>
           <div class="paragraph">
@@ -331,14 +368,15 @@ function makeAjaxRequest() {
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que GlassFish Server se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
-                  <p>From the File menu, choose Open Project.</p>
+                  <p>En el menú Archivo, elija Abrir Proyecto.</p>
                 </li>
                 <li>
-                  <p>In the Open Project dialog box, navigate to:</p>
+                  <p>En el cuadro de diálogo Abrir Proyecto, vaya a:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
@@ -350,16 +388,21 @@ tut-install/examples/web/servlet
                   </div>
                 </li>
                 <li>
-                  <p>Select the <code>dukeetf</code> folder.</p>
+                  <p>Seleccione la carpeta <code>dukeetf</code>.</p>
                 </li>
                 <li>
-                  <p>Click Open Project.</p>
+                  <p>Haga clic en Abrir Proyecto.</p>
                 </li>
                 <li>
-                  <p>In the Projects tab, right-click the <code>dukeetf</code> project and select Run.</p>
+                  <p>
+                    En la pestaña Proyectos, haga clic con el botón derecho en el proyecto 
+                    <code>dukeetf</code> y seleccione Ejecutar.
+                  </p>
                   <div class="paragraph">
                     <p>
-                      This command builds and packages the application into a WAR file (<code>dukeetf.war</code>) located in the <code>target</code> directory, deploys it to the server, and launches a web browser window with the following URL:
+                      Este comando compila y empaqueta la aplicación en un archivo WAR 
+                      (<code>dukeetf.war</code>) ubicado en el directorio <code>target</code>, lo implementa 
+                      en el servidor y abre una ventana del navegador web con la siguiente URL:
                     </p>
                   </div>
                   <div class="listingblock">
@@ -373,7 +416,8 @@ http://localhost:8080/dukeetf/
                   </div>
                   <div class="paragraph">
                     <p>
-                      Open the same URL in a different web browser to see how both pages get price and volume updates simultaneously.
+                      Abra la misma URL en un navegador web diferente para ver cómo ambas páginas obtienen 
+                      actualizaciones de precio y volumen simultáneamente.
                     </p>
                   </div>
                 </li>
@@ -388,11 +432,12 @@ http://localhost:8080/dukeetf/
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que GlassFish Server se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
-                  <p>In a terminal window, go to:</p>
+                  <p>En una ventana de terminal, vaya a:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
@@ -404,7 +449,7 @@ tut-install/examples/web/servlet/dukeetf/
                   </div>
                 </li>
                 <li>
-                  <p>Enter the following command to deploy the application:</p>
+                  <p>Ingrese el siguiente comando para implementar la aplicación:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
@@ -416,7 +461,7 @@ mvn install
                   </div>
                 </li>
                 <li>
-                  <p>Open a web browser window and type the following address:</p>
+                  <p>Abra una ventana del navegador web y escriba la siguiente dirección:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
@@ -428,7 +473,8 @@ http://localhost:8080/dukeetf/
                   </div>
                   <div class="paragraph">
                     <p>
-                      Open the same URL in a different web browser to see how both pages get price and volume updates simultaneously.
+                      Abra la misma URL en un navegador web diferente para ver cómo ambas páginas obtienen 
+                      actualizaciones de precio y volumen simultáneamente.
                     </p>
                   </div>
                 </li>

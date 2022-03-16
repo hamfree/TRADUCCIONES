@@ -49,7 +49,11 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            The <code>dukeetf2</code> example application, located in the tut-install`/examples/web/websocket/dukeetf2/` directory, demonstrates how to use a WebSocket endpoint to provide data updates to web clients. The example resembles a service that provides periodic updates on the price and trading volume of an electronically traded fund (ETF).
+            La aplicación de ejemplo <code>dukeetf2</code>, que se encuentra en el directorio 
+            tut-install`/examples/web/websocket/dukeetf2/`, demuestra cómo usar un extremo de WebSocket para 
+            proporcionar actualizaciones de datos a los clientes web. El ejemplo se asemeja a un servicio que 
+            proporciona actualizaciones periódicas sobre el precio y el volumen de negociación de un fondo 
+            negociado electrónicamente (ETF).
           </p>
         </div>
         <div class="paragraph">
@@ -66,25 +70,31 @@
           </ul>
         </div>
         <div class="sect2" id="CIHJHJCD">
-          <h3 id="architecture-of-the-dukeetf2-sample-application">Arquitectura de la Aplicación de Ejemplo dukeetf2</h3>
+          <h3 id="architecture-of-the-dukeetf2-sample-application">
+            Arquitectura de la Aplicación de Ejemplo dukeetf2
+          </h3>
           <div class="paragraph">
             <p>
-              The <code>dukeetf2</code> example application consists of a WebSocket endpoint, an enterprise bean, and an HTML page.
+              La aplicación de ejemplo <code>dukeetf2</code> consta de un punto final WebSocket, un bean 
+              empresarial y una página HTML.
             </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
                 <p>
-                  The endpoint accepts connections from clients and sends them updates when new data for price and trading volume becomes available.
+                  El punto final acepta conexiones de clientes y les envía actualizaciones cuando hay nuevos 
+                  datos disponibles para el precio y el volumen de negociación.
                 </p>
               </li>
               <li>
-                <p>The enterprise bean updates the price and volume information once every second.</p>
+                <p>El Enterprise bean actualiza la información de precio y volumen una vez por segundo.</p>
               </li>
               <li>
                 <p>
-                  The HTML page uses JavaScript code to connect to the WebSocket endpoint, parse incoming messages, and update the price and volume information without reloading the page.
+                  La página HTML utiliza código JavaScript para conectarse al extremo de WebSocket, analizar 
+                  los mensajes entrantes y actualizar la información de precio y volumen sin recargar la 
+                  página.
                 </p>
               </li>
             </ul>
@@ -93,7 +103,9 @@
             <h4 id="the-endpoint">El Endpoint</h4>
             <div class="paragraph">
               <p>
-                The WebSocket endpoint is implemented in the <code>ETFEndpoint</code> class, which stores all connected sessions in a queue and provides a method that the enterprise bean calls when there is new information available to send:
+                El punto final de WebSocket se implementa en la clase <code>ETFEndpoint</code>, que almacena 
+                todas las sesiones conectadas en una cola y proporciona un método al que llama el bean 
+                empresarial cuando hay nueva información disponible para enviar:
               </p>
             </div>
             <div class="listingblock">
@@ -103,13 +115,13 @@
 @ServerEndpoint("/dukeetf")
 public class ETFEndpoint {
    private static final Logger logger = Logger.getLogger("ETFEndpoint");
-   /* Queue for all open WebSocket sessions */
+   /* Cola para todas las sesiones abiertas de WebSocket */
    static Queue&lt;Session&gt; queue = new ConcurrentLinkedQueue&lt;&gt;();
-   /* PriceVolumeBean calls this method to send updates */
+   /* PriceVolumeBean llama a este método para enviar actualizaciones */
    public static void send(double price, int volume) {
       String msg = String.format("%.2f / %d", price, volume);
       try {
-         /* Send updates to all open WebSocket sessions */
+         /* Envia actualizaciones a todas las sesiones abiertas de WebSocket */
          for (Session session : queue) {
             session.getBasicRemote().sendText(msg);
             logger.log(Level.INFO, "Sent: {0}", msg);
@@ -125,7 +137,10 @@ public class ETFEndpoint {
               </div>
             </div>
             <div class="paragraph">
-              <p>The lifecycle methods of the endpoint add and remove sessions to and from the queue:</p>
+              <p>
+                Los métodos de ciclo de vida del punto final agregan y eliminan sesiones hacia y desde la 
+                cola:
+              </p>
             </div>
             <div class="listingblock">
               <div class="content">
@@ -136,22 +151,22 @@ public class ETFEndpoint {
    ...
    @OnOpen
    public void openConnection(Session session) {
-      /* Register this connection in the queue */
+      /* Registrar esta conexión en la cola */
       queue.add(session);
-      logger.log(Level.INFO, "Connection opened.");
+      logger.log(Level.INFO, "Conexión abierta.");
    }
    @OnClose
    public void closedConnection(Session session) {
-      /* Remove this connection from the queue */
+      /* Eliminar esta conexión de la cola */
       queue.remove(session);
-      logger.log(Level.INFO, "Connection closed.");
+      logger.log(Level.INFO, "Conexión cerrada.");
    }
    @OnError
    public void error(Session session, Throwable t) {
-      /* Remove this connection from the queue */
+      /* Eliminar esta conexión de la cola */
       queue.remove(session);
       logger.log(Level.INFO, t.toString());
-      logger.log(Level.INFO, "Connection error.");
+      logger.log(Level.INFO, "Error de conexión.");
    }
 }
                   </code>
@@ -163,7 +178,8 @@ public class ETFEndpoint {
             <h4 id="the-enterprise-bean">El Enterprise Bean</h4>
             <div class="paragraph">
               <p>
-                The enterprise bean uses the timer service to generate new price and volume information every second:
+                El bean empresarial utiliza el servicio de temporizador para generar nueva información de 
+                precio y volumen cada segundo:
               </p>
             </div>
             <div class="listingblock">
@@ -173,7 +189,7 @@ public class ETFEndpoint {
 @Startup
 @Singleton
 public class PriceVolumeBean {
-   /* Use the container's timer service */
+   /* Usa el servicio de temporizador del contenedor*/
    @Resource TimerService tservice;
    private Random random;
    private volatile double price = 100.0;
@@ -181,14 +197,14 @@ public class PriceVolumeBean {
    private static final Logger logger = Logger.getLogger("PriceVolumeBean");
    @PostConstruct
    public void init() {
-       /* Initialize the EJB and create a timer */
-       logger.log(Level.INFO, "Initializing EJB.");
+       /* Inicializa el EJB y crear un temporizador */
+       logger.log(Level.INFO, "Inicializando EJB.");
        random = new Random();
        tservice.createIntervalTimer(1000, 1000, new TimerConfig());
    }
    @Timeout
    public void timeout() {
-       /* Adjust price and volume and send updates */
+       /* Ajustar el precio y el volumen y enviar actualizaciones */
        price += 1.0*(random.nextInt(100)-50)/100.0;
        volume += random.nextInt(5000) - 2500;
        ETFEndpoint.send(price, volume);
@@ -200,7 +216,12 @@ public class PriceVolumeBean {
             </div>
             <div class="paragraph">
               <p>
-                The enterprise bean calls the <code>send</code> method of the <code>ETFEndpoint</code> class in the timeout method. See <a href="ejb-basicexamples005.html#BNBOY">Using the Timer Service</a> in <a href="ejb-basicexamples.html#GIJRB">Capítulo 37, "Ejecutando los Ejemplos de Enterprise Bean"</a> for more information on the timer service.
+                El bean empresarial llama al método <code>send</code> de la clase <code>ETFEndpoint</code> en 
+                el método de tiempo de espera. Consulte 
+                <a href="ejb-basicexamples005.html#BNBOY">Uso del servicio de temporizador</a> en 
+                <a href="ejb-basicexamples.html#GIJRB">
+                  Capítulo 37, "Ejecutando los ejemplos de Enterprise Bean"</a> para obtener más información 
+                sobre el servicio de temporizador.
               </p>
             </div>
           </div>
@@ -208,7 +229,8 @@ public class PriceVolumeBean {
             <h4 id="the-html-page">La Página HTML</h4>
             <div class="paragraph">
               <p>
-                The HTML page consists of a table and some JavaScript code. The table contains two fields referenced from JavaScript code:
+                La página HTML consta de una tabla y algo de código JavaScript. La tabla contiene dos campos a 
+                los que se hace referencia desde el código JavaScript:
               </p>
             </div>
             <div class="listingblock">
@@ -235,7 +257,9 @@ public class PriceVolumeBean {
             </div>
             <div class="paragraph">
               <p>
-                The JavaScript code uses the WebSocket API to connect to the server endpoint and to designate a callback method for incoming messages. The callback method updates the page with the new information.
+                El código JavaScript utiliza la IPA de WebSocket para conectarse al extremo del servidor y 
+                designar un método de devolución de llamada para los mensajes entrantes. El método de 
+                devolución de llamada actualiza la página con la nueva información.
               </p>
             </div>
             <div class="listingblock">
@@ -259,7 +283,8 @@ window.addEventListener("load", connect, false);
             </div>
             <div class="paragraph">
               <p>
-                The WebSocket API is supported by most modern browsers, and it is widely used in HTML5 web client development.
+                La IPA de WebSocket es compatible con la mayoría de los navegadores modernos y se usa 
+                ampliamente en el desarrollo de clientes web HTML5.
               </p>
             </div>
           </div>
@@ -268,7 +293,8 @@ window.addEventListener("load", connect, false);
           <h3 id="running-the-dukeetf2-example-application">Ejecutando la Aplicación de Ejemplo dukeetf2</h3>
           <div class="paragraph">
             <p>
-              This section describes how to run the <code>dukeetf2</code> example application using NetBeans IDE and from the command line.
+              Esta sección describe cómo ejecutar la aplicación de ejemplo <code>dukeetf2</code> utilizando el 
+              EID de NetBeans y desde la línea de comandos.
             </p>
           </div>
           <div class="paragraph">
@@ -277,7 +303,11 @@ window.addEventListener("load", connect, false);
           <div class="ulist">
             <ul>
               <li>
-                <p><a href="#CIHEBIAH">Para Ejecutar la Aplicación de Ejemplo dukeetf2 Usando el EID NetBeans</a></p>
+                <p>
+                  <a href="#CIHEBIAH">
+                    Para Ejecutar la Aplicación de Ejemplo dukeetf2 Usando el EID NetBeans
+                  </a>
+                </p>
               </li>
               <li>
                 <p><a href="#CIHDJCGJ">Para Ejecutar la Aplicación de Ejemplo dukeetf2 Usando Maven</a></p>
@@ -292,14 +322,15 @@ window.addEventListener("load", connect, false);
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que GlassFish Server se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
-                  <p>From the File menu, choose Open Project.</p>
+                  <p>En el menú Archivo, elija Abrir Proyecto.</p>
                 </li>
                 <li>
-                  <p>In the Open Project dialog box, navigate to:</p>
+                  <p>En el cuadro de diálogo Abrir Proyecto, vaya a:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
@@ -311,16 +342,21 @@ tut-install/examples/web/websocket
                   </div>
                 </li>
                 <li>
-                  <p>Select the <code>dukeetf2</code> folder.</p>
+                  <p>Seleccione la carpeta <code>dukeetf2</code>.</p>
                 </li>
                 <li>
-                  <p>Click Open Project.</p>
+                  <p>Haga clic en Abrir Proyecto.</p>
                 </li>
                 <li>
-                  <p>In the Projects tab, right-click the <code>dukeetf2</code> project and select Run.</p>
+                  <p>
+                    En la pestaña Proyectos, haga clic con el botón derecho en el proyecto 
+                    <code>dukeetf2</code> y seleccione Ejecutar.
+                  </p>
                   <div class="paragraph">
                     <p>
-                      This command builds and packages the application into a WAR file (<code>dukeetf2.war</code>) located in the <code>target/</code> directory, deploys it to the server, and launches a web browser window with the following URL:
+                      Este comando compila y empaqueta la aplicación en un archivo WAR 
+                      (<code>dukeetf2.war</code>) ubicado en el directorio <code>target/</code>, lo implementa 
+                      en el servidor y abre una ventana del navegador web con la siguiente URL:
                     </p>
                   </div>
                   <div class="listingblock">
@@ -334,7 +370,8 @@ http://localhost:8080/dukeetf2/
                   </div>
                   <div class="paragraph">
                     <p>
-                      Open the same URL on a different web browser tab or window to see how both pages get price and volume updates simultaneously.
+                      Abra la misma URL en una pestaña o ventana diferente del navegador web para ver cómo 
+                      ambas páginas obtienen actualizaciones de precio y volumen simultáneamente.
                     </p>
                   </div>
                 </li>
@@ -349,11 +386,12 @@ http://localhost:8080/dukeetf2/
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que GlassFish Server se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
-                  <p>In a terminal window, go to:</p>
+                  <p>En una ventana de terminal, vaya a:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
@@ -365,15 +403,18 @@ tut-install/examples/web/websocket/dukeetf2/
                   </div>
                 </li>
                 <li>
-                  <p>Enter the following command to deploy the application:</p>
+                  <p>Ingrese el siguiente comando para implementar la aplicación:</p>
                   <div class="listingblock">
                     <div class="content">
-                      <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">mvn install</code></pre>
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+mvn install
+                        </code></pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>Open a web browser window and enter the following URL:</p>
+                  <p>Abra una ventana del navegador web e ingrese la siguiente URL:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
@@ -385,7 +426,8 @@ http://localhost:8080/dukeetf2/
                   </div>
                   <div class="paragraph">
                     <p>
-                      Open the same URL on a different web browser tab or window to see how both pages get price and volume updates simultaneously.
+                      Abra la misma URL en una pestaña o ventana diferente del navegador web para ver cómo 
+                      ambas páginas obtienen actualizaciones de precio y volumen simultáneamente.
                     </p>
                   </div>
                 </li>

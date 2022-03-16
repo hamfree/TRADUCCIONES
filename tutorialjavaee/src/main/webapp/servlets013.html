@@ -49,51 +49,72 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            Web containers in application servers normally use a server thread per client request. To develop scalable web applications, you must ensure that threads associated with client requests are never sitting idle waiting for a blocking operation to complete. <a href="servlets012.html#BEIGCFDF">Procesamiento Asincrónico</a> provides a mechanism to execute application-specific blocking operations in a new thread, returning the thread associated with the request immediately to the container. Even if you use asynchronous processing for all the application-specific blocking operations inside your service methods, threads associated with client requests can be momentarily sitting idle because of input/output considerations.
+            Los contenedores web en los servidores de aplicaciones normalmente usan un subproceso de servidor 
+            por solicitud del cliente. Para desarrollar aplicaciones web escalables, debe asegurarse de que 
+            los subprocesos asociados con las solicitudes de los clientes nunca estén inactivos esperando que 
+            se complete una operación de bloqueo. 
+            <a href="servlets012.html#BEIGCFDF">Procesamiento Asincrónico</a> proporciona un mecanismo para 
+            ejecutar operaciones de bloqueo específicas de la aplicación en un nuevo hilo, devolviendo el hilo 
+            asociado con la solicitud inmediatamente al contenedor. Incluso si utiliza el procesamiento 
+            asincrónico para todas las operaciones de bloqueo específicas de la aplicación dentro de sus 
+            métodos de servicio, los subprocesos asociados con las solicitudes de los clientes pueden 
+            permanecer momentáneamente inactivos debido a consideraciones de entrada/salida.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            For example, if a client is submitting a large HTTP POST request over a slow network connection, the server can read the request faster than the client can provide it. Using traditional I/O, the container thread associated with this request would be sometimes sitting idle waiting for the rest of the request.
+            Por ejemplo, si un cliente envía una solicitud HTTP POST grande a través de una conexión de red 
+            lenta, el servidor puede leer la solicitud más rápido de lo que el cliente puede proporcionarla. 
+            Al usar la E/S tradicional, el subproceso del contenedor asociado con esta solicitud a veces 
+            estaría inactivo esperando el resto de la solicitud.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            Java EE provides nonblocking I/O support for servlets and filters when processing requests in asynchronous mode. The following steps summarize how to use nonblocking I/O to process requests and write responses inside service methods.
+            Java EE proporciona soporte de E/S sin bloqueo para servlets y filtros al procesar solicitudes en 
+            modo asíncrono. Los siguientes pasos resumen cómo usar E/S sin bloqueo para procesar solicitudes y 
+            escribir respuestas dentro de los métodos de servicio.
           </p>
         </div>
         <div class="olist arabic">
           <ol class="arabic">
             <li>
               <p>
-                Put the request in asynchronous mode as described in <a href="servlets012.html#BEIGCFDF">Procesamiento Asincrónico</a>.
+                Ponga la solicitud en modo asíncrono como se describe en 
+                <a href="servlets012.html#BEIGCFDF">Procesamiento Asincrónico</a>.
               </p>
             </li>
             <li>
               <p>
-                Obtain an input stream and/or an output stream from the request and response objects in the service method.
+                Obtenga un flujo de entrada y/o un flujo de salida de los objetos de solicitud y respuesta en 
+                el método de servicio.
               </p>
             </li>
             <li>
               <p>
-                Assign a read listener to the input stream and/or a write listener to the output stream.
+                Asigne un oyente de lectura al flujo de entrada y/o un oyente de escritura al flujo de salida.
               </p>
             </li>
             <li>
-              <p>Process the request and the response inside the listener's callback methods.</p>
+              <p>
+                Procese la solicitud y la respuesta dentro de los métodos de devolución de llamada del oyente.
+              </p>
             </li>
           </ol>
         </div>
         <div class="paragraph">
           <p>
-            <a href="#BEIFDICJ">Table 18-4</a> and <a href="#BEIFIIIH">Table 18-5</a> describe the methods available in the servlet input and output streams for nonblocking I/O support. <a href="#BEIFGJCG">Table 18-6</a> describes the interfaces for read listeners and write listeners.
+            Las tablas <a href="#BEIFDICJ">Tabla 18-4</a> y <a href="#BEIFIIIH">Tabla 18-5</a> describen los 
+            métodos disponibles en los flujos de entrada y salida del servlet para el soportpe de E/S sin 
+            bloqueo. La <a href="#BEIFGJCG">Tabla 18-6</a> describe las interfaces para escuchas de lectura y 
+            escritura.
           </p>
         </div>
         <div class="paragraph">
           <p><a id="sthref106"></a><a id="BEIFDICJ"></a></p>
         </div>
         <div class="paragraph">
-          <p><strong>Table 18-4 Nonblocking I/O Support in javax.servlet.ServletInputStream</strong></p>
+          <p><strong>Tabla 18-4 Soporte de E/S sin bloqueo en javax.servlet.ServletInputStream</strong></p>
         </div>
         <table class="tableblock frame-all grid-all" style="width: 80%;">
           <colgroup>
@@ -103,7 +124,7 @@
           <tbody>
             <tr>
               <td class="tableblock halign-left valign-top">
-                <p class="tableblock"><strong>Method</strong></p></td>
+                <p class="tableblock"><strong>Método</strong></p></td>
               <td class="tableblock halign-left valign-top">
                 <p class="tableblock"><strong>Descripción</strong></p></td>
             </tr>
@@ -112,7 +133,10 @@
                 <p class="tableblock"><code>void setReadListener(ReadListener rl)</code></p></td>
               <td class="tableblock halign-left valign-top">
                 <p class="tableblock">
-                  Associates this input stream with a listener object that contains callback methods to read data asynchronously. You provide the listener object as an anonymous class or use another mechanism to pass the input stream to the read listener object.
+                  Asocia este flujo de entrada con un objeto de escucha que contiene métodos de devolución de 
+                  llamada para leer datos de forma asíncrona. Proporcione el objeto de escucha como una clase 
+                  anónima o utilice otro mecanismo para pasar el flujo de entrada al objeto de escucha de 
+                  lectura.
                 </p>
               </td>
             </tr>
@@ -120,13 +144,13 @@
               <td class="tableblock halign-left valign-top">
                 <p class="tableblock"><code>boolean isReady()</code></p></td>
               <td class="tableblock halign-left valign-top">
-                <p class="tableblock">Returns true if data can be read without blocking.</p></td>
+                <p class="tableblock">Devuelve verdadero si los datos se pueden leer sin bloquear.</p></td>
             </tr>
             <tr>
               <td class="tableblock halign-left valign-top">
                 <p class="tableblock"><code>boolean isFinished()</code></p></td>
               <td class="tableblock halign-left valign-top">
-                <p class="tableblock">Returns true when all the data has been read.</p></td>
+                <p class="tableblock">Devuelve verdadero cuando todos los datos han sido leídos.</p></td>
             </tr>
           </tbody>
         </table>
@@ -134,7 +158,7 @@
           <p><a id="sthref107"></a><a id="BEIFIIIH"></a></p>
         </div>
         <div class="paragraph">
-          <p><strong>Table 18-5 Nonblocking I/O Support in javax.servlet.ServletOutputStream</strong></p>
+          <p><strong>Tabla 18-5 Soporte de E/S sin bloqueo en javax.servlet.ServletOutputStream</strong></p>
         </div>
         <table class="tableblock frame-all grid-all" style="width: 80%;">
           <colgroup>
@@ -144,7 +168,7 @@
           <tbody>
             <tr>
               <td class="tableblock halign-left valign-top">
-                <p class="tableblock"><strong>Method</strong></p></td>
+                <p class="tableblock"><strong>Método</strong></p></td>
               <td class="tableblock halign-left valign-top">
                 <p class="tableblock"><strong>Descripción</strong></p></td>
             </tr>
@@ -153,7 +177,10 @@
                 <p class="tableblock"><code>void setWriteListener(WriteListener wl)</code></p></td>
               <td class="tableblock halign-left valign-top">
                 <p class="tableblock">
-                  Associates this output stream with a listener object that contains callback methods to write data asynchronously. You provide the write listener object as an anonymous class or use another mechanism to pass the output stream to the write listener object.
+                  Asocia este flujo de salida con un objeto de escucha que contiene métodos de devolución de 
+                  llamada para escribir datos de forma asíncrona. Proporcione el objeto de escucha de 
+                  escritura como una clase anónima o utilice otro mecanismo para pasar el flujo de salida al 
+                  objeto de escucha de escritura.
                 </p>
               </td>
             </tr>
@@ -162,7 +189,7 @@
                 <p class="tableblock"><code>boolean isReady()</code></p>
               </td>
               <td class="tableblock halign-left valign-top">
-                <p class="tableblock">Returns true if data can be written without blocking.</p>
+                <p class="tableblock">Devuelve verdadero si los datos se pueden escribir sin bloqueo.</p>
               </td>
             </tr>
           </tbody>
@@ -171,7 +198,7 @@
           <p><a id="sthref108"></a><a id="BEIFGJCG"></a></p>
         </div>
         <div class="paragraph">
-          <p><strong>Table 18-6 Listener Interfaces for Nonblocking I/O Support</strong></p>
+          <p><strong>Tabla 18-6 Interfaces de escucha para soporte de E/S sin bloqueo</strong></p>
         </div>
         <table class="tableblock frame-all grid-all" style="width: 99%;">
           <colgroup>
@@ -182,9 +209,9 @@
           <tbody>
             <tr>
               <td class="tableblock halign-left valign-top">
-                <p class="tableblock"><strong>Interface</strong></p></td>
+                <p class="tableblock"><strong>Interfaz</strong></p></td>
               <td class="tableblock halign-left valign-top">
-                <p class="tableblock"><strong>Methods</strong></p></td>
+                <p class="tableblock"><strong>Métodos</strong></p></td>
               <td class="tableblock halign-left valign-top">
                 <p class="tableblock"><strong>Descripción</strong></p></td>
             </tr>
@@ -206,7 +233,8 @@
               </td>
               <td class="tableblock halign-left valign-top">
                 <p class="tableblock">
-                  A <code>ServletInputStream</code> instance calls these methods on its listener when there is data available to read, when all the data has been read, or when there is an error.
+                  Una instancia de <code>ServletInputStream</code> llama a estos métodos en su escucha cuando 
+                  hay datos disponibles para leer, cuando se han leído todos los datos o cuando hay un error.
                 </p>
               </td>
             </tr>
@@ -225,7 +253,8 @@
               </td>
               <td class="tableblock halign-left valign-top">
                 <p class="tableblock">
-                  A <code>ServletOutputStream</code> instance calls these methods on its listener when it is possible to write data without blocking or when there is an error.
+                  Una instancia de <code>ServletOutputStream</code> llama a estos métodos en su escucha cuando 
+                  es posible escribir datos sin bloqueo o cuando hay un error.
                 </p>
               </td>
             </tr>
@@ -237,7 +266,11 @@
           </h3>
           <div class="paragraph">
             <p>
-              The code in this section shows how to read a large HTTP POST request inside a servlet by putting the request in asynchronous mode (as described in <a href="servlets012.html#BEIGCFDF">Procesamiento Asincrónico</a>) and using the nonblocking I/O functionality from <a href="#BEIFDICJ">Table 18-4</a> and <a href="#BEIFGJCG">Table 18-6</a>.
+              El código de esta sección muestra cómo leer una solicitud HTTP POST grande dentro de un servlet 
+              poniendo la solicitud en modo asíncrono (como se describe en 
+              <a href="servlets012.html#BEIGCFDF">Procesamiento Asincrónico</a>) y usando la funcionalidad de 
+              E/S sin bloqueo de las tablas <a href="#BEIFDICJ">Tabla 18-4</a> y 
+              <a href="#BEIFGJCG">Tabla 18-6</a>.
             </p>
           </div>
           <div class="listingblock">
@@ -268,7 +301,7 @@ public class AsyncIOServlet extends HttpServlet {
          public void onAllDataRead() {
             try {
                acontext.getResponse().getWriter()
-                                     .write("...the response...");
+                                     .write("...la respuesta...");
             } catch (IOException ex) { ... }
             acontext.complete();
          }
@@ -283,7 +316,13 @@ public class AsyncIOServlet extends HttpServlet {
           </div>
           <div class="paragraph">
             <p>
-              This example declares the web servlet with asynchronous support using the <code>@WebServlet</code> annotation parameter <code>asyncSupported=true</code>. The service method first puts the request in asynchronous mode by calling the <code>startAsync()</code> method of the request object, which is required in order to use nonblocking I/O. Then, the service method obtains an input stream associated with the request and assigns a read listener defined as an inner class. The listener reads parts of the request as they become available and then writes some response to the client when it finishes reading the request.
+              Este ejemplo declara el servlet web con soporte asíncrono usando el parámetro de anotación 
+              <code>@WebServlet</code> <code>asyncSupported=true</code>. El método de servicio primero pone la 
+              solicitud en modo asíncrono llamando al método <code>startAsync()</code> del objeto de 
+              solicitud, que es necesario para usar E/S sin bloqueo. Luego, el método de servicio obtiene un 
+              flujo de entrada asociado con la solicitud y asigna un oyente de lectura definido como una clase 
+              interna. El oyente lee partes de la solicitud a medida que están disponibles y luego escribe 
+              alguna respuesta al cliente cuando termina de leer la solicitud.
             </p>
           </div>
         </div>
