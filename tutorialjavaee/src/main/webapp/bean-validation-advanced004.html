@@ -51,22 +51,31 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            If you add validation constraints to objects in an inheritance hierarchy, take special care to avoid unintended errors when using subtypes.
+            Si agrega restricciones de validación a objetos en una jerarquía de herencia, tenga 
+            especial cuidado para evitar errores no deseados al usar subtipos.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            For a given type, subtypes should be able to be substituted without encountering errors. For example, if you have a <code>Person</code> class and an <code>Employee</code> subclass that extends <code>Person</code>, you should be able to use <code>Employee</code> instances wherever you might use <code>Person</code> instances. If <code>Employee</code> overrides a method in <code>Person</code> by adding method parameter constraints, code that works correctly with <code>Person</code> objects may throw validation exceptions with <code>Employee</code> objects.
+            Para un tipo dado, los subtipos deben poder sustituirse sin encontrar errores. Por 
+            ejemplo, si tiene una clase <code>Person</code> y una subclase <code>Employee</code> que 
+            amplía <code>Person</code>, debería poder usar instancias <code>Employee</code> donde 
+            quiera que pueda usar instancias <code>Person</code>. Si <code>Employee</code> anula un 
+            método en <code>Person</code> agregando restricciones de parámetros de método, el código 
+            que funciona correctamente con objetos <code>Person</code> puede generar excepciones de 
+            validación con objetos <code>Employee</code>.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            The following code shows an incorrect use of method parameter constraints within a class hierarchy:
+            El siguiente código muestra un uso incorrecto de las restricciones de parámetros de 
+            método dentro de una jerarquía de clases:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 public class Person {
 ...
   public void setPhone(String phone) { ... }
@@ -76,22 +85,30 @@ public class Employee extends Person {
   @Override
   public void setPhone(@Verified String phone) { ... }
 }
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            By adding the <code>@Verified</code> constraint to <code>Employee.setPhone</code>, parameters that were valid with <code>Person.setPhone</code> will not be valid with <code>Employee.setPhone</code>. This is called strengthening the preconditions (that is, the method parameters) of a subtype's method. You may not strengthen the preconditions of subtype method calls.
+            Al agregar la restricción <code>@Verified</code> a <code>Employee.setPhone</code>, los 
+            parámetros que eran válidos con <code>Person.setPhone</code> no serán válidos con 
+            <code>Employee.setPhone</code>. Esto se llama fortalecer las condiciones previas (es 
+            decir, los parámetros del método) del método de un subtipo. No puede reforzar las 
+            condiciones previas de las llamadas a métodos de subtipos.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            Similarly, the return values from method calls should not be weakened in subtypes. The following code shows an incorrect use of constraints on method return values in a class hierarchy:
+            De manera similar, los valores de retorno de las llamadas a métodos no deben debilitarse 
+            en los subtipos. El siguiente código muestra un uso incorrecto de las restricciones en 
+            los valores devueltos del método en una jerarquía de clases:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 public class Person {
 ...
   @Verified
@@ -102,27 +119,39 @@ public class Employee extends Person {
   @Override
   public USPhoneNumber getPhone() { ... }
 }
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            In this example, the <code>Employee.getPhone</code> method removes the <code>@Verified</code> constraint on the return value. Return values that would be not pass validation when calling <code>Person.getEmail</code> are allowed when calling <code>Employee.getPhone</code>. This is called weakening the postconditions (that is, return values) of a subtype. You may not weaken the postconditions of a subtype method call.
+            En este ejemplo, el método <code>Employee.getPhone</code> elimina la restricción 
+            <code>@Verified</code> en el valor de retorno. Los valores devueltos que no pasarían la 
+            validación al llamar a <code>Person.getEmail</code> están permitidos al llamar a 
+            <code>Employee.getPhone</code>. Esto se denomina debilitar las condiciones posteriores 
+            (es decir, los valores devueltos) de un subtipo. No puede debilitar las condiciones 
+            posteriores de una llamada de método de subtipo.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            If your type hierarchy strengthens the preconditions or weakens the postconditions of subtype method calls, a <code>javax.validation.ConstraintDeclarationException</code> will be thrown by the Validación de Beans runtime.
+            Si su jerarquía de tipos fortalece las condiciones previas o debilita las condiciones 
+            posteriores de las llamadas a métodos de subtipos, el tiempo de ejecución de Validación 
+            de Beans generará una <code>javax.validation.ConstraintDeclarationException</code>.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            Classes that implement several interfaces that each have the same method signature, known as parallel types, need to be aware of the constraints applied to the interfaces that they implement to avoid strengthening the preconditions. For example:
+            Las clases que implementan varias interfaces, cada una de las cuales tiene la misma 
+            firma de método, conocidas como tipos paralelos, deben conocer las restricciones que se 
+            aplican a las interfaces que implementan para evitar fortalecer las condiciones previas. 
+            Por ejemplo:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 public interface PaymentService {
   void processOrder(Order order, double amount);
 ...
@@ -137,12 +166,17 @@ public class MyPaymentService implements PaymentService,
   public void processOrder(Order order, double amount) { ... }
 ...
 }
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            In this case, <code>MyPaymentService</code> has the constraints from the <code>processOrder</code> method in <code>CreditCardPaymentService</code>, but client code that calls <code>PaymentService.processOrder</code> doesn't expect these constraints. This is another example of strengthening the preconditions of a subtype and will result in a <code>ConstraintDeclarationException</code>.
+            En este caso, <code>MyPaymentService</code> tiene las restricciones del método 
+            <code>processOrder</code> en <code>CreditCardPaymentService</code>, pero el código del 
+            cliente llama a <code>PaymentService.processOrder</code > no espera estas restricciones. 
+            Este es otro ejemplo de cómo fortalecer las condiciones previas de un subtipo y dará 
+            como resultado una <code>ConstraintDeclarationException</code>.
           </p>
         </div>
         <div class="sect2" id="sthref125">
@@ -151,24 +185,29 @@ public class MyPaymentService implements PaymentService,
           </h3>
           <div class="paragraph">
             <p>
-              The following rules define how method validation constraints should be used in type hierarchies.
+              Las siguientes reglas definen cómo se deben usar las restricciones de validación de 
+              métodos en las jerarquías de tipos.
             </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
                 <p>
-                  Do not add method parameter constraints to overridden or implemented methods in a subtype.
+                  No agregue restricciones de parámetros de método a métodos anulados o 
+                  implementados en un subtipo.
                 </p>
               </li>
               <li>
                 <p>
-                  Do not add method parameter constraints to overridden or implemented methods in a subtype that was originally declared in several parallel types.
+                  No agregue restricciones de parámetros de método a métodos anulados o 
+                  implementados en un subtipo que se declaró originalmente en varios tipos 
+                  paralelos.
                 </p>
               </li>
               <li>
                 <p>
-                  You may add return value constraints to an overridden or implemented method in a subtype.
+                  Puede agregar restricciones de valor devuelto a un método anulado o implementado 
+                  en un subtipo.
                 </p>
               </li>
             </ul>

@@ -49,84 +49,116 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            Constraints may be added to one or more groups. Constraint groups are used to create subsets of constraints so that only certain constraints will be validated for a particular object. By default, all constraints are included in the <code>Default</code> constraint group.
+            Las restricciones se pueden agregar a uno o más grupos. Los grupos de restricciones se 
+            utilizan para crear subconjuntos de restricciones para que solo se validen ciertas 
+            restricciones para un objeto en particular. De forma predeterminada, todas las 
+            restricciones se incluyen en el grupo de restricciones <code>Default</code>.
           </p>
         </div>
         <div class="paragraph">
-          <p>Constraint groups are represented by interfaces.</p>
+          <p>Los grupos de restricciones están representados por interfaces.</p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 public interface Employee {}
 public interface Contractor {}
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
-          <p>Constraint groups can inherit from other groups.</p>
+          <p>Los grupos de restricciones pueden heredar de otros grupos.</p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 public interface Manager extends Employee {}
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            When a constraint is added to an element, the constraint declares the groups to which that constraint belongs by specifying the class name of the group interface name in the <code>groups</code> element of the constraint.
+            Cuando se agrega una restricción a un elemento, la restricción declara los grupos a los 
+            que pertenece esa restricción especificando el nombre de la clase del nombre de la 
+            interfaz del grupo en el elemento <code>groups</code> de la restricción.
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @NotNull(groups=Employee.class)
 Phone workPhone;
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            Multiple groups can be declared by surrounding the groups with braces (<code>{</code> and <code>}</code>) and separating the groups' class names with commas.
+            Se pueden declarar varios grupos encerrando los grupos con llaves (<code>{</code> y 
+            <code>}</code>) y separando los nombres de clase de los grupos con comas.
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @NotNull(groups={ Employee.class, Contractor.class })
 Phone workPhone;
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            If a group inherits from another group, validating that group results in validating all constraints declared as part of the supergroup. For example, validating the <code>Manager</code> group results in the <code>workPhone</code> field being validated, because <code>Employee</code> is a superinterface of <code>Manager</code>.
+            Si un grupo hereda de otro grupo, la validación de ese grupo da como resultado la 
+            validación de todas las restricciones declaradas como parte del supergrupo. Por ejemplo, 
+            validar el grupo <code>Manager</code> da como resultado que se valide el campo 
+            <code>workPhone</code>, porque <code>Employee</code> es una superinterfaz de 
+            <code>Manager</code>.
           </p>
         </div>
         <div class="sect2" id="GKAGU">
-          <h3 id="customizing-group-validation-order">Personalizando el Orden Del Grupo de Validación</h3>
+          <h3 id="customizing-group-validation-order">
+            Personalizando el Orden Del Grupo de Validación
+          </h3>
           <div class="paragraph">
             <p>
-              By default, constraint groups are validated in no particular order. There are cases in which some groups should be validated before others. For example, in a particular class, basic data should be validated before more advanced data.
+              De forma predeterminada, los grupos de restricciones se validan sin ningún orden en 
+              particular. Hay casos en los que unos grupos deben ser validados antes que otros. Por 
+              ejemplo, en una clase en particular, los datos básicos deben validarse antes que los 
+              datos más avanzados.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              To set the validation order for a group, add a <code>javax.validation.GroupSequence</code> annotation to the interface definition, listing the order in which the validation should occur.
+              Para establecer el orden de validación de un grupo, agregue una anotación 
+              <code>javax.validation.GroupSequence</code> a la definición de la interfaz, enumerando 
+              el orden en que debe ocurrir la validación.
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @GroupSequence({Default.class, ExpensiveValidationGroup.class})
 public interface FullValidationGroup {}
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              When validating <code>FullValidationGroup</code>, first the <code>Default</code> group is validated. If all the data passes validation, then the <code>ExpensiveValidationGroup</code> group is validated. If a constraint is part of both the <code>Default</code> and the <code>ExpensiveValidationGroup</code> groups, the constraint is validated as part of the <code>Default</code> group and will not be validated on the subsequent <code>ExpensiveValidationGroup</code> pass.
+              Al validar <code>FullValidationGroup</code>, primero se valida el grupo 
+              <code>Default</code>. Si todos los datos pasan la validación, se valida el grupo 
+              <code>ExpensiveValidationGroup</code>. Si una restricción es parte de los grupos 
+              <code>Default</code> y <code>ExpensiveValidationGroup</code>, la restricción se valida 
+              como parte del grupo <code>Default</code> y no se validará en el paso subsiguiente de 
+              <code>ExpensiveValidationGroup</code>.
             </p>
           </div>
         </div>
