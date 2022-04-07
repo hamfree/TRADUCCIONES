@@ -49,15 +49,18 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            Contexts and Dependency Injection (CDI) enables your objects to have their dependencies provided to them automatically, instead of creating them or receiving them as parameters. CDI also manages the lifecycle of those dependencies for you.
+            Contexts and Dependency Injection (CDI), en español sería Contextos e Inyección de Dependencias 
+            (CID), permite que sus objetos tengan sus dependencias automáticamente, en lugar de crearlos o 
+            recibirlos como parámetros. CDI también administra el ciclo de vida de esas dependencias por usted.
           </p>
         </div>
         <div class="paragraph">
-          <p>For example, consider the following servlet:</p>
+          <p>Por ejemplo, considere el siguiente servlet:</p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @WebServlet("/cdiservlet")
 public class NewServlet extends HttpServlet {
     private Message message;
@@ -71,47 +74,55 @@ public class NewServlet extends HttpServlet {
         response.getWriter().write(message.get());
     }
 }
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            This servlet needs an instance of an object that implements the <code>Message</code> interface:
+            Este servlet necesita una instancia de un objeto que implemente la interfaz <code>Message</code>:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 public interface Message {
     public String get();
 }
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
-          <p>The servlet creates itself an instance of the following object:</p>
+          <p>El servlet se crea a sí mismo una instancia del siguiente objeto:</p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 public class MessageB implements Message {
     public MessageB() { }
     @Override
     public String get() {
-        return "message B";
+        return "mensaje B";
     }
 }
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            Using CDI, this servlet can declare its dependency on a <code>Message</code> instance and have it injected automatically by the CDI runtime. The new servlet code is the following:
+            Usando CDI, este servlet puede declarar su dependencia en una instancia de <code>Message</code> y 
+            hacer que el tiempo de ejecución de CDI lo inyecte automáticamente. El nuevo código del servlet es 
+            el siguiente:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @WebServlet("/cdiservlet")
 public class NewServlet extends HttpServlet {
     @Inject private Message message;
@@ -121,35 +132,61 @@ public class NewServlet extends HttpServlet {
         response.getWriter().write(message.get());
     }
 }
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            The CDI runtime looks for classes that implement the <code>Message</code> interface, finds the <code>MessageB</code> class, creates a new instance of it, and injects it into the servlet at runtime. To manage the lifecycle of the new instance, the CDI runtime needs to know what the scope of the instance should be. In this example, the servlet only needs the instance to process an HTTP request; the instance can then be garbage collected. This is specified using the <code>javax.enterprise.context.RequestScoped</code> annotation:
+            El tiempo de ejecución de CDI busca clases que implementen la interfaz <code>Message</code>, 
+            encuentra la clase <code>MessageB</code>, crea una nueva instancia de la misma y la inyecta en el 
+            servlet en tiempo de ejecución. Para administrar el ciclo de vida de la nueva instancia, el tiempo 
+            de ejecución de CDI necesita saber cuál debe ser el alcance de la instancia. En este ejemplo, el 
+            servlet solo necesita la instancia para procesar una solicitud HTTP; la instancia puede luego ser 
+            recolectada como basura. Esto se especifica mediante la anotación 
+            <code>javax.enterprise.context.RequestScoped</code>:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @RequestScoped
 public class MessageB implements Message { ... }
-</code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            For more information on scopes, see <a href="cdi-basic008.html#GJBBK">Usando Ámbitos</a>.
+            Para obtener más información sobre los ámbitos, consulte 
+            <a href="cdi-basic008.html#GJBBK">Usando Ámbitos</a>.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            The <code>MessageB</code> class is a CDI bean. CDI beans are classes that CDI can instantiate, manage, and inject automatically to satisfy the dependencies of other objects. Almost any Java class can be managed and injected by CDI. For more information on beans, see <a href="cdi-basic003.html#GJEBJ">Sobre los Beans</a>. A JAR or WAR file that contains a CDI bean is a bean archive. For more information on packaging bean archives, see <a href="cdi-basic013.html#GJBNZ">Configurando una Aplicación CDI</a> in this chapter and <a href="cdi-adv001.html#CACDCFDE">Empaquetando Aplicaciones CDI</a> in <a href="cdi-adv.html#GJEHI">Capítulo 27, "Contexts and Inyección de Dependencias para Java EE: Advanced Topics"</a>.
+            La clase <code>MessageB</code> es un bean CDI. Los beans CDI son clases que CDI puede instanciar, 
+            administrar e inyectar automáticamente para satisfacer las dependencias de otros objetos. CDI 
+            puede administrar e inyectar casi cualquier clase de Java. Para obtener más información sobre los 
+            beans, consulte <a href="cdi-basic003.html#GJEBJ">Sobre los beans</a>. Un archivo JAR o WAR que 
+            contiene un bean CDI es un archivo de bean. Para obtener más información sobre cómo empaquetar 
+            archivos de beans, consulte <a href="cdi-basic013.html#GJBNZ">Configurando una Aplicación CDI</a> 
+            en este capítulo y <a href="cdi-adv001.html#CACDCFDE">Empaquetando Aplicaciones CDI</a> en 
+            <a href="cdi-adv.html#GJEHI">
+              Capítulo 27, "Contextos e Inyección de Dependencias para Java EE: Temas Avanzados"
+            </a>.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            In this example, <code>MessageB</code> is the only class that implements the <code>Message</code> interface. If an application has more than one implementation of an interface, CDI provides mechanisms that you can use to select which implementation to inject. For more information, see <a href="cdi-basic006.html#GJBCK">Usando Calificadores</a> in this chapter and <a href="cdi-adv002.html#GJSDF">Usando Alternativas en Aplicaciones CDI</a> in <a href="cdi-adv.html#GJEHI">Capítulo 27, "Contexts and Dependency Injection for Java EE: Advanced Topics"</a>.
+            En este ejemplo, <code>MessageB</code> es la única clase que implementa la interfaz 
+            <code>Message</code>. Si una aplicación tiene más de una implementación de una interfaz, CDI 
+            proporciona mecanismos que puede usar para seleccionar qué implementación inyectar. Para obtener 
+            más información, consulte <a href="cdi-basic006.html#GJBCK">Usando Calificadores</a> en este 
+            capítulo y <a href="cdi-adv002.html#GJSDF">Usando Alternativas en Aplicaciones CDI</a> en 
+            <a href="cdi-adv.html#GJEHI">
+              Capítulo 27, "Contextos e Inyección de Dependencias para Java EE: Temas Avanzados"
+            </a>.
           </p>
         </div>
       </div>
