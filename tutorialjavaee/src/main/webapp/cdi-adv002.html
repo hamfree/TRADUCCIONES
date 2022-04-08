@@ -49,187 +49,249 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            When you have more than one version of a bean that you use for different purposes, you can choose between them during the development phase by injecting one qualifier or another, as shown in <a href="cdi-basicexamples002.html#GJBJU">El Ejemplo de CDI simplegreeting</a>.
+            Cuando tiene más de una versión de un bean que usa para diferentes propósitos, puede elegir entre 
+            ellas durante la fase de desarrollo inyectando un calificador u otro, como se muestra en 
+            <a href="cdi-basicexamples002.html#GJBJU">El Ejemplo de CDI saludo simple</a>.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            Instead of having to change the source code of your application, however, you can make the choice at deployment time by using alternatives.
+            Sin embargo, en lugar de tener que cambiar el código fuente de su aplicación, puede elegir en el 
+            momento de la implementación mediante el uso de alternativas.
           </p>
         </div>
         <div class="paragraph">
-          <p>Alternatives are commonly used for purposes such as the following:</p>
+          <p>Las alternativas se usan comúnmente para propósitos como los siguientes:</p>
         </div>
         <div class="ulist">
           <ul>
             <li>
-              <p>To handle client-specific business logic that is determined at runtime</p>
-            </li>
-            <li>
               <p>
-                To specify beans that are valid for a particular deployment scenario (for example, when country-specific sales tax laws require country-specific sales tax business logic)
+                Para manejar la lógica empresarial específica del cliente que se determina en tiempo de 
+                ejecución
               </p>
             </li>
             <li>
-              <p>To create dummy (mock) versions of beans to be used for testing</p>
+              <p>
+                Para especificar beans que son válidos para un escenario de implementación en particular (por 
+                ejemplo, cuando las leyes de impuestos sobre las ventas específicas de un país requieren una 
+                lógica comercial de impuestos sobre las ventas específica del país)
+              </p>
+            </li>
+            <li>
+              <p>Para crear versiones ficticias (simuladas) de beans que se utilizarán para las pruebas</p>
             </li>
           </ul>
         </div>
         <div class="paragraph">
           <p>
-            To make a bean available for lookup, injection, or EL resolution using this mechanism, give it a <code>javax.enterprise.inject.Alternative</code> annotation and then use the <code>alternatives</code> element to specify it in the <code>beans.xml</code> file.
+            Para hacer que un bean esté disponible para búsqueda, inyección o resolución EL usando este 
+            mecanismo, asígnele una anotación <code>javax.enterprise.inject.Alternative</code> y luego use el 
+            elemento <code>alternatives</code> para especificar en el archivo <code>beans.xml</code>.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            For example, you might want to create a full version of a bean and also a simpler version that you use only for certain kinds of testing. The example described in <a href="cdi-adv-examples002.html#GKHPU">El Ejemplo encoder: Usando Alternativas</a> contains two such beans, <code>CoderImpl</code> and <code>TestCoderImpl</code>. The test bean is annotated as follows:
+            Por ejemplo, es posible que desee crear una versión completa de un bean y también una versión más 
+            simple que use solo para ciertos tipos de pruebas. El ejemplo descrito en 
+            <a href="cdi-adv-examples002.html#GKHPU">El Ejemplo encoder: Usando Alternativas</a> contiene dos 
+            beans de este tipo, <code>CoderImpl</code> y <code>TestCoderImpl</code>. El bean de prueba se 
+            anota de la siguiente manera:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Alternative
 public class TestCoderImpl implements Coder { ... }
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
-          <p>The full version is not annotated:</p>
+          <p>La versión completa no está anotada:</p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 public class CoderImpl implements Coder { ... }
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
-          <p>The managed bean injects an instance of the <code>Coder</code> interface:</p>
+          <p>El bean gestionado inyecta una instancia de la interfaz <code>Coder</code>:</p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Inject
 Coder coder;
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            The alternative version of the bean is used by the application only if that version is declared as follows in the <code>beans.xml</code> file:
+            La aplicación utiliza la versión alternativa del bean solo si esa versión se declara de la 
+            siguiente manera en el archivo <code>beans.xml</code>:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 &lt;beans ...&gt;
     &lt;alternatives&gt;
         &lt;class&gt;javaeetutorial.encoder.TestCoderImpl&lt;/class&gt;
     &lt;/alternatives&gt;
 &lt;/beans&gt;
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            If the <code>alternatives</code> element is commented out in the <code>beans.xml</code> file, the <code>CoderImpl</code> class is used.
+            Si el elemento <code>alternatives</code> está comentado en el archivo <code>beans.xml</code>, se 
+            utiliza la clase <code>CoderImpl</code>.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            You can also have several beans that implement the same interface, all annotated <code>@Alternative</code>. In this case, you must specify in the <code>beans.xml</code> file which of these alternative beans you want to use. If <code>CoderImpl</code> were also annotated <code>@Alternative</code>, one of the two beans would always have to be specified in the <code>beans.xml</code> file.
+            También puede tener varios beans que implementen la misma interfaz, todos anotados 
+            <code>@Alternative</code>. En este caso, debe especificar en el archivo <code>beans.xml</code> 
+            cuál de estos beans alternativos desea utilizar. Si <code>CoderImpl</code> también estuviera 
+            anotado como <code>@Alternative</code>, uno de los dos beans siempre tendría que especificarse en 
+            el archivo <code>beans.xml</code>.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            The alternatives that you specify in the <code>beans.xml</code> file apply only to classes in the same archive. Use the <code>@Priority</code> annotation to specify alternatives globally for an application that consists of multiple modules, as in the following example:
+            Las alternativas que especifique en el archivo <code>beans.xml</code> se aplican solo a las clases 
+            en el mismo archivo. Utilice la anotación <code>@Priority</code> para especificar alternativas 
+            globalmente para una aplicación que consta de varios módulos, como en el siguiente ejemplo:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Alternative
 @Priority(Interceptor.Priority.APPLICATION+10)
 public class TestCoderImpl implements Coder { ... }
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            The alternative with higher priority value is selected if several alternative beans that implement the same interface are annotated with <code>@Priority</code>. You do not need to specify the alternative in the <code>beans.xml</code> file when you use the <code>@Priority</code> annotation.</p> 
+            La alternativa con mayor valor de prioridad se selecciona si varios beans alternativos que 
+            implementan la misma interfaz se anotan con <code>@Priority</code>. No necesita especificar la 
+            alternativa en el archivo <code>beans.xml</code> cuando usa la anotación <code>@Priority</code>.
+          </p> 
         </div>
         <div class="sect2" id="GKHPO">
           <h3 id="using-specialization">Usando Especialización</h3>
           <div class="paragraph">
             <p>
-              Specialization has a function similar to that of alternatives in that it allows you to substitute one bean for another. However, you might want to make one bean override the other in all cases. Suppose you defined the following two beans:
+              La especialización tiene una función similar a la de las alternativas en que te permite 
+              sustituir un bean por otro. Sin embargo, es posible que desee hacer que un bean anule al otro en 
+              todos los casos. Supongamos que definió los dos beans siguientes:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Default @Asynchronous
 public class AsynchronousService implements Service { ... }
 @Alternative
 public class MockAsynchronousService extends AsynchronousService { ... }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              If you then declared <code>MockAsynchronousService</code> as an alternative in your <code>beans.xml</code> file, the following injection point would resolve to <code>MockAsynchronousService</code>:
+              Si luego declaró <code>MockAsynchronousService</code> como una alternativa en su archivo 
+              <code>beans.xml</code>, el siguiente punto de inyección se resolvería en 
+              <code>MockAsynchronousService</code>:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Inject Service service;
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              The following, however, would resolve to <code>AsynchronousService</code> rather than <code>MockAsynchronousService</code>, because <code>MockAsynchronousService</code> does not have the <code>@Asynchronous</code> qualifier:
+              Sin embargo, lo siguiente se resolvería en <code>AsynchronousService</code> en lugar de 
+              <code>MockAsynchronousService</code>, porque <code>MockAsynchronousService</code> no tiene el 
+              calificador <code>@Asynchronous</code>:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Inject @Asynchronous Service service;
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              To make sure that <code>MockAsynchronousService</code> was always injected, you would have to implement all bean types and bean qualifiers of <code>AsynchronousService</code>. However, if <code>AsynchronousService</code> declared a producer method or observer method, even this cumbersome mechanism would not ensure that the other bean was never invoked. Specialization provides a simpler mechanism.
+              Para asegurarse de que siempre se inyectó <code>MockAsynchronousService</code>, tendría que 
+              implementar todos los tipos de bean y los calificadores de bean de 
+              <code>AsynchronousService</code>. Sin embargo, si <code>AsynchronousService</code> declarara un 
+              método productor o un método observador, incluso este engorroso mecanismo no garantizaría que el 
+              otro bean nunca fuera invocado. La especialización proporciona un mecanismo más simple.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              Specialization happens at development time as well as at runtime. If you declare that one bean specializes another, it extends the other bean class, and at runtime the specialized bean completely replaces the other bean. If the first bean is produced by means of a producer method, you must also override the producer method.
+              La especialización ocurre tanto en tiempo de desarrollo como en tiempo de ejecución. Si declara 
+              que un bean especializa a otro, extiende la otra clase de bean y, en tiempo de ejecución, el 
+              bean especializado reemplaza completamente al otro bean. Si el primer bean se produce mediante 
+              un método de productor, también debe anular el método de productor.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              You specialize a bean by giving it the <code>javax.enterprise.inject.Specializes</code> annotation. For example, you might declare a bean as follows:
+              Usted especializa un bean dándole la anotación <code>javax.enterprise.inject.Specializes</code>. 
+              Por ejemplo, podría declarar un bean de la siguiente manera:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Specializes
 public class MockAsynchronousService extends AsynchronousService { ... }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              In this case, the <code>MockAsynchronousService</code> class will always be invoked instead of the <code>AsynchronousService</code> class.
+              En este caso, la clase <code>MockAsynchronousService</code> siempre se invocará en lugar de la 
+              clase <code>AsynchronousService</code>.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              Usually, a bean marked with the <code>@Specializes</code> annotation is also an alternative and is declared as an alternative in the <code>beans.xml</code> file. Such a bean is meant to stand in as a replacement for the default implementation, and the alternative implementation automatically inherits all qualifiers of the default implementation as well as its EL name, if it has one.
+              Por lo general, un bean marcado con la anotación <code>@Specializes</code> también es una 
+              alternativa y se declara como alternativa en el archivo <code>beans.xml</code>. Dicho bean está 
+              destinado a reemplazar la implementación predeterminada, y la implementación alternativa hereda 
+              automáticamente todos los calificadores de la implementación predeterminada, así como su nombre 
+              EL, si lo tiene.
             </p>
           </div>
         </div>

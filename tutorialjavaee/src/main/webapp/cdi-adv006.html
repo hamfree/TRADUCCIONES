@@ -49,120 +49,172 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            An interceptor is a class used to interpose in method invocations or lifecycle events that occur in an associated target class. The interceptor performs tasks, such as logging or auditing, that are separate from the business logic of the application and are repeated often within an application. Such tasks are often called cross-cutting tasks. Interceptors allow you to specify the code for these tasks in one place for easy maintenance. When interceptors were first introduced to the Java EE platform, they were specific to enterprise beans. On the Java EE platform, you can use them with Java EE managed objects of all kinds, including managed beans.
+            Un interceptor es una clase que se utiliza para interponerse en invocaciones de métodos o eventos 
+            de ciclo de vida que ocurren en una clase de destino asociada. El interceptor realiza tareas, como 
+            registro o auditoría, que están separadas de la lógica comercial de la aplicación y se repiten con 
+            frecuencia dentro de una aplicación. Tales tareas a menudo se denominan tareas transversales. Los 
+            interceptores le permiten especificar el código para estas tareas en un solo lugar para facilitar 
+            el mantenimiento. Cuando los interceptores se introdujeron por primera vez en la plataforma Java 
+            EE, eran específicos de los beans empresariales. En la plataforma Java EE, puede utilizarlos con 
+            objetos gestionados Java EE de todo tipo, incluidos beans gestionados.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            For information on Java EE interceptors, see <a href="interceptors.html#GKEED">Capítulo 57, "Usando los Interceptadores de Java EE"</a>.
+            Para obtener información sobre los interceptores de Java EE, consulte 
+            <a href="interceptors.html#GKEED">Capítulo 57, "Usando los Interceptadores de Java EE"</a>.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            An interceptor class often contains a method annotated <code>@AroundInvoke</code>, which specifies the tasks the interceptor will perform when intercepted methods are invoked. It can also contain a method annotated <code>@PostConstruct</code>, <code>@PreDestroy</code>, <code>@PrePassivate</code>, or <code>@PostActivate</code>, to specify lifecycle callback interceptors, and a method annotated <code>@AroundTimeout</code>, to specify EJB timeout interceptors. An interceptor class can contain more than one interceptor method, but it must have no more than one method of each type.
+            Una clase de interceptor a menudo contiene un método anotado <code>@AroundInvoke</code>, que 
+            especifica las tareas que realizará el interceptor cuando se invoquen los métodos interceptados. 
+            También puede contener un método anotado <code>@PostConstruct</code>, <code>@PreDestroy</code>, 
+            <code>@PrePassivate</code> o <code>@PostActivate</code>, para especificar interceptores de 
+            devolución de llamada del ciclo de vida y un método anotado <code>@AroundTimeout</code>, para 
+            especificar los interceptores de tiempo de espera de EJB. Una clase de interceptor puede contener 
+            más de un método de interceptor, pero no debe tener más de un método de cada tipo.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            Along with an interceptor, an application defines one or more interceptor binding types, which are annotations that associate an interceptor with target beans or methods. For example, the <code>billpayment</code> example contains an interceptor binding type named <code>@Logged</code> and an interceptor named <code>LoggedInterceptor</code>. The interceptor binding type declaration looks something like a qualifier declaration, but it is annotated with <code>javax.interceptor.InterceptorBinding</code>:
+            Junto con un interceptor, una aplicación define uno o más tipos de enlace de interceptor, que son 
+            anotaciones que asocian un interceptor con beans o métodos de destino. Por ejemplo, el ejemplo de 
+            <code>billpayment</code> contiene un tipo de enlace de interceptor llamado <code>@Logged</code> y 
+            un interceptor llamado <code>LoggedInterceptor</code>. La declaración del tipo de enlace del 
+            interceptor se parece a una declaración de calificador, pero se anota con 
+            <code>javax.interceptor.InterceptorBinding</code>:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Inherited
 @InterceptorBinding
 @Retention(RUNTIME)
 @Target({METHOD, TYPE})
 public @interface Logged {
 }
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            An interceptor binding also has the <code>java.lang.annotation.Inherited</code> annotation, to specify that the annotation can be inherited from superclasses. The <code>@Inherited</code> annotation also applies to custom scopes (not discussed in this tutorial) but does not apply to qualifiers.
+            Un enlace de interceptor también tiene la anotación <code>java.lang.annotation.Inherited</code>, 
+            para especificar que la anotación se puede heredar de las superclases. La anotación 
+            <code>@Inherited</code> también se aplica a los ámbitos personalizados (no se trata en este 
+            tutorial), pero no se aplica a los calificadores.
           </p>
         </div>
         <div class="paragraph">
-          <p>An interceptor binding type may declare other interceptor bindings.</p>
+          <p>Un tipo de enlace de interceptor puede declarar otros enlaces de interceptor.</p>
         </div>
         <div class="paragraph">
           <p>
-            The interceptor class is annotated with the interceptor binding as well as with the <code>@Interceptor</code> annotation. For an example, see <a href="cdi-adv-examples005.html#GKHRQ">La Clase Interceptadora LoggedInterceptor</a>.
+            La clase de interceptor se anota con el enlace de interceptor, así como con la anotación 
+            <code>@Interceptor</code>. Para ver un ejemplo, véase 
+            <a href="cdi-adv-examples005.html#GKHRQ">La Clase Interceptadora LoggedInterceptor</a>.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            Every <code>@AroundInvoke</code> method takes a <code>javax.interceptor.InvocationContext</code> argument, returns a <code>java.lang.Object</code>, and throws an <code>Exception</code>. It can call <code>InvocationContext</code> methods. The <code>@AroundInvoke</code> method must call the <code>proceed</code> method, which causes the target class method to be invoked.
+            Cada método <code>@AroundInvoke</code> toma un argumento 
+            <code>javax.interceptor.InvocationContext</code>, devuelve un <code>java.lang.Object</code> y 
+            lanza una <code>Exception</code>. Puede llamar a métodos <code>InvocationContext</code>. El 
+              método <code>@AroundInvoke</code> debe llamar al método <code>proceed</code>, lo que hace que se 
+              invoque el método de la clase de destino.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            Once an interceptor and binding type are defined, you can annotate beans and individual methods with the binding type to specify that the interceptor is to be invoked either on all methods of the bean or on specific methods. For example, in the <code>billpayment</code> example, the <code>PaymentHandler</code> bean is annotated <code>@Logged</code>, which means that any invocation of its business methods will cause the interceptor's <code>@AroundInvoke</code> method to be invoked:
+            Una vez que se definen un interceptor y un tipo de vinculación, puede anotar beans y métodos 
+            individuales con el tipo de vinculación para especificar que el interceptor debe invocarse en 
+            todos los métodos del bean o en métodos específicos. Por ejemplo, en el ejemplo de 
+            <code>billpayment</code>, el bean <code>PaymentHandler</code> se anota como <code>@Logged</code>, 
+            lo que significa que cualquier invocación de sus métodos comerciales hará que el método 
+            interceptor <code>@AroundInvoke</code> se invoque:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Logged
 @SessionScoped
 public class PaymentHandler implements Serializable {...}
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            However, in the <code>PaymentBean</code> bean, only the <code>pay</code> and <code>reset</code> methods have the <code>@Logged</code> annotation, so the interceptor is invoked only when these methods are invoked:
+            Sin embargo, en el bean <code>PaymentBean</code>, solo los métodos <code>pay</code> y 
+            <code>reset</code> tienen la anotación <code>@Logged</code>, por lo que el interceptor se invoca 
+            solo cuando se invocan estos métodos:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Logged
 public String pay() {...}
 @Logged
 public void reset() {...}
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            In order for an interceptor to be invoked in a CDI application, it must, like an alternative, be specified in the <code>beans.xml</code> file. For example, the <code>LoggedInterceptor</code> class is specified as follows:
+            Para que se invoque un interceptor en una aplicación CDI, debe, como una alternativa, 
+            especificarse en el archivo <code>beans.xml</code>. Por ejemplo, la clase 
+            <code>LoggedInterceptor</code> se especifica de la siguiente manera:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 &lt;interceptors&gt;
     &lt;class&gt;javaeetutorial.billpayment.interceptors.LoggedInterceptor&lt;/class&gt;
 &lt;/interceptors&gt;
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            If an application uses more than one interceptor, the interceptors are invoked in the order specified in the <code>beans.xml</code> file.
+            Si una aplicación usa más de un interceptor, los interceptores se invocan en el orden especificado 
+            en el archivo <code>beans.xml</code>.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            The interceptors that you specify in the <code>beans.xml</code> file apply only to classes in the same archive. Use the <code>@Priority</code> annotation to specify interceptors globally for an application that consists of multiple modules, as in the following example:
+            Los interceptores que especifique en el archivo <code>beans.xml</code> se aplican solo a las 
+            clases en el mismo archivo. Utilice la anotación <code>@Priority</code> para especificar 
+            interceptores globalmente para una aplicación que consta de varios módulos, como en el siguiente 
+            ejemplo:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Logged
 @Interceptor
 @Priority(Interceptor.Priority.APPLICATION)
 public class LoggedInterceptor implements Serializable { ... }
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            Interceptors with lower priority values are called first. You do not need to specify the interceptor in the <code>beans.xml</code> file when you use the <code>@Priority</code> annotation.
+            Los interceptores con valores de prioridad más bajos se llaman primero. No necesita especificar el 
+            interceptor en el archivo <code>beans.xml</code> cuando usa la anotación <code>@Priority</code>.
           </p>
         </div>
       </div>

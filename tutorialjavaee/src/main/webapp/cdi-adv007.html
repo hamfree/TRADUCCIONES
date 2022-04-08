@@ -49,27 +49,38 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            A decorator is a Java class that is annotated <code>javax.decorator.Decorator</code> and that has a corresponding <code>decorators</code> element in the <code>beans.xml</code> file.
+            Un decorador es una clase de Java que se anota como <code>javax.decorator.Decorator</code> y que 
+            tiene un elemento <code>decorators</code> correspondiente en el archivo <code>beans.xml</code>.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            A decorator bean class must also have a delegate injection point, which is annotated <code>javax.decorator.Delegate</code>. This injection point can be a field, a constructor parameter, or an initializer method parameter of the decorator class.
+            Una clase de bean decorador también debe tener un punto de inyección de delegado, que se anota 
+            como <code>javax.decorator.Delegate</code>. Este punto de inyección puede ser un campo, un 
+            parámetro de constructor o un parámetro de método de inicialización de la clase decoradora.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            Decorators are outwardly similar to interceptors. However, they actually perform tasks complementary to those performed by interceptors. Interceptors perform cross-cutting tasks associated with method invocation and with the lifecycles of beans, but cannot perform any business logic. Decorators, on the other hand, do perform business logic by intercepting business methods of beans. This means that instead of being reusable for different kinds of applications, as are interceptors, their logic is specific to a particular application.
+            Los decoradores son aparentemente similares a los interceptores. Sin embargo, en realidad realizan 
+            tareas complementarias a las realizadas por los interceptores. Los interceptores realizan tareas 
+            transversales asociadas con la invocación de métodos y con los ciclos de vida de los beans, pero 
+            no pueden realizar ninguna lógica comercial. Los decoradores, por otro lado, realizan la lógica 
+            comercial al interceptar los métodos comerciales de los beans. Esto significa que en lugar de ser 
+            reutilizable para diferentes tipos de aplicaciones, como los interceptores, su lógica es 
+            específica para una aplicación en particular.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            For example, instead of using an alternative <code>TestCoderImpl</code> class for the <code>encoder</code> example, you could create a decorator as follows:
+            Por ejemplo, en lugar de usar una clase <code>TestCoderImpl</code> alternativa para el ejemplo de 
+            <code>encoder</code>, podría crear un decorador de la siguiente manera:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Decorator
 public abstract class CoderDecorator implements Coder {
     @Inject
@@ -78,69 +89,85 @@ public abstract class CoderDecorator implements Coder {
     Coder coder;
     public String codeString(String s, int tval) {
         int len = s.length();
-        return "\"" + s + "\" becomes " + "\"" + coder.codeString(s, tval)
-                + "\", " + len + " characters in length";
+        return "\"" + s + "\" se convierte " + "\"" + coder.codeString(s, tval)
+                + "\", " + len + " caracteres de longitud";
     }
 }
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            See <a href="cdi-adv-examples006.html#GKPAX">El Ejemplo decorators: Decorando un Bean</a> for an example that uses this decorator.
+            Vea <a href="cdi-adv-examples006.html#GKPAX">El Ejemplo decorators: Decorando un Bean</a> para un 
+            ejemplo que usa este decorador.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            This simple decorator returns more detailed output than the encoded string returned by the <code>CoderImpl.codeString</code> method. A more complex decorator could store information in a database or perform some other business logic.
+            Este decorador simple devuelve una salida más detallada que la cadena codificada devuelta por el 
+            método <code>CoderImpl.codeString</code>. Un decorador más complejo podría almacenar información 
+            en una base de datos o realizar alguna otra lógica comercial.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            A decorator can be declared as an abstract class so that it does not have to implement all the business methods of the interface.
+            Un decorador se puede declarar como una clase abstracta para que no tenga que implementar todos 
+            los métodos comerciales de la interfaz.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            In order for a decorator to be invoked in a CDI application, it must, like an interceptor or an alternative, be specified in the <code>beans.xml</code> file. For example, the <code>CoderDecorator</code> class is specified as follows:
+            Para que se invoque un decorador en una aplicación CDI, debe especificarse, como un interceptor o 
+            una alternativa, en el archivo <code>beans.xml</code>. Por ejemplo, la clase 
+            <code>CoderDecorator</code> se especifica de la siguiente manera:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 &lt;decorators&gt;
     &lt;class&gt;javaeetutorial.decorators.CoderDecorator&lt;/class&gt;
 &lt;/decorators&gt;
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            If an application uses more than one decorator, the decorators are invoked in the order in which they are specified in the <code>beans.xml</code> file.
+            Si una aplicación utiliza más de un decorador, los decoradores se invocan en el orden en que se 
+            especifican en el archivo <code>beans.xml</code>.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            If an application has both interceptors and decorators, the interceptors are invoked first. This means, in effect, that you cannot intercept a decorator.
+            Si una aplicación tiene interceptores y decoradores, los interceptores se invocan primero. Esto 
+            significa, en efecto, que no puedes interceptar a un decorador.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            The decorators that you specify in the <code>beans.xml</code> file apply only to classes in the same archive. Use the <code>@Priority</code> annotation to specify decorators globally for an application that consists of multiple modules, as in the following example:
+            Los decoradores que especifique en el archivo <code>beans.xml</code> se aplican solo a las clases 
+            en el mismo archivo. Utilice la anotación <code>@Priority</code> para especificar decoradores 
+            globalmente para una aplicación que consta de varios módulos, como en el siguiente ejemplo:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Decorator
 @Priority(Interceptor.Priority.APPLICATION)
 public abstract class CoderDecorator implements Coder { ... }
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            Decorators with lower priority values are called first. You do not need to specify the decorator in the <code>beans.xml</code> when you use the <code>@Priority</code> annotation.
+            Los decoradores con valores de prioridad más bajos se llaman primero. No necesita especificar el 
+            decorador en <code>beans.xml</code> cuando usa la anotación <code>@Priority</code>.
           </p>
         </div>
       </div>

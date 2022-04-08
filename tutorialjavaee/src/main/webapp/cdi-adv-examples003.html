@@ -53,7 +53,15 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            The <code>producermethods</code> example shows how to use a producer method to choose between two beans at runtime, as described in <a href="cdi-adv003.html#GKGKV">Usando Métodos de Producer, Campos de Producer, y Métodos de Disposer en Aplicaciones CDI</a>. It is very similar to the <code>encoder</code> example described in <a href="cdi-adv-examples002.html#GKHPU">El Ejemplo encoder: Usando Alternativas</a>. The example includes the same interface and two implementations of it, a managed bean, a Facelets page, and configuration files. It also contains a qualifier type. When you run it, you do not need to edit the <code>beans.xml</code> file and redeploy the application to change its behavior.
+            El ejemplo de <code>producermethods</code> muestra cómo usar un método de productor para elegir 
+            entre dos beans en tiempo de ejecución, como se describe en 
+            <a href="cdi-adv003.html#GKGKV">Usando Métodos de Producer, Campos de Producer, y Métodos de 
+              Disposer en Aplicaciones CDI</a>. Es muy similar al ejemplo de <code>encoder</code> descrito en 
+              <a href="cdi-adv-examples002.html#GKHPU">El Ejemplo de codificador: uso de Alternativas</a>. El 
+              ejemplo incluye la misma interfaz y dos implementaciones de la misma, un bean administrado, una 
+              página Facelets y archivos de configuración. También contiene un tipo de calificador. Cuando lo 
+              ejecuta, no necesita editar el archivo <code>beans.xml</code> y volver a implementar la 
+              aplicación para cambiar su comportamiento.
           </p>
         </div>
         <div class="paragraph">
@@ -73,41 +81,53 @@
           <h3 id="components-of-the-producermethods-example">Componentes del Ejemplo producermethods</h3>
           <div class="paragraph">
             <p>
-              The components of <code>producermethods</code> are very much like those for <code>encoder</code>, with some significant differences.
+              Los componentes de <code>producermethods</code> son muy parecidos a los de <code>encoder</code>, 
+              con algunas diferencias significativas.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              Neither implementation of the <code>Coder</code> bean is annotated <code>@Alternative</code>, and there is no <code>beans.xml</code> file, because it is not needed.
+              Ninguna implementación del bean <code>Coder</code> está anotada como <code>@Alternative</code>, 
+              y no hay ningún archivo <code>beans.xml</code> porque no es necesario.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              The Facelets page and the managed bean, <code>CoderBean</code>, have an additional property, <code>coderType</code>, that allows the user to specify at runtime which implementation to use. In addition, the managed bean has a producer method that selects the implementation using a qualifier type, <code>@Chosen</code>.
+              La página Facelets y el bean administrado, <code>CoderBean</code>, tienen una propiedad 
+              adicional, <code>coderType</code>, que permite al usuario especificar en tiempo de ejecución qué 
+              implementación usar. Además, el bean administrado tiene un método productor que selecciona la 
+              implementación utilizando un tipo de calificador, <code>@Chosen</code>.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              The bean declares two constants that specify whether the coder type is the test implementation or the implementation that actually shifts letters:
+              El bean declara dos constantes que especifican si el tipo de codificador es la implementación de 
+              prueba o la implementación que realmente cambia letras:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight"
+                   ><code class="language-oac_no_warn" data-lang="oac_no_warn">
     private final static int TEST = 1;
     private final static int SHIFT = 2;
-    private int coderType = SHIFT; // default value
-              </code></pre>
+    private int coderType = SHIFT; // valor por defecto
+              </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              The producer method, annotated with <code>@Produces</code> and <code>@Chosen</code> as well as <code>@RequestScoped</code> (so that it lasts only for the duration of a single request and response), returns one of the two implementations based on the <code>coderType</code> supplied by the user.
+              El método productor, anotado con <code>@Produces</code> y <code>@Chosen</code> así como 
+              <code>@RequestScoped</code> (para que dure solo la duración de una sola solicitud y respuesta), 
+              devuelve una de las dos implementaciones según el <code>coderType</code> proporcionado por el 
+              usuario.
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">    
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">    
     @Produces
     @Chosen
     @RequestScoped
@@ -121,50 +141,56 @@
                 return null;
         }
     }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              Finally, the managed bean injects the chosen implementation, specifying the same qualifier as that returned by the producer method to resolve ambiguities:
+              Finalmente, el bean administrado inyecta la implementación elegida, especificando el mismo 
+              calificador que devuelve el método productor para resolver ambigüedades:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
     @Inject
     @Chosen
     @RequestScoped
     Coder coder;
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              The Facelets page contains modified instructions and a pair of options whose selected value is assigned to the property <code>coderBean.coderType</code>:
+              La página Facelets contiene instrucciones modificadas y un par de opciones cuyo valor 
+              seleccionado se asigna a la propiedad <code>coderBean.coderType</code>:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
     &lt;h2&gt;String Encoder&lt;/h2&gt;
-        &lt;p&gt;Select Test or Shift, type a string and an integer, then click
-            Encode.&lt;/p&gt;
-        &lt;p&gt;If you select Test, the TestCoderImpl bean will display the
-            argument values.&lt;/p&gt;
-        &lt;p&gt;If you select Shift, the CoderImpl bean will return a string that
-            shifts the letters in the original string by the value you specify.
-            The value must be between 0 and 26.&lt;/p&gt;
+        &lt;p&gt;Seleccione Prueba o Cambio, escriba una cadena y un número entero, luego haga clic en
+            Codificar.&lt;/p&gt;
+        &lt;p&gt;Si selecciona Prueba, el bean TestCoderImpl mostrará los
+            valores de argumento.&lt;/p&gt;
+        &lt;p&gt;Si selecciona Shift, el bean CoderImpl devolverá una cadena que
+            cambia las letras de la cadena original por el valor que especifique.
+            El valor debe estar entre 0 y 26.&lt;/p&gt;
         &lt;h:form id="encodeit"&gt;
             &lt;h:selectOneRadio id="coderType"
                               required="true"
                               value="#{coderBean.coderType}"&gt;
                 &lt;f:selectItem
                     itemValue="1"
-                    itemLabel="Test"/&gt;
+                    itemLabel="Prueba"/&gt;
                 &lt;f:selectItem
                     itemValue="2"
-                    itemLabel="Shift Letters"/&gt;
+                    itemLabel="Letras de cambio"/&gt;
             &lt;/h:selectOneRadio&gt;
             ...
               </code></pre>
@@ -175,7 +201,8 @@
           <h3 id="running-the-producermethods-example">Ejecutando el Ejemplo producermethods</h3>
           <div class="paragraph">
             <p>
-              You can use either NetBeans IDE or Maven to build, package, deploy, and run the <code>producermethods</code> application.
+              Puede usar el EID NetBeans o Maven para compilar, empaquetar, implementar y ejecutar la 
+              aplicación <code>producermethods</code>.
             </p>
           </div>
           <div class="paragraph">
@@ -192,7 +219,9 @@
               </li>
               <li>
                 <p>
-                  <a href="#GKHPS">Para Construir, Empaquetar, y Desplegar el Ejemplo producermethods Usando Maven</a>
+                  <a href="#GKHPS">
+                    Para Construir, Empaquetar, y Desplegar el Ejemplo producermethods Usando Maven
+                  </a>
                 </p>
               </li>
               <li>
@@ -208,36 +237,41 @@
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que se haya iniciado GlassFish Server (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
-                  <p>From the File menu, choose Open Project.</p>
+                  <p>En el menú Archivo, elija Abrir proyecto.</p>
                 </li>
                 <li>
-                  <p>In the Open Project dialog box, navigate to:</p>
+                  <p>En el cuadro de diálogo Abrir proyecto, vaya a:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 tut-install/examples/cdi
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>Select the <code>producermethods</code> folder.</p>
+                  <p>Seleccione la carpeta <code>producermethods</code>.</p>
                 </li>
                 <li>
-                  <p>Click Open Project.</p>
+                  <p>Haga clic en Abrir proyecto.</p>
                 </li>
                 <li>
                   <p>
-                    In the Projects tab, right-click the <code>producermethods</code> project and select Build.
+                    En la pestaña Proyectos, haga clic con el botón derecho en el proyecto 
+                    <code>producermethods</code> y seleccione Build.
                   </p>
                   <div class="paragraph">
                     <p>
-                      This command builds and packages the application into a WAR file, <code>producermethods.war</code>, located in the <code>target</code> directory, and then deploys it to GlassFish Server.
+                      Este comando compila y empaqueta la aplicación en un archivo WAR, 
+                      <code>producermethods.war</code>, ubicado en el directorio <code>target</code> y luego 
+                      lo implementa en el Servidor GlassFish.
                     </p>
                   </div>
                 </li>
@@ -252,33 +286,38 @@ tut-install/examples/cdi
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que GlassFish Server se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
-                  <p>In a terminal window, go to:</p>
+                  <p>En una ventana de terminal, vaya a:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 tut-install/examples/cdi/producermethods/
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>Enter the following command to deploy the application:</p>
+                  <p>Ingrese el siguiente comando para implementar la aplicación:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 mvn install
-                      </code></pre>
+                      </code>
+                      </pre>
                     </div>
                   </div>
                   <div class="paragraph">
                     <p>
-                      This command builds and packages the application into a WAR file, <code>producermethods.war</code>, located in the <code>target</code> directory, and then deploys it to GlassFish Server.
+                      Este comando compila y empaqueta la aplicación en un archivo WAR, 
+                      <code>producermethods.war</code>, ubicado en el directorio <code>target</code> y luego 
+                      lo implementa en el Servidor GlassFish.
                     </p>
                   </div>
                 </li>
@@ -290,23 +329,26 @@ mvn install
             <div class="olist arabic">
               <ol class="arabic">
                 <li>
-                  <p>In a web browser, enter the following URL:</p>
+                  <p>En un navegador web, ingrese la siguiente URL:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 http://localhost:8080/producermethods
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
                   <p>
-                    On the String Encoder page, select either the Test or Shift Letters option, enter a string and the number of letters to shift by, and then click Encode.
+                    En la página Codificador de cadenas, seleccione la opción Probar o Cambiar letras, ingrese 
+                    una cadena y el número de letras para cambiar y luego haga clic en Codificar.
                   </p>
                   <div class="paragraph">
                     <p>
-                      Depending on your selection, the Result line displays either the encoded string or the input values you specified.
+                      Según su selección, la línea Resultado muestra la cadena codificada o los valores de 
+                      entrada que especificó.
                     </p>
                   </div>
                 </li>
