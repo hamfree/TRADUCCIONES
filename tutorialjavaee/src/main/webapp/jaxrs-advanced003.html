@@ -45,28 +45,34 @@
       </tr>
     </table>
     <div class="sect1" id="GKNAV">
-      <h2 id="subresources-and-runtime-resource-resolution">Subrecursos y Resolución de Recursos en Tiempo de Ejecución</h2>
+      <h2 id="subresources-and-runtime-resource-resolution">
+        Subrecursos y Resolución de Recursos en Tiempo de Ejecución
+      </h2>
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            You can use a resource class to process only a part of the URI request. A root resource can then implement subresources that can process the remainder of the URI path.
+            Puede usar una clase de recurso para procesar solo una parte de la solicitud de URI. Luego, un 
+            recurso raíz puede implementar subrecursos que pueden procesar el resto de la ruta URI.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            A resource class method that is annotated with <code>@Path</code> is either a subresource method or a subresource locator.
+            Un método de clase de recurso que está anotado con <code>@Path</code> es un método de subrecurso o 
+            un localizador de subrecurso.
           </p>
         </div>
         <div class="ulist">
           <ul>
             <li>
               <p>
-                A subresource method is used to handle requests on a subresource of the corresponding resource.
+                Un método de subrecurso se usa para manejar solicitudes en un subrecurso del recurso 
+                correspondiente.
               </p>
             </li>
             <li>
               <p>
-                A subresource locator is used to locate subresources of the corresponding resource.
+                Se utiliza un localizador de subrecursos para localizar los subrecursos del recurso 
+                correspondiente.
               </p>
             </li>
           </ul>
@@ -88,17 +94,24 @@
           <h3 id="subresource-methods">Métodos de Subrecurso</h3>
           <div class="paragraph">
             <p>
-              A subresource method handles an HTTP request directly. The method must be annotated with a request method designator, such as <code>@GET</code> or <code>@POST</code>, in addition to <code>@Path</code>. The method is invoked for request URIs that match a URI template created by concatenating the URI template of the resource class with the URI template of the method.
+              Un método de subrecurso maneja una solicitud HTTP directamente. El método se debe anotar con un 
+              designador de método de solicitud, como <code>@GET</code> o <code>@POST</code>, además de 
+              <code>@Path</code>. El método se invoca para los URI de solicitud que coinciden con una 
+              plantilla de URI creada mediante la concatenación de la plantilla de URI de la clase de recurso 
+              con la plantilla de URI del método.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              The following code snippet shows how a subresource method can be used to extract the last name of an employee when the employee's email address is provided:
+              El siguiente fragmento de código muestra cómo se puede usar un método de subrecurso para extraer 
+              el apellido de un empleado cuando se proporciona la dirección de correo electrónico del 
+              empleado:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Path("/employeeinfo")
 public class EmployeeInfo {
     public employeeinfo() {}
@@ -109,19 +122,23 @@ public class EmployeeInfo {
        ...
     }
 }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              The <code>getEmployeeLastName</code> method returns <code>doe</code> for the following <code>GET</code> request:
+              El método <code>getEmployeeLastName</code> devuelve <code>doe</code> para la siguiente solicitud 
+              <code>GET</code>:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 GET /employeeinfo/employees/john.doe@example.com
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
         </div>
@@ -129,31 +146,35 @@ GET /employeeinfo/employees/john.doe@example.com
           <h3 id="subresource-locators">Localizadores de Subrecursos</h3>
           <div class="paragraph">
             <p>
-              A subresource locator returns an object that will handle an HTTP request. The method must not be annotated with a request method designator. You must declare a subresource locator within a subresource class, and only subresource locators are used for runtime resource resolution.
+              Un localizador de subrecursos devuelve un objeto que manejará una solicitud HTTP. El método no 
+              se debe anotar con un designador de método de solicitud. Debe declarar un localizador de 
+              subrecursos dentro de una clase de subrecursos, y solo los localizadores de subrecursos se 
+              utilizan para la resolución de recursos en tiempo de ejecución.
             </p>
           </div>
           <div class="paragraph">
-            <p>The following code snippet shows a subresource locator:</p>
+            <p>El siguiente fragmento de código muestra un localizador de subrecursos:</p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
-// Root resource class
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+// Clase de recurso raíz
 @Path("/employeeinfo")
 public class EmployeeInfo {
-    // Subresource locator: obtains the subresource Employee
-    // from the path /employeeinfo/employees/{empid}
+    // Localizador de subrecursos: obtiene el subrecurso Employee
+    // del camino /employeeinfo/employees/{empid}
     @Path("/employees/{empid}")
     public Employee getEmployee(@PathParam("empid") String id) {
-        // Find the Employee based on the id path parameter
+        // Encuentra el Employee según el parámetro de ruta de identificación
         Employee emp = ...;
         ...
         return emp;
     }
 }
-// Subresource class
+// Clase de subrecurso
 public class Employee {
-    // Subresource method: returns the employee's last name
+    // Método subrecurso: devuelve el apellido del employee
     @GET
     @Path("/lastname")
     public String getEmployeeLastName() {
@@ -161,17 +182,25 @@ public class Employee {
         return lastName;
     }
 }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              In this code snippet, the <code>getEmployee</code> method is the subresource locator that provides the <code>Employee</code> object, which services requests for <code>lastname</code>.
+              En este fragmento de código, el método <code>getEmployee</code> es el localizador de subrecursos 
+              que proporciona el objeto <code>Employee</code>, que atiende las solicitudes de 
+              <code>lastname</code>.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              If your HTTP request is <code>GET /employeeinfo/employees/as209/</code>, the <code>getEmployee</code> method returns an <code>Employee</code> object whose id is <code>as209</code>. At runtime, JAX-RS sends a <code>GET /employeeinfo/employees/as209/lastname</code> request to the <code>getEmployeeLastName</code> method. The <code>getEmployeeLastName</code> method retrieves and returns the last name of the employee whose id is <code>as209</code>.
+              Si su solicitud HTTP es <code>GET /employeeinfo/employees/as209/</code>, el método 
+              <code>getEmployee</code> devuelve un objeto <code>Employee</code> cuya identificación es 
+              <code>as209</code>. En tiempo de ejecución, JAX-RS envía una solicitud 
+              <code>GET /employeeinfo/employees/as209/lastname</code> al método 
+              <code>getEmployeeLastName</code>. El método <code>getEmployeeLastName</code> recupera y devuelve 
+              el apellido del empleado cuya identificación es <code>as209</code>.
             </p>
           </div>
         </div>
