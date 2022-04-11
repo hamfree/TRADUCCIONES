@@ -49,39 +49,56 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            The <code>cart</code> example represents a shopping cart in an online bookstore and uses a stateful session bean to manage the operations of the shopping cart. The bean's client can add a book to the cart, remove a book, or retrieve the cart's contents. To assemble <code>cart</code>, you need the following code:
+            El ejemplo <code>cart</code> representa un carrito de compras en una librería en línea y utiliza 
+            un bean de sesión con estado para administrar las operaciones del carrito de compras. El cliente 
+            del bean puede agregar un libro al carrito, eliminar un libro o recuperar el contenido del 
+            carrito. Para ensamblar <code>cart</code>, necesita el siguiente código:
           </p>
         </div>
         <div class="ulist">
           <ul>
             <li>
-              <p>Session bean class (<code>CartBean</code>)</p>
+              <p>Clase de bean de sesión (<code>CartBean</code>)</p>
             </li>
             <li>
-              <p>Remote business interface (<code>Cart</code>)</p>
+              <p>Interfaz de negocios remota (<code>Cart</code>)</p>
             </li>
           </ul>
         </div>
         <div class="paragraph">
           <p>
-            All session beans require a session bean class. All enterprise beans that permit remote access must have a remote business interface. To meet the needs of a specific application, an enterprise bean may also need some helper classes. The <code>CartBean</code> session bean uses two helper classes, <code>BookException</code> and <code>IdVerifier</code>, which are discussed in the section <a href="#BNBOJ">Clases de Utilidad</a>.
+            Todos los beans de sesión requieren una clase de bean de sesión. Todos los enterprise beans que 
+            permiten el acceso remoto deben tener una interfaz de negocios remota. Para satisfacer las 
+            necesidades de una aplicación específica, un enterprise bean también puede necesitar algunas 
+            clases auxiliares. El bean de sesión <code>CartBean</code> utiliza dos clases auxiliares, 
+            <code>BookException</code> e <code>IdVerifier</code>, que se analizan en la sección 
+            <a href="#BNBOJ">Clases de Utilidad</a>.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            The source code for this example is in the <code>_tut-install_/examples/ejb/cart/</code> directory.
+            El código fuente de este ejemplo se encuentra en el directorio 
+            <code>_tut-install_/examples/ejb/cart/</code>.
           </p>
         </div>
         <div class="sect2" id="BNBOE">
-          <h3 id="the-business-interface">La Interfaz Business</h3>
+          <h3 id="the-business-interface">La Interfaz de Negocio</h3>
           <div class="paragraph">
             <p>
-              The <code>Cart</code> business interface is a plain Java interface that defines all the business methods implemented in the bean class. If the bean class implements a single interface, that interface is assumed to the business interface. The business interface is a local interface unless it is annotated with the <code>javax.ejb.Remote</code> annotation; the <code>javax.ejb.Local</code> annotation is optional in this case.
+              La interfaz de negocio <code>Cart</code> es una interfaz simple de Java que define todos los 
+              métodos de negocios implementados en la clase bean. Si la clase de bean implementa una única 
+              interfaz, se supone que esa interfaz es la interfaz de negocio. La interfaz de negocio es una 
+              interfaz local a menos que esté anotada con la anotación <code>javax.ejb.Remote</code>; la 
+              anotación <code>javax.ejb.Local</code> es opcional en este caso.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              The bean class may implement more than one interface. In that case, the business interfaces must either be explicitly annotated <code>@Local</code> or <code>@Remote</code> or be specified by decorating the bean class with <code>@Local</code> or <code>@Remote</code>. However, the following interfaces are excluded when determining whether the bean class implements more than one interface:
+              La clase de bean puede implementar más de una interfaz. En ese caso, las interfaces de negocio 
+              deben anotarse explícitamente <code>@Local</code> o <code>@Remote</code> o especificarse 
+              decorando la clase de bean con <code>@Local</code> o <code>@Remoto</code>. Sin embargo, las 
+              siguientes interfaces se excluyen al determinar si la clase de bean implementa más de una 
+              interfaz:
             </p>
           </div>
           <div class="ulist">
@@ -93,16 +110,17 @@
                 <p><code>java.io.Externalizable</code></p>
               </li>
               <li>
-                <p>Any of the interfaces defined by the <code>javax.ejb</code> package</p>
+                <p>Cualquiera de las interfaces definidas por el paquete <code>javax.ejb</code></p>
               </li>
             </ul>
           </div>
           <div class="paragraph">
-            <p>The source code for the <code>Cart</code> business interface is as follows:</p>
+            <p>El código fuente de la interfaz de negocios <code>Cart</code> es el siguiente:</p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 package javaeetutorial.cart.ejb;
 import cart.util.BookException;
 import java.util.List;
@@ -116,7 +134,8 @@ public interface Cart {
     public List&lt;String&gt; getContents();
     public void remove();
 }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
         </div>
@@ -124,45 +143,50 @@ public interface Cart {
           <h3 id="session-bean-class">La Clase del Bean de Sesión</h3>
           <div class="paragraph">
             <p>
-              The session bean class for this example is called <code>CartBean</code>. Like any stateful session bean, the <code>CartBean</code> class must meet the following requirements.
+              La clase de bean de sesión para este ejemplo se llama <code>CartBean</code>. Como cualquier bean 
+              de sesión con estado, la clase <code>CartBean</code> debe cumplir los siguientes requisitos.
             </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
-                <p>The class is annotated <code>@Stateful</code>.</p>
+                <p>La clase se anota <code>@Stateful</code>.</p>
               </li>
               <li>
-                <p>The class implements the business methods defined in the business interface.</p>
+                <p>La clase implementa los métodos de negocio definidos en la interfaz de negocio.</p>
               </li>
             </ul>
           </div>
           <div class="paragraph">
-            <p>Stateful session beans may also do the following.</p>
+            <p>Los beans de sesión con estado también pueden hacer lo siguiente.</p>
           </div>
           <div class="ulist">
             <ul>
               <li>
                 <p>
-                  Implement the business interface, a plain Java interface. It is good practice to implement the bean's business interface.
+                  Implementar la interfaz de negocio, una interfaz simple de Java. Es una buena práctica 
+                  implementar la interfaz de negocio del bean.
                 </p>
               </li>
               <li>
                 <p>
-                  Implement any optional lifecycle callback methods, annotated <code>@PostConstruct</code>, <code>@PreDestroy</code>, <code>@PostActivate</code>, and <code>@PrePassivate</code>.
+                  Implementar cualquier método de devolución de llamada del ciclo de vida opcional, anotado 
+                  <code>@PostConstruct</code>, <code>@PreDestroy</code>, <code>@PostActivate</code> y 
+                  <code>@PrePassivate</code>.
                 </p>
               </li>
               <li>
-                <p>Implement any optional business methods annotated <code>@Remove</code>.</p>
+                <p>Implementar cualquier método de negocio opcional anotado <code>@Remove</code>.</p>
               </li>
             </ul>
           </div>
           <div class="paragraph">
-            <p>The source code for the <code>CartBean</code> class is as follows:</p>
+            <p>El código fuente de la clase <code>CartBean</code> es el siguiente:</p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 package javaeetutorial.cart.ejb;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -179,7 +203,7 @@ public class CartBean implements Cart {
     @Override
     public void initialize(String person) throws BookException {
         if (person == null) {
-            throw new BookException("Null person not allowed.");
+            throw new BookException("No se permite persona nula.");
         } else {
             customerName = person;
         }
@@ -190,7 +214,7 @@ public class CartBean implements Cart {
     public void initialize(String person, String id)
                  throws BookException {
         if (person == null) {
-            throw new BookException("Null person not allowed.");
+            throw new BookException("No se permite persona nula.");
         } else {
             customerName = person;
         }
@@ -198,7 +222,7 @@ public class CartBean implements Cart {
         if (idChecker.validate(id)) {
             customerId = id;
         } else {
-            throw new BookException("Invalid id: " + id);
+            throw new BookException("Identificación invalida: " + id);
         }
         contents = new ArrayList&lt;&gt;();
     }
@@ -210,7 +234,7 @@ public class CartBean implements Cart {
     public void removeBook(String title) throws BookException {
         boolean result = contents.remove(title);
         if (result == false) {
-            throw new BookException("\"" + title + " not in cart.");
+            throw new BookException("\"" + title + " no está en el carrito.");
         }
     }
     @Override
@@ -223,54 +247,76 @@ public class CartBean implements Cart {
         contents = null;
     }
 }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="sect3" id="BNBOG">
             <h4 id="lifecycle-callback-methods">Métodos de Retrollamada del Ciclo de Vida</h4>
             <div class="paragraph">
               <p>
-                A method in the bean class may be declared as a lifecycle callback method by annotating the method with the following annotations.
+                Un método en la clase de bean se puede declarar como un método de devolución de llamada del 
+                ciclo de vida anotando el método con las siguientes anotaciones.
               </p>
             </div>
             <div class="ulist">
               <ul>
                 <li>
                   <p>
-                    <code>javax.annotation.PostConstruct</code>: Methods annotated with <code>@PostConstruct</code> are invoked by the container on newly constructed bean instances after all dependency injection has completed and before the first business method is invoked on the enterprise bean.
+                    <code>javax.annotation.PostConstruct</code>: Los métodos anotados con 
+                    <code>@PostConstruct</code> son invocados por el contenedor en las instancias de bean 
+                    recién construidas después de que se haya completado la inyección de dependencia y antes 
+                    de que se invoque el primer método de negocio en el enterprise bean.
                   </p>
                 </li>
                 <li>
                   <p>
-                    <code>javax.annotation.PreDestroy</code>: Methods annotated with <code>@PreDestroy</code> are invoked after any method annotated <code>@Remove</code> has completed and before the container removes the enterprise bean instance.
+                    <code>javax.annotation.PreDestroy</code>: Los métodos anotados con 
+                    <code>@PreDestroy</code> se invocan después de que se haya completado cualquier método 
+                    anotado con <code>@Remove</code> y antes de que el contenedor elimine la instancia del 
+                    enterprise bean.
                   </p>
                 </li>
                 <li>
                   <p>
-                    <code>javax.ejb.PostActivate</code>: Methods annotated with <code>@PostActivate</code> are invoked by the container after the container moves the bean from secondary storage to active status.
+                    <code>javax.ejb.PostActivate</code>: El contenedor invoca los métodos anotados con 
+                    <code>@PostActivate</code> después de que el contenedor mueve el bean del almacenamiento 
+                    secundario al estado activo.
                   </p>
                 </li>
                 <li>
                   <p>
-                    <code>javax.ejb.PrePassivate</code>: Methods annotated with <code>@PrePassivate</code> are invoked by the container before it passivates the enterprise bean, meaning that the container temporarily removes the bean from the environment and saves it to secondary storage.
+                    <code>javax.ejb.PrePassivate</code>: El contenedor invoca los métodos anotados con 
+                    <code>@PrePassivate</code> antes de desactivar el enterprise bean, lo que significa que el 
+                    contenedor elimina temporalmente el bean del entorno y lo guarda en un almacenamiento 
+                    secundario.
                   </p>
                 </li>
               </ul>
             </div>
             <div class="paragraph">
-              <p>Lifecycle callback methods must return <code>void</code> and have no parameters.</p>
+              <p>
+                Los métodos de devolución de llamada del ciclo de vida deben devolver <code>void</code> y no 
+                tener parámetros.
+              </p>
             </div>
           </div>
           <div class="sect3" id="BNBOH">
-            <h4 id="business-methods">Métodos de Business</h4>
+            <h4 id="business-methods">Métodos de Negocio</h4>
             <div class="paragraph">
               <p>
-                The primary purpose of a session bean is to run business tasks for the client. The client invokes business methods on the object reference it gets from dependency injection or JNDI lookup. From the client's perspective, the business methods appear to run locally, although they run remotely in the session bean. The following code snippet shows how the <code>CartClient</code> program invokes the business methods:
+                El objetivo principal de un bean de sesión es ejecutar tareas de negocio para el cliente. El 
+                cliente invoca métodos de negocio en la referencia de objeto que obtiene de la inyección de 
+                dependencia o la búsqueda JNDI. Desde la perspectiva del cliente, los métodos de negocio 
+                parecen ejecutarse localmente, aunque se ejecutan de forma remota en el bean de sesión. El 
+                siguiente fragmento de código muestra cómo el programa <code>CartClient</code> invoca los 
+                métodos de negocio:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 cart.initialize("Duke DeEarl", "123");
 ...
 cart.addBook("Bel Canto");
@@ -278,17 +324,19 @@ cart.addBook("Bel Canto");
 List&lt;String&gt; bookList = cart.getContents();
 ...
 cart.removeBook("Gravity's Rainbow");
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
             <div class="paragraph">
               <p>
-                The <code>CartBean</code> class implements the business methods in the following code:
+                La clase <code>CartBean</code> implementa los métodos de negocio en el siguiente código:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Override
 public void addBook(String title) {
    contents.add(title);
@@ -297,7 +345,7 @@ public void addBook(String title) {
 public void removeBook(String title) throws BookException {
    boolean result = contents.remove(title);
    if (result == false) {
-      throw new BookException("\"" + title + "not in cart.");
+      throw new BookException("\"" + title + "no está en el carrito.");
    }
 }
 @Override
@@ -308,46 +356,58 @@ public List&lt;String&gt; getContents() {
               </div>
             </div>
             <div class="paragraph">
-              <p>The signature of a business method must conform to these rules.</p>
+              <p>La firma de un método de neogcio debe ajustarse a estas reglas.</p>
             </div>
             <div class="ulist">
               <ul>
                 <li>
                   <p>
-                    The method name must not begin with <code>ejb</code>, to avoid conflicts with callback methods defined by the EJB architecture. For example, you cannot call a business method <code>ejbCreate</code> or <code>ejbActivate</code>.
+                    El nombre del método no debe comenzar con <code>ejb</code>, para evitar conflictos con los 
+                    métodos de devolución de llamada definidos por la arquitectura EJB. Por ejemplo, no puede 
+                    llamar a un método de negocio <code>ejbCreate</code> o <code>ejbActivate</code>.
                   </p>
                 </li>
                 <li>
-                  <p>The access control modifier must be <code>public</code>.</p>
+                  <p>El modificador de control de acceso debe ser <code>public</code>.</p>
                 </li>
                 <li>
                   <p>
-                    If the bean allows remote access through a remote business interface, the arguments and return types must be legal types for the Java Remote Method Invocation (RMI) API.
+                    Si el bean permite el acceso remoto a través de una interfaz de negocio remota, los 
+                    argumentos y los tipos de devolución deben ser tipos legales para la API de invocación de 
+                    método remoto (RMI) de Java.
                   </p>
                 </li>
                 <li>
                   <p>
-                    If the bean is a JAX-WS web service endpoint, the arguments and return types for the methods annotated <code>@WebMethod</code> must be legal types for JAX-WS.
+                    Si el bean es un punto final de servicio web JAX-WS, los argumentos y los tipos de retorno 
+                    para los métodos anotados <code>@WebMethod</code> deben ser tipos legales para JAX-WS.
                   </p>
                 </li>
                 <li>
                   <p>
-                    If the bean is a JAX-RS resource, the arguments and return types for the resource methods must be legal types for JAX-RS.
+                    Si el bean es un recurso JAX-RS, los argumentos y los tipos de devolución para los métodos 
+                    de recurso deben ser tipos legales para JAX-RS.
                   </p>
                 </li>
                 <li>
-                  <p>The modifier must not be <code>static</code> or <code>final</code>.</p>
+                  <p>El modificador no debe ser <code>static</code> ni <code>final</code>.</p>
                 </li>
               </ul>
             </div>
             <div class="paragraph">
               <p>
-                The <code>throws</code> clause can include exceptions that you define for your application. The <code>removeBook</code> method, for example, throws a <code>BookException</code> if the book is not in the cart.
+                La cláusula <code>throws</code> puede incluir excepciones que defina para su aplicación. El 
+                método <code>removeBook</code>, por ejemplo, arroja una <code>BookException</code> si el libro 
+                no está en el carrito.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                To indicate a system-level problem, such as the inability to connect to a database, a business method should throw a <code>javax.ejb.EJBException</code>. The container will not wrap application exceptions, such as <code>BookException</code>. Because <code>EJBException</code> is a subclass of <code>RuntimeException</code>, you do not need to include it in the <code>throws</code> clause of the business method.
+                Para indicar un problema a nivel del sistema, como la imposibilidad de conectarse a una base 
+                de datos, un método de negocio debe generar una <code>javax.ejb.EJBException</code>. El 
+                contenedor no encapsulará las excepciones de la aplicación, como <code>BookException</code>. 
+                Debido a que <code>EJBException</code> es una subclase de <code>RuntimeException</code>, no 
+                necesita incluirla en la cláusula <code>throws</code> del método de negocio.
               </p>
             </div>
           </div>
@@ -356,21 +416,26 @@ public List&lt;String&gt; getContents() {
           <h3 id="the-remove-method">El Método @Remove</h3>
           <div class="paragraph">
             <p>
-              Business methods annotated with <code>javax.ejb.Remove</code> in the stateful session bean class can be invoked by enterprise bean clients to remove the bean instance. The container will remove the enterprise bean after a <code>@Remove</code> method completes, either normally or abnormally.
+              Los métodos de negocio anotados con <code>javax.ejb.Remove</code> en la clase de bean de sesión 
+              con estado pueden ser invocados por clientes de enterprise bean para eliminar la instancia de 
+              bean. El contenedor eliminará el enterprise bean después de que se complete un método 
+              <code>@Remove</code>, ya sea de manera normal o anormal.
             </p>
           </div>
           <div class="paragraph">
-            <p>In <code>CartBean</code>, the <code>remove</code> method is a <code>@Remove</code> method:</p>
+            <p>En <code>CartBean</code>, el método <code>remove</code> es un método <code>@Remove</code>:</p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Remove
 @Override
 public void remove() {
     contents = null;
 }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
         </div>
@@ -378,7 +443,14 @@ public void remove() {
           <h3 id="helper-classes">Clases de Utilidad</h3>
           <div class="paragraph">
             <p>
-              The <code>CartBean</code> session bean has two helper classes: <code>BookException</code> and <code>IdVerifier</code>. The <code>BookException</code> is thrown by the <code>removeBook</code> method, and the <code>IdVerifier</code> validates the <code>customerId</code> in one of the <code>create</code> methods. Helper classes may reside in an EJB JAR file that contains the enterprise bean class; a WAR file if the enterprise bean is packaged within a WAR; or an EAR file that contains an EJB JAR, a WAR file, or a separate library JAR file. In <code>cart</code>, the helper classes are included in a library JAR used by the application client and the EJB JAR.
+              El bean de sesión <code>CartBean</code> tiene dos clases auxiliares: <code>BookException</code> 
+              y <code>IdVerifier</code>. La <code>BookException</code> es lanzada por el método 
+              <code>removeBook</code>, y el <code>IdVerifier</code> valida el <code>customerId</code> en uno 
+              de los métodos <code>create</code>. Las clases auxiliares pueden residir en un archivo JAR EJB 
+              que contiene la clase de enterprise bean; un archivo WAR si el enterprise bean está empaquetado 
+              dentro de un archivo WAR; o un archivo EAR que contiene un EJB JAR, un archivo WAR o un archivo 
+              JAR de biblioteca independiente. En <code>cart</code>, las clases auxiliares se incluyen en un 
+              JAR de biblioteca utilizado por el cliente de la aplicación y el JAR de EJB.
             </p>
           </div>
         </div>
@@ -386,12 +458,16 @@ public void remove() {
           <h3 id="running-the-cart-example">Ejecutando el Ejemplo cart</h3>
           <div class="paragraph">
             <p>
-              Now you are ready to compile the remote interface (<code>Cart.java</code>), the enterprise bean class (<code>CartBean.java</code>), the client class (<code>CartClient.java</code>), and the helper classes (<code>BookException.java</code> and <code>IdVerifier.java</code>).
+              Ahora está listo para compilar la interfaz remota (<code>Cart.java</code>), la clase de 
+              enterprise bean (<code>CartBean.java</code>), la clase de cliente 
+              (<code>CartClient.java</code>), y las clases auxiliares (<code>BookException.java</code> y 
+              <code>IdVerifier.java</code>).
             </p>
           </div>
           <div class="paragraph">
             <p>
-              You can use either NetBeans IDE or Maven to build, package, deploy, and run the <code>cart</code> application.
+              Puede usar el EID NetBeans o Maven para compilar, empaquetar, implementar y ejecutar la 
+              aplicación <code>cart</code>.
             </p>
           </div>
           <div class="paragraph">
@@ -415,44 +491,50 @@ public void remove() {
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que el servidor GlassFish se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
-                  <p>From the File menu, choose Open Project.</p>
+                  <p>En el menú Archivo, elija Abrir proyecto.</p>
                 </li>
                 <li>
-                  <p>In the Open Project dialog box, navigate to:</p>
+                  <p>En el cuadro de diálogo Abrir proyecto, vaya a:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 tut-install/examples/ejb
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>Select the <code>cart</code> folder.</p>
+                  <p>Selecciona la carpeta <code>cart</code>.</p>
                 </li>
                 <li>
-                  <p>Select the Open Required Projects check box.</p>
+                  <p>Seleccione la casilla de verificación Abrir proyectos requeridos.</p>
                 </li>
                 <li>
-                  <p>Click Open Project.</p>
+                  <p>Haga clic en Abrir proyecto.</p>
                 </li>
                 <li>
                   <p>
-                    In the Projects tab, right-click the <code>cart</code> project and select Build.
+                    En la pestaña Proyectos, haga clic con el botón derecho en el proyecto <code>cart</code> 
+                    y seleccione Build.
                   </p>
                   <div class="paragraph">
                     <p>
-                      This builds and packages the application into <code>cart.ear</code>, located in <code>_tut-install_/examples/ejb/cart/cart-ear/target/</code>, and deploys this EAR file to your GlassFish Server instance.
+                      Esto crea y empaqueta la aplicación en <code>cart.ear</code>, ubicado en 
+                      <code>_tut-install_/examples/ejb/cart/cart-ear/target/</code>, y despliega este archivo 
+                      EAR para su instancia del servidor GlassFish.
                     </p>
                   </div>
                   <div class="paragraph">
                     <p>
-                      You will see the output of the <code>cart-app-client</code> application client in the Output tab:
+                      Verá la salida del cliente de la aplicación <code>cart-app-client</code> en la pestaña 
+                      Salida:
                     </p>
                   </div>
                   <div class="listingblock">
@@ -478,38 +560,44 @@ Caught a BookException: "Gravity's Rainbow" not in cart.
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que el servidor GlassFish se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
-                  <p>In a terminal window, go to:</p>
+                  <p>En una ventana de terminal, vaya a:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 tut-install/examples/ejb/cart/
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>Enter the following command:</p>
+                  <p>Introduzca el siguiente comando:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 mvn install
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                   <div class="paragraph">
                     <p>
-                      This command compiles and packages the application into an EAR file, <code>cart.ear</code>, located in the <code>target</code> directory, and deploys the EAR to your GlassFish Server instance.
+                      Este comando compila y empaqueta la aplicación en un archivo EAR, <code>cart.ear</code>, 
+                      ubicado en el directorio <code>target</code>, e implementa el EAR en su instancia del 
+                      servidor GlassFish.
                     </p>
                   </div>
                   <div class="paragraph">
                     <p>
-                      Then, the client stubs are retrieved and run. This is equivalent to running the following command:
+                      Luego, los stubs del cliente se recuperan y ejecutan. Esto es equivalente a ejecutar el 
+                      siguiente comando:
                     </p>
                   </div>
                   <div class="listingblock">
@@ -517,22 +605,28 @@ mvn install
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 appclient -client cart-ear/target/cart-earClient.jar
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                   <div class="paragraph">
                     <p>
-                      The client JAR, <code>cart-earClient.jar</code>, contains the application client class, the helper class <code>BookException</code>, and the <code>Cart</code> business interface.
+                      El JAR del cliente, <code>cart-earClient.jar</code>, contiene la clase de cliente de la 
+                      aplicación, la clase auxiliar <code>BookException</code> y la interfaz de negocio 
+                      <code>Cart</code>.
                     </p>
                   </div>
                   <div class="paragraph">
                     <p>
-                      When you run the client, the application client container injects any component references declared in the application client class, in this case the reference to the <code>Cart</code> enterprise bean.
+                      Cuando ejecuta el cliente, el contenedor del cliente de la aplicación inyecta cualquier 
+                      referencia de componente declarada en la clase del cliente de la aplicación, en este 
+                      caso, la referencia al enterprise bean <code>Cart</code>.
                     </p>
                   </div>
                   <div class="paragraph">
                     <p>
-                      You will see the output of the <code>cart-app-client</code> application client in the terminal window:
+                      Verá la salida del cliente de la aplicación <code>cart-app-client</code> en la ventana 
+                      del terminal:
                     </p>
                   </div>
                   <div class="listingblock">
@@ -545,7 +639,8 @@ Retrieving book title from cart: Bel Canto
 Retrieving book title from cart: Kafka on the Shore
 Removing "Gravity's Rainbow" from cart.
 Caught a BookException: "Gravity's Rainbow" not in cart.
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
