@@ -49,27 +49,34 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            The <code>roster</code> application maintains the team rosters for players in recreational sports leagues. The application has four components: Java Persistence API entities (<code>Player</code>, <code>Team</code>, and <code>League</code>), a stateful session bean (<code>RequestBean</code>), an application client (<code>RosterClient</code>), and three helper classes  (<code>PlayerDetails</code>, <code>TeamDetails</code>, and <code>LeagueDetails</code>).
+            La aplicación <code>roster</code> mantiene las listas de los jugadores de las ligas deportivas 
+            recreativas. La aplicación tiene cuatro componentes: entidades de la IPA de Persistencia de Java 
+            (<code>Player</code>, <code>Team</code> y <code>League</code>), un bean de sesión con estado 
+            (<code>RequestBean</code>), un cliente de aplicación (<code>RosterClient</code>) y tres clases 
+            auxiliares (<code>PlayerDetails</code>, <code>TeamDetails</code> y <code>LeagueDetails</code>).
           </p>
         </div>
         <div class="paragraph">
           <p>
-            Functionally, <code>roster</code> is similar to the <code>order</code> application, with three new features that <code>order</code> does not have: many-to-many relationships, entity inheritance, and automatic table creation at deployment time.
+            Funcionalmente, <code>roster</code> es similar a la aplicación <code>order</code>, con tres 
+            características nuevas que <code>order</code> no tiene: relaciones de muchos a muchos, herencia de 
+            entidades y creación automática de tablas en el momento de la implementación.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            The database schema in Apache Derby for the <code>roster</code> application is shown in <a href="#CHDCHJHG">Figure 41-2</a>.
+            El esquema de la base de datos en Apache Derby para la aplicación <code>roster</code> se muestra 
+            en la <a href="#CHDCHJHG">Figura 41-2</a>.
           </p>
         </div>
         <div id="CHDCHJHG" class="paragraph">
           <div class="title">
-            <strong>Figure 41-2 Database Schema for the roster Application</strong>
+            <strong>Figura 41-2 Esquema de base de datos para la aplicación roster</strong>
           </div>
           <p>
             <span class="image">
               <img src="img/javaeett_dt_025.png" 
-                   alt="Diagram showing the database schema for the roster application">
+                   alt="Diagrama que muestra el esquema de la base de datos para la aplicación roster">
             </span>
           </p>
         </div>
@@ -82,11 +89,12 @@
               <td class="tableblock halign-left valign-top">
                 <div>
                   <div class="paragraph">
-                    <p>Note:</p>
+                    <p>Nota:</p>
                   </div>
                   <div class="paragraph">
                     <p>
-                      In this diagram, for simplicity, the  <code>PERSISTENCE_ROSTER_</code> prefix is omitted from the table names.
+                     En este diagrama, por simplicidad, el prefijo <code>PERSISTENCE_ROSTER_</code> se omite 
+                     de los nombres de las tablas.
                     </p>
                   </div>
                 </div>
@@ -97,39 +105,40 @@
         <div class="sect2" id="GIQSO">
           <h3 id="relationships-in-the-roster-application">Relaciones en la Aplicación roster</h3>
           <div class="paragraph">
-            <p>A recreational sports system has the following relationships.</p>
+            <p>Un sistema deportivo recreativo tiene las siguientes relaciones.</p>
           </div>
           <div class="ulist">
             <ul>
               <li>
-                <p>A player can be on many teams.</p>
+                <p>Un jugador puede estar en muchos equipos.</p>
               </li>
               <li>
-                <p>A team can have many players.</p>
+                <p>Un equipo puede tener muchos jugadores.</p>
               </li>
               <li>
-                <p>A team is in exactly one league.</p>
+                <p>Un equipo está exactamente en una liga.</p>
               </li>
               <li>
-                <p>A league has many teams.</p>
+                <p>Una liga tiene muchos equipos.</p>
               </li>
             </ul>
           </div>
           <div class="paragraph">
             <p>
-              In <code>roster</code> this system is reflected by the following relationships between the <code>Player</code>, <code>Team</code>, and <code>League</code> entities.
+              En <code>roster</code>, este sistema se refleja en las siguientes relaciones entre las 
+              entidades <code>Player</code>, <code>Team</code> y <code>League</code>.
             </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
                 <p>
-                  There is a many-to-many relationship between <code>Player</code> and <code>Team</code>.
+                  Existe una relación de muchos a muchos entre <code>Player</code> y <code>Team</code>.
                 </p>
               </li>
               <li>
                 <p>
-                  There is a many-to-one relationship between <code>Team</code> and <code>League</code>.
+                  Existe una relación de muchos a uno entre <code>Team</code> y <code>League</code>.
                 </p>
               </li>
             </ul>
@@ -140,12 +149,15 @@
             </h4>
             <div class="paragraph">
               <p>
-                The many-to-many relationship between <code>Player</code> and <code>Team</code> is specified by using the <code>@ManyToMany</code> annotation. In <code>Team.java</code>, the <code>@ManyToMany</code> annotation decorates the <code>getPlayers</code> method:
+                La relación de muchos a muchos entre <code>Player</code> y <code>Team</code> se especifica 
+                usando la anotación <code>@ManyToMany</code>. En <code>Team.java</code>, la anotación 
+                <code>@ManyToMany</code> decora el método <code>getPlayers</code>:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @ManyToMany
 @JoinTable(
     name="PERSISTENCE_ROSTER_TEAM_PLAYER",
@@ -157,32 +169,46 @@
 public Collection&lt;Player&gt; getPlayers() {
     return players;
 }
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
             <div class="paragraph">
               <p>
-                The <code>@JoinTable</code> annotation is used to specify a database table that will associate player IDs with team IDs. The entity that specifies the <code>@JoinTable</code> is the owner of the relationship, so the <code>Team</code> entity is the owner of the relationship with the <code>Player</code> entity. Because <code>roster</code> uses automatic table creation at deployment time, the container will create a join table named <code>PERSISTENCE_ROSTER_TEAM_PLAYER</code>.
+                La anotación <code>@JoinTable</code> se usa para especificar una tabla de base de datos que 
+                asociará las ID de los jugadores con las ID de los equipos. La entidad que especifica 
+                <code>@JoinTable</code> es la propietaria de la relación, por lo que la entidad 
+                <code>Team</code> es la propietaria de la relación con la entidad <code>Player</code>. Debido 
+                a que <code>roster</code> utiliza la creación automática de tablas en el momento de la 
+                implementación, el contenedor creará una tabla de unión denominada 
+                <code>PERSISTENCE_ROSTER_TEAM_PLAYER</code>.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                <code>Player</code> is the inverse, or nonowning, side of the relationship with <code>Team</code>. As one-to-one and many-to-one relationships, the nonowning side is marked by the <code>mappedBy</code> element in the relationship annotation. Because the relationship between <code>Player</code> and <code>Team</code> is bidirectional, the choice of which entity is the owner of the relationship is arbitrary.
+                <code>Player</code> es el lado inverso, o no propietario, de la relación con el 
+                <code>Team</code>. Como relaciones de uno a uno y de muchos a uno, el lado no propietario está 
+                marcado por el elemento <code>mappedBy</code> en la anotación de la relación. Debido a que la 
+                relación entre <code>Player</code> y <code>Team</code> es bidireccional, la elección de qué 
+                entidad es la propietaria de la relación es arbitraria.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                In <code>Player.java</code>, the <code>@ManyToMany</code> annotation decorates the <code>getTeams</code> method:
+                En <code>Player.java</code>, la anotación <code>@ManyToMany</code> decora el método 
+                <code>getTeams</code>:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @ManyToMany(mappedBy="players")
 public Collection&lt;Team&gt; getTeams() {
     return teams;
 }
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
           </div>
@@ -193,35 +219,45 @@ public Collection&lt;Team&gt; getTeams() {
           </h3>
           <div class="paragraph">
             <p>
-              The <code>roster</code> application shows how to use entity inheritance, as described in <a href="persistence-intro003.html#BNBQN">Herencia de la Entidad</a>.
+              La aplicación <code>roster</code> muestra cómo usar la herencia de entidades, como se describe 
+              en <a href="persistence-intro003.html#BNBQN">Herencia de la Entidad</a>.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              The <code>League</code> entity in <code>roster</code> is an abstract entity with two concrete subclasses: <code>SummerLeague</code> and <code>WinterLeague</code>. Because <code>League</code> is an abstract class, it cannot be instantiated:
+              La entidad <code>League</code> en <code>roster</code> es una entidad abstracta con dos subclases 
+              concretas: <code>SummerLeague</code> y <code>WinterLeague</code>. Debido a que 
+              <code>League</code> es una clase abstracta, no se puede instanciar:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Entity
 @Table(name = "PERSISTENCE_ROSTER_LEAGUE")
 public abstract class League implements Serializable { ... }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              Instead, when creating a league, clients use <code>SummerLeague</code> or <code>WinterLeague</code>. <code>SummerLeague</code> and <code>WinterLeague</code> inherit the persistent properties defined in <code>League</code> and add only a constructor that verifies that the sport parameter matches the type of sport allowed in that seasonal league. For example, here is the <code>SummerLeague</code> entity:
+              En cambio, al crear una liga, los clientes usan <code>SummerLeague</code> o 
+              <code>WinterLeague</code>. <code>SummerLeague</code> y <code>WinterLeague</code> heredan las 
+              propiedades persistentes definidas en <code>League</code> y agregan solo un constructor que 
+              verifica que el parámetro de deporte coincida con el tipo de deporte permitido en ese liga de 
+              temporada. Por ejemplo, aquí está la entidad <code>SummerLeague</code>:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 ...
 @Entity
 public class SummerLeague extends League implements Serializable {
-    /** Creates a new instance of SummerLeague */
+    /** Crea una nueva instancia de SummerLeague */
     public SummerLeague() {
     }
     public SummerLeague(String id, String name, String sport)
@@ -234,7 +270,7 @@ public class SummerLeague extends League implements Serializable {
                 sport.equalsIgnoreCase("baseball")) {
             this.sport = sport;
         } else {
-            throw new IncorrectSportException("Sport is not a summer sport.");
+            throw new IncorrectSportException("El deporte no es un deporte de verano.");
         }
     }
 }
@@ -243,32 +279,47 @@ public class SummerLeague extends League implements Serializable {
           </div>
           <div class="paragraph">
             <p>
-              The <code>roster</code> application uses the default mapping strategy of <code>InheritanceType.SINGLE_TABLE</code>, so the <code>@Inheritance</code> annotation is not required. If you want to use a different mapping strategy, decorate <code>League</code> with <code>@Inheritance</code> and specify the mapping strategy in the <code>strategy</code> element:
+              La aplicación <code>roster</code> utiliza la estrategia de asignación predeterminada de 
+              <code>InheritanceType.SINGLE_TABLE</code>, por lo que no se requiere la anotación 
+              <code>@Inheritance</code>. Si desea utilizar una estrategia de mapeo diferente, decore 
+              <code>League</code> con <code>@Inheritance</code> y especifique la estrategia de mapeo en el 
+              elemento <code>strategy</code>:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Entity
 @Inheritance(strategy=JOINED)
 @Table(name="PERSISTENCE_ROSTER_LEAGUE")
 public abstract class League implements Serializable { ... }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              The <code>roster</code> application uses the default discriminator column name, so the <code>@DiscriminatorColumn</code> annotation is not required. Because you are using automatic table generation in <code>roster</code>, the Persistence provider will create a discriminator column called <code>DTYPE</code> in the <code>PERSISTENCE_ROSTER_LEAGUE</code> table, which will store the name of the inherited entity used to create the league. If you want to use a different name for the discriminator column, decorate <code>League</code> with <code>@DiscriminatorColumn</code> and set the <code>name</code> element:
+              La aplicación <code>roster</code> utiliza el nombre de columna discriminador predeterminado, por 
+              lo que no se requiere la anotación <code>@DiscriminatorColumn</code>. Debido a que está 
+              utilizando la generación automática de tablas en <code>roster</code>, el proveedor de 
+              persistencia creará una columna discriminadora denominada <code>DTYPE</code> en la tabla 
+              <code>PERSISTENCE_ROSTER_LEAGUE</code>, que almacenará la nombre de la entidad heredada 
+              utilizada para crear la liga. Si desea utilizar un nombre diferente para la columna 
+              discriminadora, decore <code>League</code> con <code>@DiscriminatorColumn</code> y configure el 
+              elemento <code>name</code>:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Entity
 @DiscriminatorColumn(name="DISCRIMINATOR")
 @Table(name="PERSISTENCE_ROSTER_LEAGUE")
 public abstract class League implements Serializable { ... }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
         </div>
@@ -278,7 +329,10 @@ public abstract class League implements Serializable { ... }
           </h3>
           <div class="paragraph">
             <p>
-              The <code>roster</code> application uses Criteria API queries, as opposed to the JPQL queries used in <code>order</code>. Criteria queries are Java programming language, typesafe queries defined in the business tier of <code>roster</code>, in the <code>RequestBean</code> stateful session bean.
+              La aplicación <code>roster</code> utiliza consultas de la IPA Criteria, a diferencia de las 
+              consultas JPQL utilizadas en <code>order</code>. Las consultas de criterios son consultas con 
+              seguridad de tipos del lenguaje de programación Java definidas en el nivel empresarial de 
+              <code>roster</code>, en el bean de sesión con estado <code>RequestBean</code>.
             </p>
           </div>
           <div class="paragraph">
@@ -309,17 +363,25 @@ public abstract class League implements Serializable { ... }
             </h4>
             <div class="paragraph">
               <p>
-                Metamodel classes model an entity's attributes and are used by Criteria queries to navigate to an entity's attributes. Each entity class in <code>roster</code> has a corresponding metamodel class, generated at compile time, with the same package name as the entity and appended with an underscore character (_). For example, the <code>roster.entity.Player</code> entity has a corresponding metamodel class, <code>roster.entity.Player_</code>.
+                Las clases de metamodelo modelan los atributos de una entidad y las consultas de criterios las 
+                utilizan para navegar a los atributos de una entidad. Cada clase de entidad en 
+                <code>roster</code> tiene una clase de metamodelo correspondiente, generada en tiempo de 
+                compilación, con el mismo nombre de paquete que la entidad y anexado con un carácter de 
+                subrayado (_). Por ejemplo, la entidad <code>roster.entity.Player</code> tiene una clase de 
+                metamodelo correspondiente, <code>roster.entity.Player_</code>.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                Each persistent field or property in the entity class has a corresponding attribute in the entity's metamodel class. For the <code>Player</code> entity, the corresponding metamodel class is as follows:
+                Cada campo o propiedad persistente en la clase de entidad tiene un atributo correspondiente en 
+                la clase de metamodelo de la entidad. Para la entidad <code>Player</code>, la clase de 
+                metamodelo correspondiente es la siguiente:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @StaticMetamodel(Player.class)
 public class Player_ {
     public static volatile SingularAttribute&lt;Player, String&gt; id;
@@ -328,7 +390,8 @@ public class Player_ {
     public static volatile SingularAttribute&lt;Player, Double&gt; salary;
     public static volatile CollectionAttribute&lt;Player, Team&gt; teams;
 }
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
           </div>
@@ -338,12 +401,16 @@ public class Player_ {
             </h4>
             <div class="paragraph">
               <p>
-                The <code>CriteriaBuilder</code> interface defines methods to create criteria query objects and create expressions for modifying those query objects. <code>RequestBean</code> creates an instance of <code>CriteriaBuilder</code> by using a <code>@PostConstruct</code> method, <code>init</code>:
+                La interfaz <code>CriteriaBuilder</code> define métodos para crear objetos de consulta de 
+                criterios y crea expresiones para modificar esos objetos de consulta. <code>RequestBean</code> 
+                crea una instancia de <code>CriteriaBuilder</code> usando un método 
+                <code>@PostConstruct</code>, <code>init</code>:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @PersistenceContext
 private EntityManager em;
 private CriteriaBuilder cb;
@@ -351,12 +418,18 @@ private CriteriaBuilder cb;
 private void init() {
     cb = em.getCriteriaBuilder();
 }
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
             <div class="paragraph">
               <p>
-                The <code>EntityManager</code> instance is injected at runtime, and then that <code>EntityManager</code> object is used to create the <code>CriteriaBuilder</code> instance by calling <code>getCriteriaBuilder</code>. The <code>CriteriaBuilder</code> instance is created in a <code>@PostConstruct</code> method to ensure that the <code>EntityManager</code> instance has been injected by the enterprise bean container.
+                La instancia de <code>EntityManager</code> se inyecta en tiempo de ejecución, y luego ese 
+                objeto <code>EntityManager</code> se usa para crear la instancia de 
+                <code>CriteriaBuilder</code> llamando a <code>getCriteriaBuilder</code>. La instancia de 
+                <code>CriteriaBuilder</code> se crea en un método <code>@PostConstruct</code> para garantizar 
+                que el contenedor de enterprise beans haya inyectado la instancia de 
+                <code>EntityManager</code>.
               </p>
             </div>
           </div>
@@ -366,12 +439,15 @@ private void init() {
             </h4>
             <div class="paragraph">
               <p>
-                Many of the business methods in <code>RequestBean</code> define Criteria queries. One business method, <code>getPlayersByPosition</code>, returns a list of players who play a particular position on a team:
+                Muchos de los métodos de negocio en <code>RequestBean</code> definen consultas de criterios. 
+                Un método de negocio, <code>getPlayersByPosition</code>, devuelve una lista de jugadores que 
+                juegan en una posición particular en un equipo:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 public List&lt;PlayerDetails&gt; getPlayersByPosition(String position) {
     logger.info("getPlayersByPosition");
     List&lt;Player&gt; players = null;
@@ -379,7 +455,7 @@ public List&lt;PlayerDetails&gt; getPlayersByPosition(String position) {
         CriteriaQuery&lt;Player&gt; cq = cb.createQuery(Player.class);
         if (cq != null) {
             Root&lt;Player&gt; player = cq.from(Player.class);
-            // set the where clause
+            // establecer la cláusula where
             cq.where(cb.equal(player.get(Player_.position), position));
             cq.select(player);
             TypedQuery&lt;Player&gt; q = em.createQuery(cq);
@@ -395,27 +471,46 @@ public List&lt;PlayerDetails&gt; getPlayersByPosition(String position) {
             </div>
             <div class="paragraph">
               <p>
-                A query object is created by calling the <code>CriteriaBuilder</code> object's <code>createQuery</code> method, with the type set to <code>Player</code> because the query will return a list of players.
+                Un objeto de consulta se crea llamando al método <code>createQuery</code> del objeto 
+                <code>CriteriaBuilder</code>, con el tipo establecido en <code>Player</code> porque la 
+                consulta devolverá una lista de jugadores.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                The query root, the base entity from which the query will navigate to find the entity's attributes and related entities, is created by calling the <code>from</code> method of the query object. This sets the <code>FROM</code> clause of the query.
+                La raíz de la consulta, la entidad base desde la que navegará la consulta para encontrar los 
+                atributos de la entidad y las entidades relacionadas, se crea llamando al método 
+                <code>from</code> del objeto de consulta. Esto establece la cláusula <code>FROM</code> de la 
+                consulta.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                The <code>WHERE</code> clause, set by calling the <code>where</code> method on the query object, restricts the results of the query according to the conditions of an expression. The <code>CriteriaBuilder.equal</code> method compares the two expressions. In <code>getPlayersByPosition</code>, the <code>position</code> attribute of the <code>Player_</code> metamodel class, accessed by calling the <code>get</code> method of the query root, is compared to the <code>position</code> parameter passed to <code>getPlayersByPosition</code>.
+                La cláusula <code>WHERE</code>, establecida llamando al método <code>where</code> en el objeto 
+                de consulta, restringe los resultados de la consulta según las condiciones de una expresión. 
+                El método <code>CriteriaBuilder.equal</code> compara las dos expresiones. En 
+                <code>getPlayersByPosition</code>, el atributo <code>position</code> de la clase de metamodelo 
+                <code>Player_</code>, al que se accede llamando al método <code>get</code> de la consulta 
+                raíz, se compara con el parámetro <code>position</code> pasado a 
+                <code>getPlayersByPosition</code>.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                The <code>SELECT</code> clause of the query is set by calling the <code>select</code> method of the query object. The query will return <code>Player</code> entities, so the query root object is passed as a parameter to <code>select</code>.
+                La cláusula <code>SELECT</code> de la consulta se establece llamando al método 
+                <code>select</code> del objeto de consulta. La consulta devolverá entidades 
+                <code>Player</code>, por lo que el objeto raíz de la consulta se pasa como parámetro a 
+                <code>select</code>.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                The query object is prepared for execution by calling <code>EntityManager.createQuery</code>, which returns a <code>TypedQuery&lt;T&gt;</code> object with the type of the query, in this case <code>Player</code>. This typed query object is used to execute the query, which occurs when the <code>getResultList</code> method is called, and a <code>List&lt;Player&gt;</code> collection is returned.
+                El objeto de consulta se prepara para su ejecución llamando a 
+                <code>EntityManager.createQuery</code>, que devuelve un objeto 
+                <code>TypedQuery&lt;T&gt;</code> con el tipo de consulta, en este caso 
+                <code>Player</code>. Este objeto de consulta escrito se usa para ejecutar la consulta, lo que 
+                ocurre cuando se llama al método <code>getResultList</code> y se devuelve una colección 
+                <code>List&lt;Player&gt;</code>.
               </p>
             </div>
           </div>
@@ -426,12 +521,16 @@ public List&lt;PlayerDetails&gt; getPlayersByPosition(String position) {
           </h3>
           <div class="paragraph">
             <p>
-              At deployment time, GlassFish Server will automatically drop and create the database tables used by <code>roster</code>. This is done by setting the <code>javax.persistence.schema-generation.database.action</code> property to <code>drop-and-create</code> in <code>persistence.xml</code>:
+              En el momento de la implementación, el servidor GlassFish eliminará y creará automáticamente las 
+              tablas de la base de datos utilizadas por <code>roster</code>. Esto se hace configurando la 
+              propiedad <code>javax.persistence.schema-generation.database.action</code> en 
+              <code>drop-and-create</code> en <code>persistence.xml</code>:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;persistence version="2.1"
     xmlns="http://xmlns.jcp.org/xml/ns/persistence"
@@ -446,7 +545,8 @@ public List&lt;PlayerDetails&gt; getPlayersByPosition(String position) {
     &lt;/properties&gt;
   &lt;/persistence-unit&gt;
 &lt;/persistence&gt;
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
         </div>
@@ -454,7 +554,8 @@ public List&lt;PlayerDetails&gt; getPlayersByPosition(String position) {
           <h3 id="running-the-roster-example">Ejecutando el Ejemplo roster</h3>
           <div class="paragraph">
             <p>
-              You can use either NetBeans IDE or Maven to build, package, deploy, and run the <code>roster</code> application.
+              Puede usar el EID NetBeans o Maven para compilar, empaquetar, implementar y ejecutar la 
+              aplicación <code>roster</code>.
             </p>
           </div>
           <div class="paragraph">
@@ -484,49 +585,54 @@ public List&lt;PlayerDetails&gt; getPlayersByPosition(String position) {
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que se haya iniciado el servidor GlassFish (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
                   <p>
-                    If the database server is not already running, start it by following the instructions in <a href="usingexamples004.html#BNADK">Arrancando y Parando Apache Derby</a>.
+                    Si el servidor de la base de datos aún no se está ejecutando, inícielo siguiendo las 
+                    instrucciones en 
+                    <a href="usingexamples004.html#BNADK">Arrancando y Parando Apache Derby</a>.
                   </p>
                 </li>
                 <li>
-                  <p>From the File menu, choose Open Project.</p>
+                  <p>En el menú Archivo, elija Abrir proyecto.</p>
                 </li>
                 <li>
-                  <p>In the Open Project dialog box, navigate to:</p>
+                  <p>En el cuadro de diálogo Abrir proyecto, vaya a:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 tut-install/examples/persistence
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>Select the <code>roster</code> folder.</p>
+                  <p>Seleccione la carpeta <code>roster</code>.</p>
                 </li>
                 <li>
-                  <p>Select the Open Required Projects check box.</p>
+                  <p>Seleccione la casilla de verificación Abrir proyectos requeridos.</p>
                 </li>
                 <li>
-                  <p>Click Open Project.</p>
+                  <p>Haga clic en Abrir proyecto.</p>
                 </li>
                 <li>
                   <p>
-                    In the Projects tab, right-click the <code>roster</code> project and select Build.
+                    En la pestaña Proyectos, haga clic con el botón derecho en el proyecto <code>roster</code> 
+                    y seleccione Build.
                   </p>
                   <div class="paragraph">
                     <p>
-                      This will compile, package, and deploy the EAR to GlassFish Server.
+                      Esto compilará, empaquetará e implementará el EAR en el servidor GlassFish.
                     </p>
                   </div>
                   <div class="paragraph">
                     <p>
-                      You will see the following partial output from the application client in the Output tab:
+                      Verá el siguiente resultado parcial del cliente de la aplicación en la pestaña Salida:
                     </p>
                   </div>
                   <div class="listingblock">
@@ -549,7 +655,8 @@ P5 Barney Bold defender 100.0
 P9 Jan Wesley defender 100.0
 P22 Janice Walker defender 857.0
 P25 Frank Fletcher defender 399.0
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
@@ -564,51 +671,62 @@ P25 Frank Fletcher defender 399.0
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que se haya iniciado el servidor GlassFish (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
                   <p>
-                    If the database server is not already running, start it by following the instructions in <a href="usingexamples004.html#BNADK">Arrancando y Parando Apache Derby</a>.
+                    Si el servidor de la base de datos aún no se está ejecutando, inícielo siguiendo las 
+                    instrucciones en 
+                    <a href="usingexamples004.html#BNADK">Arrancando y Parando Apache Derby</a>.
                   </p>
                 </li>
                 <li>
                   <p>
-                    In a terminal window, go to:
+                    En una ventana de terminal, vaya a:
                   </p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 tut-install/examples/persistence/roster/roster-ear/
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
                   <p>
-                    Enter the following command:
+                    Introduzca el siguiente comando:
                   </p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 mvn install
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                   <div class="paragraph">
                     <p>
-                      This compiles the source files and packages the application into an EAR file located at tut-install `/examples/persistence/roster/target/roster.ear`. The EAR file is then deployed to GlassFish Server. GlassFish Server will then drop and create the database tables during deployment, as specified in <code>persistence.xml</code>.
+                      Esto compila los archivos fuente y empaqueta la aplicación en un archivo EAR ubicado en 
+                      tut-install `/examples/persistence/roster/target/roster.ear`. Luego, el archivo EAR se 
+                      implementa en el servidor GlassFish. El servidor GlassFish eliminará y creará las 
+                      tablas de la base de datos durante la implementación, como se especifica en 
+                      <code>persistence.xml</code>.
                     </p>
                   </div>
                   <div class="paragraph">
                     <p>
-                      After successfully deploying the EAR, the client stubs are retrieved and the application client is run using the appclient application included with GlassFish Server.
+                      Después de implementar con éxito el EAR, se recuperan los apéndices del cliente y el 
+                      cliente de la aplicación se ejecuta utilizando la aplicación appclient incluida con el 
+                      servidor GlassFish.
                     </p>
                   </div>
                   <div class="paragraph">
-                    <p>You will see the output, which begins as follows:</p>
+                    <p>Verá la salida, que comienza de la siguiente manera:</p>
                   </div>
                   <div class="listingblock">
                     <div class="content">
@@ -631,7 +749,8 @@ mvn install
 [exec] P9 Jan Wesley defender 100.0
 [exec] P22 Janice Walker defender 857.0
 [exec] P25 Frank Fletcher defender 399.0
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>

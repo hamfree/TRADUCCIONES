@@ -49,7 +49,13 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            Entities are managed by the entity manager, which is represented by <code>javax.persistence.EntityManager</code> instances. Each <code>EntityManager</code> instance is associated with a persistence context: a set of managed entity instances that exist in a particular data store. A persistence context defines the scope under which particular entity instances are created, persisted, and removed. The <code>EntityManager</code> interface defines the methods that are used to interact with the persistence context.
+            Las entidades son administradas por el administrador de entidades (entity manager, en inglés), que 
+            está representado por instancias <code>javax.persistence.EntityManager</code>. Cada instancia de 
+            <code>EntityManager</code> está asociada con un contexto de persistencia: un conjunto de 
+            instancias de entidades administradas que existen en un almacén de datos en particular. Un 
+            contexto de persistencia define el alcance bajo el cual se crean, conservan y eliminan instancias 
+            de entidades particulares. La interfaz <code>EntityManager</code> define los métodos que se 
+            utilizan para interactuar con el contexto de persistencia.
           </p>
         </div>
         <div class="paragraph">
@@ -69,7 +75,9 @@
           <h3 id="the-entitymanager-interface">La Interfaz del EntityManager</h3>
           <div class="paragraph">
             <p>
-              The <code>EntityManager</code> API creates and removes persistent entity instances, finds entities by the entity's primary key, and allows queries to be run on entities.
+              La IPA de <code>EntityManager</code> crea y elimina instancias de entidades persistentes, 
+              encuentra entidades por la clave principal de la entidad y permite que se ejecuten consultas en 
+              entidades.
             </p>
           </div>
           <div class="paragraph">
@@ -106,25 +114,41 @@
             </h4>
             <div class="paragraph">
               <p>
-                With a container-managed entity manager, an <code>EntityManager</code> instance's persistence context is automatically propagated by the container to all application components that use the <code>EntityManager</code> instance within a single IPA de Java Transaction (JTA) transaction.
+                Con un administrador de entidades gestionado por contenedor, el contenedor propaga 
+                automáticamente el contexto de persistencia de una instancia de <code>EntityManager</code> a 
+                todos los componentes de la aplicación que usan la instancia de <code>EntityManager</code> 
+                dentro de una única transacción IPA de Java (transacción JTA).
               </p>
             </div>
             <div class="paragraph">
               <p>
-                JTA transactions usually involve calls across application components. To complete a JTA transaction, these components usually need access to a single persistence context. This occurs when an <code>EntityManager</code> is injected into the application components by means of the <code>javax.persistence.PersistenceContext</code> annotation. The persistence context is automatically propagated with the current JTA transaction, and <code>EntityManager</code> references that are mapped to the same persistence unit provide access to the persistence context within that transaction. By automatically propagating the persistence context, application components don't need to pass references to <code>EntityManager</code> instances to each other in order to make changes within a single transaction. The Java EE container manages the lifecycle of container-managed entity
+                Las transacciones JTA generalmente involucran llamadas a través de los componentes de la 
+                aplicación. Para completar una transacción JTA, estos componentes generalmente necesitan 
+                acceso a un solo contexto de persistencia. Esto ocurre cuando se inyecta un 
+                <code>EntityManager</code> en los componentes de la aplicación mediante la anotación 
+                <code>javax.persistence.PersistenceContext</code>. El contexto de persistencia se propaga 
+                automáticamente con la transacción JTA actual y las referencias <code>EntityManager</code> que 
+                se asignan a la misma unidad de persistencia brindan acceso al contexto de persistencia dentro 
+                de esa transacción. Al propagar automáticamente el contexto de persistencia, los componentes 
+                de la aplicación no necesitan pasar referencias a instancias de <code>EntityManager</code> 
+                entre sí para realizar cambios en una sola transacción. El contenedor Java EE gestiona el 
+                ciclo de vida de los administradores de entidades gestionadas por contenedores.
                 managers.</p>
             </div>
             <div class="paragraph">
               <p>
-                To obtain an <code>EntityManager</code> instance, inject the entity manager into the application component:
+                Para obtener una instancia de <code>EntityManager</code>, inyecte el administrador de 
+                entidades en el componente de la aplicación:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @PersistenceContext
 EntityManager em;
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
           </div>
@@ -134,70 +158,101 @@ EntityManager em;
             </h4>
             <div class="paragraph">
               <p>
-                With an application-managed entity manager, on the other hand, the persistence context is not propagated to application components, and the lifecycle of <code>EntityManager</code> instances is managed by the application.
+                Con un administrador de entidades gestionado por la aplicación, por otro lado, el contexto de 
+                persistencia no se propaga a los componentes de la aplicación, y la aplicación administra el 
+                ciclo de vida de las instancias de <code>EntityManager</code>.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                Application-managed entity managers are used when applications need to access a persistence context that is not propagated with the JTA transaction across <code>EntityManager</code> instances in a particular persistence unit. In this case, each <code>EntityManager</code> creates a new, isolated persistence context. The <code>EntityManager</code> and its associated persistence context are created and destroyed explicitly by the application. They are also used when directly injecting <code>EntityManager</code> instances can't be done because <code>EntityManager</code> instances are not thread-safe. <code>EntityManagerFactory</code> instances are thread-safe.
+                Los administradores de entidades gestionados por aplicaciones se utilizan cuando las 
+                aplicaciones necesitan acceder a un contexto de persistencia que no se propaga con la 
+                transacción JTA a través de instancias de <code>EntityManager</code> en una unidad de 
+                persistencia particular. En este caso, cada <code>EntityManager</code> crea un nuevo contexto 
+                de persistencia aislado. La aplicación crea y destruye explícitamente 
+                <code>EntityManager</code> y su contexto de persistencia asociado. También se usan cuando no 
+                se pueden inyectar instancias de <code>EntityManager</code> directamente porque las instancias 
+                de <code>EntityManager</code> no son seguras para subprocesos. Las instancias de 
+                <code>EntityManagerFactory</code> son seguras para subprocesos.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                Applications create <code>EntityManager</code> instances in this case by using the <code>createEntityManager</code> method of <code>javax.persistence.EntityManagerFactory</code>.
+                Las aplicaciones crean instancias de <code>EntityManager</code> en este caso utilizando el 
+                método <code>createEntityManager</code> de 
+                <code>javax.persistence.EntityManagerFactory</code>.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                To obtain an <code>EntityManager</code> instance, you first must obtain an <code>EntityManagerFactory</code> instance by injecting it into the application component by means of the <code>javax.persistence.PersistenceUnit</code> annotation:
+                Para obtener una instancia de <code>EntityManager</code>, primero debe obtener una instancia 
+                de <code>EntityManagerFactory</code> inyectándola en el componente de la aplicación por medio 
+                de la anotación <code>javax.persistence.PersistenceUnit</code>:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @PersistenceUnit
 EntityManagerFactory emf;
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
             <div class="paragraph">
               <p>
-                Then obtain an <code>EntityManager</code> from the <code>EntityManagerFactory</code> instance:
+                Luego obtenga un <code>EntityManager</code> de la instancia <code>EntityManagerFactory</code>:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 EntityManager em = emf.createEntityManager();
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
             <div class="paragraph">
               <p>
-                Application-managed entity managers don't automatically propagate the JTA transaction context. Such applications need to manually gain access to the JTA transaction manager and add transaction demarcation information when performing entity operations. The <code>javax.transaction.UserTransaction</code> interface defines methods to begin, commit, and roll back transactions. Inject an instance of <code>UserTransaction</code> by creating an instance variable annotated with <code>@Resource</code>:
+                Los administradores de entidades gestionados por aplicaciones no propagan automáticamente el 
+                contexto de transacciones JTA. Dichas aplicaciones deben obtener acceso manualmente al 
+                administrador de transacciones JTA y agregar información de demarcación de transacciones al 
+                realizar operaciones de entidad. La interfaz <code>javax.transaction.UserTransaction</code> 
+                define métodos para iniciar, confirmar y revertir transacciones. Inyecte una instancia de 
+                <code>UserTransaction</code> creando una variable de instancia anotada con 
+                <code>@Resource</code>:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Resource
 UserTransaction utx;
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
             <div class="paragraph">
               <p>
-                To begin a transaction, call the <code>UserTransaction.begin</code> method. When all the entity operations are complete, call the <code>UserTransaction.commit</code> method to commit the transaction. The <code>UserTransaction.rollback</code> method is used to roll back the current transaction.
+                Para comenzar una transacción, llame al método <code>UserTransaction.begin</code>. Cuando 
+                todas las operaciones de la entidad estén completas, llame al método 
+                <code>UserTransaction.commit</code> para confirmar la transacción. El método 
+                <code>UserTransaction.rollback</code> se utiliza para revertir la transacción actual.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                The following example shows how to manage transactions in an application that uses an application-managed entity manager:
+                El siguiente ejemplo muestra cómo administrar transacciones en una aplicación que utiliza un 
+                administrador de entidades gestionado por la aplicación:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @PersistenceUnit
 EntityManagerFactory emf;
 EntityManager em;
@@ -214,7 +269,8 @@ try {
 } catch (Exception e) {
     utx.rollback();
 }
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
           </div>
@@ -222,12 +278,14 @@ try {
             <h4 id="finding-entities-using-the-entitymanager">Buscar Entidades Usando el EntityManager</h4>
             <div class="paragraph">
               <p>
-                The <code>EntityManager.find</code> method is used to look up entities in the data store by the entity's primary key:
+                El método <code>EntityManager.find</code> se usa para buscar entidades en el almacén de datos 
+                por la clave principal de la entidad:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @PersistenceContext
 EntityManager em;
 public void enterOrder(int custID, CustomerOrder newOrder) {
@@ -235,7 +293,8 @@ public void enterOrder(int custID, CustomerOrder newOrder) {
     cust.getOrders().add(newOrder);
     newOrder.setCustomer(cust);
 }
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
           </div>
@@ -245,29 +304,35 @@ public void enterOrder(int custID, CustomerOrder newOrder) {
             </h4>
             <div class="paragraph">
               <p>
-                You manage entity instances by invoking operations on the entity by means of an <code>EntityManager</code> instance. Entity instances are in one of four states: new, managed, detached, or removed.
+                Las instancias de entidad se administran invocando operaciones en la entidad por medio de una 
+                instancia de <code>EntityManager</code>. Las instancias de entidad se encuentran en uno de 
+                cuatro estados: nuevo, administrado, desconectado o eliminado.
               </p>
             </div>
             <div class="ulist">
               <ul>
                 <li>
                   <p>
-                    New entity instances have no persistent identity and are not yet associated with a persistence context.
+                    Las nuevas instancias de entidad no tienen identidad persistente y aún no están asociadas 
+                    con un contexto de persistencia.
                   </p>
                 </li>
                 <li>
                   <p>
-                    Managed entity instances have a persistent identity and are associated with a persistence context.
+                    Las instancias de entidad administrada tienen una identidad persistente y están asociadas 
+                    con un contexto de persistencia.
                   </p>
                 </li>
                 <li>
                   <p>
-                    Detached entity instances have a persistent identity and are not currently associated with a persistence context.
+                    Las instancias de entidades separadas tienen una identidad persistente y actualmente no 
+                    están asociadas con un contexto de persistencia.
                   </p>
                 </li>
                 <li>
                   <p>
-                    Removed entity instances have a persistent identity, are associated with a persistent context, and are scheduled for removal from the data store.
+                    Las instancias de entidad eliminadas tienen una identidad persistente, están asociadas con 
+                    un contexto persistente y están programadas para su eliminación del almacén de datos.
                   </p>
                 </li>
               </ul>
@@ -277,12 +342,25 @@ public void enterOrder(int custID, CustomerOrder newOrder) {
             <h4 id="persisting-entity-instances">Persistir Instancias de Entidad</h4>
             <div class="paragraph">
               <p>
-                New entity instances become managed and persistent either by invoking the <code>persist</code> method or by a cascading <code>persist</code> operation invoked from related entities that have the <code>cascade=PERSIST</code> or <code>cascade=ALL</code> elements set in the relationship annotation. This means that the entity's data is stored to the database when the transaction associated with the <code>persist</code> operation is completed. If the entity is already managed, the <code>persist</code> operation is ignored, although the <code>persist</code> operation will cascade to related entities that have the <code>cascade</code> element set to <code>PERSIST</code> or <code>ALL</code> in the relationship annotation. If <code>persist</code> is called on a removed entity instance, the entity becomes managed. If the entity is detached, either <code>persist</code> will throw an <code>IllegalArgumentException</code>, or the transaction commit will fail. The following method performs a <code>persist</code> operation:
+                Las nuevas instancias de entidad se vuelven administradas y persistentes al invocar el método 
+                <code>persist</code> o mediante una operación <code>persist</code> en cascada invocada desde 
+                entidades relacionadas que tienen elementos establecidos con <code>cascade=PERSIST</code> o 
+                <code>cascade=ALL</code> en la anotación de relación. Esto significa que los datos de la 
+                entidad se almacenan en la base de datos cuando se completa la transacción asociada con la 
+                operación <code>persist</code>. Si la entidad ya está administrada, la operación 
+                <code>persist</code> se ignora, aunque la operación <code>persist</code> se conectará en 
+                cascada a las entidades relacionadas que tengan el elemento <code>cascade</code> establecido 
+                en <code>PERSIST</code> o <code>ALL</code> en la anotación de relación. Si se llama a 
+                <code>persist</code> en una instancia de entidad eliminada, la entidad pasa a ser 
+                administrada. Si la entidad está separada, <code>persist</code> arrojará una 
+                <code>IllegalArgumentException</code>, o la confirmación de la transacción fallará. El 
+                siguiente método realiza una operación <code>persist</code>:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @PersistenceContext
 EntityManager em;
 ...
@@ -293,22 +371,27 @@ public LineItem createLineItem(CustomerOrder order, Product product,
     em.persist(li);
     return li;
 }
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
             <div class="paragraph">
               <p>
-                The <code>persist</code> operation is propagated to all entities related to the calling entity that have the <code>cascade</code> element set to <code>ALL</code> or <code>PERSIST</code> in the relationship annotation:
+                La operación <code>persist</code> se propaga a todas las entidades relacionadas con la 
+                entidad que llama que tienen el elemento <code>cascade</code> establecido en 
+                <code>ALL</code> o <code>PERSIST</code > en la anotación de relación:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @OneToMany(cascade=ALL, mappedBy="order")
 public Collection&lt;LineItem&gt; getLineItems() {
     return lineItems;
 }
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
           </div>
@@ -316,23 +399,38 @@ public Collection&lt;LineItem&gt; getLineItems() {
             <h4 id="removing-entity-instances">Eliminar Instancias de Entidad</h4>
             <div class="paragraph">
               <p>
-                Managed entity instances are removed by invoking the <code>remove</code> method or by a cascading <code>remove</code> operation invoked from related entities that have the <code>cascade=REMOVE</code> or <code>cascade=ALL</code> elements set in the relationship annotation. If the <code>remove</code> method is invoked on a new entity, the <code>remove</code> operation is ignored, although <code>remove</code> will cascade to related entities that have the <code>cascade</code> element set to <code>REMOVE</code> or <code>ALL</code> in the relationship annotation. If <code>remove</code> is invoked on a detached entity, either <code>remove</code> will throw an <code>IllegalArgumentException</code>, or the transaction commit will fail. If invoked on an already removed entity, <code>remove</code> will be ignored. The entity's data will be removed from the data store when the transaction is completed or as a result of the <code>flush</code> operation.
+                Las instancias de entidades administradas se eliminan invocando el método <code>remove</code> 
+                o mediante una operación <code>remove</code> en cascada invocada desde entidades relacionadas 
+                que tienen elementos establecidos con el método <code>cascade=REMOVE</code> o 
+                <code>cascade=ALL</code> en la anotación de relación. Si se invoca el método 
+                <code>remove</code> en una nueva entidad, la operación <code>remove</code> se ignora, aunque 
+                <code>remove</code> se conectará en cascada a las entidades relacionadas que tienen el 
+                elemento<code>cascade</code> establecido en <code>REMOVE</code> o <code>ALL</code> en la 
+                anotación de relación. Si se invoca <code>remove</code> en una entidad separada, 
+                <code>remove</code> lanzará una <code>IllegalArgumentException</code>, o la confirmación de la 
+                transacción fallará. Si se invoca en una entidad ya eliminada, se ignorará 
+                <code>remove</code>. Los datos de la entidad se eliminarán del almacén de datos cuando se 
+                complete la transacción o como resultado de la operación <code>flush</code>.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                In the following example, all <code>LineItem</code> entities associated with the order are also removed, as <code>CustomerOrder.getLineItems</code> has <code>cascade=ALL</code> set in the relationship annotation:
+                En el siguiente ejemplo, todas las entidades <code>LineItem</code> asociadas con el pedido 
+                también se eliminan, ya que <code>CustomerOrder.getLineItems</code> tiene 
+                <code>cascade=ALL</code> establecido en la anotación de relación:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 public void removeOrder(Integer orderId) {
     try {
         CustomerOrder order = em.find(CustomerOrder.class, orderId);
         em.remove(order);
     }...
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
           </div>
@@ -342,17 +440,26 @@ public void removeOrder(Integer orderId) {
             </h4>
             <div class="paragraph">
               <p>
-                The state of persistent entities is synchronized to the database when the transaction with which the entity is associated commits. If a managed entity is in a bidirectional relationship with another managed entity, the data will be persisted, based on the owning side of the relationship.
+                El estado de las entidades persistentes se sincroniza con la base de datos cuando se confirma 
+                la transacción a la que está asociada la entidad. Si una entidad gestionada tiene una relación 
+                bidireccional con otra entidad gestionada, los datos persistirán, en función del lado 
+                propietario de la relación.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                To force synchronization of the managed entity to the data store, invoke the <code>flush</code> method of the <code>EntityManager</code> instance. If the entity is related to another entity and the relationship annotation has the <code>cascade</code> element set to <code>PERSIST</code> or <code>ALL</code>, the related entity's data will be synchronized with the data store when <code>flush</code> is called.
+                Para forzar la sincronización de la entidad administrada con el almacén de datos, invoque el 
+                método <code>flush</code> de la instancia <code>EntityManager</code>. Si la entidad está 
+                relacionada con otra entidad y la anotación de la relación tiene el elemento 
+                <code>cascade</code> establecido en <code>PERSIST</code> o <code>ALL</code>, los datos de la 
+                entidad relacionada se sincronizarán con el almacén de datos cuando se llama a 
+                <code>flush</code>.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                If the entity is removed, calling <code>flush</code> will remove the entity data from the data store.
+                Si se elimina la entidad, llamar a <code>flush</code> eliminará los datos de la entidad del 
+                almacén de datos.
               </p>
             </div>
           </div>
@@ -361,22 +468,27 @@ public void removeOrder(Integer orderId) {
           <h3 id="persistence-units">Unidades de Persistencia</h3>
           <div class="paragraph">
             <p>
-              A persistence unit defines a set of all entity classes that are managed by <code>EntityManager</code> instances in an application. This set of entity classes represents the data contained within a single data store.
+              Una unidad de persistencia define un conjunto de todas las clases de entidad que son 
+              administradas por instancias de <code>EntityManager</code> en una aplicación. Este conjunto de 
+              clases de entidad representa los datos contenidos en un único almacén de datos.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              Persistence units are defined by the <code>persistence.xml</code> configuration file. The following is an example <code>persistence.xml</code> file:
+              Las unidades de persistencia están definidas por el archivo de configuración 
+              <code>persistence.xml</code>. El siguiente es un ejemplo de archivo 
+              <code>persistence.xml</code>:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn"
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn"
 >&lt;persistence&gt;
     &lt;persistence-unit name="OrderManagement"&gt;
-        &lt;description&gt;This unit manages orders and customers.
-            It does not rely on any vendor-specific features and can
-            therefore be deployed to any persistence provider.
+        &lt;description&gt;Esta unidad gestiona pedidos y clientes.
+            No se basa en ninguna característica específica del proveedor y 
+            por lo tanto, se implementará en cualquier proveedor de persistencia.
         &lt;/description&gt;
         &lt;jta-data-source&gt;jdbc/MyOrderDB&lt;/jta-data-source&gt;
         &lt;jar-file&gt;MyOrderApp.jar&lt;/jar-file&gt;
@@ -384,52 +496,71 @@ public void removeOrder(Integer orderId) {
         &lt;class&gt;com.widgets.Customer&lt;/class&gt;
     &lt;/persistence-unit&gt;
 &lt;/persistence&gt;
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              This file defines a persistence unit named <code>OrderManagement</code>, which uses a JTA-aware data source, <code>jdbc/MyOrderDB</code>. The <code>jar-file</code> and <code>class</code> elements specify managed persistence classes: entity classes, embeddable classes, and mapped superclasses. The <code>jar-file</code> element specifies JAR files that are visible to the packaged persistence unit that contain managed persistence classes, whereas the <code>class</code> element explicitly names managed persistence classes.
+              Este archivo define una unidad de persistencia denominada <code>OrderManagement</code>, que 
+              utiliza una fuente de datos compatible con JTA, <code>jdbc/MyOrderDB</code>. Los elementos 
+              <code>jar-file</code> y <code>class</code> especifican clases de persistencia administrada: 
+              clases de entidad, clases integrables y superclases asignadas. El elemento 
+              <code>jar-file</code> especifica los archivos JAR que son visibles para la unidad de 
+              persistencia empaquetada que contienen clases de persistencia administradas, mientras que el 
+              elemento <code>class</code> nombra explícitamente las clases de persistencia administradas.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              The <code>jta-data-source</code> (for JTA-aware data sources) and <code>non-jta-data-source</code> (for non-JTA-aware data sources) elements specify the global JNDI name of the data source to be used by the container.
+              Los elementos <code>jta-data-source</code> (para fuentes de datos compatibles con JTA) y 
+              <code>non-jta-data-source</code> (para fuentes de datos no compatibles con JTA) especifican el 
+              valor global Nombre JNDI del origen de datos que utilizará el contenedor.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              The JAR file or directory whose <code>META-INF</code> directory contains <code>persistence.xml</code> is called the root of the persistence unit. The scope of the persistence unit is determined by the persistence unit's root. Each persistence unit must be identified with a name that is unique to the persistence unit's scope.
+              El archivo o directorio JAR cuyo directorio <code>META-INF</code> contiene 
+              <code>persistence.xml</code> se denomina raíz de la unidad de persistencia. El ámbito de la 
+              unidad de persistencia está determinado por la raíz de la unidad de persistencia. Cada unidad de 
+              persistencia debe identificarse con un nombre que sea único para el ámbito de la unidad de 
+              persistencia.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              Persistent units can be packaged as part of a WAR or EJB JAR file or can be packaged as a JAR file that can then be included in an WAR or EAR file.
+              Las unidades persistentes se pueden empaquetar como parte de un archivo WAR o EJB JAR o se 
+              pueden empaquetar como un archivo JAR que luego se puede incluir en un archivo WAR o EAR.
             </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
                 <p>
-                  If you package the persistent unit as a set of classes in an EJB JAR file, <code>persistence.xml</code> should be put in the EJB JAR's <code>META-INF</code> directory.
+                  Si empaqueta la unidad persistente como un conjunto de clases en un archivo EJB JAR, 
+                  <code>persistence.xml</code> debe colocarse en el directorio <code>META-INF</code> de 
+                  EJB JAR.
                 </p>
               </li>
               <li>
                 <p>
-                  If you package the persistence unit as a set of classes in a WAR file, <code>persistence.xml</code> should be located in the WAR file's <code>WEB-INF/classes/META-INF</code> directory.
+                  Si empaqueta la unidad de persistencia como un conjunto de clases en un archivo WAR, 
+                  <code>persistence.xml</code> debe ubicarse en el directorio 
+                  <code>WEB-INF/classes/META-INF</code> del archivo WAR.
                 </p>
               </li>
               <li>
                 <p>
-                  If you package the persistence unit in a JAR file that will be included in a WAR or EAR file, the JAR file should be located in either
+                  Si empaqueta la unidad de persistencia en un archivo JAR que se incluirá en un archivo WAR o 
+                  EAR, el archivo JAR debe ubicarse en 
                 </p>
                 <div class="ulist">
                   <ul>
                     <li>
-                      <p>The <code>WEB-INF/lib</code> directory of a WAR</p>
+                      <p>El directorio <code>WEB-INF/lib</code> de un WAR</p>
                     </li>
                     <li>
-                      <p>Or the EAR file's library directory</p>
+                      <p>O el directorio de la biblioteca del archivo EAR</p>
                       <table class="tableblock frame-all grid-all spread">
                         <colgroup>
                           <col style="width: 100%;">
@@ -439,11 +570,15 @@ public void removeOrder(Integer orderId) {
                             <td class="tableblock halign-left valign-top">
                               <div>
                                 <div class="paragraph">
-                                  <p><strong>Note</strong>:</p>
+                                  <p><strong>Nota</strong>:</p>
                                 </div>
                                 <div class="paragraph">
                                   <p>
-                                    In the IPA de Java Persistence 1.0, JAR files could be located at the root of an EAR file as the root of the persistence unit. This is no longer supported. Portable applications should use the EAR file's library directory as the root of the persistence unit.
+                                    En la IPA de la Persistencia de Java 1.0, los archivos JAR podían 
+                                    ubicarse en la raíz de un archivo EAR como la raíz de la unidad de 
+                                    persistencia. Esto ya no es compatible. Las aplicaciones portátiles deben 
+                                    usar el directorio de la biblioteca del archivo EAR como la raíz de la 
+                                    unidad de persistencia.
                                   </p>
                                 </div>
                               </div>
