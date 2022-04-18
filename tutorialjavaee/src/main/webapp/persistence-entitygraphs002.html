@@ -49,34 +49,46 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            You can create entity graphs statically by using annotations or a deployment descriptor, or dynamically by using standard interfaces.
+            Puede crear grafos de entidades de forma estática mediante el uso de anotaciones o un descriptor 
+            de implementación, o de forma dinámica mediante el uso de interfaces estándar.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            You can use an entity graph with the <code>EntityManager.find</code> method or as part of a JPQL or Criteria API query by specifying the entity graph as a hint to the operation or query.
+            Puede usar un grafo de entidad con el método <code>EntityManager.find</code> o como parte de una 
+            consulta de las IPA de JPQL o Criteria especificando el grafo de entidad como una sugerencia para 
+            la operación o consulta.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            Entity graphs have attributes that correspond to the fields that will be eagerly fetched during a <code>find</code> or query operation. The primary key and version fields of the entity class are always fetched and do not need to be explicitly added to an entity graph.
+            Los grafos de entidad tienen atributos que corresponden a los campos que se buscarán 
+            anticipadamente durante una operación <code>find</code> o de consulta. Los campos de clave 
+            principal y versión de la clase de entidad siempre se recuperan y no es necesario agregarlos 
+            explícitamente a un grafo de entidad.
           </p>
         </div>
         <div class="sect2" id="sthref184">
           <h3 id="the-default-entity-graph">El Grafo De Entidad Predeterminado</h3>
           <div class="paragraph">
             <p>
-              By default, all fields in an entity are fetched lazily unless the <code>fetch</code> attribute of the entity metadata is set to <code>javax.persistence.FetchType.EAGER</code>. The default entity graph consists of all the fields of an entity whose fields are set to be eagerly fetched.
+              De forma predeterminada, todos los campos de una entidad se obtienen de forma diferida, a menos 
+              que el atributo <code>fetch</code> de los metadatos de la entidad esté configurado en 
+              <code>javax.persistence.FetchType.EAGER</code>. El grafo de entidad predeterminado consta de 
+              todos los campos de una entidad cuyos campos están configurados para ser buscados con 
+              anticipación.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              For example, the following <code>EmailMessage</code> entity specifies that some fields will be fetched eagerly:
+              Por ejemplo, la siguiente entidad <code>EmailMessage</code> especifica que algunos campos se 
+              buscarán con anticipación:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Entity
 public class EmailMessage implements Serializable {
     @Id
@@ -90,12 +102,15 @@ public class EmailMessage implements Serializable {
     Set&lt;EmailAttachment&gt; attachments;
     ...
 }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              The default entity graph for this entity would contain the <code>messageId</code>, <code>subject</code>, and <code>sender</code> fields, but not the <code>body</code> or <code>attachments</code> fields.
+              El grafo de entidad predeterminado para esta entidad contendría los campos 
+              <code>messageId</code>, <code>subject</code> y <code>sender</code>, pero no los campos 
+              <code>body</code> o <code>attachments</code>.
             </p>
           </div>
         </div>
@@ -105,16 +120,25 @@ public class EmailMessage implements Serializable {
           </h3>
           <div class="paragraph">
             <p>
-              Entity graphs are used by creating an instance of the <code>javax.persistence.EntityGraph</code> interface by calling either <code>EntityManager.getEntityGraph</code> for named entity graphs or <code>EntityManager.createEntityGraph</code> for creating dynamic entity graphs.
+              Los grafos de entidades se utilizan creando una instancia de la interfaz 
+              <code>javax.persistence.EntityGraph</code> llamando a <code>EntityManager.getEntityGraph</code> 
+              para grafos de entidades con nombre o <code>EntityManager.createEntityGraph</code> para crear 
+              grafos de entidades dinámicas.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              A named entity graph is an entity graph specified by the <code>@NamedEntityGraph</code> annotation applied to entity classes, or the <code>named-entity-graph</code> element in the application's deployment descriptors. Named entity graphs defined within the deployment descriptor override any annotation-based entity graphs with the same name.
+              Un grafo de entidad con nombre es un grafo de entidad especificado por la anotación 
+              <code>@NamedEntityGraph</code> aplicada a las clases de entidad, o el elemento 
+              <code>named-entity-graph</code> en los descriptores de implementación de la aplicación. Los 
+              grafos de entidades con nombre definidos dentro del descriptor de implementación anulan 
+              cualquier grafo de entidades basado en anotaciones con el mismo nombre.
             </p>
           </div>
           <div class="paragraph">
-            <p>The created entity graph can be either a fetch graph or a load graph.</p>
+            <p>
+              El grafo de entidad creado puede ser un grafo de búsqueda o un grafo de carga.
+            </p>
           </div>
           <div class="paragraph">
             <p>Aquí se tratan los siguientes temas:</p>
@@ -133,24 +157,31 @@ public class EmailMessage implements Serializable {
             <h4 id="fetch-graphs">Obtener Grafos</h4>
             <div class="paragraph">
               <p>
-                To specify a fetch graph, set the <code>javax.persistence.fetchgraph</code> property when you execute an <code>EntityManager.find</code> or query operation. A fetch graph consists of only the fields explicitly specified in the <code>EntityGraph</code> instance, and ignores the default entity graph settings.
+                Para especificar un grafo de búsqueda, establezca la propiedad 
+                <code>javax.persistence.fetchgraph</code> cuando ejecute una operación de consulta o 
+                <code>EntityManager.find</code>. Un grafo de obtención consta solo de los campos especificados 
+                explícitamente en la instancia de <code>EntityGraph</code> e ignora la configuración 
+                predeterminada del grafo de entidad.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                In the following example, the default entity graph is ignored, and only the <code>body</code> field is included in the dynamically created fetch graph:
+                En el siguiente ejemplo, se ignora el grafo de entidad predeterminado y solo se incluye el 
+                campo <code>body</code> en el grafo de búsqueda creado dinámicamente:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 EntityGraph&lt;EmailMessage&gt; eg = em.createEntityGraph(EmailMessage.class);
 eg.addAttributeNodes("body");
 ...
 Properties props = new Properties();
 props.put("javax.persistence.fetchgraph", eg);
 EmailMessage message = em.find(EmailMessage.class, id, props);
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
           </div>
@@ -158,24 +189,31 @@ EmailMessage message = em.find(EmailMessage.class, id, props);
             <h4 id="load-graphs">Cargar Grafos</h4>
             <div class="paragraph">
               <p>
-                To specify a load graph, set the <code>javax.persistence.loadgraph</code> property when you execute an <code>EntityManager.find</code> or query operation. A load graph consists of the fields explicitly specified in the <code>EntityGraph</code> instance plus any fields in the default entity graph.
+                Para especificar un grafo de carga, establezca la propiedad 
+                <code>javax.persistence.loadgraph</code> cuando ejecute una operación de consulta o 
+                <code>EntityManager.find</code>. Un grafo de carga consta de los campos especificados 
+                explícitamente en la instancia de <code>EntityGraph</code> más cualquier campo en el grafo de 
+                entidad predeterminado.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                In the following example, the dynamically created load graph contains all the fields in the default entity graph plus the <code>body</code> field:
+                En el siguiente ejemplo, el grafo de carga creado dinámicamente contiene todos los campos del 
+                grafo de entidad predeterminado más el campo <code>body</code>:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 EntityGraph&lt;EmailMessage&gt; eg = em.createEntityGraph(EmailMessage.class);
 eg.addAttributeNodes("body");
 ...
 Properties props = new Properties();
 props.put("javax.persistence.loadgraph", eg);
 EmailMessage message = em.find(EmailMessage.class, id, props);
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
           </div>
