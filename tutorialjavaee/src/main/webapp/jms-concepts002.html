@@ -49,12 +49,15 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            This section introduces the most basic JMS API concepts, the ones you must know to get started writing simple application clients that use the JMS API.
+            Esta sección presenta los conceptos más básicos de la IPA de JMS, los que debe conocer para 
+            comenzar a escribir clientes de aplicaciones simples que utilizan la IPA de JMS.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            The next section introduces the JMS API programming model. Later sections cover more advanced concepts, including the ones you need in order to write applications that use message-driven beans.
+            La siguiente sección presenta el modelo de programación de la IPA de JMS. Las secciones 
+            posteriores cubren conceptos más avanzados, incluidos los que necesita para escribir aplicaciones 
+            que usan beans controlados por mensajes.
           </p>
         </div>
         <div class="paragraph">
@@ -76,46 +79,67 @@
         <div class="sect2" id="BNCDY">
           <h3 id="jms-api-architecture">Arquitectura de la IPA de JMS</h3>
           <div class="paragraph">
-            <p>A JMS application is composed of the following parts.</p>
+            <p>
+              Una aplicación JMS se compone de las siguientes partes.
+            </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
                 <p>
-                  A JMS provider is a messaging system that implements the JMS interfaces and provides administrative and control features. An implementation of the Java EE platform that supports the full profile includes a JMS provider.
+                  Un proveedor de JMS es un sistema de mensajería que implementa las interfaces de JMS y 
+                  proporciona funciones administrativas y de control. Una implementación de la plataforma 
+                  Java EE que admite el perfil completo incluye un proveedor JMS.
                 </p>
               </li>
               <li>
                 <p>
-                  JMS clients are the programs or components, written in the Java programming language, that produce and consume messages. Any Java EE application component can act as a JMS client.
+                  Los clientes JMS son los programas o componentes, escritos en el lenguaje de programación 
+                  Java, que producen y consumen mensajes. Cualquier componente de la aplicación Java EE puede 
+                  actuar como un cliente JMS.
                 </p>
                 <div class="paragraph">
                   <p>
-                    Java SE applications can also act as JMS clients; the Message Queue Developer's Guide for Java Clients in the GlassFish Server documentation (<code>https://javaee.github.io/glassfish/documentation</code>) explains how to make this work.
+                    Las aplicaciones Java SE también pueden actuar como clientes JMS; la Guía del 
+                    Desarrollador de Message Queue para Clientes Java en la documentación del servidor 
+                    GlassFish (<code>https://javaee.github.io/glassfish/documentation</code>) explica cómo 
+                    hacer que esto funcione.
                   </p>
                 </div>
               </li>
               <li>
-                <p>Messages are the objects that communicate information between JMS clients.</p>
+                <p>
+                  Los mensajes son los objetos que comunican información entre clientes JMS.
+                </p>
               </li>
               <li>
                 <p>
-                  Administered objects are JMS objects configured for the use of clients. The two kinds of JMS administered objects are destinations and connection factories, described in <a href="jms-concepts003.html#BNCEJ">Objetos Administrados por JMS</a>. An administrator can create objects that are available to all applications that use a particular installation of GlassFish Server; alternatively, a developer can use annotations to create objects that are specific to a particular application.
+                  Los objetos administrados son objetos JMS configurados para el uso de clientes. Los dos 
+                  tipos de objetos administrados por JMS son los destinos y las fábricas de conexiones, 
+                  descritos en <a href="jms-concepts003.html#BNCEJ">Objetos Administrados por JMS</a>. Un 
+                  administrador puede crear objetos que están disponibles para todas las aplicaciones que usan 
+                  una instalación particular del servidor GlassFish; como alternativa, un desarrollador puede 
+                  usar anotaciones para crear objetos que son específicos de una aplicación en particular.
                 </p>
               </li>
             </ul>
           </div>
           <div class="paragraph">
             <p>
-              <a href="#BNCDZ">Figure 48-2</a> illustrates the way these parts interact. Administrative tools or annotations allow you to bind destinations and connection factories into a JNDI namespace. A JMS client can then use resource injection to access the administered objects in the namespace and then establish a logical connection to the same objects through the JMS provider.
+              La <a href="#BNCDZ">Figura 48-2</a> ilustra la forma en que interactúan estas partes. Las 
+              herramientas administrativas o las anotaciones le permiten vincular destinos y fábricas de 
+              conexiones en un espacio de nombres JNDI. Un cliente JMS puede usar la inyección de recursos 
+              para acceder a los objetos administrados en el espacio de nombres y luego establecer una 
+              conexión lógica con los mismos objetos a través del proveedor JMS.
             </p>
           </div>
           <div id="BNCDZ" class="paragraph">
-            <div class="title"><strong>Figure 48-2 Arquitectura de la IPA de JMS</strong></div>
+            <div class="title"><strong>Figura 48-2 Arquitectura de la IPA de JMS</strong></div>
             <p>
               <span class="image">
                 <img src="img/javaeett_dt_027.png" 
-                     alt="Diagram of JMS API architecture, showing administrative tool, JMS client, JNDI namespace, and JMS provider">
+                     alt="Diagrama de la arquitectura de la IPA JMS, que muestra la herramienta 
+                     administrativa, el cliente JMS, el espacio de nombres JNDI y el proveedor JMS">
               </span>
             </p>
           </div>
@@ -124,50 +148,69 @@
           <h3 id="messaging-styles">Estilos de mensajería</h3>
           <div class="paragraph">
             <p>
-              Before the JMS API existed, most messaging products supported either the point-to-point or the publish/subscribe style of messaging. The JMS specification defines compliance for each style. A JMS provider must implement both styles, and the JMS API provides interfaces that are specific to each. The following subsections describe these messaging styles.
+              Antes de que existiera la IPA de JMS, la mayoría de los productos de mensajería admitían el 
+              estilo de mensajería de punto a punto o de publicación/suscripción. La especificación JMS define 
+              el cumplimiento de cada estilo. Un proveedor de JMS debe implementar ambos estilos, y la IPA de 
+              JMS proporciona interfaces que son específicas para cada uno. Las siguientes subsecciones 
+              describen estos estilos de mensajería.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              The JMS API, however, makes it unnecessary to use only one of the two styles. It allows you to use the same code to send and receive messages using either the PTP or the pub/sub style. The destinations you use remain specific to one style, and the behavior of the application will depend in part on whether you are using a queue or a topic. However, the code itself can be common to both styles, making your applications flexible and reusable. This tutorial describes and illustrates this coding approach, using the greatly simplified API provided by JMS 2.0.
+              Sin embargo, la IPA de JMS hace que no sea necesario utilizar solo uno de los dos estilos. Le 
+              permite usar el mismo código para enviar y recibir mensajes usando el estilo PTP o pub/sub. Los 
+              destinos que utilice seguirán siendo específicos de un estilo y el comportamiento de la 
+              aplicación dependerá en parte de si está utilizando una cola o un tema. Sin embargo, el código 
+              en sí puede ser común a ambos estilos, lo que hace que sus aplicaciones sean flexibles y 
+              reutilizables. Este tutorial describe e ilustra este enfoque de codificación, utilizando la IPA 
+              muy simplificada proporcionada por JMS 2.0.
             </p>
           </div>
           <div class="sect3" id="BNCEB">
             <h4 id="point-to-point-messaging-style">Estilo de Mensajería Punto a Punto</h4>
             <div class="paragraph">
               <p>
-                A point-to-point (PTP) product or application is built on the concept of message queues, senders, and receivers. Each message is addressed to a specific queue, and receiving clients extract messages from the queues established to hold their messages. Queues retain all messages sent to them until the messages are consumed or expire.
+                Un producto o aplicación punto a punto (PTP) se basa en el concepto de colas de mensajes, 
+                remitentes y receptores. Cada mensaje se dirige a una cola específica y los clientes 
+                receptores extraen los mensajes de las colas establecidas para contener sus mensajes. Las 
+                colas retienen todos los mensajes que se les envían hasta que se consumen o caducan.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                PTP messaging, illustrated in <a href="#BNCEC">Figure 48-3</a>, has the following characteristics.
+                La mensajería PTP, ilustrada en la <a href="#BNCEC">Figura 48-3</a>, tiene las siguientes 
+                características.
               </p>
             </div>
             <div class="ulist">
               <ul>
                 <li>
-                  <p>Each message has only one consumer.</p>
+                  <p>
+                    Cada mensaje tiene un solo consumidor.
+                  </p>
                 </li>
                 <li>
                   <p>
-                    The receiver can fetch the message whether or not it was running when the client sent the message.
+                    El receptor puede obtener el mensaje ya sea que se esté ejecutando o no cuando el cliente 
+                    envió el mensaje.
                   </p>
                 </li>
               </ul>
             </div>
             <div id="BNCEC" class="paragraph">
-              <div class="title"><strong>Figure 48-3 Point-to-Point Messaging</strong></div>
+              <div class="title"><strong>Figura 48-3 Mensajería Punto a Punto</strong></div>
               <p>
                 <span class="image">
                   <img src="img/javaeett_dt_028.png" 
-                       alt="Diagram of point-to-point messaging, showing Client 1 sending a message to a queue, and Client 2 consuming and acknowledging the message">
+                       alt="Diagrama de mensajería punto a punto, que muestra al Cliente 1 enviando un mensaje 
+                       a una cola y al Cliente 2 consumiendo y reconociendo el mensaje">
                 </span>
               </p>
             </div>
             <div class="paragraph">
               <p>
-                Use PTP messaging when every message you send must be processed successfully by one consumer.
+                Utilice la mensajería PTP cuando cada mensaje que envíe deba ser procesado correctamente por 
+                un consumidor.
               </p>
             </div>
           </div>
@@ -175,29 +218,52 @@
             <h4 id="publishsubscribe-messaging-style">Estilo de Mensajería de Publicación/Suscripción</h4>
             <div class="paragraph">
               <p>
-                In a publish/subscribe (pub/sub) product or application, clients address messages to a topic, which functions somewhat like a bulletin board. Publishers and subscribers can dynamically publish or subscribe to the topic. The system takes care of distributing the messages arriving from a topic's multiple publishers to its multiple subscribers. Topics retain messages only as long as it takes to distribute them to subscribers.
+                En un producto o aplicación de publicación/suscripción (pub/sub), los clientes envían mensajes 
+                a un tema, que funciona como un tablón de anuncios. Los editores y suscriptores pueden 
+                publicar dinámicamente o suscribirse al tema. El sistema se encarga de distribuir los mensajes 
+                que llegan de los múltiples editores de un tema a sus múltiples suscriptores. Los temas 
+                conservan los mensajes solo durante el tiempo necesario para distribuirlos a los suscriptores.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                With pub/sub messaging, it is important to distinguish between the consumer that subscribes to a topic (the subscriber) and the subscription that is created. The consumer is a JMS object within an application, while the subscription is an entity within the JMS provider. Normally, a topic can have many consumers, but a subscription has only one subscriber. It is possible, however, to create shared subscriptions; see <a href="jms-concepts003.html#BABJCIGJ">Creación de Suscripciones Compartidas</a> for details. See <a href="jms-concepts003.html#BABEEJJJ">Consumir Mensajes desde los Temas</a> for details on the semantics of pub/sub messaging.
+                Con la mensajería pub/sub, es importante distinguir entre el consumidor que se suscribe a un 
+                tema (el suscriptor) y la suscripción que se crea. El consumidor es un objeto JMS dentro de 
+                una aplicación, mientras que la suscripción es una entidad dentro del proveedor JMS. 
+                Normalmente, un tema puede tener muchos consumidores, pero una suscripción solo tiene un 
+                suscriptor. Sin embargo, es posible crear suscripciones compartidas; ver 
+                <a href="jms-concepts003.html#BABJCIGJ">Creación de Suscripciones Compartidas</a> para más 
+                detalles. Consulte 
+                <a href="jms-concepts003.html#BABEEJJJ">Consumir Mensajes desde los Temas</a> para obtener 
+                detalles sobre la semántica de los mensajes pub/sub.
               </p>
             </div>
             <div class="paragraph">
-              <p>Pub/sub messaging has the following characteristics.</p>
+              <p>
+                La mensajería de publicación/suscripción tiene las siguientes características.
+              </p>
             </div>
             <div class="ulist">
               <ul>
                 <li>
-                  <p>Each message can have multiple consumers.</p>
+                  <p>
+                    Cada mensaje puede tener varios consumidores.
+                  </p>
                 </li>
                 <li>
                   <p>
-                    A client that subscribes to a topic can consume only messages sent after the client has created a subscription, and the consumer must continue to be active in order for it to consume messages.
+                    Un cliente que se suscribe a un tema puede consumir solo los mensajes enviados después de 
+                    que el cliente haya creado una suscripción, y el consumidor debe continuar activo para 
+                    poder consumir mensajes.
                   </p>
                   <div class="paragraph">
                     <p>
-                      The JMS API relaxes this requirement to some extent by allowing applications to create durable subscriptions, which receive messages sent while the consumers are not active. Durable subscriptions provide the flexibility and reliability of queues but still allow clients to send messages to many recipients. For more information about durable subscriptions, see <a href="jms-concepts003.html#BNCGD">Creación de Suscripciones Duraderas</a>.
+                      La IPA de JMS relaja este requisito hasta cierto punto al permitir que las aplicaciones 
+                      creen suscripciones duraderas, que reciben mensajes enviados mientras los consumidores 
+                      no están activos. Las suscripciones duraderas brindan la flexibilidad y confiabilidad de 
+                      las colas, pero permiten que los clientes envíen mensajes a muchos destinatarios. Para 
+                      obtener más información sobre suscripciones duraderas, consulte 
+                      <a href="jms-concepts003.html#BNCGD">Creación de Suscripciones Duraderas</a>.
                     </p>
                   </div>
                 </li>
@@ -205,15 +271,18 @@
             </div>
             <div class="paragraph">
               <p>
-                Use pub/sub messaging when each message can be processed by any number of consumers (or none). <a href="#BNCEE">Figure 48-4</a> illustrates pub/sub messaging.
+                Utilice mensajes de publicación/suscripción cuando cualquier número de consumidores (o 
+                ninguno) pueda procesar cada mensaje. La <a href="#BNCEE">Figura 48-4</a> ilustra los mensajes 
+                de publicación/suscripción.
               </p>
             </div>
             <div id="BNCEE" class="paragraph">
-              <div class="title"><strong>Figure 48-4 Publish/Subscribe Messaging</strong></div>
+              <div class="title"><strong>Figura 48-4 Mensajería de Publicación/Suscripción</strong></div>
               <p>
                 <span class="image">
                   <img src="img/javaeett_dt_029.png" 
-                       alt="Diagram of pub/sub messaging, showing Client 1 sending a message to a topic, and the message being delivered to two consumers to the topic">
+                       alt="Diagrama de mensajes de publicación/suscripción, que muestra al Cliente 1 enviando 
+                       un mensaje a un tema y el mensaje que se entrega a dos consumidores del tema">
                 </span>
               </p>
             </div>
@@ -223,19 +292,30 @@
           <h3 id="message-consumption">Consumo de Mensajes</h3>
           <div class="paragraph">
             <p>
-              Messaging products are inherently asynchronous: There is no fundamental timing dependency between the production and the consumption of a message. However, the JMS specification uses this term in a more precise sense. Messages can be consumed in either of two ways.
+              Los productos de mensajería son inherentemente asincrónicos: no existe una dependencia de tiempo 
+              fundamental entre la producción y el consumo de un mensaje. Sin embargo, la especificación JMS 
+              usa este término en un sentido más preciso. Los mensajes se pueden consumir de dos maneras.
             </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
                 <p>
-                  Synchronously: A consumer explicitly fetches the message from the destination by calling the <code>receive</code> method. The <code>receive</code> method can block until a message arrives or can time out if a message does not arrive within a specified time limit.
+                  Sincrónicamente: un consumidor obtiene explícitamente el mensaje del destino llamando al 
+                  método <code>receive</code>. El método <code>receive</code> puede bloquear hasta que llega 
+                  un mensaje o puede expirar si un mensaje no llega dentro de un límite de tiempo 
+                  especificado.
                 </p>
               </li>
               <li>
                 <p>
-                  Asynchronously: An application client or a Java SE client can register a message listener with a consumer. A message listener is similar to an event listener. Whenever a message arrives at the destination, the JMS provider delivers the message by calling the listener's <code>onMessage</code> method, which acts on the contents of the message. In a Java EE application, a message-driven bean serves as a message listener (it too has an <code>onMessage</code> method), but a client does not need to register it with a consumer.
+                  Asíncronamente: un cliente de aplicación o un cliente Java SE puede registrar un detector de 
+                  mensajes con un consumidor. Un detector de mensajes es similar a un detector de eventos. 
+                  Cada vez que un mensaje llega al destino, el proveedor de JMS entrega el mensaje llamando al 
+                  método <code>onMessage</code> del oyente, que actúa sobre el contenido del mensaje. En una 
+                  aplicación Java EE, un bean controlado por mensajes sirve como detector de mensajes (también 
+                  tiene un método <code>onMessage</code>), pero un cliente no necesita registrarlo con un 
+                  consumidor.
                 </p>
               </li>
             </ul>
