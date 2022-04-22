@@ -51,43 +51,64 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            Web applications can use the JMS API to send and receive messages, as noted in <a href="jms-concepts005.html#BNCGN">Using Componentes de Java EE to Produce and to Synchronously Receive Messages</a>. This section describes the components of a very simple web application that uses the JMS API.
+            Las aplicaciones web pueden usar la IPA de JMS para enviar y recibir mensajes, como se indica en 
+            <a href="jms-concepts005.html#BNCGN">
+              Uso de componentes de Java EE para producir y recibir mensajes sincrónicamente</a>. Esta sección 
+              describe los componentes de una aplicación web muy simple que utiliza la IPA de JMS.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            This section assumes that you are familiar with the basics of JavaServer Faces technology, described in <a href="partwebtier.html#BNADP">Part IX, "The Web Tier."</a>
+            Esta sección asume que está familiarizado con los conceptos básicos de la tecnología JavaServer 
+            Faces, descrita en la <a href="partwebtier.html#BNADP">Parte III, "El nivel web"</a>.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            The example, <code>websimplemessage</code>, is under the <code>_tut-install_/jms/examples/</code> directory. It uses sending and receiving Facelets pages as well as corresponding backing beans. When a user enters a message in the text field of the sending page and clicks a button, the backing bean for the page sends the message to a queue and displays it on the page. When the user goes to the receiving page and clicks another button, the backing bean for that page receives the message synchronously and displays it.
+            El ejemplo, <code>websimplemessage</code>, se encuentra en el directorio 
+            <code>_tut-install_/jms/examples/</code>. Utiliza el envío y la recepción de páginas de Facelets, 
+            así como los beans de respaldo correspondientes. Cuando un usuario ingresa un mensaje en el campo 
+            de texto de la página de envío y hace clic en un botón, el bean de respaldo para la página envía 
+            el mensaje a una cola y lo muestra en la página. Cuando el usuario va a la página de recepción y 
+            hace clic en otro botón, el bean de respaldo para esa página recibe el mensaje de forma sincrónica 
+            y lo muestra.
           </p>
         </div>
         <div id="sthref213" class="paragraph">
-          <div class="title"><strong>Figure 49-2 The websimplemessage Application</strong></div>
+          <div class="title"><strong>Figura 49-2 La Aplicación websimplemessage</strong></div>
           <p>
             <span class="image">
               <img src="img/javaeett_dt_035.png" 
-                   alt="Diagram showing a web application in which a managed bean sends a message to a queue, and another managed bean receives the message from the queue.">
+                   alt="Diagrama que muestra una aplicación web en la que un bean gestionado envía un mensaje 
+                   a una cola y otro bean gestionado recibe el mensaje de la cola.">
             </span>
           </p>
         </div>
         <div class="sect2" id="sthref215">
           <h3 id="the-websimplemessage-facelets-pages">Las Páginas Facelets de websimplemessage</h3>
           <div class="paragraph">
-            <p>The Facelets pages for the example are as follows.</p>
+            <p>
+              Las páginas de Facelets para el ejemplo son las siguientes.
+            </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
                 <p>
-                  <code>sender.xhtml</code>, which provides a labeled <code>h:InputText</code> tag where the user enters the message, along with two command buttons. When the user clicks the Send Message button, the <code>senderBean.sendMessage</code> method is called to send the message to the queue and display its contents. When the user clicks the Go to Receive Page button, the <code>receiver.xhtml</code> page appears.
+                  <code>sender.xhtml</code>, que proporciona una etiqueta etiquetada <code>h:InputText</code> 
+                  donde el usuario ingresa el mensaje, junto con dos botones de comando. Cuando el usuario 
+                  hace clic en el botón Enviar Mensaje, se llama al método <code>senderBean.sendMessage</code> 
+                  para enviar el mensaje a la cola y mostrar su contenido. Cuando el usuario hace clic en el 
+                  botón Ir a la Página de Recepción, aparece la página <code>receiver.xhtml</code>.
                 </p>
               </li>
               <li>
                 <p>
-                  <code>receiver.xhtml</code>, which also provides two command buttons. When the user clicks the Receive Message button, the <code>receiverBean.getMessage</code> method is called to fetch the message from the queue and display its contents. When the user clicks the Send Another Message button, the sender.xhtml page appears again.
+                  <code>receiver.xhtml</code>, que también proporciona dos botones de comando. Cuando el 
+                  usuario hace clic en el botón Recibir Mensaje, se llama al método 
+                  <code>receiverBean.getMessage</code> para obtener el mensaje de la cola y mostrar su 
+                  contenido. Cuando el usuario hace clic en el botón Enviar Otro Mensaje, vuelve a aparecer la 
+                  página sender.xhtml.
                 </p>
               </li>
             </ul>
@@ -96,33 +117,40 @@
         <div class="sect2" id="sthref216">
           <h3 id="the-websimplemessage-managed-beans">Beans Gestionados de websimplemessage</h3>
           <div class="paragraph">
-            <p>The two managed beans for the example are as follows.</p>
+            <p>
+              Los dos beans administrados para el ejemplo son los siguientes.
+            </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
                 <p>
-                  <code>SenderBean.java</code>, a CDI managed bean with one property, <code>messageText</code>, and one business method, <code>sendMessage</code>. The class is annotated with <code>@JMSDestinationDefinition</code> to create a component-private queue:
+                  <code>SenderBean.java</code>, un bean administrado por CDI con una propiedad, 
+                  <code>messageText</code>, y un método de negocio, <code>sendMessage</code>. La clase se 
+                  anota con <code>@JMSDestinationDefinition</code> para crear una cola privada de 
+                  componentes:
                 </p>
                 <div class="listingblock">
                   <div class="content">
                     <pre class="prettyprint highlight">
                       <code class="language-oac_no_warn" data-lang="oac_no_warn">
-                        @JMSDestinationDefinition(
+@JMSDestinationDefinition(
         name = "java:comp/jms/webappQueue",
         interfaceName = "javax.jms.Queue",
         destinationName = "PhysicalWebappQueue")
 @Named
 @RequestScoped
 public class SenderBean {
-                    </code></pre>
+                      </code>
+                    </pre>
                   </div>
                 </div>
                 <div class="paragraph">
                   <p>
-                    The <code>sendMessage</code> method injects a <code>JMSContext</code> (using the default 
-                    connection factory) and the queue, creates a producer, sends the message the user typed on 
-                    the Facelets page, and creates a <code>FacesMessage</code> to display on the Facelets page:
+                    El método <code>sendMessage</code> inyecta un <code>JMSContext</code> (utilizando el valor 
+                    predeterminado de fábrica de conexiones) y la cola, crea un productor, envía el mensaje 
+                    que el usuario escribió en la página Facelets y crea un <code>FacesMessage</code> para 
+                    mostrar en la página Facelets:
                   </p>
                 </div>
                 <div class="listingblock">
@@ -148,13 +176,18 @@ public void sendMessage() {
                 t.toString());
     }
 }
-                    </code></pre>
+                      </code>
+                    </pre>
                   </div>
                 </div>
               </li>
               <li>
                 <p>
-                  <code>ReceiverBean.java</code>, a CDI managed bean with one business method, <code>getMessage</code>. The method injects a <code>JMSContext</code> (using the default connection factory) and the queue that was defined in <code>SenderBean</code>, creates a consumer, receives the message, and creates a <code>FacesMessage</code> to display on the Facelets page:
+                  <code>ReceiverBean.java</code>, un bean administrado por CDI con un método de negocio, 
+                  <code>getMessage</code>. El método inyecta un <code>JMSContext</code> (utilizando la fábrica 
+                  de conexiones predeterminada) y la cola que se definió en <code>SenderBean</code>, crea un 
+                  consumidor, recibe el mensaje y crea un <code>FacesMessage </code> para mostrar en la página 
+                  Facelets:
                 </p>
                 <div class="listingblock">
                   <div class="content">
@@ -184,7 +217,8 @@ public void getMessage() {
                 t.toString());
     }
 }
-                    </code></pre>
+                      </code>
+                    </pre>
                   </div>
                 </div>
               </li>
@@ -195,7 +229,8 @@ public void getMessage() {
           <h3 id="running-the-websimplemessage-example">Ejecutando el Ejemplo websimplemessage</h3>
           <div class="paragraph">
             <p>
-              You can use either NetBeans IDE or Maven to build, package, deploy, and run the <code>websimplemessage</code> application.
+              Puede usar el EID NetBeans o Maven para compilar, empaquetar, implementar y ejecutar la 
+              aplicación <code>websimplemessage</code>.
             </p>
           </div>
           <div class="paragraph">
@@ -207,7 +242,9 @@ public void getMessage() {
                 <p><a href="#CHDHEHAB">Creación de Recursos para el Ejemplo websimplemessage</a></p>
               </li>
               <li>
-                <p><a href="#CHDBADGA">Para Empaquetar y Desplegar websimplemessage Usando el EID NetBeans</a></p>
+                <p>
+                  <a href="#CHDBADGA">Para Empaquetar y Desplegar websimplemessage Usando el EID NetBeans</a>
+                </p>
               </li>
               <li>
                 <p><a href="#CHDBBBEI">Para Empaquetar e Implementar websimplemessage Usando Maven</a></p>
@@ -223,7 +260,8 @@ public void getMessage() {
             </h4>
             <div class="paragraph">
               <p>
-                This example uses an annotation-defined queue and the preconfigured default connection factory <code>java:comp/DefaultJMSConnectionFactory</code>.
+                Este ejemplo utiliza una cola definida por anotaciones y la fábrica de conexiones 
+                predeterminada preconfigurada <code>java:comp/DefaultJMSConnectionFactory</code>.
               </p>
             </div>
           </div>
@@ -235,35 +273,46 @@ public void getMessage() {
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que se haya iniciado el servidor GlassFish (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
-                  <p>From the File menu, choose Open Project.</p>
+                  <p>En el menú Archivo, elija Abrir Proyecto.</p>
                 </li>
                 <li>
-                  <p>In the Open Project dialog box, navigate to:</p>
+                  <p>
+                    En el cuadro de diálogo Abrir proyecto, vaya a:
+                  </p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 tut-install/examples/jms
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>Select the <code>websimplemessage</code> folder.</p>
-                </li>
-                <li>
-                  <p>Click Open Project.</p>
+                  <p>
+                    Seleccione la carpeta <code>websimplemessage</code>.
+                  </p>
                 </li>
                 <li>
                   <p>
-                    In the Projects tab, right-click the <code>websimplemessage</code> project and select Build.
+                    Haga clic en Abrir Proyecto.
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    En la pestaña Proyectos, haga clic con el botón derecho en el proyecto 
+                    <code>websimplemessage</code> y seleccione Construir.
                   </p>
                   <div class="paragraph">
-                    <p>This command builds and deploys the project.</p>
+                    <p>
+                      Este comando compila e implementa el proyecto.
+                    </p>
                   </div>
                 </li>
               </ol>
@@ -277,30 +326,36 @@ tut-install/examples/jms
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que se haya iniciado el servidor GlassFish (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
-                  <p>In a terminal window, go to:</p>
+                  <p>
+                    En una ventana de terminal, vaya a:
+                  </p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 tut-install/examples/jms/websimplemessage/
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
                   <p>
-                    To compile the source files and package and deploy the application, use the following command:
+                    Para compilar los archivos fuente y empaquetar e implementar la aplicación, use el 
+                    siguiente comando:
                   </p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 mvn install
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
@@ -312,53 +367,71 @@ mvn install
             <div class="olist arabic">
               <ol class="arabic">
                 <li>
-                  <p>In a web browser, enter the following URL:</p>
+                  <p>
+                    En un navegador web, ingrese la siguiente URL:
+                  </p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 http://localhost:8080/websimplemessage
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>Enter a message in the text field and click Send Message.</p>
+                  <p>
+                    Ingrese un mensaje en el campo de texto y haga clic en Enviar Mensaje.
+                  </p>
                   <div class="paragraph">
-                    <p>If, for example, you enter "Hello, Duke", the following appears below the buttons:</p>
+                    <p>
+                      Si, por ejemplo, ingresa "Hola, Duke", debajo de los botones aparece lo siguiente:
+                    </p>
                   </div>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
-Sent message: Message from producer: Hello, Duke
-                      </code></pre>
+Sent message: Message from producer: Hola, Duke
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>Click Go to Receive Page.</p>
+                  <p>
+                    Haga clic en Ir a la Página de Recepción.
+                  </p>
                 </li>
                 <li>
-                  <p>Click Receive Message.</p>
+                  <p>
+                    Haga clic en Recibir Mensaje.
+                  </p>
                   <div class="paragraph">
-                    <p>The following appears below the buttons:</p>
+                    <p>
+                      Debajo de los botones aparece lo siguiente:
+                    </p>
                   </div>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 Reading message: Message from producer: Hello, Duke
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>Click Send Another Message to return to the sending page.</p>
+                  <p>
+                    Haga clic en Enviar Otro Mensaje para volver a la página de envío.
+                  </p>
                 </li>
                 <li>
                   <p>
-                    After you have finished running the application, undeploy it using either the Services tab of NetBeans IDE or the <code>mvn cargo:undeploy</code> command.
+                    Una vez que haya terminado de ejecutar la aplicación, anule la implementación mediante la 
+                    pestaña Servicios del EID de NetBeans o el comando <code>mvn cargo:undeploy</code>.
                   </p>
                 </li>
               </ol>

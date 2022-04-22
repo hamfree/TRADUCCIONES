@@ -51,60 +51,82 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            If you are writing an application to run in the Java EE application client container or on the Java SE platform, and you want to receive messages asynchronously, you need to define a class that implements the <code>MessageListener</code> interface, create a <code>JMSConsumer</code>, and call the method <code>setMessageListener</code>.
+            Si está escribiendo una aplicación para ejecutarla en el contenedor del cliente de aplicaciones 
+            Java EE o en la plataforma Java SE y desea recibir mensajes de forma asíncrona, debe definir una 
+            clase que implemente la interfaz <code>MessageListener</code>, cree un <code>JMSConsumer</code>, y 
+            llame al método <code>setMessageListener</code>.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            If you're writing an application to run in the Java EE web or EJB container and want it to receive messages asynchronously, you also need to need to define a class that implements the <code>MessageListener</code> interface. However, instead of creating a <code>JMSConsumer</code> and calling the method <code>setMessageListener</code>, you must configure your message listener class to be a message-driven bean. The application server will then take care of the rest.
+            Si está escribiendo una aplicación para que se ejecute en el contenedor web Java EE o EJB y desea 
+            que reciba mensajes de forma asincrónica, también debe definir una clase que implemente la 
+            interfaz <code>MessageListener</code>. Sin embargo, en lugar de crear un <code>JMSConsumer</code> 
+            y llamar al método <code>setMessageListener</code>, debe configurar su clase de escucha de 
+            mensajes para que sea un bean controlado por mensajes. El servidor de aplicaciones se encargará 
+            del resto.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            Message-driven beans can implement any messaging type. Most commonly, however, they implement the Java Message Service (JMS) technology.
+            Los beans controlados por mensajes pueden implementar cualquier tipo de mensajería. Sin embargo, 
+            lo más común es que implementen la tecnología Java Message Service (JMS).
           </p>
         </div>
         <div class="paragraph">
           <p>
-            This section describes a simple message-driven bean example. Before proceeding, you should read the basic conceptual information in the section <a href="ejb-intro003.html#GIPKO">¿Qué Es un Bean Controlado por Mensajes?</a> as well as <a href="jms-concepts005.html#BNCGQ">Uso de Beans Controlados por Mensajes para Recibir Mensajes de Forma Asíncrona</a>.
+            Esta sección describe un ejemplo simple de bean controlado por mensajes. Antes de continuar, debe 
+            leer la información conceptual básica en la sección 
+            <a href="ejb-intro003.html#GIPKO">¿Qué es un Bean Controlado por Mensajes?</a> así como en 
+            <a href="jms- conceptos005.html#BNCGQ">Uso de Beans Controlados por Mensajes para Recibir Mensajes 
+              de Forma Asíncrona</a>.
           </p>
         </div>
         <div class="sect2" id="BNBPL">
           <h3 id="overview-of-the-simplemessage-example">Descripción General del Ejemplo simplemessage</h3>
           <div class="paragraph">
-            <p>The <code>simplemessage</code> application has the following components:</p>
+            <p>
+              La aplicación <code>simplemessage</code> tiene los siguientes componentes:
+            </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
                 <p>
-                  <code>SimpleMessageClient</code>: An application client that sends several messages to a queue
+                  <code>SimpleMessageClient</code>: una aplicación cliente que envía varios mensajes a una 
+                  cola
                 </p>
               </li>
               <li>
                 <p>
-                  <code>SimpleMessageBean</code>: A message-driven bean that asynchronously processes the messages that are sent to the queue
+                  <code>SimpleMessageBean</code>: un bean controlado por mensajes que procesa de forma 
+                  asíncrona los mensajes que se envían a la cola
                 </p>
               </li>
             </ul>
           </div>
           <div class="paragraph">
             <p>
-              <a href="#BNBPM">Figure 49-3</a> illustrates the structure of this application. The application client sends messages to the queue, which was created administratively using the Administration Console. The JMS provider (in this case, GlassFish Server) delivers the messages to the instances of the message-driven bean, which then processes the messages.
+              La <a href="#BNBPM">Figura 49-3</a> ilustra la estructura de esta aplicación. El cliente de la 
+              aplicación envía mensajes a la cola, que se creó administrativamente mediante la Consola de 
+              administración. El proveedor JMS (en este caso, el servidor GlassFish) entrega los mensajes a 
+              las instancias del bean controlado por mensajes, que luego procesa los mensajes.
             </p>
           </div>
           <div id="BNBPM" class="paragraph">
-            <div class="title"><strong>Figure 49-3 The simplemessage Application</strong></div>
+            <div class="title"><strong>Figura 49-3 La Aplicación simplemessage</strong></div>
             <p>
               <span class="image">
                 <img src="img/javaeett_dt_036.png" 
-                     alt="Diagram of application showing an application client sending a message to a queue, and the message being delivered to a message-driven bean">
+                     alt="Diagrama de aplicación que muestra un cliente de aplicación que envía un mensaje a 
+                     una cola y el mensaje se entrega a un bean controlado por mensajes">
               </span>
             </p>
           </div>
           <div class="paragraph">
             <p>
-              The source code for this application is in the tut-install`/examples/jms/simplemessage/` directory.
+              El código fuente de esta aplicación se encuentra en el directorio 
+              tut-install`/examples/jms/simplemessage/`.
             </p>
           </div>
         </div>
@@ -112,22 +134,27 @@
           <h3 id="the-simplemessage-application-client">La Aplicación Cliente simplemessage</h3>
           <div class="paragraph">
             <p>
-              The <code>SimpleMessageClient</code> sends messages to the queue that the <code>SimpleMessageBean</code> listens to. The client starts by injecting the connection factory and queue resources:
+              <code>SimpleMessageClient</code> envía mensajes a la cola que escucha 
+              <code>SimpleMessageBean</code>. El cliente comienza inyectando la fábrica de conexiones y los 
+              recursos de la cola:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Resource(lookup = "java:comp/DefaultJMSConnectionFactory")
 private static ConnectionFactory connectionFactory;
 @Resource(lookup = "jms/MyQueue")
 private static Queue queue;
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              Siguiente, the client creates the <code>JMSContext</code> in a <code>try</code>-with-resources block:
+              A continuación, el cliente crea el <code>JMSContext</code> en un bloque 
+              <code>try</code>-with-resources:
             </p>
           </div>
           <div class="listingblock">
@@ -137,11 +164,14 @@ private static Queue queue;
 String text;
 final int NUM_MSGS = 3;
 try (JMSContext context = connectionFactory.createContext();) {
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
-            <p>Finally, the client sends several text messages to the queue:</p>
+            <p>
+              Finalmente, el cliente envía varios mensajes de texto a la cola:
+            </p>
           </div>
           <div class="listingblock">
             <div class="content">
@@ -152,7 +182,8 @@ for (int i = 0; i &lt; NUM_MSGS; i++) {
     System.out.println("Sending message: " + text);
     context.createProducer().send(queue, text);
 }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
         </div>
@@ -162,12 +193,18 @@ for (int i = 0; i &lt; NUM_MSGS; i++) {
           </h3>
           <div class="paragraph">
             <p>
-              The code for the <code>SimpleMessageBean</code> class illustrates the requirements of a message-driven bean class described in <a href="jms-concepts005.html#BNCGQ">Uso de Beans Controlados por Mensajes para Recibir Mensajes de Forma Asíncrona</a>.
+              El código para la clase <code>SimpleMessageBean</code> ilustra los requisitos de una clase de 
+              bean controlada por mensajes descrita en 
+              <a href="jms-concepts005.html#BNCGQ">
+                Uso de Beans Controlados por Mensajes para Recibir Mensajes de Forma Asícrona
+              </a>.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              The first few lines of the <code>SimpleMessageBean</code> class use the <code>@MessageDriven</code> annotation's <code>activationConfig</code> attribute to specify configuration properties:
+              Las primeras líneas de la clase <code>SimpleMessageBean</code> utilizan el atributo 
+              <code>activationConfig</code> de la anotación <code>@MessageDriven</code> para especificar las 
+              propiedades de configuración:
             </p>
           </div>
           <div class="listingblock">
@@ -180,29 +217,37 @@ for (int i = 0; i &lt; NUM_MSGS; i++) {
     @ActivationConfigProperty(propertyName = "destinationType",
             propertyValue = "javax.jms.Queue")
 })
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              See <a href="jms-concepts005.html#GJKOH">Table 48-3</a> for a list of the available properties.
+              Consulte la <a href="jms-concepts005.html#GJKOH">Tabla 48-3</a> para obtener una lista de las 
+              propiedades disponibles.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              See <a href="jms-examples008.html#BNCGW">Envío de Mensajes Desde un Bean de Sesión a un MDB</a> for examples of the <code>subscriptionDurability</code>, <code>clientId</code>, <code>subscriptionName</code>, and <code>messageSelector</code> properties.
+              Consulte 
+              <a href="jms-examples008.html#BNCGW">Envío de Mensajes Desde un Bean de Sesión a un MDB</a> para 
+              ver ejemplos de <code>subscriptionDurability</code>, <code>clientId</code >, 
+              <code>subscriptionName</code> y <code>messageSelector</code>.
             </p>
           </div>
           <div class="sect3" id="BNBPP">
             <h4 id="the-onmessage-method">El Método onMessage</h4>
             <div class="paragraph">
               <p>
-                When the queue receives a message, the EJB container invokes the message listener method or methods. For a bean that uses JMS, this is the <code>onMessage</code> method of the <code>MessageListener</code> interface.
+                Cuando la cola recibe un mensaje, el contenedor EJB invoca el método o los métodos de escucha 
+                de mensajes. Para un bean que usa JMS, este es el método <code>onMessage</code> de la interfaz 
+                <code>MessageListener</code>.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                In the <code>SimpleMessageBean</code> class, the <code>onMessage</code> method casts the incoming message to a <code>TextMessage</code> and displays the text:
+                En la clase <code>SimpleMessageBean</code>, el método <code>onMessage</code> envía el mensaje 
+                entrante a un <code>TextMessage</code> y muestra el texto:
               </p>
             </div>
             <div class="listingblock">
@@ -227,7 +272,8 @@ public void onMessage(Message inMessage) {
         mdc.setRollbackOnly();
     }
 }
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
           </div>
@@ -236,7 +282,8 @@ public void onMessage(Message inMessage) {
           <h3 id="running-the-simplemessage-example">Ejecutando el Ejemplo simplemessage</h3>
           <div class="paragraph">
             <p>
-              You can use either NetBeans IDE or Maven to build, deploy, and run the <code>simplemessage</code> example.
+              Puede usar el EID NetBeans o Maven para compilar, implementar y ejecutar el ejemplo de 
+              <code>simplemessage</code>.
             </p>
           </div>
           <div class="paragraph">
@@ -261,17 +308,23 @@ public void onMessage(Message inMessage) {
             </h4>
             <div class="paragraph">
               <p>
-                This example uses the queue named <code>jms/MyQueue</code> and the preconfigured default connection factory <code>java:comp/DefaultJMSConnectionFactory</code>.
+                Este ejemplo utiliza la cola denominada <code>jms/MyQueue</code> y la fábrica de conexiones 
+                predeterminada preconfigurada <code>java:comp/DefaultJMSConnectionFactory</code>.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                If you have run the simple JMS examples in <a href="jms-examples003.html#BNCFA">Escritura de Aplicaciones JMS Simples</a> and have not deleted the resources, you already have the queue. Otherwise, follow the instructions in <a href="jms-examples003.html#BABHEFCB">Para Crear Recursos para los Ejemplos Simples</a> to create it.
+                Si ha ejecutado los ejemplos JMS simples en 
+                <a href="jms-examples003.html#BNCFA">Escritura de Aplicaciones JMS Simples</a> y no ha borrado 
+                los recursos, ya tiene la cola. De lo contrario, siga las instrucciones en 
+                <a href="jms-examples003.html#BABHEFCB">Para Crear Recursos para los Ejemplos Simples</a> para 
+                crearlo.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                For more information on creating JMS resources, see <a href="jms-examples003.html#GKTJS">Creación de Objetos Administrados JMS</a>.
+                Para obtener más información sobre la creación de recursos JMS, consulte 
+                <a href="jms-examples003.html#GKTJS">Creación de Objetos Administrados JMS</a>.
               </p>
             </div>
           </div>
@@ -283,43 +336,53 @@ public void onMessage(Message inMessage) {
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que se haya iniciado el servidor GlassFish (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
-                  <p>From the File menu, choose Open Project.</p>
+                  <p>En el menú Archivo, elija Abrir Proyecto.</p>
                 </li>
                 <li>
-                  <p>In the Open Project dialog box, navigate to:</p>
+                  <p>En el cuadro de diálogo Abrir Proyecto, vaya a:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 tut-install/examples/jms/simplemessage
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>Select the <code>simplemessage</code> folder.</p>
+                  <p>Selecciona la carpeta <code>simplemessage</code>.</p>
                 </li>
                 <li>
                   <p>
-                    Make sure that the Open Required Projects check box is selected, then click Open Project.
+                    Asegúrese de que la casilla de verificación Abrir Proyectos Requeridos esté seleccionada y 
+                    luego haga clic en Abrir Proyecto.
                   </p>
                 </li>
                 <li>
                   <p>
-                    In the Projects tab, right-click the <code>simplemessage</code> project and select Build. (If NetBeans IDE suggests that you run a priming build, click the box to do so.)
+                    En la pestaña Proyectos, haga clic con el botón derecho en el proyecto 
+                    <code>simplemessage</code> y seleccione Construir. (Si el EID de NetBeans sugiere que 
+                    ejecute una compilación de preparación, haga clic en el cuadro para hacerlo).
                   </p>
                   <div class="paragraph">
                     <p>
-                      This command packages the application client and the message-driven bean, then creates a file named <code>simplemessage.ear</code> in the <code>simplemessage-ear/target/</code> directory. It then deploys the <code>simplemessage-ear</code> module, retrieves the client stubs, and runs the application client.
+                      Este comando empaqueta el cliente de la aplicación y el bean controlado por mensajes, 
+                      luego crea un archivo llamado <code>simplemessage.ear</code> en el directorio 
+                      <code>simplemessage-ear/target/</code>. Luego implementa el módulo 
+                      <code>simplemessage-ear</code>, recupera los esbozos del cliente y ejecuta el cliente 
+                      de la aplicación.
                     </p>
                   </div>
                   <div class="paragraph">
                     <p>
-                      The output in the output window looks like this (preceded by application client container output):
+                      El resultado en la ventana de resultados tiene este aspecto (precedido por el resultado 
+                      del contenedor del cliente de la aplicación):
                     </p>
                   </div>
                   <div class="listingblock">
@@ -331,11 +394,12 @@ Sending message: This is message 2
 Sending message: This is message 3
 To see if the bean received the messages,
  check &lt;install_dir&gt;/domains/domain1/logs/server.log.
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                   <div class="paragraph">
-                    <p>In the server log file, lines similar to the following appear:</p>
+                    <p>En el archivo de registro del servidor, aparecen líneas similares a las siguientes:</p>
                   </div>
                   <div class="listingblock">
                     <div class="content">
@@ -344,17 +408,22 @@ To see if the bean received the messages,
 MESSAGE BEAN: Message received: This is message 1
 MESSAGE BEAN: Message received: This is message 2
 MESSAGE BEAN: Message received: This is message 3
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                   <div class="paragraph">
                     <p>
-                      The received messages may appear in a different order from the order in which they were sent.
+                      Los mensajes recibidos pueden aparecer en un orden diferente al orden en que fueron 
+                      enviados.
                     </p>
                   </div>
                 </li>
                 <li>
-                  <p>After you have finished running the application, undeploy it using the Services tab.</p>
+                  <p>
+                    Una vez que haya terminado de ejecutar la aplicación, anule su implementación mediante la 
+                    pestaña Servicios.
+                  </p>
                 </li>
               </ol>
             </div>
@@ -367,38 +436,48 @@ MESSAGE BEAN: Message received: This is message 3
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que se haya iniciado el servidor GlassFish (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
-                  <p>In a terminal window, go to:</p>
+                  <p>En una ventana de terminal, vaya a:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 tut-install/examples/jms/simplemessage/
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>To compile the source files and package the application, use the following command:</p>
+                  <p>
+                    Para compilar los archivos fuente y empaquetar la aplicación, use el siguiente comando:
+                  </p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 mvn install
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                   <div class="paragraph">
                     <p>
-                      This target packages the application client and the message-driven bean, then creates a file named <code>simplemessage.ear</code> in the <code>simplemessage-ear/target/</code> directory. It then deploys the <code>simplemessage-ear</code> module, retrieves the client stubs, and runs the application client.
+                      Este objetivo empaqueta el cliente de la aplicación y el bean controlado por mensajes, 
+                      luego crea un archivo llamado <code>simplemessage.ear</code> en el directorio 
+                      <code>simplemessage-ear/target/</code>. Luego implementa el módulo 
+                      <code>simplemessage-ear</code>, recupera los esbozos del cliente y ejecuta el cliente de 
+                      la aplicación.
                     </p>
                   </div>
                   <div class="paragraph">
                     <p>
-                      The output in the terminal window looks like this (preceded by application client container output):
+                      El resultado en la ventana del terminal tiene este aspecto (precedido por el resultado 
+                      del contenedor del cliente de la aplicación):
                     </p>
                   </div>
                   <div class="listingblock">
@@ -414,7 +493,7 @@ To see if the bean received the messages,
                     </div>
                   </div>
                   <div class="paragraph">
-                    <p>In the server log file, lines similar to the following appear:</p>
+                    <p>En el archivo de registro del servidor, aparecen líneas similares a las siguientes:</p>
                   </div>
                   <div class="listingblock">
                     <div class="content">
@@ -428,13 +507,15 @@ MESSAGE BEAN: Message received: This is message 3
                   </div>
                   <div class="paragraph">
                     <p>
-                      The received messages may appear in a different order from the order in which they were sent.
+                      Los mensajes recibidos pueden aparecer en un orden diferente al orden en que fueron 
+                      enviados.
                     </p>
                   </div>
                 </li>
                 <li>
                   <p>
-                    After you have finished running the application, undeploy it using the <code>mvn cargo:undeploy</code> command.
+                    Una vez que haya terminado de ejecutar la aplicación, anule la implementación con el 
+                    comando <code>mvn cargo:undeploy</code>.
                   </p>
                 </li>
               </ol>

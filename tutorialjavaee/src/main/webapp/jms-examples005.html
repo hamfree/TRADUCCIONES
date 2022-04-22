@@ -51,7 +51,9 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            This section describes how to use the JMS API to write applications that can handle high volumes of messages robustly. These examples use both nondurable and durable shared consumers.
+            Esta sección describe cómo usar la IPA de JMS para escribir aplicaciones que puedan manejar 
+            grandes volúmenes de mensajes de manera sólida. Estos ejemplos utilizan consumidores compartidos 
+            duraderos y no duraderos.
           </p>
         </div>
         <div class="paragraph">
@@ -71,22 +73,34 @@
           <h3 id="using-shared-nondurable-subscriptions">Uso de Suscripciones no Duraderas Compartidas</h3>
           <div class="paragraph">
             <p>
-              This section describes the receiving clients in an example that shows how to use a shared consumer to distribute messages sent to a topic among different consumers. This section then explains how to compile and run the clients using GlassFish Server.
+              Esta sección describe los clientes receptores en un ejemplo que muestra cómo usar un consumidor 
+              compartido para distribuir mensajes enviados a un tema entre diferentes consumidores. Esta 
+              sección luego explica cómo compilar y ejecutar los clientes utilizando el servidor GlassFish.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              You may wish to compare this example to the results of <a href="jms-examples003.html#BABDDHHC">Ejecución de Múltiples Consumidores en el Mismo Destino</a> using an unshared consumer. In that example, messages are distributed among the consumers on a queue, but each consumer on the topic receives all the messages because each consumer on the topic is using a separate topic subscription.
+              Es posible que desee comparar este ejemplo con los resultados de 
+              <a href="jms-examples003.html#BABDDHHC">
+                Ejecución de Múltiples Consumidores en el Mismo Destino</a> utilizando un consumidor no 
+              compartido. En ese ejemplo, los mensajes se distribuyen entre los consumidores en una cola, 
+              pero cada consumidor del tema recibe todos los mensajes porque cada consumidor del tema 
+              utiliza una suscripción de tema independiente.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              In this example, however, messages are distributed among multiple consumers on a topic, because all the consumers are sharing the same subscription. Each message added to the topic subscription is received by only one consumer, similarly to the way in which each message added to a queue is received by only one consumer.
+              En este ejemplo, sin embargo, los mensajes se distribuyen entre varios consumidores sobre un 
+              tema, porque todos los consumidores comparten la misma suscripción. Cada mensaje agregado a la 
+              suscripción del tema lo recibe un solo consumidor, de manera similar a como cada mensaje 
+              agregado a una cola lo recibe un solo consumidor.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              A topic may have multiple subscriptions. Each message sent to the topic will be added to each topic subscription. However, if there are multiple consumers on a particular subscription, each message added to that subscription will be delivered to only one of those consumers.
+              Un tema puede tener varias suscripciones. Cada mensaje enviado al tema se agregará a cada 
+              suscripción de tema. Sin embargo, si hay varios consumidores en una suscripción en particular, 
+              cada mensaje agregado a esa suscripción se entregará solo a uno de esos consumidores.
             </p>
           </div>
           <div class="sect3" id="sthref210">
@@ -94,138 +108,181 @@
               Escribiendo los Clientes para el Ejemplo Shared Consumer
             </h4>
             <div class="paragraph">
-              <p>The sending client is <code>Producer.java</code>, the same client used in previous examples.</p>
+              <p>
+                El cliente de envío es <code>Producer.java</code>, el mismo cliente utilizado en los ejemplos 
+                anteriores.
+              </p>
             </div>
             <div class="paragraph">
               <p>
-                The receiving client is <code>SharedConsumer.java</code>. It is very similar to <code>AsynchConsumer.java</code>, except that it always uses a topic. It performs the following steps.
+                El cliente receptor es <code>SharedConsumer.java</code>. Es muy similar a 
+                <code>AsynchConsumer.java</code>, excepto que siempre usa un tema. Realiza los siguientes 
+                pasos.
               </p>
             </div>
             <div class="olist arabic">
               <ol class="arabic">
                 <li>
-                  <p>Injects resources for a connection factory and topic.</p>
+                  <p>Inyecta recursos para una fábrica de conexiones y un tema.</p>
                 </li>
                 <li>
-                  <p>In a <code>try</code>-with-resources block, creates a <code>JMSContext</code>.</p>
+                  <p>En un bloque <code>try</code>-with-resources, crea un <code>JMSContext</code>.</p>
                 </li>
                 <li>
-                  <p>Creates a consumer on a shared nondurable subscription, specifying a subscription name:</p>
+                  <p>
+                    Crea un consumidor en una suscripción no duradera compartida, especificando un nombre de 
+                    suscripción:
+                  </p>
                   <div class="listingblock">
                     <div class="content">
-                      <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
 consumer = context.createSharedConsumer(topic, "SubName");
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
                   <p>
-                    Creates an instance of the <code>TextListener</code> class and registers it as the message listener for the shared consumer.
+                    Crea una instancia de la clase <code>TextListener</code> y la registra como detector de 
+                    mensajes para el consumidor compartido.
                   </p>
                 </li>
                 <li>
                   <p>
-                    Listens for the messages published to the destination, stopping when the user types the character <code>q</code> or <code>Q</code>.
+                    Escucha los mensajes publicados en el destino, deteniéndose cuando el usuario escribe el 
+                    carácter <code>q</code> o <code>Q</code>.
                   </p>
                 </li>
                 <li>
                   <p>
-                    Catches and handles any exceptions. The end of the <code>try</code>-with-resources block automatically causes the <code>JMSContext</code> to be closed.
+                    Atrapa y maneja cualquier excepción. El final del bloque <code>try</code>-with-resources 
+                    hace que <code>JMSContext</code> se cierre automáticamente.
                   </p>
                 </li>
               </ol>
             </div>
             <div class="paragraph">
-              <p>The <code>TextListener.java</code> class is identical to the one for the <code>asynchconsumer</code> example.</p>
+              <p>
+                La clase <code>TextListener.java</code> es idéntica a la del ejemplo 
+                <code>asynchconsumer</code>.
+              </p>
             </div>
             <div class="paragraph">
               <p>
-                For this example, you will use the default connection factory and the topic you created in <a href="jms-examples003.html#BABHEFCB">Para Crear Recursos para los Ejemplos Simples</a>.
+                Para este ejemplo, utilizará la fábrica de conexiones predeterminada y el tema que creó en 
+                <a href="jms-examples003.html#BABHEFCB">Para Crear Recursos para los Ejemplos Simples</a>.
               </p>
             </div>
           </div>
           <div class="sect3" id="sthref211">
-            <h4 id="to-run-the-sharedconsumer-and-producer-clients">Para Ejecutar los Clientes SharedConsumer y Producer</h4>
+            <h4 id="to-run-the-sharedconsumer-and-producer-clients">
+              Para Ejecutar los Clientes SharedConsumer y Producer
+            </h4>
             <div class="olist arabic">
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que se haya iniciado el servidor GlassFish (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
-                  <p>Open three command windows. In the first, go to the
-                    <code>simple/producer/</code> directory:</p>
+                  <p>
+                    Abra tres ventanas de comando. En el primero, ve al directorio 
+                    <code>simple/producer/</code>:
+                  </p>
                   <div class="listingblock">
                     <div class="content">
-                      <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
 cd tut-install/examples/jms/simple/producer/
-                      </code></pre>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <p>In the second and third command windows, go to the <code>shared/sharedconsumer/</code> directory:</p>
-                  <div class="listingblock">
-                    <div class="content">
-                      <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
-cd tut-install/examples/jms/shared/sharedconsumer/
-                      </code></pre>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <p>In one of the <code>sharedconsumer</code> windows, build the example:</p>
-                  <div class="listingblock">
-                    <div class="content">
-                      <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
-mvn install
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
                   <p>
-                    In each of the two <code>sharedconsumer</code> windows, start running the client. You do not need to specify a <code>topic</code> argument:
+                    En la segunda y tercera ventana de comandos, vaya al directorio 
+                    <code>shared/sharedconsumer/</code>:
                   </p>
                   <div class="listingblock">
                     <div class="content">
-                      <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
-appclient -client target/sharedconsumer.jar
-                      </code></pre>
-                    </div>
-                  </div>
-                  <div class="paragraph">
-                    <p>Wait until you see the following output in both windows:</p>
-                  </div>
-                  <div class="listingblock">
-                    <div class="content">
-                      <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
-Waiting for messages on topic
-To end program, enter Q or q, then &lt;return&gt;
-                      </code></pre>
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+cd tut-install/examples/jms/shared/sharedconsumer/
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>In the <code>producer</code> window, run the client, specifying the topic and a number of messages:</p>
+                  <p>En una de las ventanas <code>sharedconsumer</code>, construye el ejemplo:</p>
                   <div class="listingblock">
                     <div class="content">
-                      <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+mvn install
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    En cada una de las dos ventanas <code>sharedconsumer</code>, comience a ejecutar el 
+                    cliente. No necesita especificar un argumento <code>topic</code>:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+appclient -client target/sharedconsumer.jar
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>Espere hasta que vea el siguiente resultado en ambas ventanas:</p>
+                  </div>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+Waiting for messages on topic
+To end program, enter Q or q, then &lt;return&gt;
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    En la ventana <code>producer</code>, ejecute el cliente, especificando el tema y una serie 
+                    de mensajes:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
 appclient -client target/producer.jar topic 20
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                   <div class="paragraph">
                     <p>
-                      Each consumer client receives some of the messages. Only one of the clients receives the non-text message that signals the end of the message stream.
+                      Cada cliente consumidor recibe algunos de los mensajes. Solo uno de los clientes recibe 
+                      el mensaje que no es de texto que indica el final del flujo de mensajes.
                     </p>
                   </div>
                 </li>
                 <li>
                   <p>
-                    Enter <code>Q</code> or <code>q</code> and press Return to stop each client and see a report of the number of text messages received.
+                    Ingrese <code>Q</code> o <code>q</code> y presione Intro para detener a cada cliente y 
+                    ver un informe de la cantidad de mensajes de texto recibidos.
                   </p>
                 </li>
               </ol>
@@ -236,28 +293,39 @@ appclient -client target/producer.jar topic 20
           <h3 id="using-shared-durable-subscriptions">Uso de Suscripciones Duraderas Compartidas</h3>
           <div class="paragraph">
             <p>
-              The <code>shareddurableconsumer</code> client shows how to use shared durable subscriptions. It shows how shared durable subscriptions combine the advantages of durable subscriptions (the subscription remains active when the client is not) with those of shared consumers (the message load can be divided among multiple clients).
+              El cliente <code>shareddurableconsumer</code> muestra cómo usar suscripciones duraderas 
+              compartidas. Muestra cómo las suscripciones duraderas compartidas combinan las ventajas de las 
+              suscripciones duraderas (la suscripción permanece activa cuando el cliente no lo está) con las 
+              de los consumidores compartidos (la carga de mensajes se puede dividir entre varios clientes).
             </p>
           </div>
           <div class="paragraph">
             <p>
-              The example is much more similar to the <code>sharedconsumer</code> example than to the <code>DurableConsumer.java</code> client. It uses two classes, <code>SharedDurableConsumer.java</code> and <code>TextListener.java</code>, which can be found under the tut-install`/examples/jms/shared/shareddurableconsumer/`directory.
+              El ejemplo es mucho más similar al ejemplo de <code>sharedconsumer</code> que al cliente 
+              <code>DurableConsumer.java</code>. Utiliza dos clases, <code>SharedDurableConsumer.java</code> y 
+              <code>TextListener.java</code>, que se pueden encontrar en el directorio 
+              tut-install`/examples/jms/shared/shareddurableconsumer/`.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              The client uses <code>java:comp/DefaultJMSConnectionFactory</code>, the connection factory that does not have a client identifier, as is recommended for shared durable subscriptions. It uses the <code>createSharedDurableConsumer</code> method with a subscription name to establish the subscription:
+              El cliente usa <code>java:comp/DefaultJMSConnectionFactory</code>, la fábrica de conexiones que 
+              no tiene un identificador de cliente, como se recomienda para las suscripciones duraderas 
+              compartidas. Utiliza el método <code>createSharedDurableConsumer</code> con un nombre de 
+              suscripción para establecer la suscripción:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 consumer = context.createSharedDurableConsumer(topic, "MakeItLast");
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
-            <p>You run the example in combination with the <code>Producer.java</code> client.</p>
+            <p>El ejemplo se ejecuta en combinación con el cliente <code>Producer.java</code>.</p>
           </div>
           <div class="sect3" id="sthref212">
             <h4 id="to-run-the-shareddurableconsumer-and-producer-clients">
@@ -266,102 +334,126 @@ consumer = context.createSharedDurableConsumer(topic, "MakeItLast");
             <div class="olist arabic">
               <ol class="arabic">
                 <li>
-                  <p>In a terminal window, go to the following directory:</p>
+                  <p>En una ventana de terminal, vaya al siguiente directorio:</p>
                   <div class="listingblock">
                     <div class="content">
-                      <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
 tut-install/examples/jms/shared/shareddurableconsumer
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>To compile and package the client, enter the following command:</p>
+                  <p>Para compilar y empaquetar el cliente, ingrese el siguiente comando:</p>
                   <div class="listingblock">
                     <div class="content">
-                      <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
 mvn install
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>Run the client first to establish the durable subscription:</p>
+                  <p>Primero ejecute el cliente para establecer la suscripción duradera:</p>
                   <div class="listingblock">
                     <div class="content">
-                      <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
 appclient -client target/shareddurableconsumer.jar
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>The client displays the following and pauses:</p>
+                  <p>El cliente muestra lo siguiente y hace una pausa:</p>
                   <div class="listingblock">
                     <div class="content">
-                      <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
 Waiting for messages on topic
 To end program, enter Q or q, then &lt;return&gt;
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
                   <p>
-                    In the <code>shareddurableconsumer</code> window, enter <code>q</code> or <code>Q</code> to exit the program. The subscription remains active, although the client is not running.
+                    En la ventana <code>shareddurableconsumer</code>, ingresa <code>q</code> o <code>Q</code> 
+                    para salir del programa. La suscripción permanece activa, aunque el cliente no se está 
+                    ejecutando.
                   </p>
                 </li>
                 <li>
-                  <p>Open another terminal window and go to the <code>producer</code> example directory:</p>
+                  <p>Abra otra ventana de terminal y vaya al directorio de ejemplo <code>producer</code>:</p>
                   <div class="listingblock">
                     <div class="content">
-                      <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
 cd tut-install/examples/jms/simple/producer
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>Run the <code>producer</code> example, sending a number of messages to the topic:</p>
+                  <p>Ejecute el ejemplo de <code>producer</code>, enviando una serie de mensajes al tema:</p>
                   <div class="listingblock">
                     <div class="content">
-                      <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
 appclient -client target/producer.jar topic 6
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
                   <p>
-                    After the producer has sent the messages, open a third terminal window and go to the <code>shareddurableconsumer</code> directory.
+                    Después de que el productor haya enviado los mensajes, abra una tercera ventana de 
+                    terminal y vaya al directorio <code>shareddurableconsumer</code>.
                   </p>
                 </li>
                 <li>
                   <p>
-                    Run the client in both the first and third terminal windows. Whichever client starts first will receive all the messages that were sent when there was no active subscriber:
+                    Ejecute el cliente en la primera y tercera ventana de terminal. El cliente que inicie 
+                    primero recibirá todos los mensajes que se enviaron cuando no había un suscriptor activo:
                   </p>
                   <div class="listingblock">
                     <div class="content">
-                      <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
 appclient -client target/shareddurableconsumer.jar
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
                   <p>
-                    With both <code>shareddurableconsumer</code> clients still running, go to the <code>producer</code> window and send a larger number of messages to the topic:
+                    Con ambos clientes <code>shareddurableconsumer</code> aún ejecutándose, vaya a la ventana 
+                    <code>producer</code> y envíe una mayor cantidad de mensajes al tema:
                   </p>
                   <div class="listingblock">
                     <div class="content">
-                      <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
 appclient -client target/producer.jar topic 25
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                   <div class="paragraph">
                     <p>
-                      Now the messages will be shared by the two consumer clients. If you continue sending groups of messages to the topic, each client receives some of the messages. If you exit one of the clients and send more messages, the other client will receive all the messages.
+                      Ahora los mensajes serán compartidos por los dos clientes consumidores. Si continúa 
+                      enviando grupos de mensajes al tema, cada cliente recibe algunos de los mensajes. Si 
+                      sale de uno de los clientes y envía más mensajes, el otro cliente recibirá todos los 
+                      mensajes.
                     </p>
                   </div>
                 </li>
