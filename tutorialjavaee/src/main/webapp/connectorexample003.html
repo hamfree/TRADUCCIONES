@@ -49,114 +49,143 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            The <code>traffic</code> example demonstrates how to implement and use a simple inbound resource adapter that receives data from a legacy EIS using a TCP socket.
+            El ejemplo de <code>traffic</code> demuestra cómo implementar y usar un adaptador de recursos de 
+            entrada simple que recibe datos de un EIS heredado usando un socket TCP.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            The example is in the tut-install`/examples/connectors/traffic` directory. See <a href="usingexamples.html#GFIUD">Capítulo 2, "Uso de los Ejemplos del Tutorial,"</a> for basic information on building and running sample applications.
+            El ejemplo está en el directorio tut-install`/examples/connectors/traffic`. Consulte el 
+            <a href="usingexamples.html#GFIUD">Capítulo 2, "Uso de los Ejemplos del Tutorial,"</a> para 
+            obtener información básica sobre la creación y ejecución de aplicaciones de muestra.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            The example demonstrates the scenario in <a href="#CHDGFGHB">Figure 56-3</a> and consists of the following modules:
+            El ejemplo demuestra el escenario de la <a href="#CHDGFGHB">Figura 56-3</a> y consta de los 
+            siguientes módulos:
           </p>
         </div>
         <div class="ulist">
           <ul>
             <li>
-              <p><code>traffic-eis</code>: A Java SE program that simulates an EIS</p>
+              <p><code>traffic-eis</code>: Un programa Java SE que simula un EIS</p>
             </li>
             <li>
-              <p><code>traffic-rar</code>: The inbound resource adapter implementation</p>
+              <p><code>traffic-rar</code>: La implementación del adaptador de recursos de entrada</p>
             </li>
             <li>
               <p>
-                <code>traffic-ejb</code>: A message-driven bean that is the endpoint for incoming messages
+                <code>traffic-ejb</code>: Un bean controlado por mensajes que es el punto final para los 
+                mensajes entrantes
               </p>
             </li>
             <li>
               <p>
-                <code>traffic-war</code>: A web application that displays information from the message-driven bean
+                <code>traffic-war</code>: Una aplicación web que muestra información del bean controlado por 
+                mensajes
               </p>
             </li>
             <li>
               <p>
-                <code>traffic-ear</code>: An enterprise archive that contains the resource adapter, the message-driven bean, and the web application
+                <code>traffic-ear</code>: Un archivo empresarial que contiene el adaptador de recursos, el 
+                bean controlado por mensajes y la aplicación web
               </p>
             </li>
           </ul>
         </div>
         <div id="CHDGFGHB" class="paragraph">
-          <div class="title"><strong>Figure 56-3 The traffic Example</strong></div>
+          <div class="title"><strong>Figura 56-3 El ejemplo traffic</strong></div>
           <p>
             <span class="image">
               <img src="img/javaeett_dt_056.png" 
-                   alt="This figure shows the components of the traffic example: a WAR communicating with an enterprise bean using a JMS topic, and a RAR communicating with an EIS over a TCP socket.">
+                   alt="Esta figura muestra los componentes del ejemplo traffic: un WAR que se comunica con un 
+                   bean empresarial utilizando un tema JMS y un RAR que se comunica con un EIS a través de un 
+                   socket TCP.">
             </span>
           </p>
         </div>
         <div class="paragraph">
           <p>
-            The <code>traffic-eis</code> module is an auxiliary project that resembles a legacy traffic information system. It contains a Java SE program that sends traffic status updates for several cities to any subscribed client. The program sends the updates in JSON format over a TCP socket. For example, a traffic update looks like this:
+            El módulo <code>traffic-eis</code> es un proyecto auxiliar que se asemeja a un sistema de 
+            información de tráfico heredado. Contiene un programa Java SE que envía actualizaciones del estado 
+            del tráfico de varias ciudades a cualquier cliente suscrito. El programa envía las actualizaciones 
+            en formato JSON a través de un socket TCP. Por ejemplo, una actualización de tráfico se ve así:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
             <pre class="prettyprint highlight">
-<code class="language-oac_no_warn" data-lang="oac_no_warn">
-  {"report":[
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+ {"report":[
     {"city":"City1", "access":"AccessA", "status":"GOOD"},
     {"city":"City1", "access":"AccessB", "status":"CONGESTED"},
     ...
     {"city":"City5", "access":"AccessE", "status":"SLOW"}
  ]}
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            The <code>traffic-rar</code> module implements the inbound contract of the Java EE Connector Architecture. This module subscribes to the traffic information system using the TCP port indicated by the configuration provided by the MDB and invokes the methods of the MDB to process traffic information updates.
+            El módulo <code>traffic-rar</code> implementa el contrato de entrada de la arquitectura del 
+            conector Java EE. Este módulo se suscribe al sistema de información de tráfico utilizando el 
+            puerto TCP indicado por la configuración proporcionada por la MDB e invoca los métodos de la MDB 
+            para procesar las actualizaciones de la información de tráfico.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            The <code>traffic-ejb</code> module contains a message-driven bean that activates the resource adapter with a configuration parameter (the TCP port to subscribe to the traffic information system). The MDB contains a method to process the traffic information updates. This method filters the updates for a particular city and publishes the results to a Java Message Service (JMS) topic.
+            El módulo <code>traffic-ejb</code> contiene un bean controlado por mensajes que activa el 
+            adaptador de recursos con un parámetro de configuración (el puerto TCP para suscribirse al 
+            sistema de información de tráfico). El MDB contiene un método para procesar las actualizaciones de 
+            información de tráfico. Este método filtra las actualizaciones de una ciudad en particular y 
+            publica los resultados en un tema de Java Message Service (JMS).
           </p>
         </div>
         <div class="paragraph">
           <p>
-            The <code>traffic-war</code> module contains a message-driven bean that receives filtered traffic information updates from the JMS topic asynchronously and sends them to the clients using a WebSocket endpoint.
+            El módulo <code>traffic-war</code> contiene un bean controlado por mensajes que recibe 
+            actualizaciones de información de tráfico filtrado del tema JMS de forma asincrónica y las envía a 
+            los clientes mediante un punto final WebSocket.
           </p>
         </div>
         <div class="sect2" id="sthref248">
           <h3 id="using-the-inbound-resource-adapter">Uso del Adaptador de Recursos de Entrada</h3>
           <div class="paragraph">
             <p>
-              In most cases, Java EE application developers use inbound resource adapters developed by a third party. To use an inbound resource adapter, a Java EE application includes a message-driven bean with the following characteristics.
+              En la mayoría de los casos, los desarrolladores de aplicaciones Java EE utilizan adaptadores de 
+              recursos de entrada desarrollados por un tercero. Para utilizar un adaptador de recursos de 
+              entrada, una aplicación Java EE incluye un bean controlado por mensajes con las siguientes 
+              características.
             </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
-                <p>The MDB implements the business interface defined by the resource adapter.</p>
+                <p>El MDB implementa la interfaz empresarial definida por el adaptador de recursos.</p>
               </li>
               <li>
-                <p>The MDB specifies configuration parameters to activate the resource adapter.</p>
+                <p>
+                  El MDB especifica los parámetros de configuración para activar el adaptador de recursos.
+                </p>
               </li>
             </ul>
           </div>
           <div class="paragraph">
             <p>
-              The business interface defined by the resource adapter is not specified in the Arquitectura de los Conectores de JavaEE; it is specific to the EIS.
+              La interfaz empresarial definida por el adaptador de recursos no está especificada en la 
+              Arquitectura de los Conectores de JavaEE; es específico para el EIS.
             </p>
           </div>
           <div class="paragraph">
-            <p>The MDB in this example is defined as follows:</p>
+            <p>El MDB en este ejemplo se define de la siguiente manera:</p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @MessageDriven(
     activationConfig = {
       @ActivationConfigProperty(propertyName = "port",
@@ -164,22 +193,30 @@
     }
 )
 public class TrafficMdb implements TrafficListener { ... }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              The <code>TrafficListener</code> interface is defined in the API package of the resource adapter. The resource adapter requires the MDB to provide the <code>port</code> property.
+              La interfaz <code>TrafficListener</code> está definida en el paquete de la IPA del adaptador de 
+              recursos. El adaptador de recursos requiere que la MDB proporcione la propiedad 
+              <code>port</code>.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              When the MDB is deployed, it activates the <code>traffic-rar</code> resource adapter, which invokes the methods of the MDB to process traffic information updates. Then the MDB filters the updates for a particular city and publishes the results to a JMS topic.
+              Cuando se implementa la MDB, activa el adaptador de recursos <code>traffic-rar</code>, que 
+              invoca los métodos de la MDB para procesar las actualizaciones de información de tráfico. Luego, 
+              el MDB filtra las actualizaciones para una ciudad en particular y publica los resultados en un 
+              tema JMS.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              In this particular example, the <code>TrafficListener</code> interface is empty. In addition to this interface, the resource adapter provides the <code>TrafficCommand</code> annotation and uses reflection to discover which methods in the MDB are decorated with this annotation:
+              En este ejemplo en particular, la interfaz <code>TrafficListener</code> está vacía. Además de 
+              esta interfaz, el adaptador de recursos proporciona la anotación <code>TrafficCommand</code> y 
+              usa la reflexión para descubrir qué métodos en el MDB están decorados con esta anotación:
             </p>
           </div>
           <div class="listingblock">
@@ -192,12 +229,14 @@ public class TrafficMdb implements TrafficListener {
     public void processReport(String jsonReport) { ... }
     ...
 }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              This approach enables you to adapt the MDB to support new features in the EIS without having to modify the <code>TrafficListener</code> interface or the resource adapter module.
+              Este enfoque le permite adaptar la MDB para admitir nuevas funciones en el EIS sin tener que 
+              modificar la interfaz <code>TrafficListener</code> o el módulo del adaptador de recursos.
             </p>
           </div>
         </div>
@@ -207,28 +246,32 @@ public class TrafficMdb implements TrafficListener {
           </h3>
           <div class="paragraph">
             <p>
-              The <code>traffic-rar</code> module implements the inbound resource adapter contract from the Arquitectura de los Conectores de JavaEE for the simple traffic information system (EIS) used in this example. The architecture of the inbound resource adapter is shown in <a href="#CHDHADDC">Figure 56-4</a>.
+              El módulo <code>traffic-rar</code> implementa el contrato de adaptador de recursos de entrada de 
+              la Arquitectura de los Conectores de JavaEE para el sistema de información de tráfico simple 
+              (EIS) utilizado en este ejemplo. La arquitectura del adaptador de recursos de entrada se muestra 
+              en la <a href="#CHDHADDC">Figura 56-4</a>.
             </p>
           </div>
           <div id="CHDHADDC" class="paragraph">
-            <div class="title"><strong>Figure 56-4 Architecture of the traffic Example</strong></div>
+            <div class="title"><strong>Figura 56-4 Arquitectura del Ejemplo traffic</strong></div>
             <p>
               <span class="image">
                 <img src="img/javaeett_dt_057.png" 
-                     alt="This figure shows the classes in each of the components of the traffic example.">
+                     alt="Esta figura muestra las clases en cada uno de los componentes del ejemplo traffic.">
               </span>
             </p>
           </div>
           <div class="paragraph">
             <p>
-              The <code>traffic-rar</code> module implements the interfaces listed in <a href="#CHDEDEAF">Table 56-3</a>.
+              El módulo <code>traffic-rar</code> implementa las interfaces enumeradas en la 
+              <a href="#CHDEDEAF">Tabla 56-3</a>.
             </p>
           </div>
           <div class="paragraph">
             <p><a id="sthref251"></a><a id="CHDEDEAF"></a></p>
           </div>
           <div class="paragraph">
-            <p><strong>Table 56-3 Interfaces Implemented in the traffic-rar Module</strong></p>
+            <p><strong>Tabla 56-3 Interfaces Implementadas en el Módulo Traffic-rar</strong></p>
           </div>
           <table class="tableblock frame-all grid-all" style="width: 99%;">
             <colgroup>
@@ -239,9 +282,9 @@ public class TrafficMdb implements TrafficListener {
             <tbody>
               <tr>
                 <td class="tableblock halign-left valign-top">
-                  <p class="tableblock"><strong>Package</strong></p></td>
+                  <p class="tableblock"><strong>Paquete</strong></p></td>
                 <td class="tableblock halign-left valign-top">
-                  <p class="tableblock"><strong>Interface</strong></p></td>
+                  <p class="tableblock"><strong>Interfaz</strong></p></td>
                 <td class="tableblock halign-left valign-top">
                   <p class="tableblock"><strong>Descripción</strong></p></td>
               </tr>
@@ -251,8 +294,10 @@ public class TrafficMdb implements TrafficListener {
                 <td class="tableblock halign-left valign-top">
                   <p class="tableblock"><code>ResourceAdapter</code></p></td>
                 <td class="tableblock halign-left valign-top">
-                  <p class="tableblock">Defines the lifecycle methods
-                    of the resource adapter.</p></td>
+                  <p class="tableblock">
+                    Define los métodos de ciclo de vida del adaptador de recursos.
+                  </p>
+                </td>
               </tr>
               <tr>
                 <td class="tableblock halign-left valign-top">
@@ -261,7 +306,8 @@ public class TrafficMdb implements TrafficListener {
                   <p class="tableblock"><code>ActivationSpec</code></p></td>
                 <td class="tableblock halign-left valign-top">
                   <p class="tableblock">
-                    Defines the configuration parameters that the MDB provides to activate the inbound resource adapter.
+                    Define los parámetros de configuración que proporciona la MDB para activar el adaptador de 
+                    recursos de entrada.
                   </p>
                 </td>
               </tr>
@@ -271,7 +317,8 @@ public class TrafficMdb implements TrafficListener {
                 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Work</code></p></td>
                 <td class="tableblock halign-left valign-top">
                   <p class="tableblock">
-                    The traffic service subscriber implements this interface from the work management contract to wait for traffic updates on a separate thread.
+                    El suscriptor del servicio de tráfico implementa esta interfaz desde el contrato de 
+                    gestión de trabajo para esperar actualizaciones de tráfico en un subproceso separado.
                   </p>
                 </td>
               </tr>
@@ -279,12 +326,14 @@ public class TrafficMdb implements TrafficListener {
           </table>
           <div class="paragraph">
             <p>
-              When an MDB activates the inbound resource adapter, the container invokes the <code>endpointActivation</code> method in the <code>TrafficResourceAdapter</code> class:
+              Cuando un MDB activa el adaptador de recursos de entrada, el contenedor invoca el método 
+              <code>endpointActivation</code> en la clase <code>TrafficResourceAdapter</code>:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Connector(...)
 public class TrafficResourceAdapter implements ResourceAdapter, Serializable {
     ...
@@ -297,22 +346,29 @@ public class TrafficResourceAdapter implements ResourceAdapter, Serializable {
         MessageEndpoint endpoint = endpointFactory.createEndpoint(null); */
     }
 }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              The <code>getEndpointClass</code> method returns the <code>Class</code> type of the MDB performing the activation, which enables the resource adapter to use reflection to find methods annotated with <code>@TrafficCommand</code> in the MDB.
+              El método <code>getEndpointClass</code> devuelve el tipo <code>Class</code> del MDB que realiza 
+              la activación, lo que permite que el adaptador de recursos utilice la reflexión para buscar 
+              métodos anotados con <code>@TrafficCommand</code> en el MDB.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              The <code>createEndpoint</code> method returns an instance of the MDB. The resource adapter uses this instance to invoke the methods of the MDB when it receives requests from the EIS.
+              El método <code>createEndpoint</code> devuelve una instancia de la MDB. El adaptador de recursos 
+              utiliza esta instancia para invocar los métodos de la MDB cuando recibe solicitudes del EIS.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              After obtaining the message endpoint instance (MDB), the resource adapter uses the work management contract to create the traffic service subscriber thread that receives traffic updates from the EIS. The resource adapter obtains the <code>WorkManager</code> instance from the bootstrap context as follows:
+              Después de obtener la instancia de punto final de mensaje (MDB), el adaptador de recursos usa el 
+              contrato de administración de trabajo para crear el subproceso de suscriptor de servicio de 
+              tráfico que recibe actualizaciones de tráfico del EIS. El adaptador de recursos obtiene la 
+              instancia de <code>WorkManager</code> del contexto de arranque de la siguiente manera:
             </p>
           </div>
           <div class="listingblock">
@@ -325,33 +381,42 @@ WorkManager workManager;
 public void start(BootstrapContext ctx) ... {
     workManager = ctx.getWorkManager();
 }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              The resource adapter schedules the traffic service subscriber thread using the work manager:
+              El adaptador de recursos programa el subproceso del suscriptor del servicio de tráfico mediante 
+              el administrador de trabajo:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 tSubscriber = new TrafficServiceSubscriber(tSpec, endpoint);
 workManager.scheduleWork(tSubscriber);
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              The <code>TrafficServiceSubscriber</code> class implements the <code>javax.resource.spi.Work</code> interface from the work management contract.
+              La clase <code>TrafficServiceSubscriber</code> implementa la interfaz 
+              <code>javax.resource.spi.Work</code> del contrato de gestión de trabajo.
             </p>
           </div>
           <div class="paragraph">
-            <p>The traffic service subscriber thread uses reflection to invoke the methods in the MDB:</p>
+            <p>
+              El subproceso del suscriptor del servicio de tráfico usa la reflexión para invocar los métodos 
+              en el MDB:
+            </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 private String callMdb(MessageEndpoint mdb, Method command,
                        String... params) ... {
     String resp;
@@ -363,7 +428,8 @@ private String callMdb(MessageEndpoint mdb, Method command,
     return resp;
 }
 For more details, see the code and the comments in the traffic-rar module.
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
         </div>
@@ -371,7 +437,8 @@ For more details, see the code and the comments in the traffic-rar module.
           <h3 id="running-the-traffic-example">Para Ejecutar el Ejemplo traffic</h3>
           <div class="paragraph">
             <p>
-              You can use either NetBeans IDE or Maven to build, package, deploy, and run the <code>traffic</code> example.
+              Puede usar el EID de NetBeans o Maven para compilar, empaquetar, implementar y ejecutar el 
+              ejemplo de <code>traffic</code>.
             </p>
           </div>
           <div class="paragraph">
@@ -395,78 +462,94 @@ For more details, see the code and the comments in the traffic-rar module.
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que el servidor GlassFish se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
-                  <p>From the File menu, choose Open Project.</p>
+                  <p>En el menú Archivo, elija Abrir proyecto.</p>
                 </li>
                 <li>
-                  <p>In the Open Project dialog box, navigate to:</p>
+                  <p>En el cuadro de diálogo Abrir proyecto, vaya a:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 tut-install/examples/connectors
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>Select the <code>traffic</code> folder.</p>
+                  <p>Seleccione la carpeta <code>traffic</code>.</p>
                 </li>
                 <li>
-                  <p>Click Open Project.</p>
+                  <p>Haga clic en Abrir proyecto.</p>
                 </li>
                 <li>
-                  <p>In the Projects tab, expand the <code>traffic</code> node.</p>
+                  <p>En la pestaña Proyectos, expanda el nodo <code>traffic</code>.</p>
                 </li>
                 <li>
-                  <p>Right-click the <code>traffic-eis</code> module and select Open Project.</p>
+                  <p>
+                    Haga clic con el botón derecho en el módulo <code>traffic-eis</code> y seleccione Abrir 
+                    proyecto.
+                  </p>
                 </li>
                 <li>
-                  <p>Right-click the <code>traffic-eis</code> project and select Run.</p>
+                  <p>
+                    Haga clic con el botón derecho en el proyecto <code>traffic-eis</code> y seleccione 
+                    Ejecutar.
+                  </p>
                   <div class="paragraph">
-                    <p>The messages from the EIS appear on the Output tab:</p>
+                    <p>Los mensajes del EIS aparecen en la pestaña Salida:</p>
                   </div>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 Traffic EIS accepting connections on port 4008
-                        </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
                   <p>
-                    In the Projects tab, right-click the <code>traffic</code> project and select Clean and Build.
+                    En la pestaña Proyectos, haga clic con el botón derecho en el proyecto 
+                    <code>traffic</code> y seleccione Limpiar y Construir.
                   </p>
                   <div class="paragraph">
                     <p>
-                      This command builds and packages the resource adapter, the MDB, and the web application into an EAR archive and deploys it. The server log shows the call sequence that activates the resource adapter and the filtered traffic updates for City1.
+                      Este comando compila y empaqueta el adaptador de recursos, la MDB y la aplicación web en 
+                      un archivo EAR y lo implementa. El registro del servidor muestra la secuencia de 
+                      llamadas que activa el adaptador de recursos y las actualizaciones de tráfico filtradas 
+                      para City1.
                     </p>
                   </div>
                 </li>
                 <li>
-                  <p>Open the following URL in a web browser:</p>
+                  <p>Abra la siguiente URL en un navegador web:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 http://localhost:8080/traffic/
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                   <div class="paragraph">
                     <p>
-                      The web interface shows filtered traffic updates for City1 every few seconds.
+                      La interfaz web muestra actualizaciones de tráfico filtradas para City1 cada pocos 
+                      segundos.
                     </p>
                   </div>
                 </li>
                 <li>
                   <p>
-                    After undeploying the <code>traffic-ear</code> application, close the <code>traffic-eis</code> application from the status bar.
+                    Después de cancelar la implementación de la aplicación <code>traffic-ear</code>, cierre la 
+                    aplicación <code>traffic-eis</code> desde la barra de estado.
                   </p>
                 </li>
               </ol>
@@ -478,103 +561,119 @@ http://localhost:8080/traffic/
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que el servidor GlassFish se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
-                  <p>In a terminal window, go to:</p>
+                  <p>En una ventana de terminal, vaya a:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 tut-install/examples/connectors/traffic/traffic-eis/
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>Enter the following command in the terminal window:</p>
+                  <p>En una ventana de terminal, vaya a:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 mvn install
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                   <div class="paragraph">
-                    <p>This command builds and packages the traffic EIS.</p>
+                    <p>Este comando construye y empaqueta el tráfico EIS.</p>
                   </div>
                 </li>
                 <li>
-                  <p>Enter the following command in the terminal window:</p>
+                  <p>Ingrese el siguiente comando en la ventana de terminal:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 mvn exec:java
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                   <div class="paragraph">
-                    <p>The messages from the EIS appear in the terminal window:</p>
+                    <p>Los mensajes del EIS aparecen en la ventana del terminal:</p>
                   </div>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 Traffic EIS accepting connections on port 4008
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                   <div class="paragraph">
-                    <p>Leave this terminal window open.</p>
+                    <p>Deje esta ventana de terminal abierta.</p>
                   </div>
                 </li>
                 <li>
-                  <p>Open a new terminal window and go to:</p>
+                  <p>Abra una nueva ventana de terminal y vaya a:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 tut-install/examples/connectors/traffic/
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>Enter the following command:</p>
+                  <p>Introduzca el siguiente comando:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 mvn install
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                   <div class="paragraph">
                     <p>
-                      This command builds and packages the resource adapter, the MDB, and the web application into an EAR archive and deploys it. The server log shows the call sequence that activates the resource adapter and the filtered traffic updates for City1.
+                      Este comando compila y empaqueta el adaptador de recursos, la MDB y la aplicación web en 
+                      un archivo EAR y lo implementa. El registro del servidor muestra la secuencia de 
+                      llamadas que activa el adaptador de recursos y las actualizaciones de tráfico filtradas 
+                      para City1.
                     </p>
                   </div>
                 </li>
                 <li>
-                  <p>Open the following URL in a web browser:</p>
+                  <p>Abra la siguiente URL en un navegador web:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 http://localhost:8080/traffic/
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                   <div class="paragraph">
-                    <p>The web interface shows the filtered traffic updates for City1 every few seconds.</p>
+                    <p>
+                      La interfaz web muestra las actualizaciones de tráfico filtradas para City1 cada pocos 
+                      segundos.
+                    </p>
                   </div>
                 </li>
                 <li>
                   <p>
-                    After undeploying the <code>traffic-ear</code> application, press Ctrl+C in the first terminal window to close the <code>traffic-eis</code> application.
+                    Después de cancelar la implementación de la aplicación <code>traffic-ear</code>, presione 
+                    Ctrl+C en la primera ventana de terminal para cerrar la aplicación 
+                    <code>traffic-eis</code>.
                   </p>
                 </li>
               </ol>

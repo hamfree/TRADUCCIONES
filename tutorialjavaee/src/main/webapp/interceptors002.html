@@ -49,12 +49,16 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            To define an interceptor, use one of the interceptor metadata annotations listed in <a href="interceptors001.html#GKECC">Table 57-1</a> within the target class, or in a separate interceptor class. The following code declares an <code>@AroundTimeout</code> interceptor method within a target class:
+            Para definir un interceptor, use una de las anotaciones de metadatos del interceptor enumeradas en 
+            la <a href="interceptors001.html#GKECC">Tabla 57-1</a> dentro de la clase de destino o en una 
+            clase de interceptor separada. El siguiente código declara un método interceptor 
+            <code>@AroundTimeout</code> dentro de una clase objetivo:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Stateless
 public class TimerBean {
     ...
@@ -64,29 +68,35 @@ public class TimerBean {
     public void timeoutInterceptorMethod(InvocationContext ctx) { ... }
     ...
 }
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            If you are using interceptor classes, use the <code>javax.interceptor.Interceptors</code> annotation to declare one or more interceptors at the class or method level of the target class. The following code declares interceptors at the class level:
+            Si utiliza clases de interceptores, utilice la anotación 
+            <code>javax.interceptor.Interceptors</code> para declarar uno o más interceptores en el nivel de 
+            clase o método de la clase de destino. El siguiente código declara interceptores a nivel de clase:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Stateless
 @Interceptors({PrimaryInterceptor.class, SecondaryInterceptor.class})
 public class OrderBean { ... }
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
-          <p>The following code declares a method-level interceptor class:</p>
+          <p>El siguiente código declara una clase de interceptor a nivel de método:</p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Stateless
 public class OrderBean {
     ...
@@ -94,79 +104,100 @@ public class OrderBean {
     public void placeOrder(Order order) { ... }
     ...
 }
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="sect2" id="GKECY">
           <h3 id="intercepting-method-invocations">Intercepción de Invocaciones de Métodos</h3>
           <div class="paragraph">
             <p>
-              Use the <code>@AroundInvoke</code> annotation to designate interceptor methods for managed object methods. Only one around-invoke interceptor method per class is allowed. Around-invoke interceptor methods have the following form:
+              Use la anotación <code>@AroundInvoke</code> para designar métodos interceptores para métodos de 
+              objetos administrados. Solo se permite un método de interceptor de invocación por clase. Los 
+              métodos de interceptor de invocación periférica tienen la siguiente forma:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @AroundInvoke
 visibility Object method-name(InvocationContext) throws Exception { ... }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
-            <p>For example:</p>
+            <p>Por ejemplo:</p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @AroundInvoke
 public void interceptOrder(InvocationContext ctx) { ... }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              Around-invoke interceptor methods can have public, private, protected, or package-level access, and must not be declared static or final.
+              Los métodos de interceptor de invocación periférica pueden tener acceso público, privado, 
+              protegido o de nivel de paquete, y no deben declararse como estáticos o finales.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              An around-invoke interceptor can call any component or resource that is callable by the target method on which it interposes, can have the same security and transaction context as the target method, and can run in the same Java virtual machine call stack as the target method.
+              Un interceptor de invocación periférica puede llamar a cualquier componente o recurso al que 
+              pueda llamar el método de destino en el que se interpone, puede tener el mismo contexto de 
+              seguridad y transacción que el método de destino y puede ejecutarse en la misma pila de llamadas 
+              de la máquina virtual Java que el método destino.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              Around-invoke interceptors can throw runtime exceptions and any exception allowed by the <code>throws</code> clause of the target method. They may catch and suppress exceptions, and then recover by calling the <code>InvocationContext.proceed</code> method.
+              Los interceptores de invocación pueden generar excepciones en tiempo de ejecución y cualquier 
+              excepción permitida por la cláusula <code>throws</code> del método de destino. Pueden capturar y 
+              suprimir excepciones, y luego recuperarse llamando al método 
+              <code>InvocationContext.proceed</code>.
             </p>
           </div>
           <div class="sect3" id="GKHMH">
             <h4 id="using-multiple-method-interceptors">Uso de Interceptores de Métodos Múltiples</h4>
             <div class="paragraph">
               <p>
-                Use the <code>@Interceptors</code> annotation to declare multiple interceptors for a target method or class:
+                Utilice la anotación <code>@Interceptors</code> para declarar múltiples interceptores para un 
+                método o clase de destino:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Interceptors({PrimaryInterceptor.class, SecondaryInterceptor.class,
         LastInterceptor.class})
 public void updateInfo(String info) { ... }
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
             <div class="paragraph">
               <p>
-                The order of the interceptors in the <code>@Interceptors</code> annotation is the order in which the interceptors are invoked.
+                El orden de los interceptores en la anotación <code>@Interceptors</code> es el orden en que se 
+                invocan los interceptores.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                You can also define multiple interceptors in the deployment descriptor. The order of the interceptors in the deployment descriptor is the order in which the interceptors will be invoked:
+                También puede definir varios interceptores en el descriptor de implementación. El orden de los 
+                interceptores en el descriptor de despliegue es el orden en que se invocarán los 
+                interceptores:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 ...
 &lt;interceptor-binding&gt;
     &lt;target-name&gt;myapp.OrderBean&lt;/target-name&gt;
@@ -176,27 +207,39 @@ public void updateInfo(String info) { ... }
     &lt;method-name&gt;updateInfo&lt;/method-name&gt;
 &lt;/interceptor-binding&gt;
 ...
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
             <div class="paragraph">
               <p>
-                To explicitly pass control to the next interceptor in the chain, call the <code>InvocationContext.proceed</code> method.
+                Para pasar explícitamente el control al siguiente interceptor de la cadena, llama al método 
+                <code>InvocationContext.proceed</code>.
               </p>
             </div>
             <div class="paragraph">
-              <p>Data can be shared across interceptors.</p>
+              <p>Los datos se pueden compartir entre interceptores.</p>
             </div>
             <div class="ulist">
               <ul>
                 <li>
                   <p>
-                    The same <code>InvocationContext</code> instance is passed as an input parameter to each interceptor method in the interceptor chain for a particular target method. The <code>InvocationContext</code> instance's <code>contextData</code> property is used to pass data across interceptor methods. The <code>contextData</code> property is a <code>java.util.Map&lt;String, Object&gt;</code> object. Data stored in <code>contextData</code> is accessible to interceptor methods further down the interceptor chain.
+                    La misma instancia de <code>InvocationContext</code> se pasa como parámetro de entrada a 
+                    cada método de interceptor en la cadena de interceptores para un método de destino en 
+                    particular. La propiedad <code>contextData</code> de la instancia 
+                    <code>InvocationContext</code> se usa para pasar datos a través de métodos interceptores. 
+                    La propiedad <code>contextData</code> es un objeto 
+                    <code>java.util.Map&lt;String, Object&gt;</code>. Los datos almacenados en 
+                    <code>contextData</code> son accesibles para métodos interceptores más abajo en la cadena 
+                    de interceptores.
                   </p>
                 </li>
                 <li>
                   <p>
-                    The data stored in <code>contextData</code> is not sharable across separate target class method invocations. That is, a different <code>InvocationContext</code> object is created for each invocation of the method in the target class.
+                    Los datos almacenados en <code>contextData</code> no se pueden compartir entre 
+                    invocaciones de métodos de clases de destino independientes. Es decir, se crea un objeto 
+                    <code>InvocationContext</code> diferente para cada invocación del método en la clase de 
+                    destino.
                   </p>
                 </li>
               </ul>
@@ -208,20 +251,32 @@ public void updateInfo(String info) { ... }
             </h4>
             <div class="paragraph">
               <p>
-                You can use the <code>InvocationContext</code> instance passed to each around-invoke method to access and modify the parameters of the target method. The <code>parameters</code> property of <code>InvocationContext</code> is an array of <code>Object</code> instances that corresponds to the parameter order of the target method. For example, for the following target method, the <code>parameters</code> property, in the <code>InvocationContext</code> instance passed to the around-invoke interceptor method in <code>PrimaryInterceptor</code>, is an <code>Object</code> array containing two <code>String</code> objects (<code>firstName</code> and <code>lastName</code>) and a <code>Date</code> object (<code>date</code>):
+                Puede usar la instancia de <code>InvocationContext</code> pasada a cada método de invocación 
+                para acceder y modificar los parámetros del método de destino. La propiedad 
+                <code>parameters</code> de <code>InvocationContext</code> es una matriz de instancias de 
+                <code>Object</code> que corresponde al orden de los parámetros del método de destino. Por 
+                ejemplo, para el siguiente método de destino, la propiedad <code>parameters</code>, en la 
+                instancia de <code>InvocationContext</code> pasada al método de interceptor de invocación en 
+                <code>PrimaryInterceptor</code>, es una matriz <code>Object</code> que contiene dos objetos 
+                <code>String</code> (<code>firstName</code> y <code>lastName</code>) y un objeto 
+                <code>Date</code> (<code>date</code>):
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Interceptors(PrimaryInterceptor.class)
 public void updateInfo(String firstName, String lastName, Date date) { ... }
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
             <div class="paragraph">
               <p>
-                You can access and modify the parameters by using the <code>InvocationContext.getParameters</code> and <code>InvocationContext.setParameters</code> methods, respectively.
+                Puede acceder a los parámetros y modificarlos mediante los métodos 
+                <code>InvocationContext.getParameters</code> y <code>InvocationContext.setParameters</code>, 
+                respectivamente.
               </p>
             </div>
           </div>
@@ -232,59 +287,88 @@ public void updateInfo(String firstName, String lastName, Date date) { ... }
           </h3>
           <div class="paragraph">
             <p>
-              Interceptors for lifecycle callback events (around-construct, post-construct, and pre-destroy) may be defined in the target class or in interceptor classes. The <code>javax.interceptor.AroundConstruct</code> annotation designates the method as an interceptor method that interposes on the invocation of the target class's constructor. The <code>javax.annotation.PostConstruct</code> annotation is used to designate a method as a post-construct lifecycle event interceptor. The <code>javax.annotation.PreDestroy</code> annotation is used to designate a method as a pre-destroy lifecycle event interceptor.
+              Los interceptores para los eventos de devolución de llamada del ciclo de vida (alrededor de la 
+              construcción, posterior a la construcción y previo a la destrucción) se pueden definir en la 
+              clase de destino o en las clases de interceptor. La anotación 
+              <code>javax.interceptor.AroundConstruct</code> designa el método como un método interceptor que 
+              se interpone en la invocación del constructor de la clase de destino. La anotación 
+              <code>javax.annotation.PostConstruct</code> se utiliza para designar un método como interceptor 
+              de eventos del ciclo de vida posterior a la construcción. La anotación 
+              <code>javax.annotation.PreDestroy</code> se utiliza para designar un método como interceptor de 
+              eventos del ciclo de vida previo a la destrucción.
             </p>
           </div>
           <div class="paragraph">
-            <p>Lifecycle event interceptors defined within the target class have the following form:</p>
+            <p>
+              Los interceptores de eventos del ciclo de vida definidos dentro de la clase de destino tienen la 
+              siguiente forma:
+            </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 void method-name() { ... }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
-            <p>For example:</p>
+            <p>Por ejemplo:</p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @PostConstruct
 void initialize() { ... }
-              </code></pre>
-            </div>
-          </div>
-          <div class="paragraph">
-            <p>Lifecycle event interceptors defined in an interceptor class have the following form:</p>
-          </div>
-          <div class="listingblock">
-            <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
-void method-name(InvocationContext) { ... }
-              </code></pre>
-            </div>
-          </div>
-          <div class="paragraph">
-            <p>For example:</p>
-          </div>
-          <div class="listingblock">
-            <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
-@PreDestroy
-void cleanup(InvocationContext ctx) { ... }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              Lifecycle interceptor methods can have public, private, protected, or package-level access, and must not be declared static or final. Lifecycle interceptors may throw runtime exceptions but cannot throw checked exceptions.
+              Los interceptores de eventos del ciclo de vida definidos en una clase de interceptor tienen la 
+              siguiente forma:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+void method-name(InvocationContext) { ... }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>Por ejemplo:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@PreDestroy
+void cleanup(InvocationContext ctx) { ... }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los métodos de interceptor de ciclo de vida pueden tener acceso público, privado, protegido o de 
+              nivel de paquete, y no deben declararse como estáticos o finales. Los interceptores de ciclo de 
+              vida pueden generar excepciones de tiempo de ejecución, pero no pueden generar excepciones 
+              comprobadas.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              Lifecycle interceptor methods are called in an unspecified security and transaction context. That is, portable Java EE applications should not assume the lifecycle event interceptor method has access to a security or transaction context. Only one interceptor method for each lifecycle event (post-create and pre-destroy) is allowed per class.
+              Los métodos de interceptor de ciclo de vida se llaman en un contexto de seguridad y transacción 
+              no especificado. Es decir, las aplicaciones Java EE portables no deben suponer que el método 
+              interceptor de eventos del ciclo de vida tiene acceso a un contexto de seguridad o transacción. 
+              Solo se permite un método interceptor para cada evento del ciclo de vida (post-creación y 
+              pre-destrucción) por clase.
             </p>
           </div>
           <div class="sect3" id="sthref254">
@@ -293,17 +377,28 @@ void cleanup(InvocationContext ctx) { ... }
             </h4>
             <div class="paragraph">
               <p>
-                <code>@AroundConstruct</code> methods are interposed on the invocation of the target class's constructor. Methods decorated with <code>@AroundConstruct</code> may only be defined within interceptor classes or superclasses of interceptor classes. You may not use <code>@AroundConstruct</code> methods within the target class.
+                Los métodos <code>@AroundConstruct</code> se interponen en la invocación del constructor de la 
+                clase de destino. Los métodos decorados con <code>@AroundConstruct</code> solo se pueden 
+                definir dentro de clases de interceptor o superclases de clases de interceptor. No puede usar 
+                métodos <code>@AroundConstruct</code> dentro de la clase de destino.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                The <code>@AroundConstruct</code> method is called after dependency injection has been completed for all interceptors associated with the target class. The target class is created and the target class's constructor injection is performed after all associated <code>@AroundConstruct</code> methods have called the <code>Invocation.proceed</code> method. At that point, dependency injection for the target class is completed, and then any <code>@PostConstruct</code> callback methods are invoked.
+                Se llama al método <code>@AroundConstruct</code> después de que se haya completado la 
+                inyección de dependencia para todos los interceptores asociados con la clase de destino. La 
+                clase de destino se crea y la inyección del constructor de la clase de destino se realiza 
+                después de que todos los métodos <code>@AroundConstruct</code> asociados hayan llamado al 
+                método <code>Invocation.proceed</code>. En ese momento, se completa la inyección de 
+                dependencia para la clase de destino y luego se invoca cualquier método de devolución de 
+                llamada <code>@PostConstruct</code>.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                <code>@AroundConstruct</code> methods can access the constructed target instance after calling <code>Invocation.proceed</code> by calling the <code>InvocationContext.getTarget</code> method.
+                Los métodos <code>@AroundConstruct</code> pueden acceder a la instancia de destino construida 
+                después de llamar a <code>Invocation.proceed</code> llamando al método 
+                <code>InvocationContext.getTarget</code>.
               </p>
             </div>
             <table class="tableblock frame-all grid-all spread">
@@ -315,11 +410,13 @@ void cleanup(InvocationContext ctx) { ... }
                   <td class="tableblock halign-left valign-top">
                     <div>
                       <div class="paragraph">
-                        <p><strong>Caution</strong>:</p>
+                        <p><strong>Precaución</strong>:</p>
                       </div>
                       <div class="paragraph">
                         <p>
-                          Calling methods on the target instance from an <code>@AroundConstruct</code> method is dangerous because dependency injection may not have completed on the target instance.
+                          Llamar a métodos en la instancia de destino desde un método 
+                          <code>@AroundConstruct</code> es peligroso porque es posible que la inyección de 
+                          dependencia no se haya completado en la instancia de destino.
                         </p>
                       </div>
                     </div>
@@ -329,7 +426,9 @@ void cleanup(InvocationContext ctx) { ... }
             </table>
             <div class="paragraph">
               <p>
-                <code>@AroundConstruct</code> methods must call <code>Invocation.proceed</code> in order to create the target instance. If an <code>@AroundConstruct</code> method does not call <code>Invocation.proceed</code>, the target instance will not be created.
+                Los métodos <code>@AroundConstruct</code> deben llamar a <code>Invocation.proceed</code> para 
+                crear la instancia de destino. Si un método <code>@AroundConstruct</code> no llama a 
+                <code>Invocation.proceed</code>, la instancia de destino no se creará.
               </p>
             </div>
           </div>
@@ -339,22 +438,27 @@ void cleanup(InvocationContext ctx) { ... }
             </h4>
             <div class="paragraph">
               <p>
-                You can define multiple lifecycle interceptors for a target class by specifying the interceptor classes in the <code>@Interceptors</code> annotation:
+                Puede definir varios interceptores de ciclo de vida para una clase de destino especificando 
+                las clases de interceptor en la anotación <code>@Interceptors</code>:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Interceptors({PrimaryInterceptor.class, SecondaryInterceptor.class,
         LastInterceptor.class})
 @Stateless
 public class OrderBean { ... }
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
             <div class="paragraph">
               <p>
-                Data stored in the <code>contextData</code> property of <code>InvocationContext</code> is not sharable across different lifecycle events.
+                Los datos almacenados en la propiedad <code>contextData</code> de 
+                <code>InvocationContext</code> no se pueden compartir entre diferentes eventos del ciclo de 
+                vida.
               </p>
             </div>
           </div>
@@ -363,43 +467,54 @@ public class OrderBean { ... }
           <h3 id="intercepting-timeout-events">Intercepción de Eventos de Tiempo de Espera</h3>
           <div class="paragraph">
             <p>
-              You can define interceptors for EJB timer service timeout methods by using the <code>@AroundTimeout</code> annotation on methods in the target class or in an interceptor class. Only one <code>@AroundTimeout</code> method per class is allowed.
+              Puede definir interceptores para los métodos de tiempo de espera del servicio de temporizador 
+              EJB utilizando la anotación <code>@AroundTimeout</code> en los métodos de la clase de destino o 
+              en una clase de interceptor. Solo se permite un método <code>@AroundTimeout</code> por clase.
             </p>
           </div>
           <div class="paragraph">
-            <p>Timeout interceptors have the following form:</p>
+            <p>Los interceptores de tiempo de espera tienen la siguiente forma:</p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 Object method-name(InvocationContext) throws Exception { ... }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
-            <p>For example:</p>
+            <p>Por ejemplo:</p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @AroundTimeout
 protected void timeoutInterceptorMethod(InvocationContext ctx) { ... }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              Timeout interceptor methods can have public, private, protected, or package-level access, and must not be declared static or final.
+              Los métodos de interceptor de tiempo de espera pueden tener acceso público, privado, protegido o 
+              de nivel de paquete, y no deben declararse como estáticos o finales.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              Timeout interceptors can call any component or resource callable by the target timeout method, and are invoked in the same transaction and security context as the target method.
+              Los interceptores de tiempo de espera pueden llamar a cualquier componente o recurso al que 
+              pueda llamar el método de tiempo de espera de destino y se invocan en el mismo contexto de 
+              transacción y seguridad que el método de destino.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              Timeout interceptors may access the timer object associated with the target timeout method through the <code>InvocationContext</code> instance's <code>getTimer</code> method.
+              Los interceptores de tiempo de espera pueden acceder al objeto de temporizador asociado con el 
+              método de tiempo de espera de destino a través del método <code>getTimer</code> de la instancia 
+              <code>InvocationContext</code>.
             </p>
           </div>
           <div class="sect3" id="GKHLA">
@@ -408,17 +523,26 @@ protected void timeoutInterceptorMethod(InvocationContext ctx) { ... }
             </h4>
             <div class="paragraph">
               <p>
-                You can define multiple timeout interceptors for a given target class by specifying the interceptor classes containing <code>@AroundTimeout</code> interceptor methods in an <code>@Interceptors</code> annotation at the class level.
+                Puede definir varios interceptores de tiempo de espera para una clase de destino determinada 
+                especificando las clases de interceptor que contienen métodos de interceptor 
+                <code>@AroundTimeout</code> en una anotación <code>@Interceptors</code> en el nivel de clase.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                If a target class specifies timeout interceptors in an interceptor class, and also has an <code>@AroundTimeout</code> interceptor method within the target class itself, the timeout interceptors in the interceptor classes are called first, followed by the timeout interceptors defined in the target class. For example, in the following example, assume that both the <code>PrimaryInterceptor</code> and <code>SecondaryInterceptor</code> classes have timeout interceptor methods:
+                Si una clase de destino especifica interceptores de tiempo de espera en una clase de 
+                interceptor y también tiene un método de interceptor <code>@AroundTimeout</code> dentro de la 
+                propia clase de destino, se llama primero a los interceptores de tiempo de espera en las 
+                clases de interceptor, seguidos de los interceptores de tiempo de espera definidos. en la 
+                clase objetivo. Por ejemplo, en el siguiente ejemplo, suponga que las clases 
+                <code>PrimaryInterceptor</code> y <code>SecondaryInterceptor</code> tienen métodos de 
+                interceptor de tiempo de espera:
               </p>
             </div>
             <div class="listingblock">
               <div class="content">
-                <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Interceptors({PrimaryInterceptor.class, SecondaryInterceptor.class})
 @Stateful
 public class OrderBean {
@@ -427,12 +551,15 @@ public class OrderBean {
     private void last(InvocationContext ctx) { ... }
     ...
 }
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
             <div class="paragraph">
               <p>
-                The timeout interceptor in <code>PrimaryInterceptor</code> will be called first, followed by the timeout interceptor in <code>SecondaryInterceptor</code>, and finally the <code>last</code> method defined in the target class.
+                Primero se llamará al interceptor de tiempo de espera en <code>PrimaryInterceptor</code>, 
+                seguido por el interceptor de tiempo de espera en <code>SecondaryInterceptor</code> y, 
+                finalmente, el método <code>last</code> definido en la clase de destino.
               </p>
             </div>
           </div>
@@ -441,23 +568,33 @@ public class OrderBean {
           <h3 id="binding-interceptors-to-components">Unión de Interceptores a Componentes</h3>
           <div class="paragraph">
             <p>
-              Interceptor binding types are annotations that may be applied to components to associate them with a particular interceptor. Interceptor binding types are typically custom runtime annotation types that specify the interceptor target. Use the <code>javax.interceptor.InterceptorBinding</code> annotation on the custom annotation definition and specify the target by using <code>@Target</code>, setting one or more of <code>TYPE</code> (class-level interceptors), <code>METHOD</code> (method-level interceptors), <code>CONSTRUCTOR</code> (around-construct interceptors), or any other valid target:
+              Los tipos de enlace de interceptor son anotaciones que se pueden aplicar a los componentes para 
+              asociarlos con un interceptor en particular. Los tipos de enlace de interceptor suelen ser tipos 
+              de anotación de tiempo de ejecución personalizados que especifican el destino del interceptor. 
+              Use la anotación <code>javax.interceptor.InterceptorBinding</code> en la definición de anotación 
+              personalizada y especifique el destino usando <code>@Target</code>, configurando uno o más de 
+              <code>TYPE</code> (interceptores de nivel de clase), <code>METHOD</code> (interceptores de nivel 
+              de método), <code>CONSTRUCTOR</code> (interceptores alrededor de la construcción) o cualquier 
+              otro objetivo válido:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @InterceptorBinding
 @Target({TYPE, METHOD})
 @Retention(RUNTIME)
 @Inherited
 pubic @interface Logged { ... }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="paragraph">
             <p>
-              Interceptor binding types may also be applied to other interceptor binding types:
+              Los tipos de enlaces de interceptores también se pueden aplicar a otros tipos de enlaces de 
+              interceptores:
             </p>
           </div>
           <div class="listingblock">
@@ -470,7 +607,8 @@ pubic @interface Logged { ... }
 @Retention(RUNTIME)
 @Inherited
 public @interface Secured { ... }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
           <div class="sect3" id="sthref256">
@@ -479,7 +617,8 @@ public @interface Secured { ... }
             </h4>
             <div class="paragraph">
               <p>
-                Annotate the interceptor class with the interceptor binding type and <code>@Interceptor</code> to associate the interceptor binding with the interceptor class:
+                Anote la clase de interceptor con el tipo de enlace del interceptor y 
+                <code>@Interceptor</code> para asociar el enlace del interceptor con la clase del interceptor:
               </p>
             </div>
             <div class="listingblock">
@@ -493,17 +632,22 @@ public class LoggingInterceptor {
     public Object logInvocation(InvocationContext ctx) throws Exception { ... }
     ...
 }
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
             <div class="paragraph">
               <p>
-                An interceptor class may declare multiple interceptor binding types, and more than one interceptor class may declare an interceptor binding type.
+                Una clase de interceptor puede declarar varios tipos de vinculación de interceptor y más de 
+                una clase de interceptor puede declarar un tipo de vinculación de interceptor.
               </p>
             </div>
             <div class="paragraph">
               <p>
-                If the interceptor class intercepts lifecycle callbacks, it can only declare interceptor binding types with <code>Target(TYPE)</code>, or in the case of <code>@AroundConstruct</code> lifecycle callbacks, <code>Target(CONSTRUCTOR)</code>.
+                Si la clase de interceptor intercepta las devoluciones de llamada del ciclo de vida, solo 
+                puede declarar tipos de enlaces de interceptor con <code>Target(TYPE)</code>, o en el caso de 
+                las devoluciones de llamada del ciclo de vida <code>@AroundConstruct</code>, 
+                <code>Target( CONSTRUCTOR)</code>.
               </p>
             </div>
           </div>
@@ -511,7 +655,9 @@ public class LoggingInterceptor {
             <h4 id="binding-a-component-to-an-interceptor">Vinculación de un Componente a un Interceptor</h4>
             <div class="paragraph">
               <p>
-                Add the interceptor binding type annotation to the target component's class, method, or constructor. Interceptor binding types are applied using the same rules as <code>@Interceptor</code> annotations:
+                Agregue la anotación de tipo de enlace del interceptor a la clase, el método o el constructor 
+                del componente de destino. Los tipos de enlace de interceptor se aplican utilizando las mismas 
+                reglas que las anotaciones <code>@Interceptor</code>:
               </p>
             </div>
             <div class="listingblock">
@@ -525,12 +671,17 @@ public class Message {
     public void getConfidentialMessage() { ... }
     ...
 }
-                </code></pre>
+                  </code>
+                </pre>
               </div>
             </div>
             <div class="paragraph">
               <p>
-                If the component has a class-level interceptor binding, it must not be <code>final</code> or have any non-<code>static</code>, non-<code>private</code> <code>final</code> methods. If a non-<code>static</code>, non-<code>private</code> method has an interceptor binding applied to it, it must not be <code>final</code>, and the component class cannot be <code>final</code>.
+                Si el componente tiene un enlace de interceptor de nivel de clase, no debe ser 
+                <code>final</code> ni tener ningún método <code>static</code>, <code>private</code> o 
+                <code>final</code>. Si un método no <code>static</code>, no <code>private</code> tiene un 
+                enlace de interceptor aplicado, no debe ser <code>final</code>, y la clase de componente no 
+                puede ser <code>final</code>.
               </p>
             </div>
           </div>
@@ -539,46 +690,60 @@ public class Message {
           <h3 id="ordering-interceptors">Orden de los Interceptores</h3>
           <div class="paragraph">
             <p>
-              The order in which multiple interceptors are invoked is determined by the following rules.
+              El orden en el que se invocan múltiples interceptores está determinado por las siguientes 
+              reglas.
             </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
                 <p>
-                  Default interceptors are defined in a deployment descriptor, and are invoked first. They may specify the invocation order or override the order specified using annotations. Default interceptors are invoked in the order in which they are defined in the deployment descriptor.
+                  Los interceptores predeterminados se definen en un descriptor de implementación y se invocan 
+                  primero. Pueden especificar el orden de invocación o anular el orden especificado mediante 
+                  anotaciones. Los interceptores predeterminados se invocan en el orden en que están definidos 
+                  en el descriptor de implementación.
                 </p>
               </li>
               <li>
                 <p>
-                  The order in which the interceptor classes are listed in the <code>@Interceptors</code> annotation defines the order in which the interceptors are invoked. Any <code>@Priority</code> settings for interceptors listed within an <code>@Interceptors</code> annotation are ignored.
+                  El orden en que se enumeran las clases de interceptores en la anotación 
+                  <code>@Interceptors</code> define el orden en que se invocan los interceptores. Cualquier 
+                  configuración de <code>@Priority</code> para los interceptores enumerados dentro de una 
+                  anotación <code>@Interceptors</code> se ignora.
                 </p>
               </li>
               <li>
                 <p>
-                  If the interceptor class has superclasses, the interceptors defined on the superclasses are invoked first, starting with the most general superclass.
+                  Si la clase de interceptor tiene superclases, los interceptores definidos en las superclases 
+                  se invocan primero, comenzando con la superclase más general.
                 </p>
               </li>
               <li>
                 <p>
-                  Interceptor classes may set the priority of the interceptor methods by setting a value within a <code>javax.annotation.Priority</code> annotation.
+                  Las clases de interceptor pueden establecer la prioridad de los métodos de interceptor 
+                  estableciendo un valor dentro de una anotación <code>javax.annotation.Priority</code>.
                 </p>
               </li>
               <li>
                 <p>
-                  After the interceptors defined within interceptor classes have been invoked, the target class's constructor, around-invoke, or around-timeout interceptors are invoked in the same order as the interceptors within the <code>@Interceptors</code> annotation.
+                  Después de que se hayan invocado los interceptores definidos dentro de las clases de 
+                  interceptores, los interceptores de constructor, de invocación o de tiempo de espera de la 
+                  clase de destino se invocan en el mismo orden que los interceptores dentro de la anotación 
+                  <code>@Interceptors</code>.
                 </p>
               </li>
               <li>
                 <p>
-                  If the target class has superclasses, any interceptors defined on the superclasses are invoked first, starting with the most general superclass.
+                  Si la clase de destino tiene superclases, cualquier interceptor definido en las superclases 
+                  se invoca primero, comenzando con la superclase más general.
                 </p>
               </li>
             </ul>
           </div>
           <div class="paragraph">
             <p>
-              The <code>@Priority</code> annotation requires an <code>int</code> value as an element. The lower the number, the higher the priority of the associated interceptor.
+              La anotación <code>@Priority</code> requiere un valor <code>int</code> como elemento. Cuanto 
+              menor sea el número, mayor será la prioridad del interceptor asociado.
             </p>
           </div>
           <table class="tableblock frame-all grid-all spread">
@@ -590,11 +755,12 @@ public class Message {
                 <td class="tableblock halign-left valign-top">
                   <div>
                     <div class="paragraph">
-                      <p><strong>Note</strong>:</p>
+                      <p><strong>Nota</strong>:</p>
                     </div>
                     <div class="paragraph">
                       <p>
-                        The invocation order of interceptors with the same priority value is implementation-specific.
+                        El orden de invocación de los interceptores con el mismo valor de prioridad es 
+                        específico de la implementación.
                       </p>
                     </div>
                   </div>
@@ -604,14 +770,15 @@ public class Message {
           </table>
           <div class="paragraph">
             <p>
-              The <code>javax.interceptor.Interceptor.Priority</code> class defines the priority constants listed in <a href="#BABFBAEF">Table 57-2</a>.
+              La clase <code>javax.interceptor.Interceptor.Priority</code> define las constantes de prioridad 
+              enumeradas en la <a href="#BABFBAEF">Tabla 57-2</a>.
             </p>
           </div>
           <div class="paragraph">
             <p><a id="sthref259"></a><a id="BABFBAEF"></a></p>
           </div>
           <div class="paragraph">
-            <p><strong>Table 57-2 Interceptor Priority Constants</strong></p>
+            <p><strong>Tabla 57-2 Constantes de Prioridad del Interceptor</strong></p>
           </div>
           <table class="tableblock frame-all grid-all" style="width: 99%;">
             <colgroup>
@@ -622,9 +789,9 @@ public class Message {
             <tbody>
               <tr>
                 <td class="tableblock halign-left valign-top">
-                  <p class="tableblock"><strong>Priority Constant</strong></p></td>
+                  <p class="tableblock"><strong>Constante de Prioridad</strong></p></td>
                 <td class="tableblock halign-left valign-top">
-                  <p class="tableblock"><strong>Value</strong></p></td>
+                  <p class="tableblock"><strong>Valor</strong></p></td>
                 <td class="tableblock halign-left valign-top">
                   <p class="tableblock"><strong>Descripción</strong></p></td>
               </tr>
@@ -634,7 +801,10 @@ public class Message {
                 <td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
                 <td class="tableblock halign-left valign-top">
                   <p class="tableblock">
-                    Interceptors defined by the Java EE Platform and intended to be invoked early in the invocation chain should use the range between <code>PLATFORM_BEFORE</code> and <code>LIBRARY_BEFORE</code>. These interceptors have the highest priority.
+                    Los interceptores definidos por la plataforma Java EE y destinados a ser invocados al 
+                    principio de la cadena de invocación deben usar el rango entre 
+                    <code>PLATFORM_BEFORE</code> y <code>LIBRARY_BEFORE</code>. Estos interceptores tienen la 
+                    prioridad más alta.
                   </p>
                 </td>
               </tr>
@@ -644,7 +814,9 @@ public class Message {
                 <td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
                 <td class="tableblock halign-left valign-top">
                   <p class="tableblock">
-                    Interceptors defined by extension libraries that should be invoked early in the interceptor chain should use the range between <code>LIBRARY_BEFORE</code> and <code>APPLICATION</code>.
+                    Los interceptores definidos por bibliotecas de extensión que deben invocarse al principio 
+                    de la cadena de interceptores deben usar el rango entre <code>LIBRARY_BEFORE</code> y 
+                    <code>APPLICATION</code>.
                   </p>
                 </td>
               </tr>
@@ -654,7 +826,8 @@ public class Message {
                 <td class="tableblock halign-left valign-top"><p class="tableblock">2000</p></td>
                 <td class="tableblock halign-left valign-top">
                   <p class="tableblock">
-                    Interceptors defined by applications should use the range between <code>APPLICATION</code> and <code>LIBRARY_AFTER</code>.
+                    Los interceptores definidos por aplicaciones deben usar el rango entre 
+                    <code>APPLICATION</code> y <code>LIBRARY_AFTER</code>.
                   </p>
                 </td>
               </tr>
@@ -664,7 +837,8 @@ public class Message {
                 <td class="tableblock halign-left valign-top"><p class="tableblock">3000</p></td>
                 <td class="tableblock halign-left valign-top">
                   <p class="tableblock">
-                    Low priority interceptors defined by extension libraries should use the range between <code>LIBRARY_AFTER</code> and <code>PLATFORM_AFTER</code>.
+                    Los interceptores de baja prioridad definidos por bibliotecas de extensión deben usar el 
+                    rango entre <code>LIBRARY_AFTER</code> y <code>PLATFORM_AFTER</code>.
                   </p>
                 </td>
               </tr>
@@ -675,7 +849,8 @@ public class Message {
                 <td class="tableblock halign-left valign-top"><p class="tableblock">4000</p></td>
                 <td class="tableblock halign-left valign-top">
                   <p class="tableblock">
-                    Low priority interceptors defined by the Java EE Platform should have values higher than <code>PLATFORM_AFTER</code>.
+                    Los interceptores de baja prioridad definidos por la plataforma Java EE deben tener 
+                    valores superiores a <code>PLATFORM_AFTER</code>.
                   </p>
                 </td>
               </tr>
@@ -690,11 +865,12 @@ public class Message {
                 <td class="tableblock halign-left valign-top">
                   <div>
                     <div class="paragraph">
-                      <p>Note:</p>
+                      <p>Nota:</p>
                     </div>
                     <div class="paragraph">
                       <p>
-                        Negative priority values are reserved by the Interceptors specification for future use, and should not be used.
+                        Los valores de prioridad negativa están reservados por la especificación de 
+                        Interceptores para uso futuro y no deben usarse.
                       </p>
                     </div>
                   </div>
@@ -704,16 +880,19 @@ public class Message {
           </table>
           <div class="paragraph">
             <p>
-              The following code snippet shows how to use the priority constants in an application-defined interceptor:
+              El siguiente fragmento de código muestra cómo usar las constantes de prioridad en un interceptor 
+              definido por la aplicación:
             </p>
           </div>
           <div class="listingblock">
             <div class="content">
-              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Interceptor
 @Priority(Interceptor.Priority.APPLICATION+200
 public class MyInterceptor { ... }
-              </code></pre>
+                </code>
+              </pre>
             </div>
           </div>
         </div>
