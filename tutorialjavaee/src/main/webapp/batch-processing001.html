@@ -49,75 +49,123 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            Some enterprise applications contain tasks that can be executed without user interaction. These tasks are executed periodically or when resource usage is low, and they often process large amounts of information such as log files, database records, or images. Examples include billing, report generation, data format conversion, and image processing. These tasks are called batch jobs.
+            Algunas aplicaciones empresariales contienen tareas que se pueden ejecutar sin la interacción del 
+            usuario. Estas tareas se ejecutan periódicamente o cuando el uso de recursos es bajo y, a menudo, 
+            procesan grandes cantidades de información, como archivos de registro, registros de bases de datos 
+            o imágenes. Los ejemplos incluyen facturación, generación de informes, conversión de formato de 
+            datos y procesamiento de imágenes. Estas tareas se denominan trabajos por lotes.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            Batch processing refers to running batch jobs on a computer system. Java EE includes a batch processing framework that provides the batch execution infrastructure common to all batch applications, enabling developers to concentrate on the business logic of their batch applications. The batch framework consists of a job specification language based on XML, a set of batch annotations and interfaces for application classes that implement the business logic, a batch container that manages the execution of batch jobs, and supporting classes and interfaces to interact with the batch container.
+            El procesamiento por lotes se refiere a la ejecución de trabajos por lotes en un sistema 
+            informático. Java EE incluye un marco de procesamiento por lotes que proporciona la 
+            infraestructura de ejecución por lotes común a todas las aplicaciones por lotes, lo que permite a 
+            los desarrolladores concentrarse en la lógica de negocio de sus aplicaciones por lotes. El marco 
+            de trabajo por lotes consta de un lenguaje de especificación de trabajos basado en XML, un 
+            conjunto de anotaciones por lotes e interfaces para las clases de aplicación que implementan la 
+            lógica de negocio, un contenedor de lotes que administra la ejecución de trabajos por lotes y 
+            clases e interfaces compatibles para interactuar con el contenedor de lotes.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            A batch job can be completed without user intervention. For example, consider a telephone billing application that reads phone call records from the enterprise information systems and generates a monthly bill for each account. Since this application does not require any user interaction, it can run as a batch job.
+            Un trabajo por lotes se puede completar sin la intervención del usuario. Por ejemplo, considere 
+            una aplicación de facturación telefónica que lea los registros de llamadas telefónicas de los 
+            sistemas de información de la empresa y genere una factura mensual para cada cuenta. Dado que esta 
+            aplicación no requiere ninguna interacción del usuario, puede ejecutarse como un trabajo por 
+            lotes.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            The phone billing application consists of two phases: The first phase associates each call from the registry with a monthly bill, and the second phase calculates the tax and total amount due for each bill. Each of these phases is a step of the batch job.
+            La aplicación de facturación telefónica consta de dos fases: la primera fase asocia cada llamada 
+            del registro con una factura mensual, y la segunda fase calcula el impuesto y el monto total 
+            adeudado por cada factura. Cada una de estas fases es un paso del trabajo por lotes.
           </p>
         </div>
         <div class="paragraph">
           <p>
-            Batch applications specify a set of steps and their execution order. Different batch frameworks may specify additional elements, like decision elements or groups of steps that run in parallel. The following sections describe steps in more detail and provide information about other common characteristics of batch frameworks.
+            Las aplicaciones por lotes especifican un conjunto de pasos y su orden de ejecución. Diferentes 
+            marcos de trabajo por lotes pueden especificar elementos adicionales, como elementos de decisión o 
+            grupos de pasos que se ejecutan en paralelo. Las siguientes secciones describen los pasos con más 
+            detalle y brindan información sobre otras características comunes de los marcos de trabajo por 
+            lotes.
           </p>
         </div>
         <div class="sect2" id="sthref261">
           <h3 id="steps-in-batch-jobs">Pasos en Trabajos por Lotes</h3>
           <div class="paragraph">
             <p>
-              A step is an independent and sequential phase of a batch job. Batch jobs contain chunk-oriented steps and task-oriented steps.
+              Un paso es una fase independiente y secuencial de un trabajo por lotes. Los trabajos por lotes 
+              contienen pasos orientados a fragmentos y pasos orientados a tareas.
             </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
                 <p>
-                  Chunk-oriented steps (chunk steps) process data by reading items from a data source, applying some business logic to each item, and storing the results. Chunk steps read and process one item at a time and group the results into a chunk. The results are stored when the chunk reaches a configurable size. Chunk-oriented processing makes storing results more efficient and facilitates transaction demarcation.
+                  Los pasos orientados a fragmentos (pasos de fragmentos) procesan datos leyendo elementos de 
+                  un origen de datos, aplicando alguna lógica de negocio a cada elemento y almacenando los 
+                  resultados. Los pasos de fragmento leen y procesan un elemento a la vez y agrupan los 
+                  resultados en un fragmento. Los resultados se almacenan cuando el fragmento alcanza un 
+                  tamaño configurable. El procesamiento orientado a fragmentos hace que el almacenamiento de 
+                  resultados sea más eficiente y facilita la demarcación de transacciones.
                 </p>
                 <div class="paragraph">
-                  <p>Chunk steps have three parts.</p>
+                  <p>Los pasos de trozo tienen tres partes.</p>
                 </div>
                 <div class="ulist">
                   <ul>
                     <li>
                       <p>
-                        The input retrieval part reads one item at a time from a data source, such as entries on a database, files in a directory, or entries in a log file.
+                        La parte de recuperación de entrada lee un elemento a la vez de una fuente de datos, 
+                        como entradas en una base de datos, archivos en un directorio o entradas en un archivo 
+                        de registro.
                       </p>
                     </li>
                     <li>
                       <p>
-                        The business processing part manipulates one item at a time using the business logic defined by the application. Examples include filtering, formatting, and accessing data from the item for computing a result.
+                        La parte de procesamiento de negocio manipula un elemento a la vez utilizando la 
+                        lógica de negocio definida por la aplicación. Los ejemplos incluyen filtrar, formatear 
+                        y acceder a datos del elemento para calcular un resultado.
                       </p>
                     </li>
                     <li>
-                      <p>The output writing part stores a chunk of processed items at a time.</p>
+                      <p>
+                        La parte de escritura de salida almacena una parte de los elementos procesados a la 
+                        vez.
+                      </p>
                       <div class="paragraph">
                         <p>
-                          Chunk steps are often long-running because they process large amounts of data. Batch frameworks enable chunk steps to bookmark their progress using checkpoints. A chunk step that is interrupted can be restarted from the last checkpoint. The input retrieval and output writing parts of a chunk step save their current position after the processing of each chunk, and can recover it when the step is restarted.
+                          Los pasos de fragmentos suelen ser de larga duración porque procesan grandes 
+                          cantidades de datos. Los marcos de trabajo por lotes permiten que los pasos de los 
+                          fragmentos marquen su progreso mediante puntos de control. Un paso de fragmento que 
+                          se interrumpe se puede reiniciar desde el último punto de control. Las partes de 
+                          recuperación de entrada y escritura de salida de un paso de fragmento guardan su 
+                          posición actual después del procesamiento de cada fragmento y pueden recuperarla 
+                          cuando se reinicia el paso.
                         </p>
                       </div>
                       <div class="paragraph">
                         <p>
-                          <a href="#BABFJBAH">Figure 58-1</a> shows the three parts of two steps in a batch job.
+                          La  <a href="#BABFJBAH">figura 58-1</a> muestra las tres partes de dos pasos en un 
+                          trabajo por lotes.
                         </p>
                       </div>
                       <div class="paragraph">
-                        <div class="title"><strong>Figure 58-1 Chunk Steps in a Batch Job</strong></div>
+                        <div class="title">
+                          <strong>Figura 58-1 Pasos de fragmentos en un trabajo por lotes</strong>
+                        </div>
                         <p>
                           <span class="image">
                             <img src="img/javaeett_dt_058.png" 
-                                 alt="This figure shows a batch job that contains two chunk steps: step A and step B. Step A has the three parts of a chunk-oriented step: input retrieval A, business processing A, and output writing A. Step B also has the three parts of a chunk-oriented step: input retrieval B, business processing B, and output writing B.">
+                                 alt="Esta figura muestra un trabajo por lotes que contiene dos pasos de 
+                                 fragmentos: paso A y paso B. El paso A tiene las tres partes de un paso 
+                                 orientado a fragmentos: recuperación de entrada A, procesamiento de negocio A 
+                                 y escritura de salida A. El paso B también tiene los tres partes de un paso 
+                                 orientado a fragmentos: recuperación de entrada B, procesamiento de negocio B 
+                                 y escritura de salida B.">
                           </span>
                         </p>
                       </div>
@@ -128,25 +176,32 @@
             </ul>
           </div>
           <div class="paragraph">
-            <p>For example, the phone billing application consists of two chunk steps.</p>
+            <p>Por ejemplo, la aplicación de facturación telefónica consta de dos pasos.</p>
           </div>
           <div class="ulist">
             <ul>
               <li>
                 <p>
-                  In the first step, the input retrieval part reads call records from the registry; the business processing part associates each call with a bill and creates a bill if one does not exist for an account; and the output writing part stores each bill in a database.
+                  En el primer paso, la parte de recuperación de entrada lee los registros de llamadas del 
+                  registro; la parte de procesamiento de negocio asocia cada llamada con una factura y crea 
+                  una factura si no existe una para una cuenta; y la parte de escritura de salida almacena 
+                  cada factura en una base de datos.
                 </p>
               </li>
               <li>
                 <p>
-                  In the second step, the input retrieval part reads bills from the database; the business processing part calculates the tax and total amount due for each bill; and the output writing part updates the database records and generates printable versions of each bill.
+                  En el segundo paso, la parte de recuperación de entradas lee las facturas de la base de 
+                  datos; la parte de procesamiento de negocio calcula el impuesto y el monto total adeudado 
+                  por cada factura; y la parte de escritura de salida actualiza los registros de la base de 
+                  datos y genera versiones imprimibles de cada factura.
                 </p>
               </li>
             </ul>
           </div>
           <div class="paragraph">
             <p>
-              This application could also contain a task step that cleaned up the files from the bills generated for the previous month.
+              Esta aplicación también podría contener un paso de tarea que limpiara los archivos de las 
+              facturas generadas para el mes anterior.
             </p>
           </div>
         </div>
@@ -154,24 +209,30 @@
           <h3 id="parallel-processing">Procesamiento en Paralelo</h3>
           <div class="paragraph">
             <p>
-              Batch jobs often process large amounts of data or perform computationally expensive operations. Batch applications can benefit from parallel processing in two scenarios.
+              Los trabajos por lotes a menudo procesan grandes cantidades de datos o realizan operaciones 
+              computacionalmente costosas. Las aplicaciones por lotes pueden beneficiarse del procesamiento 
+              paralelo en dos escenarios.
             </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
-                <p>Steps that do not depend on each other can run on different threads.</p>
+                <p>Los pasos que no dependen unos de otros pueden ejecutarse en subprocesos diferentes.</p>
               </li>
               <li>
                 <p>
-                  Chunk-oriented steps where the processing of each item does not depend on the results of processing previous items can run on more than one thread.
+                  Los pasos orientados a fragmentos en los que el procesamiento de cada elemento no depende de 
+                  los resultados del procesamiento de elementos anteriores pueden ejecutarse en más de un 
+                  subproceso.
                 </p>
               </li>
             </ul>
           </div>
           <div class="paragraph">
             <p>
-              Batch frameworks provide mechanisms for developers to define groups of independent steps and to split chunk-oriented steps in parts that can run in parallel.
+              Los marcos de trabajo por lotes proporcionan mecanismos para que los desarrolladores definan 
+              grupos de pasos independientes y dividan los pasos orientados a fragmentos en partes que 
+              se pueden ejecutar en paralelo.
             </p>
           </div>
         </div>
@@ -179,40 +240,50 @@
           <h3 id="status-and-decision-elements">Elementos de Estado y Decisión</h3>
           <div class="paragraph">
             <p>
-              Batch frameworks keep track of a status for every step in a job. The status indicates if a step is running or if it has completed. If the step has completed, the status indicates one of the following.
+              Los marcos de trabajo por lotes realizan un seguimiento del estado de cada paso de un trabajo. 
+              El estado indica si un paso se está ejecutando o si se ha completado. Si el paso se ha 
+              completado, el estado indica uno de los siguientes.
             </p>
           </div>
           <div class="ulist">
             <ul>
               <li>
-                <p>The execution of the step was successful.</p>
+                <p>La ejecución del paso fue exitosa.</p>
               </li>
               <li>
-                <p>The step was interrupted.</p>
+                <p>El paso fue interrumpido.</p>
               </li>
               <li>
-                <p>An error occurred in the execution of the step.</p>
+                <p>Ocurrió un error en la ejecución del paso.</p>
               </li>
             </ul>
           </div>
           <div class="paragraph">
             <p>
-              In addition to steps, batch jobs can also contain decision elements. Decision elements use the exit status of the previous step to determine the next step or to terminate the batch job. Decision elements set the status of the batch job when terminating it. Like a step, a batch job can terminate successfully, be interrupted, or fail.
+              Además de los pasos, los trabajos por lotes también pueden contener elementos de decisión. Los 
+              elementos de decisión utilizan el estado de salida del paso anterior para determinar el paso 
+              siguiente o para finalizar el trabajo por lotes. Los elementos de decisión establecen el estado 
+              del trabajo por lotes al finalizarlo. Al igual que un paso, un trabajo por lotes puede terminar 
+              correctamente, interrumpirse o fallar.
             </p>
           </div>
           <div class="paragraph">
             <p>
-              <a href="#BCGDCDCA">Figure 58-2</a> shows an example of a job that contains chunk steps, task steps and a decision element.
+              La <a href="#BCGDCDCA">Figura 58-2</a> muestra un ejemplo de un trabajo que contiene pasos de 
+              fragmento, pasos de tarea y un elemento de decisión.
             </p>
           </div>
           <div id="BCGDCDCA" class="paragraph">
-            <div class="title">
-              <strong>Figure 58-2 Steps and Decision Elements in a Job</strong>
-            </div>
+            <div class="title"><strong>Figura 58-2 Pasos y elementos de decisión en un trabajo</strong></div>
             <p>
               <span class="image">
                 <img src="img/javaeett_dt_059.png" 
-                     alt="This figure shows a batch job that contains two chunk steps, a task step and a decision element. The job starts with chunk step A, continues with chunk step B, and then decision element D evaluates condition 1. The condition is based on the status of step B. If condition 1 is true, the job terminates; otherwise the job continues with step C and then the job ends.">
+                     alt="Esta figura muestra un trabajo por lotes que contiene dos pasos de fragmento, un 
+                     paso de tarea y un elemento de decisión. El trabajo comienza con el paso de fragmento A, 
+                     continúa con el paso de fragmento B y luego el elemento de decisión D evalúa la 
+                     condición 1. La condición se basa en el estado del paso B. Si la condición 1 es 
+                     verdadera, el trabajo finaliza; de lo contrario, el trabajo continúa con el paso C y 
+                     luego finaliza.">
               </span>
             </p>
           </div>
@@ -220,30 +291,35 @@
         <div class="sect2" id="sthref266">
           <h3 id="batch-framework-functionality">Funcionalidad del Marco de Trabajo por Lotes</h3>
           <div class="paragraph">
-            <p>Batch applications have the following common requirements.</p>
+            <p>Las aplicaciones por lotes tienen los siguientes requisitos comunes.</p>
           </div>
           <div class="ulist">
             <ul>
               <li>
-                <p>Define jobs, steps, decision elements, and the relationships between them.</p>
+                <p>Definen trabajos, pasos, elementos de decisión y las relaciones entre ellos.</p>
               </li>
               <li>
-                <p>Execute some groups of steps or parts of a step in parallel.</p>
+                <p>Ejecutan algunos grupos de pasos o partes de un paso en paralelo.</p>
               </li>
               <li>
-                <p>Maintain state information for jobs and steps.</p>
+                <p>Mantienen información de estado para trabajos y pasos.</p>
               </li>
               <li>
-                <p>Launch jobs and resume interrupted jobs.</p>
+                <p>Inician trabajos y reanudan trabajos interrumpidos.</p>
               </li>
               <li>
-                <p>Handle errors.</p>
+                <p>Manejan errores.</p>
               </li>
             </ul>
           </div>
           <div class="paragraph">
             <p>
-              Batch frameworks provide the batch execution infrastructure that addresses the common requirements of all batch applications, enabling developers to concentrate on the business logic of their applications. Batch frameworks consist of a format to specify jobs and steps, an application programming interface (API), and a service available at runtime that manages the execution of batch jobs.
+              Los marcos de trabajo por lotes proporcionan la infraestructura de ejecución por lotes que 
+              aborda los requisitos comunes de todas las aplicaciones por lotes, lo que permite a los 
+              desarrolladores concentrarse en la lógica de negocio de sus aplicaciones. Los marcos de trabajo 
+              por lotes consisten en un formato para especificar trabajos y pasos, una interfaz de 
+              programación de aplicaciones (API, en inglés) y un servicio disponible en tiempo de ejecución 
+              que administra la ejecución de trabajos por lotes.
             </p>
           </div>
         </div>
