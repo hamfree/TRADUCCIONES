@@ -49,78 +49,108 @@
       <div class="sectionbody">
         <div class="paragraph">
           <p>
-            The <code>taskcreator</code> example demonstrates how to use Concurrency Utilities for Java EE to run tasks immediately, periodically, or after a fixed delay. This example provides a JavaServer Faces interface that enables users to submit tasks to be executed and displays information messages for each task. The example uses the Managed Executor Service to run tasks immediately and the Managed Scheduled Executor Service to run tasks periodically or after a fixed delay. (See <a href="concurrency-utilities002.html#CIHFBCFH">Componentes Principales de las Utilidades de Concurrencia</a> for information about these services.)
+            El ejemplo de <code>taskcreator</code> demuestra cómo utilizar las utilidades de concurrencia para 
+            Java EE para ejecutar tareas de forma inmediata, periódica o después de un retraso fijo. Este 
+            ejemplo proporciona una interfaz JavaServer Faces que permite a los usuarios enviar tareas para 
+            ejecutar y muestra mensajes de información para cada tarea. El ejemplo utiliza el Servicio de 
+            Ejecutor Administrado para ejecutar tareas inmediatamente y el Servicio de Ejecutor Programado 
+            Administrado para ejecutar tareas periódicamente o después de un retraso fijo. (Consulte 
+            <a href="concurrency-utilities002.html#CIHFBCFH">
+              Componentes Principales de las Utilidades de Concurrencia
+            </a> para obtener información sobre estos servicios).
           </p>
         </div>
         <div class="paragraph">
-          <p>The <code>taskcreator</code> example consists of the following components.</p>
+          <p>El ejemplo de <code>taskcreator</code> consta de los siguientes componentes.</p>
         </div>
         <div class="ulist">
           <ul>
             <li>
               <p>
-                A JavaServer Faces page (<code>index.xhtml</code>) that contains three elements: a form to submit tasks, a task execution log, and a form to cancel periodic tasks. This page submits Ajax requests to create and cancel tasks. This page also receives WebSocket messages, using JavaScript code to update the task execution log.
+                Una página de JavaServer Faces (<code>index.xhtml</code>) que contiene tres elementos: un 
+                formulario para enviar tareas, un registro de ejecución de tareas y un formulario para 
+                cancelar tareas periódicas. Esta página envía solicitudes Ajax para crear y cancelar tareas. 
+                Esta página también recibe mensajes de WebSocket, utilizando código JavaScript para actualizar 
+                el registro de ejecución de tareas.
               </p>
             </li>
             <li>
               <p>
-                A CDI managed bean (<code>TaskCreatorBean</code>) that processes the requests from the JavaServer Faces page. This bean invokes the methods in <code>TaskEJB</code> to submit new tasks and to cancel periodic tasks.
+                Un bean gestionado por CDI (<code>TaskCreatorBean</code>) que procesa las solicitudes de la 
+                página JavaServer Faces. Este bean invoca los métodos en <code>TaskEJB</code> para enviar 
+                nuevas tareas y cancelar tareas periódicas.
               </p>
             </li>
             <li>
               <p>
-                An enterprise bean (<code>TaskEJB</code>) that obtains executor service instances using resource injection and submits tasks for execution. This bean is also a JAX-RS web service endpoint. The tasks send information messages to this endpoint.
+                Un enterprise bean (<code>TaskEJB</code>) que obtiene instancias de servicio ejecutor mediante 
+                la inyección de recursos y envía tareas para su ejecución. Este bean también es un punto final 
+                de servicio web JAX-RS. Las tareas envían mensajes de información a este punto final.
               </p>
             </li>
             <li>
               <p>
-                A WebSocket endpoint (<code>InfoEndpoint</code>) that the enterprise bean uses to send information messages to the clients.
+                Un punto final de WebSocket (<code>InfoEndpoint</code>) que utiliza el enterprise bean para 
+                enviar mensajes de información a los clientes.
               </p>
             </li>
             <li>
               <p>
-                A task class (<code>Task</code>) that implements the <code>Runnable</code> interface. The <code>run</code> method in this class sends information messages to the web service endpoint in <code>TaskEJB</code> and sleeps for 1.5 seconds.
+                Una clase de tarea (<code>Task</code>) que implementa la interfaz <code>Runnable</code>. El 
+                método <code>run</code> de esta clase envía mensajes de información al extremo del servicio 
+                web en <code>TaskEJB</code> y duerme durante 1,5 segundos.
               </p>
             </li>
           </ul>
         </div>
         <div class="paragraph">
           <p>
-            <a href="#CIHHACFF">Figure 59-1</a> shows the architecture of the <code>taskcreator</code> example.
+            La <a href="#CIHHACFF">Figura 59-1</a> muestra la arquitectura del ejemplo 
+            <code>taskcreator</code>.
           </p>
         </div>
         <div id="CIHHACFF" class="paragraph">
-          <div class="title"><strong>Figure 59-1 Architecture of the taskcreator Example</strong></div>
+          <div class="title">
+            <strong>Figura 59-1 Arquitectura del ejemplo taskcreator</strong>
+          </div>
           <p>
             <span class="image">
               <img src="img/javaeett_dt_060.png" 
-                   alt="The figure shows the architecture of the taskcreator example. The JavaServer Faces page invokes methods on a CDI-managed bean, which submits task initiation requests to an enterprise bean. The enterprise bean uses a WebSocket endpoint to indicate to clients that an updated task execution log is available.">
+                   alt="La figura muestra la arquitectura del ejemplo de taskcreator. La página JavaServer 
+                   Faces invoca métodos en un bean administrado por CDI, que envía solicitudes de iniciación 
+                   de tareas a un enterprise bean. El enterprise bean utiliza un punto final de WebSocket para 
+                   indicar a los clientes que hay disponible un registro de ejecución de tareas actualizado.">
             </span>
           </p>
         </div>
         <div class="paragraph">
           <p>
-            The <code>TaskEJB</code> class obtains the default executor service objects from the application server as follows:
+            La clase <code>TaskEJB</code> obtiene los objetos de servicio del ejecutor predeterminados del 
+            servidor de aplicaciones de la siguiente manera:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 @Resource(name="java:comp/DefaultManagedExecutorService")
 ManagedExecutorService mExecService;
 @Resource(name="java:comp/DefaultManagedScheduledExecutorService")
 ManagedScheduledExecutorService sExecService;
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            The <code>submitTask</code> method in <code>TaskEJB</code> uses these objects to submit tasks for execution as follows:
+            El método <code>submitTask</code> en <code>TaskEJB</code> utiliza estos objetos para enviar tareas 
+            para su ejecución de la siguiente manera:
           </p>
         </div>
         <div class="listingblock">
           <div class="content">
-            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
 public void submitTask(Task task, String type) {
     /* Use the managed executor objects from the app server */
     switch (type) {
@@ -138,19 +168,22 @@ public void submitTask(Task task, String type) {
             break;
     }
 }
-            </code></pre>
+              </code>
+            </pre>
           </div>
         </div>
         <div class="paragraph">
           <p>
-            For periodic tasks, <code>TaskEJB</code> keeps a reference to the <code>ScheduledFuture</code> object, so that the user can cancel the task at any time.
+            Para tareas periódicas, <code>TaskEJB</code> mantiene una referencia al objeto 
+            <code>ScheduledFuture</code>, para que el usuario pueda cancelar la tarea en cualquier momento.
           </p>
         </div>
         <div class="sect2" id="sthref296">
           <h3 id="running-the-taskcreator-example">Ejecutando el Ejemplo taskcreator</h3>
           <div class="paragraph">
             <p>
-              This section describes how to build, package, deploy, and run the <code>taskcreator</code> example using NetBeans IDE or Maven.
+              Esta sección describe cómo compilar, empaquetar, implementar y ejecutar el ejemplo de 
+              <code>taskcreator</code> utilizando el EID de NetBeans o Maven.
             </p>
           </div>
           <div class="paragraph">
@@ -160,12 +193,16 @@ public void submitTask(Task task, String type) {
             <ul>
               <li>
                 <p>
-                  <a href="#CHDCCJHB">Para Construir, Empaquetar, y Desplegar el Ejemplo taskcreator Usando el EID NetBeans</a>
+                  <a href="#CHDCCJHB">
+                    Para Construir, Empaquetar, y Desplegar el Ejemplo taskcreator Usando el EID NetBeans
+                  </a>
                 </p>
               </li>
               <li>
                 <p>
-                  <a href="#CHDHJBDD">Para Construir, Empaquetar, y Desplegar el Ejemplo taskcreator Usando Maven</a>
+                  <a href="#CHDHJBDD">
+                    Para Construir, Empaquetar, y Desplegar el Ejemplo taskcreator Usando Maven
+                  </a>
                 </p>
               </li>
               <li>
@@ -181,35 +218,38 @@ public void submitTask(Task task, String type) {
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que GlassFish Server se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
-                  <p>From the File menu, choose Open Project.</p>
+                  <p>En el menú Archivo, elija Abrir proyecto.</p>
                 </li>
                 <li>
-                  <p>In the Open Project dialog box, navigate to:</p>
+                  <p>En el cuadro de diálogo Abrir proyecto, vaya a:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 tut-install/examples/concurrency
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>Select the <code>taskcreator</code> folder.</p>
+                  <p>Seleccione la carpeta <code>taskcreator</code>.</p>
                 </li>
                 <li>
-                  <p>Click Open Project.</p>
+                  <p>Haga clic en Abrir proyecto.</p>
                 </li>
                 <li>
                   <p>
-                    In the Projects tab, right-click the <code>taskcreator</code> project and select Build.
+                    En la pestaña Proyectos, haga clic con el botón derecho en el proyecto 
+                    <code>taskcreator</code> y seleccione Generar.
                   </p>
                   <div class="paragraph">
-                    <p>This command builds and deploys the application.</p>
+                    <p>Este comando compila e implementa la aplicación.</p>
                   </div>
                 </li>
               </ol>
@@ -223,28 +263,31 @@ tut-install/examples/concurrency
               <ol class="arabic">
                 <li>
                   <p>
-                    Make sure that GlassFish Server has been started (see <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                    Asegúrese de que GlassFish Server se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
                   </p>
                 </li>
                 <li>
-                  <p>In a terminal window, go to:</p>
+                  <p>En una ventana de terminal, vaya a:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 tut-install/examples/concurrency/taskcreator
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
-                  <p>Enter the following command to build and deploy the application:</p>
+                  <p>Ingrese el siguiente comando para compilar e implementar la aplicación:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 mvn install
-                        </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
@@ -256,24 +299,27 @@ mvn install
             <div class="olist arabic">
               <ol class="arabic">
                 <li>
-                  <p>Open the following URL in a web browser:</p>
+                  <p>Abra la siguiente URL en un navegador web:</p>
                   <div class="listingblock">
                     <div class="content">
                       <pre class="prettyprint highlight">
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 http://localhost:8080/taskcreator/
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                   <div class="paragraph">
                     <p>
-                      The page contains a form to submit tasks, a task execution log, and a form to cancel periodic tasks.
+                      La página contiene un formulario para enviar tareas, un registro de ejecución de tareas 
+                      y un formulario para cancelar tareas periódicas.
                     </p>
                   </div>
                 </li>
                 <li>
                   <p>
-                    Select the Immediate task type, enter a task name, and click the Submit button. Messages like the following appear in the task execution log:
+                    Seleccione el tipo de tarea Inmediata, ingrese un nombre de tarea y haga clic en el botón 
+                    Enviar. Aparecen mensajes como el siguiente en el registro de ejecución de la tarea:
                   </p>
                   <div class="listingblock">
                     <div class="content">
@@ -281,13 +327,16 @@ http://localhost:8080/taskcreator/
                         <code class="language-oac_no_warn" data-lang="oac_no_warn">
 12:40:47 - IMMEDIATE Task TaskA finished
 12:40:45 - IMMEDIATE Task TaskA started
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
                   <p>
-                    Select the Delayed (3 sec) task type, enter a task name, and click the Submit button. Messages like the following appear in the task execution log:
+                    Seleccione el tipo de tarea Retrasada (3 segundos), ingrese un nombre de tarea y haga clic 
+                    en el botón Enviar. Aparecen mensajes como el siguiente en el registro de ejecución de la 
+                    tarea:
                   </p>
                   <div class="listingblock">
                     <div class="content">
@@ -296,13 +345,16 @@ http://localhost:8080/taskcreator/
 12:43:26 - DELAYED Task TaskB finished
 12:43:25 - DELAYED Task TaskB started
 12:43:22 - DELAYED Task TaskB submitted
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </li>
                 <li>
                   <p>
-                    Select the Periodic (8 sec) task type, enter a task name, and click the Submit button. Messages like the following appear in the task execution log:
+                    Seleccione el tipo de tarea Periódica (8 segundos), ingrese un nombre de tarea y haga clic 
+                    en el botón Enviar. Aparecen mensajes como el siguiente en el registro de ejecución de la 
+                    tarea:
                   </p>
                   <div class="listingblock">
                     <div class="content">
@@ -312,12 +364,14 @@ http://localhost:8080/taskcreator/
 12:45:23 - PERIODIC Task TaskC started run #2
 12:45:17 - PERIODIC Task TaskC finished run #1
 12:45:15 - PERIODIC Task TaskC started run #1
-                      </code></pre>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                   <div class="paragraph">
                     <p>
-                      You can add more than one periodic task. To cancel a periodic task, select it from the form and click Cancel Task.
+                      Puede agregar más de una tarea periódica. Para cancelar una tarea periódica, 
+                      selecciónela del formulario y haga clic en Cancelar tarea.
                     </p>
                   </div>
                 </li>
