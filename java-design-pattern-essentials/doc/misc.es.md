@@ -4,7 +4,7 @@
 
 * [.gitignore](#gitignore)
 * [.editorconfig](#editorconfig)
-* [Configuración del servidor](#server-configuration)
+* [Configuración del servidor](#Configuración del servidor)
 * [robots.txt](#robotstxt)
 * [humans.txt](#humanstxt)
 * [browserconfig.xml](#browserconfigxml)
