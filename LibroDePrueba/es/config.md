@@ -1,63 +1,61 @@
-# Configuration
+# Configuración
 
-HonKit allows you to customize your book using a flexible configuration. These options are specified in a `book.json` file. For authors unfamiliar with the JSON syntax, you can validate the syntax using tools such as [JSONlint](http://jsonlint.com).
+HonKit le permite personalizar su libro utilizando una configuración flexible. Estas opciones se especifican en un archivo `book.json`. Para los autores que no estén familiarizados con la sintaxis JSON, pueden validar la sintaxis utilizando herramientas como [JSONlint](http://jsonlint.com).
 
-### General Settings
+## Configuración general
 
-| Variable | Description |
+| Variable | Descripción |
 | -------- | ----------- |
-| `root` | Path to the root folder containing all the book's files, except `book.json` |
-| `structure` | To specify paths for Readme, Summary, Glossary etc. See [Structure paragraph](#structure). |
-| `title` | Title of your book, default value is `HonKit`. |
-| `description` | Description of your book, default value is extracted from the README. |
-| `author` | Name of the author(s), multiple authors should be separated by ampersands. |
-| `authorSort` | String to be used when sorting by author. |
-| `producer` | Name of the producer. |
-| `publisher` | Name of the publisher. |
-| `series` | The series this book belongs to. |
-| `seriesIndex` | Index of the book in this series. |
-| `pubdate` | Publication date of the book, formatted as YYYY-MM-DDTHH:MM:SS. |
-| `isbn` | ISBN of the book |
-| `language` | [ISO code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) of the book's language, default value is `en` |
-| `direction` | Text's direction. Can be `rtl` or `ltr`, the default value depends on the value of `language` |
-| `gitbook` | Version of HonKit that should be used. Uses the [SemVer](http://semver.org) specification and accepts conditions like `">= 3.0.0"` |
-| `honkit` | Version of HonKit that should be used. Uses the [SemVer](http://semver.org) specification and accepts conditions like `">= 3.0.0"` |
+| `root` | Ruta a la carpeta raíz que contiene todos los archivos del libro, excepto `book.json` |
+| `structure` | Para especificar rutas para Readme, Summary, Glossary etc. Vea [el párrafo de estructura](#estructura). |
+| `title` | Título de su libro, el valor por defecto es `HonKit`. |
+| `description` | Descripción de su libro, el valor por defecto se extrae del README. |
+| `author` | Nombre del autor(es), varios autores deben estar separados por el símbolo ampersand (&) |
+| `authorSort` | Cadena que se utilizará al ordenar por autor. |
+| `producer` | Nombre del productor. |
+| `publisher` | Nombre del editor. |
+| `series` | Serie a la que pertenece este libro. |
+| `seriesIndex` | Índice del libro de esta serie. |
+| `pubdate` | Fecha de publicación del libro, formateada como AAAA-MM-DDTHH: MM: SS. |
+| `isbn` | ISBN del libro |
+| `language` | [Código ISO](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) del idioma del libro, el valor predeterminado es `en` |
+| `direction` | Dirección del texto. Puede ser `rtl` o `ltr`, el valor por defecto depende del valor de `language` |
+| `gitbook` | Versión de HonKit que se debe utilizar. Utiliza la especificación [SemVer](http://semver.org) y acepta condiciones como `">= 3.0.0"` |
+| `honkit` | Versión de HonKit que se debe utilizar. Utiliza la especificación [SemVer](http://semver.org) y acepta condiciones como `">= 3.0.0"` |
 
-### Plugins
+### Complementos
 
-Plugins and their configurations are specified in the `book.json`. See [the plugins section](plugins/README.md) for more details.
+Los complementos y sus configuraciones se especifican en `book.json`. Consulte [Complementos](plugins/README.md) para obtener más detalles.
 
-Since version 3.0.0, HonKit can use themes. See [the theming section](themes/README.md) for more details.
-
-| Variable | Description |
+| Variable | Descripción |
 | -------- | ----------- |
-| `plugins` | List of plugins to load |
-| `pluginsConfig` |Configuration for plugins |
+| `plugins` | Lista de complementos a cargar |
+| `pluginsConfig` |Configuración para los complementos |
 
-### Structure
+### Estructura
 
-In addition to the `root` variable, you can tell HonKit the name of the files for Readme, Summary, Glossary, Languages (instead of using the default names such as `README.md`).
-These files must be at the root of your book (or the root of every language book). Paths such as `dir/MY_README.md` are not accepted.
+Además de la variable `root`, puede decirle a HonKit el nombre de los archivos Readme, Summary, Glossary y Lnaguages (en lugar de usar los nombres predeterminados como `README.md`).
+Estos archivos deben estar en la raíz de su libro (o en la raíz de cada libro de idioma). No se aceptan rutas como `dir/MY_README.md`.
 
-| Variable | Description |
+| Variable | Descripción |
 | -------- | ----------- |
-| `structure.readme` | Readme file name (defaults to `README.md`) |
-| `structure.summary` | Summary file name (defaults to `SUMMARY.md`) |
-| `structure.glossary` | Glossary file name (defaults to `GLOSSARY.md`) |
-| `structure.languages` | Languages file name (defaults to `LANGS.md`) |
+| `structure.readme` | nombre del archivo Readme (por defecto es `README.md`) |
+| `structure.summary` | nombre del archivo Summary (por defecto es `SUMMARY.md`) |
+| `structure.glossary` | nombre del archivo Glossary (por defecto es `GLOSSARY.md`) |
+| `structure.languages` | nombre del archivo Languages (por defecto es `LANGS.md`) |
 
-### PDF Options
+### Opciones para PDF
 
-PDF Output can be customized using a set of options in the `book.json`:
+La salida PDF se puede personalizar usando un conjunto de opciones en `book.json`:
 
-| Variable | Description |
+| Variable | Descripción |
 | -------- | ----------- |
-| `pdf.pageNumbers` | Add page numbers to the bottom of every page (default is `true`) |
-| `pdf.fontSize` | Base font size (default is `12`) |
-| `pdf.fontFamily` | Base font family (default is `Arial`) |
-| `pdf.paperSize` | Paper size, options are `'a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'b0', 'b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'legal', 'letter'` (default is `a4`) |
-| `pdf.margin.top` | Top margin (default is `56`) |
-| `pdf.margin.bottom` | Bottom margin (default is `56`) |
-| `pdf.margin.right` | Right margin (default is `62`) |
-| `pdf.margin.left` | Left margin (default is `62`) |
-| `pdf.embedFonts` | Embed all fonts into the PDF (default is `false`) |
+| `pdf.pageNumbers` | Agregue números de página al final de cada página (el valor predeterminado es `true`) |
+| `pdf.fontSize` | Tamaño de fuente base (el valor predeterminado es `12`) |
+| `pdf.fontFamily` | Familia de fuentes base (el valor predeterminado es `Arial`) |
+| `pdf.paperSize` | Tamaño del papel, las opciones son `'a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'b0', 'b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'legal', 'letter'` (el valor predeterminado es `a4`) |
+| `pdf.margin.top` | Margen superior (el valor predeterminado es `56`) |
+| `pdf.margin.bottom` | Margen inferior (el valor predeterminado es `56`) |
+| `pdf.margin.right` | Margen derecho (el valor predeterminado es `62`) |
+| `pdf.margin.left` | Margen izquierdo (el valor predeterminado es `62`) |
+| `pdf.embedFonts` | Embeber todas las fuentes dentro del PDF (el valor predeterminado es `false`) |

@@ -1,89 +1,89 @@
 # Variables
 
-The following is a reference of the available data during book's parsing and theme generation.
+La siguiente es una referencia de los datos disponibles durante el análisis del libro y la generación del tema.
 
-### Global Variables
+## Variables Globales
 
-| Variable | Description |
+| Variable | Descripción |
 | -------- | ----------- |
-| `book` | Book-wide information + configuration settings from `book.json`. See below for details. |
-| `honkit` | HonKit specific information |
-| `gitbook` | HonKit specific information. It's alias to `honkit` |
-| `page` | Current page specific information |
-| `file` | File associated with the current page specific information |
-| `readme` | Information about the Readme |
-| `glossary` | Information about the Glossary |
-| `summary` | Information about the table of contents |
-| `languages` | List of languages for multi-lingual books |
-| `output` | Information about the output generator |
-| `config` | Dump of the `book.json` |
+| `book` | Información de todo el libro + ajustes de configuración de `book.json`. Consulte a continuación para obtener más detalles. |
+| `honkit` | Información específica de HonKit |
+| `gitbook` | Información específica de HonKit. Es alias de `honkit` |
+| `page` | Información específica de la página actual |
+| `file` | Archivo asociado con la información específica de la página actual. |
+| `readme` | Información sobre el archivo LÉEME (README) |
+| `glossary` | Información sobre el GLOSARIO (GLOSSARY) |
+| `summary` | Información sobre el índice (SUMMARY) |
+| `languages` | Lista de idiomas para libros multilingües |
+| `output` | Información sobre el generador de salida. |
+| `config` | Volcado del `book.json` |
 
-### Book Variables
+## Variables del Libro (book)
 
-| Variable | Description |
+| Variable | Descripción |
 | -------- | ----------- |
-| `book.[CONFIGURATION_DATA]` | All the `variables` set via the `book.json` are available through the book variable. |
-| `book.language` | Current language for a multilingual book |
+| `book.[DATOS_DE_CONFIGURACIÓN]` | Todas las `variables` configuradas a través de `book.json` están disponibles a través de la variable book. |
+| `book.language` | Idioma actual para un libro multilingüe. |
 
-### HonKit Variables
+## Variables de HonKit (honkit)
 
-| Variable | Description |
+| Variable | Descripción |
 | -------- | ----------- |
-| `honkit.time` | The current time (when you run the `honkit` command) . |
-| `gitbook.time` | The current time (when you run the `honkit` command) . |
-| `honkit.version` | Version of HonKit used to generate the book |
-| `gitbook.version` | Version of HonKit used to generate the book |
+| `honkit.time` | La hora actual (cuando ejecuta el comando `honkit`). |
+| `gitbook.time` | La hora actual (cuando ejecuta el comando `honkit`). |
+| `honkit.version` | Versión de HonKit utilizada para generar el libro. |
+| `gitbook.version` | Versión de HonKit utilizada para generar el libro. |
 
-### File Variables
+## Variables de Archivo (file)
 
-| Variable | Description |
+| Variable | Descripción |
 | -------- | ----------- |
-| `file.path` | The path to the raw page |
-| `file.mtime` | Modified Time. Last time the file was modified |
-| `file.type` | The name of the parser used to compile this file (ex: `markdown`, `asciidoc`, etc) |
+| `file.path` | El camino a la página sin formato. |
+| `file.mtime` | Hora modificada. La última vez que se modificó el archivo |
+| `file.type` | El nombre del analizador utilizado para compilar este archivo (por ejemplo: `markdown`, `asciidoc`, etc.) |
 
-#### Page Variables
+## Variables de la Página (page)
 
-| Variable | Description |
+| Variable | Descripción |
 | -------- | ----------- |
-| `page.title` | Title of the page |
-| `page.previous` | Previous page in the Table of Contents (can be `null`) |
-| `page.next` | Next page in the Table of Contents (can be `null`) |
-| `page.dir` | Text direction, based on configuration or detected from content (`rtl` or `ltr`) |
+| `page.title` | Título de la página |
+| `page.previous` | Página anterior en el Índice de Contenidos (puede ser `null`) |
+| `page.next` | Página siguiente en el Índice de Contenidos (puede ser `null`) |
+| `page.dir` | Dirección del texto, basada en la configuración o detectada a partir del contenido. (`rtl` o `ltr`) |
 
-#### Table of Contents Variables
+## Variables del Índice de Contenidos (summary)
 
-| Variable | Description |
+| Variable | Descripción |
 | -------- | ----------- |
-| `summary.parts` | List of sections in the Table of Contents |
+| `summary.parts` | Lista de secciones en el Índice de Contenidos |
 
-The whole table of contents (`SUMMARY.md`) can be accessed:
+Se puede acceder al Índice de Contenidos completo (`SUMMARY.md`):
 
-`summary.parts[0].articles[0].title` will return the title of the first article.
+`summary.parts[0].articles[0].title` devolverá el título del primer artículo.
 
-#### Multi-lingual book Variable
+## Variable del Libro Plurilingüe (language)
 
-| Variable | Description |
+| Variable | Descripción |
 | -------- | ----------- |
-| `languages.list` | List of languages for this book |
+| `languages.list` | Lista de idiomas para este libro |
 
-Languages are defined by `{ id: 'en', title: 'English' }`.
+Los idiomas se definen mediante `{ id: 'en', title: 'English' }`.
 
-### Output Variables
+## Variables de salida (output)
 
-| Variable | Description |
+| Variable | Descripción |
 | -------- | ----------- |
-| `output.name` | Name of the output generator, possible values are `website`, `json`, `ebook` |
-| `output.format` | When `output.name == "ebook"`, `format` defines the ebook format that will be generated, possible values are `pdf`, `epub` or `mobi` |
+| `output.name` | Nombre del generador de salida, los valores posibles son `website`, `json`, `ebook` |
+| `output.format` | Cuando `output.name == "ebook"`, `format` define el formato del libro electrónico que se generará, los valores posibles son `pdf`, `epub` o `mobi` |
 
-### Readme Variables
+## Variables Readme (readme)
 
-| Variable | Description |
+| Variable | Descripción |
 | -------- | ----------- |
-| `readme.path` | Path to the Readme in the book |
+| `readme.path` | Ruta al archivo readme en el libro. |
 
-### Glossary Variables
+## Variables del glosario (glossary)
 
-| Variable | Description |
+| Variable | Descripción |
 | -------- | ----------- |
-| `glossary.path` | Path to the Glossary in the book |
+| `glossary.path` | Ruta al glosario en el libro. |

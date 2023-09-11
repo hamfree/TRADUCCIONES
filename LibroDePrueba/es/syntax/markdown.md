@@ -1,223 +1,224 @@
 # Markdown
 
-Most of the examples from this documentation are in Markdown. Markdown is default parser for HonKit, but one can also opt for the [AsciiDoc syntax](asciidoc.md).
+La mayoría de los ejemplos de esta documentación están en Markdown. Markdown es el analizador predeterminado para HonKit, pero también se puede optar por la [sintaxis AsciiDoc](asciidoc.md).
 
-Here’s an overview of Markdown syntax that you can use with HonKit (same as GitHub with some additions).
+Aquí hay una descripción general de la sintaxis de Markdown que puede usar con HonKit (igual que GitHub con algunas adiciones).
 
-### Headings
+## Encabezamientos {#headings}
 
-To create a heading, add one to six `#` symbols before your heading text. The number of # you use will determine the size of the heading.
+Para crear un encabezado, agregue de uno a seis símbolos `#` antes del texto del encabezado. El número de # que utilice determinará el tamaño del título.
 
 ```markdown
-# This is an <h1> tag
-## This is an <h2> tag
-###### This is an <h6> tag
+# Esta es una etiqueta <h1> 
+## Esta es una etiqueta <h2>
+###### Esta es una etiqueta <h6>
 ```
 
-HonKit supports a nice way for explicitly setting the header ID. If you follow the header text with an opening curly bracket (separated from the text with a least one space), a hash, the ID and a closing curly bracket, the ID is set on the header. If you use the trailing hash feature of atx style headers, the header ID has to go after the trailing hashes. For example:
+HonKit admite una buena forma de configurar explícitamente el ID del encabezado. Si sigue el texto del encabezado con una llave de apertura (separada del texto con al menos un espacio), un hash, el ID y una llave de cierre, el ID se establece en el encabezado. Si utiliza la función de hash final de los encabezados de estilo atx, el ID del encabezado debe ir después de los hashes finales. Por ejemplo:
 
 ```markdown
-Hello {#id}
+Hola {#id}
 -----
 
-# Hello {#id}
+# Hola {#id}
 
-# Hello # {#id}
+# Hola # {#id}
 ```
 
-### Paragraphs and Line Breaks {#paragraphs}
+## Párrafos y saltos de línea {#paragraphs}
 
-A paragraph is simply one or more consecutive lines of text, separated by one or more blank lines. (A blank line is any line that looks like a blank line — a line containing nothing but spaces or tabs is considered blank.) Normal paragraphs should not be indented with spaces or tabs.
-
-```
-Here's a line for us to start with.
-
-This line is separated from the one above by two newlines, so it will be a *separate paragraph*.
-```
-
-### Emphasis {#emphasis}
+Un párrafo es simplemente una o más líneas de texto consecutivas, separadas por una o más líneas en blanco. (Una línea en blanco es cualquier línea que parece una línea en blanco; una línea que no contiene nada más que espacios o tabulaciones se considera en blanco). Los párrafos normales no deben tener sangrías ni espacios ni tabulaciones.
 
 ```markdown
-*This text will be italic*
-_This will also be italic_
+Aquí tenemos una línea para empezar.
 
-**This text will be bold**
-__This will also be bold__
-
-~~This text will be crossed out.~~
-
-_You **can** combine them_
+Esta línea está separada de la anterior por dos nuevas líneas, por lo que será un *párrafo separado*.
 ```
 
-### Lists {#lists}
-
-Markdown supports ordered (numbered) and unordered (bulleted) lists.
-
-##### Unordered
-
-Unordered lists use asterisks, pluses, and hyphens — interchangably — as list markers:
+## Énfasis {#emphasis}
 
 ```markdown
-* Item 1
-* Item 2
-  * Item 2a
-  * Item 2b
+*Este texto estará en cursiva.*
+_Esto también estará en cursiva._
+
+**Este texto estará en negrita.**
+__Esto también será en negrita.__
+
+~~Este texto será tachado..~~
+
+_Puedes ** combinarlos_
 ```
 
-##### Ordered
+## Listas {#lists}
 
-Ordered lists use numbers followed by periods:
+Markdown admite listas ordenadas (numeradas) y desordenadas (con viñetas).
+
+### Desordenadas
+
+Las listas desordenadas utilizan asteriscos, signos más y guiones (indistintamente) como marcadores de lista:
 
 ```markdown
-1. Item 1
-2. Item 2
-3. Item 3
-   * Item 3a
-   * Item 3b
+* Elemento 1
+* Elemento 2
+  * Elemento 2a
+  * Elemento 2b
 ```
 
-### Links {#links}
+### Ordenadas
 
-Markdown supports two style of links: inline and reference.
-
-A simple link can be created by surrounding the text with square brackets and the link URL with parentheses:
+Las listas ordenadas utilizan números seguidos de puntos.:
 
 ```markdown
-This is [an example](http://example.com/ "Title") inline link with a title.
-
-[This link](http://example.net/) has no title attribute.
+1. Elemento 1
+2. Elemento 2
+3. Elemento 3
+   * Elemento 3a
+   * Elemento 3b
 ```
 
-Links can point to relative paths, anchors or absolute urls.
+## Enlaces {#links}
 
+Markdown admite dos estilos de enlaces: en línea y de referencia.
 
-### References
-
-There is another way to create links which does not interrupt the text flow. The URL and title are defined using a reference name and this reference name is then used in square brackets instead of the link URL:
+Se puede crear un enlace simple encerrando el texto entre corchetes y la URL del enlace entre paréntesis:
 
 ```markdown
-This is [an example][id] reference-style link.
+Este es un enlace en línea [un ejemplo](http://example.com/ "Título") con un título.
+
+[Este enlace](http://example.net/) no tiene atributo de título.
 ```
 
-Then, anywhere in the document, you define your link label like this, on a line by itself:
+Los enlaces pueden apuntar a rutas relativas, anclajes o URL absolutas.
+
+## Referencias
+
+Existe otra forma de crear enlaces que no interrumpe el flujo del texto. La URL y el título se definen mediante un nombre de referencia y este nombre de referencia se utiliza entre corchetes en lugar de la URL del enlace:
 
 ```markdown
-[id]: http://example.com/  "Optional Title Here"
+Este es un enlace de estilo de referencia [un ejemplo][id].
 ```
 
-### Images {#images}
-
-Images can be created in a similar way than links: just use an exclamation mark before the square brackets. The link text will become the alternative text of the image and the link URL specifies the image source:
+Luego, en cualquier parte del documento, define la etiqueta de su enlace de esta manera, en una línea separada:
 
 ```markdown
-An image: ![gras](img/image.jpg)
+[id]: http://example.com/  "Título opcional aquí"
 ```
 
-### Blockquotes {#blockquotes}
+## Imágenes {#images}
 
-A blockquote is started using the `>` marker followed by an optional space; all following lines that are also started with the blockquote marker belong to the blockquote. You can use any block-level elements inside a blockquote:
+Las imágenes se pueden crear de forma similar a los enlaces: simplemente utilice un signo de exclamación antes de los corchetes. El texto del enlace se convertirá en el texto alternativo de la imagen y la URL del enlace especifica la fuente de la imagen:
 
 ```markdown
-As Kanye West said:
-
-> We're living the future so
-> the present is our past.
+Una imagen: ![gras](img/image.jpg)
 ```
 
-### Tables {#tables}
+## Citas en bloque {#blockquotes}
 
-You can create tables by assembling a list of words and dividing them with hyphens `-` (for the first row), and then separating each column with a pipe `|`:
+Una cita en bloque se inicia usando el marcador `>` seguido de un espacio opcional; todas las líneas siguientes que también comienzan con el marcador de cita en bloque pertenecen a la cita en bloque. Puedes usar cualquier elemento a nivel de bloque dentro de una cita en bloque:
 
 ```markdown
-| First Header  | Second Header |
+Como dijo Kanye West:
+
+> Estamos viviendo el futuro por lo que 
+> el presente es nuestro pasado.
+```
+
+## Tablas {#tables}
+
+Puede crear tablas reuniendo una lista de palabras y dividiéndolas con guiones `-` (para la primera fila) y luego separando cada columna con una barra vertical `|`:
+
+```markdown
+| Primera Cabecera  | Segunda Cabecera |
 | ------------- | ------------- |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
+| Celda de contenido  | Celda de contenido  |
+| Celda de contenido  | Celda de contenido  |
 ```
 
-The pipes on either end of the table are optional. Cells can vary in width and do not need to be perfectly aligned within columns. There must be at least three hyphens in each column of the header row.
+Los tubos en cada extremo de la tabla son opcionales. Las celdas pueden variar en ancho y no es necesario que estén perfectamente alineadas dentro de las columnas. Debe haber al menos tres guiones en cada columna de la fila del encabezado.
 
-### Code {#code}
+## Código {#code}
 
-Markdown supports two different code block styles. One uses lines indented with either four spaces or one tab whereas the other uses lines with tilde characters as delimiters – therefore the content does not need to be indented:
+Markdown admite dos estilos de bloques de código diferentes. Uno usa líneas con sangría con cuatro espacios o una tabulación, mientras que el otro usa líneas con caracteres de tilde como delimitadores; por lo tanto, no es necesario sangrar el contenido:
 
 ```markdown
-This is a sample code block.
+Este es un bloque de código de muestra.
 
-    Continued here.
-
-```
-
-##### Fenced code blocks
-
-You can create fenced code blocks by placing triple backticks ` ``` ` before and after the code block. We recommend placing a blank line before and after code blocks to make the raw formatting easier to read.
-
-    ```
-    function test() {
-      console.log("notice the blank line before this function?");
-    }
-    ```
-
-##### Syntax highlighting
-
-You can add an optional language identifier to enable syntax highlighting in your fenced code block.
-
-For example, to syntax highlight Ruby code:
-
-    ```ruby
-    require 'redcarpet'
-    markdown = Redcarpet.new("Hello World!")
-    puts markdown.to_html
-    ```
-
-##### Inline code
-
-Text phrases can be marked up as code by surrounding them with backticks:
-
-    Use `honkit` to convert the `text` in markdown
-    syntax to HTML.
-
-### Footnotes
-
-HonKit supports a simple syntax for such footnotes. Footnotes are relative to each pages.
-
-```markdown
-Text prior to footnote reference.[^2]
-
-[^2]: Comment to include in footnote.
-```
-
-### HTML
-
-HonKit supports use of raw HTML in your text, Markdown syntax in HTML is not processed:
+    Continúa aquí.
 
 ```
+
+### Bloques de código vallados
+
+Puede crear bloques de código delimitados colocando comillas invertidas triples ` ``` ` antes y después del bloque de código. Recomendamos colocar una línea en blanco antes y después de los bloques de código para que el formato crudo sea más fácil de leer.
+
+```javascript
+function test() {
+  console.log("¿Notas la línea en blanco antes de esta función?");
+}
+```
+
+### Resaltado de sintaxis
+
+Puede agregar un identificador de idioma opcional para habilitar el resaltado de sintaxis en su bloque de código delimitado.
+
+Por ejemplo, para resaltar la sintaxis del código Ruby:
+
+```ruby
+require 'redcarpet'
+markdown = Redcarpet.new("¡Hola mundo!")
+puts markdown.to_html
+```
+
+### Código en línea
+
+Las frases de texto se pueden marcar como código rodeándolas con comillas invertidas:
+
+```text
+    Use `honkit` parar convertir el `texto` en sintaxis markdown
+    a HTML.
+```
+
+## HTML
+
+HonKit admite el uso de HTML sin formato en su texto, la sintaxis de Markdown en HTML no se procesa:
+
+```html
 <div>
-Markdown here will not be **parsed**
+El Markdown aquí no será **analizado**
 </div>
 ```
 
-### Horizontal Rule
+### Regla horizontal
 
-Horizontal Rules can be inserted using three or more asterisks, dashes or underscores, optionally separated by spaces or tabs, on an otherwise blank line:
+Las reglas horizontales se pueden insertar usando tres o más asteriscos, guiones o guiones bajos, opcionalmente separados por espacios o tabulaciones, en una línea que de otro modo estaría en blanco:
 
 ```markdown
-Three or more...
+Tres o más...
 
 ---
 
-Hyphens
+Guiones
 
 ***
 
-Asterisks
+Asteriscos
 
 ```
 
-### Ignoring Markdown formatting
+### Ignorar el formato Markdown
 
-You can tell HonKit to ignore (or escape) Markdown formatting by using `\` before the Markdown character.
+Puede indicarle a HonKit que ignore (o escape) el formato de Markdown usando `\` antes del carácter Markdown.
 
+```text
+Cambiemos el nombre de \*nuestro-nuevo-proyecto\* a \*nuestro-antiguo-proyecto\*.
 ```
-Let's rename \*our-new-project\* to \*our-old-project\*.
+
+## Notas a pie de página {#footnotes}
+
+HonKit admite una sintaxis simple para este tipo de notas a pie de página. Las notas a pie de página son relativas a cada página.
+
+```markdown
+Texto anterior a la referencia a la nota a pie de página.[^2]
+
+[^2]: Comentario a incluir en nota al pie.
 ```

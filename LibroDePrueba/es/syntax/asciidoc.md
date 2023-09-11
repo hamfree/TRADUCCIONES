@@ -1,65 +1,63 @@
 # AsciiDoc
 
-Since version `2.0.0`, HonKit can also accept AsciiDoc as an input format.
+Desde la versión `2.0.0`, HonKit también puede aceptar AsciiDoc como formato de entrada.
 
-Please refer to the [AsciiDoc Syntax Quick Reference](http://asciidoctor.org/docs/asciidoc-syntax-quick-reference/) for more informations about the format.
+Consulte la [Referencia rápida de sintaxis de AsciiDoc](<http://asciidoctor.org/docs/asciidoc-syntax-quick-reference/>) para obtener más información sobre el formato.
 
-Just like for markdown, HonKit is using some special files to extract structures: `README.adoc`, `SUMMARY.adoc`, `LANGS.adoc` and `GLOSSARY.adoc`.
+Al igual que para Markdown, HonKit utiliza algunos archivos especiales para extraer estructuras: `README.adoc`, `SUMMARY.adoc`, `LANGS.adoc` y `GLOSSARY.adoc`.
 
-### README.adoc
+## README.adoc
 
-This is the main entry of your book: the introduction. This file is **required**.
+Esta es la entrada principal de su libro: la introducción. Este archivo es **obligatorio**.
 
-### SUMMARY.adoc
+## SUMMARY.adoc
 
-This file defines the list of chapters and subchapters. Just like  in Markdown, the `SUMMARY.adoc`'s format is simply a list of links, the name of the link is used as the chapter's name, and the target is a path to that chapter's file.
+Este archivo define la lista de capítulos y subcapítulos. Al igual que en Markdown, el formato `SUMMARY.adoc` es simplemente una lista de enlaces, el nombre del enlace se utiliza como el nombre del capítulo y el destino es una ruta al archivo de ese capítulo.
 
-Subchapters are defined simply by adding a nested list to a parent chapter.
+Los subcapítulos se definen simplemente agregando una lista anidada a un capítulo principal.
 
 ```asciidoc
-= Summary
+= Sumario
 
-. link:chapter-1/README.adoc[Chapter 1]
-.. link:chapter-1/ARTICLE1.adoc[Article 1]
-.. link:chapter-1/ARTICLE2.adoc[Article 2]
-... link:chapter-1/ARTICLE-1-2-1.adoc[Article 1.2.1]
-. link:chapter-2/README.adoc[Chapter 2]
-. link:chapter-3/README.adoc[Chapter 3]
-. link:chapter-4/README.adoc[Chapter 4]
-.. Unfinished article
-. Unfinished Chapter
+. link:capitulo-1/README.adoc[Capítulo 1]
+.. link:capitulo-1/ARTICLE1.adoc[Artículo 1]
+.. link:capitulo-1/ARTICLE2.adoc[Artículo 2]
+... link:capitulo-1/ARTICLE-1-2-1.adoc[Artículo 1.2.1]
+. link:capitulo-2/README.adoc[Capítulo 2]
+. link:capitulo-3/README.adoc[Capítulo 3]
+. link:capitulo-4/README.adoc[Capítulo 4]
+.. Artículo inconcluso
+. Capítulo inconcluso
 ```
 
-### LANGS.adoc
+## LANGS.adoc
 
-For [Multi-Languages](./languages.md) books, this file is used to define the different supported languages and translations.
+Para libros [plurilingües] (./languages.md), este archivo se utiliza para definir los diferentes idiomas y traducciones admitidos.
 
-This file is following the same syntax as the `SUMMARY.adoc`:
+Este archivo sigue la misma sintaxis que `SUMMARY.adoc`:
 
 ```asciidoc
-= Languages
+= Idiomas
 
-. link:en/[English]
-. link:fr/[French]
+. link:en/[Inglés]
+. link:fr/[Francés]
 ```
 
-### GLOSSARY.adoc
+## GLOSSARY.adoc
 
-This file is used to define terms. [See the glossary section](./lexicon.md).
+Este archivo se utiliza para definir términos. [Ver la sección del glosario](../lexicon.md).
 
 ```asciidoc
-= Glossary
+= Glosario
 
-== Magic
+== Magia
 
-Sufficiently advanced technology, beyond the understanding of the
-observer producing a sense of wonder.
+Tecnología suficientemente avanzada, más allá de la comprensión del observador que produce 
+una sensación de asombro.
 
 == PHP
 
-A popular web programming language, used by many large websites such
-as Facebook. Rasmus Lerdorf originally created PHP in 1994 to power
-his personal homepage (PHP originally stood for "Personal Home Page"
-but now stands for "PHP: Hypertext Preprocessor"). ```
-
-
+Un lenguaje de programación web popular, utilizado por muchos sitios web grandes como Facebook. 
+Rasmus Lerdorf creó originalmente PHP en 1994 para potenciar su página de inicio personal 
+(PHP originalmente significaba "Página de inicio personal", pero ahora significa "PHP: 
+preprocesador de hipertexto"). ```

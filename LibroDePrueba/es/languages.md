@@ -1,17 +1,17 @@
-# Multi-Languages
+# Plurilingüe
 
-HonKit supports building books written in multiple languages. Each language should be a sub-directory following the normal HonKit format, and a file named `LANGS.md` should be present at the root of the repository with the following format:
+HonKit admite la creación de libros escritos en varios idiomas. Cada idioma debe ser un subdirectorio que siga el formato normal de HonKit y un archivo llamado `LANGS.md` debe estar presente en la raíz del repositorio con el siguiente formato:
 
 ```markdown
-# Languages
+# Idiomas
 
-* [English](en/)
-* [French](fr/)
+* [Inglés](en/)
+* [Francés](fr/)
 * [Español](es/)
 ```
 
-### Configuration for each language
+## Configuración para cada idioma
 
-When a language book (ex: `en`) has a `book.json`, its configuration will extend the main configuration.
+Cuando un libro de idioma (por ejemplo, `en`) tiene un `book.json`, su configuración ampliará la configuración principal.
 
-The only exception is plugins, plugins are specified globally, and language specific plugins cannot be specified.
+La única excepción son los complementos, los complementos se especifican globalmente y no se pueden especificar complementos específicos del idioma.

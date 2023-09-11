@@ -1,55 +1,55 @@
-# Content References
+# Referencias de contenido
 
-Content referencing (conref) is a convenient mechanism to reuse content from other files or books.
+La referencia de contenido (conref) es un mecanismo conveniente para reutilizar contenido de otros archivos o libros.
 
-### Importing local files
+## Importando archivos locales
 
-Importing an other file's content is easy using the `include` tag:
+Importar el contenido de otro archivo es fácil usando la etiqueta `include`:
 
-```
+```twig
 {% include "./test.md" %}
 ```
 
-### Importing file from another book
+## Importar archivo de otro libro
 
-HonKit can also resolve the include path by using git:
+HonKit también puede resolver la ruta de inclusión usando git:
 
-```
+```twig
 {% include "git+https://github.com/GitbookIO/documentation.git/README.md#0.0.1" %}
 ```
 
-The format of git url is:
+El formato de la URL de git es:
 
-```
+```twig
 git+https://user@hostname/owner/project.git/file#commit-ish
 ```
 
-The real git url part should finish with `.git`, the filename to import is extracted after the `.git` till the fragment of the url.
+La parte real de la URL de git debe terminar con `.git`, el nombre del archivo a importar se extrae después de `.git` hasta el fragmento de la URL.
 
-The `commit-ish` can be any tag, sha, or branch which can be supplied as an argument to `git checkout`. The default is `master`.
+El `commit-ish` puede ser cualquier etiqueta, sha o rama que pueda proporcionarse como argumento para `git checkout`. El valor predeterminado es "maestro".
 
-### Inheritance
+## Herencia
 
-Template inheritance is a way to make it easy to reuse templates. When writing a template, you can define "blocks" that child templates can override. The inheritance chain can be as long as you like.
+La herencia de plantillas es una forma de facilitar la reutilización de plantillas. Al escribir una plantilla, puede definir "bloques" que las plantillas secundarias pueden anular. La cadena de herencia puede ser tan larga como quieras.
 
-`block` defines a section on the template and identifies it with a name. Base templates can specify blocks and child templates can override them with new content.
+`block` define una sección en la plantilla y la identifica con un nombre. Las plantillas base pueden especificar bloques y las plantillas secundarias pueden anularlos con contenido nuevo.
 
-```
+```twig
 {% extends "./mypage.md" %}
 
 {% block pageContent %}
-# This is my page content
+# Este es el contenido de mi página 
 {% endblock %}
 ```
 
-In the file `mypage.md`, you should specify the blocks that can be extended:
+En el archivo `mypage.md`, debes especificar los bloques que se pueden ampliar:
 
-```
+```twig
 {% block pageContent %}
-This is the default content
+Este es el contenido predeterminado.
 {% endblock %}
 
-# License
+# Licencia
 
 {% include "./LICENSE" %}
 ```

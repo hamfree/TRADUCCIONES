@@ -1,31 +1,31 @@
-# Templating
+# Plantillas
 
-HonKit uses the [Nunjucks templating language](https://mozilla.github.io/nunjucks/) to process pages and theme's templates.
+HonKit utiliza el [lenguaje de plantillas Nunjucks] (https://mozilla.github.io/nunjucks/) para procesar páginas y plantillas de temas.
 
-The Nunjucks syntax is very similar to **Jinja2** or **Liquid**. Its syntax uses surrounding braces `{ }` to mark content that needs to be processed.
+La sintaxis de Nunjucks es muy similar a **Jinja2** o **Liquid**. Su sintaxis utiliza llaves `{ }` para marcar el contenido que debe procesarse.
 
-### Variables
+## Variables
 
-A variable looks up a value from the template context. If you wanted to simply display a variable, you would use the `{{ variable }}` syntax. For example :
+Una variable busca un valor en el contexto de la plantilla. Si quisiera simplemente mostrar una variable, usaría la sintaxis `{{ variable }}`. Por ejemplo:
 
 ```twig
-My name is {{ name }}, nice to meet you
+Ni nombre es {{ nombre }}, encantado de conocerte
 ```
 
-This looks up username from the context and displays it. Variable names can have dots in them which lookup properties, just like JavaScript. You can also use the square bracket syntax.
+Esto busca el nombre de usuario en el contexto y lo muestra. Los nombres de las variables pueden tener puntos que buscan propiedades, al igual que JavaScript. También puede utilizar la sintaxis de corchetes.
 
 ```twig
 {{ foo.bar }}
 {{ foo["bar"] }}
 ```
 
-If a value is undefined, nothing is displayed. The following all output nothing if foo is undefined: `{{ foo }}`, `{{ foo.bar }}`, `{{ foo.bar.baz }}`.
+Si un valor no está definido, no se muestra nada. Lo siguiente no genera nada si foo no está definido: `{{ foo }}`, `{{ foo.bar }}`, `{{ foo.bar.baz }}`.
 
-HonKit provides a set of [predefined  variables](variables.md) from the context.
+HonKit proporciona un conjunto de [variables predefinidas](variables.md) del contexto.
 
-### Filters
+## Filtros
 
-Filters are essentially functions that can be applied to variables. They are called with a pipe operator (`|`) and can take arguments.
+Los filtros son esencialmente funciones que se pueden aplicar a variables. Se llaman con un operador de canalización (`|`) y pueden aceptar argumentos.
 
 ```twig
 {{ foo | title }}
@@ -33,67 +33,67 @@ Filters are essentially functions that can be applied to variables. They are cal
 {{ foo | replace("foo", "bar") | capitalize }}
 ```
 
-The third example shows how you can chain filters. It would display "Bar", by first replacing "foo" with "bar" and then capitalizing it.
+El tercer ejemplo muestra cómo puedes encadenar filtros. Mostraría "Bar", reemplazando primero "foo" con "bar" y luego poniéndolo en mayúscula.
 
-### Tags
+## Etiquetas
 
-##### if
+### if
 
-`if` tests a condition and lets you selectively display content. It behaves exactly as JavaScript's `if` behaves.
+`if` prueba una condición y le permite mostrar contenido de forma selectiva. Se comporta exactamente como se comporta el "if" de JavaScript.
 
 ```twig
 {% if variable %}
-  It is true
+  Es verdadera
 {% endif %}
 ```
 
-If variable is defined and evaluates to true, "It is true" will be displayed. Otherwise, nothing will be.
+Si la variable está definida y se evalúa como verdadera, se mostrará "Es verdadera". De lo contrario, no pasará nada.
 
-You can specify alternate conditions with `elif` and `else`:
+Puede especificar condiciones alternativas con `elif` y `else`:
 
 ```twig
 {% if hungry %}
-  I am hungry
+  Estoy hambriento
 {% elif tired %}
-  I am tired
+  Estoy cansado
 {% else %}
-  I am good!
+  ¡Estoy bien!
 {% endif %}
 ```
 
-##### for
+### for
 
-`for` iterates over arrays and dictionaries.
+`for` itera sobre matrices y diccionarios.
 
 ```twig
-# Chapters about HonKit
+# Capítulos sobre HonKit
 
 {% for article in glossary.terms['gitbook'].articles %}
 * [{{ article.title }}]({{ article.path }})
 {% endfor %}
 ```
 
-##### set
+### set
 
-`set` lets you create/modify a variable.
+`set` te permite crear/modificar una variable.
 
 ```twig
 {% set softwareVersion = "1.0.0" %}
 
-Current version is {{ softwareVersion }}.
-[Download it](website.com/download/{{ softwareVersion }})
+La versión actual es {{ softwareVersion }}.
+[Descargalo](website.com/download/{{ softwareVersion }})
 ```
 
-##### include and block
+### include y block
 
-Inclusion and inheritance is detailled in the [Content References](conrefs.md) section.
+La inclusión y herencia se detallan en la sección [Referencias de contenido](conrefs.md).
 
-### Escaping
+### Escapando
 
-If you want HonKit to ignore any of the special templating tags, you can use raw and anything inside of it will be output as plain text.
+Si desea que HonKit ignore cualquiera de las etiquetas de plantilla especiales, puede usar `raw` y todo lo que contenga se generará como texto sin formato.
 
 ``` twig
 {% raw %}
-  this will {{ not be processed }}
+  esto {{ no será procesado }}
 {% endraw %}
 ```

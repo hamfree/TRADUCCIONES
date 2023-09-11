@@ -1,41 +1,41 @@
-# Generating eBooks and PDFs
+# Generar libros electrónicos y archivos PDF
 
-HonKit can generates a website, but can also output content as ebook (ePub, Mobi, PDF).
+HonKit puede generar un sitio web, pero también puede generar contenido como libro electrónico (ePub, Mobi, PDF).
 
-```
-# Generate a PDF file
+```bash
+# Generar un archivo PDF
 $ honkit pdf ./ ./mybook.pdf
 
-# Generate an ePub file
+# Generar un archivo ePub
 $ honkit epub ./ ./mybook.epub
 
-# Generate a Mobi file
+# Generar un archivo Mobi
 $ honkit mobi ./ ./mybook.mobi
 ```
 
-### Installing ebook-convert
+## Instalación de ebook-convert
 
-`ebook-convert` is required to generate ebooks (epub, mobi, pdf).
+Se requiere `ebook-convert` para generar libros electrónicos (epub, mobi, pdf).
 
-##### OS X
+### OS X
 
-Download the [Calibre application](https://calibre-ebook.com/download). After moving the `calibre.app` to your Applications folder create a symbolic link to the ebook-convert tool:
+Descargue la [aplicación Calibre](https://calibre-ebook.com/download). Después de mover `calibre.app` a su carpeta de Aplicaciones, cree un enlace simbólico a la herramienta de conversión de libros electrónicos:
 
+```bash
+sudo ln -s /Applications/calibre.app/Contents/MacOS/ebook-convert /usr/local/bin
 ```
-$ sudo ln -s /Applications/calibre.app/Contents/MacOS/ebook-convert /usr/local/bin
-```
 
-You can replace `/usr/bin` with any directory that is in your $PATH.
+Puede reemplazar `/usr/bin` con cualquier directorio que esté en su $PATH.
 
-### Cover
+### Portadas
 
-Covers are used for all the ebook formats.
+Las portadas se utilizan para todos los formatos de libros electrónicos.
 
-To provide a cover, place a **`cover.jpg`** file at the root directory of your book. Adding a **`cover_small.jpg`** will specify a smaller version of the cover. The cover should be a **JPEG** file.
+Para proporcionar una portada, coloque un archivo **`cover.jpg`** en el directorio raíz de su libro. Agregar un **`cover_small.jpg`** especificará una versión más pequeña de la portada. La portada debe ser un archivo **JPEG**.
 
-A good cover should respect the following guidelines:
+Una buena portada debe respetar las siguientes pautas:
 
-* Size of 1800x2360 pixels for `cover.jpg`, 200x262 for `cover_small.jpg`
-* No border
-* Clearly visible book title
-* Any important text should be visible in the small version
+* Tamaño de 1800x2360 píxeles para `cover.jpg`, 200x262 para `cover_small.jpg`
+* Sin bordes
+* Título del libro claramente visible.
+* Cualquier texto importante debe ser visible en la versión pequeña.

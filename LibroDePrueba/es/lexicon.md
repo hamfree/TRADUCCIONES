@@ -1,14 +1,13 @@
-# Glossary
+# Glosario
 
-Allows you to specify terms and their respective definitions to be displayed as annotations. Based on those terms, HonKit will automatically build an index and highlight those terms in pages.
+Le permite especificar términos y sus respectivas definiciones que se mostrarán como anotaciones. Según esos términos, HonKit creará automáticamente un índice y resaltará esos términos en las páginas.
 
-The `GLOSSARY.md` format is a list of `h2` headings, along with a description paragraph:
+El formato `GLOSSARY.md` es una lista de encabezados `h2`, junto con un párrafo de descripción:
 
 ```markdown
-## Term
-Definition for this term
+## Término
+Definición para este término
 
-## Another term
-With it's definition, this can contain bold text
-and all other kinds of inline markup ...
+## Otro término
+Con su definición, este puede contener texto en negrita y todos los demás tipos de marcado en línea...
 ```
