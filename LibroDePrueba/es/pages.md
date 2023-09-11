@@ -1,104 +1,103 @@
-# Pages and Summary
+# Páginas y sumario
 
-### Summary
+## Sumario
 
-HonKit uses a `SUMMARY.md` file to define the structure of chapters and subchapters of the book. The `SUMMARY.md` file is used to generate the book's table of contents.
+HonKit utiliza un archivo `SUMMARY.md` para definir la estructura de capítulos y subcapítulos del libro. El archivo `SUMMARY.md` se utiliza para generar la tabla de contenidos del libro.
 
-The format of `SUMMARY.md` is just a list of links. The link's title is used as the chapter's title, and the link's target is a path to that chapter's file.
+El formato de `SUMMARY.md` es solo una lista de enlaces. El título del enlace se utiliza como título del capítulo y el destino del enlace es una ruta al archivo de ese capítulo.
 
-Adding a nested list to a parent chapter will create subchapters.
+Agregar una lista anidada a un capítulo principal creará subcapítulos.
 
-##### Simple example
+### Ejemplo simple
 
 ```markdown
-# Summary
+# Sumario
 
-* [Part I](part1/README.md)
-    * [Writing is nice](part1/writing.md)
-    * [HonKit is nice](part1/honkit.md)
-* [Part II](part2/README.md)
-    * [We love feedback](part2/feedback_please.md)
-    * [Better tools for authors](part2/better_tools.md)
+* [Parte I](part1/README.md)
+    * [Escribir es bonito](part1/writing.md)
+    * [HonKit es bonito](part1/honkit.md)
+* [Parte II](part2/README.md)
+    * [Nos encantan los comentarios](part2/feedback_please.md)
+    * [Las mejores herramientas para los autores](part2/better_tools.md)
 ```
 
-Each chapter has a dedicated page (`part#/README.md`) and is split into subchapters.
+Cada capítulo tiene una página dedicada (`part#/README.md`) y está dividido en subcapítulos.
 
-##### Anchors
+### Anclas
 
-Chapters in the Table of Contents can be pointing to specific part of a file using anchor.
+Los capítulos del Índice de Contenidos pueden apuntar a una parte específica de un archivo mediante un ancla.
 
 ```markdown
-# Summary
+# Sumario
 
-### Part I
+### Parte I
 
-* [Part I](part1/README.md)
-    * [Writing is nice](part1/README.md#writing)
-    * [HonKit is nice](part1/README.md#honkit)
+* [Parte I](part1/README.md)
+    * [Escribir es bonito](part1/README.md#writing)
+    * [HonKit es bonito](part1/README.md#honkit)
 * [Part II](part2/README.md)
-    * [We love feedback](part2/README.md#feedback)
-    * [Better tools for authors](part2/README.md#tools)
+    * [Nos encantan los comentarios](part2/README.md#feedback)
+    * [Las mejores herramientas para los autores](part2/README.md#tools)
 ```
 
+### Partes
 
-##### Parts
-
-The Table of Contents can be divided into parts separated by headings or horizontal lines:
+El Índice de Contenidos se puede dividir en partes separadas por títulos o líneas horizontales:
 
 ```markdown
-# Summary
+# Sumario
 
-### Part I
+### Parte I
 
-* [Writing is nice](part1/writing.md)
-* [HonKit is nice](part1/honkit.md)
+* [Escribir es bonito](part1/writing.md)
+* [HonKit es bonito](part1/honkit.md)
 
-### Part II
+### Parte II
 
-* [We love feedback](part2/feedback_please.md)
+* [Nos encantan los comentarios](part2/feedback_please.md)
 * [Better tools for authors](part2/better_tools.md)
 
 ----
 
-* [Last part without title](part3/title.md)
+* [Las mejores herramientas para los autores](part3/title.md)
 ```
 
-Parts are just groups of chapters and do not have dedicated pages, but according to the theme, it will show in the navigation.
+Las partes son solo grupos de capítulos y no tienen páginas dedicadas, pero según el tema, se mostrará en la navegación.
 
-### Pages
+## Páginas
 
-#### Markdown syntax
+### Sintaxis de Markdown
 
-Most of the files for HonKit use the Markdown syntax by default. HonKit infers your pages's structure from it. The syntax used is similar to the [GitHub Flavored Markdown syntax](https://guides.github.com/features/mastering-markdown/). One can also opt for the [AsciiDoc syntax](asciidoc.md).
+La mayoría de los archivos de HonKit utilizan la sintaxis Markdown de forma predeterminada. HonKit infiere la estructura de tus páginas a partir de ahí. La sintaxis utilizada es similar a la [sintaxis de GitHub Flavored Markdown] (<https://guides.github.com/features/mastering-markdown/>). También se puede optar por la [sintaxis AsciiDoc](asciidoc.md).
 
-##### Example of a chapter file
+### ejemplo de un archivo de capítulo
 
 ``` markdown
-# Title of the chapter
+# Título del capítulo
 
-This is a great introduction.
+Esto es una gran introducción.
 
-## Section 1
+## Sección 1
 
-Markdown will dictates _most_ of your **book's structure**
+Markdown dictará _la mayor parte_ de la **estructura de su libro**
 
-## Section 2
+## Sección 2
 
 ...
 
 ```
 
-#### Front Matter
+### Front Matter (Nota del traductor: se ha preferido dejarlo en inglés original)
 
-Pages can contain an optional front matter. It can be used to define the page's description. The front matter must be the first thing in the file and must take the form of valid YAML set between triple-dashed lines. Here is a basic example:
+Las páginas pueden contener una portada opcional. Se puede utilizar para definir la descripción de la página. El texto preliminar debe ser lo primero en el archivo y debe tomar la forma de YAML válido entre líneas de triple guion. Aquí hay un ejemplo básico:
 
 ```yaml
 ---
-description: This is a short description of my page
+descripción: Esta es una breve descripción de mi página.
 ---
 
-# The content of my page
+# El contenido de mi página.
 ...
 ```
 
-The front matter can define variables of your own, they will be added to the [page variable](templating/variables.md) so you can use them in your templating.
+La portada puede definir sus propias variables, se agregarán a la [variable de página] (templating/variables.md) para que pueda usarlas en sus plantillas.
