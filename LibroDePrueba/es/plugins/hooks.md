@@ -1,86 +1,86 @@
-# Hooks
+# Ganchos
 
-Hooks is a method of augmenting or altering the behavior of the process, with custom callbacks.
+Los ganchos son un método de aumentar o alterar el comportamiento del proceso, con retrollamadas personalizadas.
 
-### List of hooks
+## Lista de ganchos
 
-### Relative to the global pipeline
+### Relativos a la tubería global
 
-| Name | Description | Arguments |
+| Nombre | Descripción | Argumentos |
 | ---- | ----------- | --------- |
-| `init` | Called after parsing the book, before generating output and pages. | None |
-| `finish:before` | Called after generating the pages, before copying assets, cover, ... | None |
-| `finish` | Called after everything else. | None |
+| `init` | Se llama después de analizar el libro, antes de generar resultados y páginas. | Ninguno |
+| `finish:before` | Se llama después de generar las páginas, antes de copiar activos, portada,... | Ninguno |
+| `finish` | Llamado después de todo lo demás. | Ninguno |
 
-### Relative to the page pipeline
+### Relativos a la tubería de la página
 
-> It is recommended using [templating](./templating.md) to extend page parsing.
+> Se recomienda utilizar [plantillas](./templating.md) para ampliar el análisis de la página.
 
-| Name | Description | Arguments |
+| Nombre | Descripción | Argumentos |
 | ---- | ----------- | --------- |
-| `page:before` | Called before running the templating engine on the page | Page Object |
-| `page` | Called before outputting and indexing the page. | Page Object |
+| `page:before` | Llamado antes de ejecutar el motor de plantillas en la página. | El objeto Page |
+| `page` | Se llama antes de generar e indexar la página. | El objeto Page |
 
-:memo: HonKit may skip these pages hooks on non-changed page when incremental mode(`honkit serve`)
+:memo: HonKit puede omitir estos enlaces de páginas en una página sin cambios cuando está en modo incremental (`honkit server`)
 
-##### Page Object
+#### Objeto Page
 
 ```js
 {
-    // Parser named
+    // Analizador llamado
     "type": "markdown",
 
-    // File Path relative to book root
+    // Ruta del archivo relativa a la raíz del libro
     "path": "page.md",
 
-    // Absolute file path
+    // Ruta absoluta del archivo
     "rawpath": "/usr/...",
 
-    // Title of the page in the SUMMARY
+    // Título de la página en el RESUMEN
     "title": "",
 
-    // Content of the page
-    // Markdown/Asciidoc in "page:before"
-    // HTML in "page"
+    // Contenido de la página
+    // Markdown/Asciidoc en "page:before"
+    // HTML en "page"
     "content": "<h1>Hello</h1>"
 
-    // Level of the page
+    // Nivel de la pagina
     "level": "1.5.3.1"
 
-    // Depth of the page
+    // Profundidad de la página
     "depth": "3"
 
-    // Other attributes appear in the .md between two '---' at the beginning of the content
-    // For example in the front of the markdown:
+    // Otros atributos aparecen en el .md entre dos '---' al comienzo del contenido
+    // Por ejemplo, al frente del markdown:
     // ---
-    // description: This is a description
+    // description: Esto es una descripción
     // ---
-    "description": "This is a description"
+    "description": "Esto es una descripción"
 
-    // Previous article
+    // Artículo anterior
     "previous": Article Object
 
-    // Next article
+    // Artículo siguiente
     "next": Article Object
 }
 ```
 
-##### Example to add a title
+##### Ejemplo para agregar un título
 
-In the `page:before` hook, `page.content` is the markdown/asciidoc content.
+En el gancho `page:before`, `page.content` es el contenido de markdown/asciidoc.
 
 ```js
 {
     "page:before": function(page) {
-        page.content = "# Title\n" +page.content;
+        page.content = "# Título\n" +page.content;
         return page;
     }
 }
 ```
 
-##### Example to replace some html
+##### Ejemplo para reemplazar algunas páginas html
 
-In the `page` hook, `page.content` is the HTML generated from the markdown/asciidoc conversion.
+En el gancho `page`, `page.content` es el HTML generado a partir de la conversión markdown/asciidoc.
 
 ```js
 {
@@ -92,12 +92,11 @@ In the `page` hook, `page.content` is the HTML generated from the markdown/ascii
 }
 ```
 
+### Operaciones asincrónicas
 
-### Asynchronous Operations
+Las retrollamadas de los ganchos pueden ser asincrónicas y devolver promesas (objetos promises de JavaScript).
 
-Hooks callbacks can be asynchronous and return promises.
-
-Example:
+Ejemplo:
 
 ```js
 {

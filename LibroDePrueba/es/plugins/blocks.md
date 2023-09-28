@@ -1,62 +1,62 @@
-# Extend Blocks
+# Extender bloques
 
-Extending templating blocks is the best way to provide extra functionalities to authors.
+Ampliar los bloques de plantillas es la mejor manera de proporcionar funcionalidades adicionales a los autores.
 
-The most common usage is to process the content within some tags at runtime. It's like [filters](./filters.md), but on steroids because you aren't confined to a single expression.
+El uso más común es procesar el contenido de algunas etiquetas en tiempo de ejecución. Es como los [filtros](./filters.md), pero con esteroides porque no estás limitado a una sola expresión.
 
-### Defining a new block
+## Definiendo un nuevo bloque
 
-Blocks are defined by the plugin, blocks is a map of name associated with a block descriptor. The block descriptor needs to contain at least a `process` method.
+Los bloques están definidos por el complemento, los bloques son un mapa de nombre asociado con un descriptor de bloque. El descriptor de bloque debe contener al menos un método `process`.
 
 ```js
 module.exports = {
     blocks: {
         tag1: {
             process: function(block) {
-                return "Hello "+block.body+", How are you?";
+                return "Hola "+block.body+", ¿Cómo estás?";
             }
         }
     }
 };
 ```
 
-The `process` should return the html content that will replace the tag. Refer to [Context and APIs](./api.md) to learn more about `this` and HonKit API.
+El `process` debería devolver el contenido html que reemplazará la etiqueta. Consulte [Contexto y API] (./api.md) para obtener más información sobre `this` y la API HonKit.
 
-### Handling block arguments
+## Manejo de argumentos de bloque
 
-Arguments can be passed to blocks:
+Los argumentos se pueden pasar a bloques:
 
-```
-{% tag1 "argument 1", "argument 2", name="Test" %}
-This is the body of the block.
+```twig
+{% tag1 "argumento 1", "argumento 2", name="Prueba" %}
+Este es el cuerpo del bloque.
 {% endtag1 %}
 ```
 
-And arguments are easily accessible in the `process` method:
+Y los argumentos son fácilmente accesibles en el método `process`:
 
 ```js
 module.exports = {
     blocks: {
         tag1: {
             process: function(block) {
-                // block.args equals ["argument 1", "argument 2"]
-                // block.kwargs equals { "name": "Test" }
+                // block.args equals ["argumento 1", "argumento 2"]
+                // block.kwargs equals { "name": "Prueba" }
             }
         }
     }
 };
 ```
 
-### Handling sub-blocks
+## Manejo de subbloques
 
-A defined block can be parsed into different sub-blocks, for example let's consider the source:
+Un bloque definido se puede analizar en diferentes subbloques, por ejemplo, consideremos la fuente:
 
-```
+```twig
 {% myTag %}
-    Main body
+    Cuerpo principal
     {% subblock1 %}
-    Body of sub-block 1
+    Cuerpo del sub-block 1
     {% subblock 2 %}
-    Body of sub-block 1
+    Cuerpo del sub-block 2
 {% endmyTag %}
 ```

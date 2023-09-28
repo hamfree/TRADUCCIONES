@@ -1,10 +1,10 @@
-# Theming
+# Tematización
 
 Since version 3.0.0, HonKit can be easily themed. Books use the [theme-default](https://github.com/honkit/honkit/tree/master/packages/%40honkit/theme-default) theme by default.
 
 > **Caution**: Custom theming can block some plugins from working correctly.
 
-### Structure of a theme
+## Structure of a theme
 
 A theme is a plugin containing templates and assets. Overriding any individual template is optional, since themes always extend the default theme.
 
@@ -13,7 +13,6 @@ A theme is a plugin containing templates and assets. Overriding any individual t
 | `_layouts` | Main folder containing all the templates |
 | `_layouts/website/page.html` | Template for a normal page |
 | `_layouts/ebook/page.html` | Template for a normal page during ebook generation (PDF< ePub, Mobi) |
-
 
 ### Extend/Customize theme in a book
 

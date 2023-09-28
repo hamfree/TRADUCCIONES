@@ -1,45 +1,46 @@
-# Extend Filters
+# Extender filtros
 
-Filters are essentially functions that can be applied to variables. They are called with a pipe operator (`|`) and can take arguments.
+Los filtros son esencialmente funciones que se pueden aplicar a variables. Se llaman con un operador de canalización (`|`) y pueden aceptar argumentos.
 
-```
+```twig
 {{ foo | title }}
 {{ foo | join(",") }}
 {{ foo | replace("foo", "bar") | capitalize }}
 ```
 
-### Defining a new filter
+## Definiendo un nuevo filtro
 
-Plugins can extend filters by defining custom functions in their entry point under the `filters` scope.
+Los complementos pueden ampliar los filtros definiendo funciones personalizadas en su punto de entrada bajo el alcance de `filters`.
 
-A filter function takes as first argument the content to filter, and should return the new content.
-Refer to [Context and APIs](./api.md) to learn more about `this` and HonKit API.
+Una función de filtro toma como primer argumento el contenido a filtrar y debe devolver el nuevo contenido.
+Consulte [Contexto y API](./api.md) para obtener más información sobre `this` y la API de HonKit.
 
 ```js
 module.exports = {
     filters: {
         hello: function(name) {
-            return 'Hello '+name;
+            return 'Hola '+name;
         }
     }
 };
 ```
 
-The filter `hello` can then be used in the book:
+El filtro `hello` se puede utilizar en el libro:
 
+
+```twig
+{{ "Aaron"|hello }}, ¿Cómo estas?
 ```
-{{ "Aaron"|hello }}, how are you?
-```
 
-### Handling block arguments
+## Manejo de argumentos de bloque
 
-Arguments can be passed to filters:
+Se pueden pasar argumentos a filtros:
 
-```
+```twig
 Hello {{ "Samy"|fullName("Pesse", man=true}} }}
 ```
 
-Arguments are passed to the function, named-arguments are passed as a last argument (object).
+Los argumentos se pasan a la función, los argumentos con nombre se pasan como último argumento (objeto).
 
 ```js
 module.exports = {
@@ -47,8 +48,8 @@ module.exports = {
         fullName: function(firstName, lastName, kwargs) {
             var name = firstName + ' ' + lastName;
 
-            if (kwargs.man) name = "Mr" + name;
-            else name = "Mrs" + name;
+            if (kwargs.man) name = "Señor " + name;
+            else name = "Señora " + name;
 
             return name;
         }
