@@ -10,19 +10,19 @@ La clase `Book` es el punto central de HonKit, centraliza todos los métodos de 
 // Lee la configuración de book.json
 var value = book.config.get('title', 'Valor predeterminado');
 
-// Resuelve un nombre de archivo en una ruta absoluta
+// Resolve a filename to an absolute path
 var filepath = book.resolve('README.md');
 
-// Representa una cadena de marcado en línea
-book.renderInline('markdown', 'Esto es **Markdown**')
+// Render an inline markup string
+book.renderInline('markdown', 'This is **Markdown**')
     .then(function(str) { ... })
 
-// Representa una cadena de marcado (modo bloque)
-book.renderBlock('markdown', '* Esto es **Markdown**')
+// Render a markup string (block mode)
+book.renderBlock('markdown', '* This is **Markdown**')
     .then(function(str) { ... })
 ```
 
-## Instancia Output
+#### Output instance
 
 La clase `Output` representa el proceso de salida/escritura.
 

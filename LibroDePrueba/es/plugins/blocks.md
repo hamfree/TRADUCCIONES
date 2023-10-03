@@ -40,7 +40,7 @@ module.exports = {
         tag1: {
             process: function(block) {
                 // block.args equals ["argumento 1", "argumento 2"]
-                // block.kwargs equals { "name": "Test" }
+                // block.kwargs equals { "name": "Prueba" }
             }
         }
     }

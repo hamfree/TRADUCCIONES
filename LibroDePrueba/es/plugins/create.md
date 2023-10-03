@@ -73,9 +73,10 @@ npm publish
 Los complementos privados se pueden alojar en GitHub e incluir usando URL `git`:
 
 ```json
+```json
 {
     "plugins": [
-        "myplugin@git+https://github.com/MyCompany/myhonkitplugin.git#1.0.0"
+        "miplugin@git+https://github.com/MiEmpresa/micomplementohonkit.git#1.0.0"
     ]
 }
 ```

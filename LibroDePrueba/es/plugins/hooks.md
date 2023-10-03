@@ -1,6 +1,6 @@
 # Ganchos
 
-Hooks es un método para aumentar o alterar el comportamiento del proceso, con retrollamadas personalizadas.
+Los ganchos son un método de aumentar o alterar el comportamiento del proceso, con retrollamadas personalizadas.
 
 ## Lista de ganchos
 
@@ -30,6 +30,7 @@ Hooks es un método para aumentar o alterar el comportamiento del proceso, con r
     // Analizador llamado
     "type": "markdown",
 
+    // Ruta del archivo relativa a la raíz del libro
     // Ruta del archivo relativa a la raíz del libro
     "path": "page.md",
 

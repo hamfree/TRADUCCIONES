@@ -47,8 +47,8 @@ module.exports = {
         fullName: function(firstName, lastName, kwargs) {
             var name = firstName + ' ' + lastName;
 
-            if (kwargs.man) name = "Mr" + name;
-            else name = "Mrs" + name;
+            if (kwargs.man) name = "Señor " + name;
+            else name = "Señora " + name;
 
             return name;
         }
