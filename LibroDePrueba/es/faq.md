@@ -1,25 +1,25 @@
-# HonKit FAQ
+# Preguntas Frecuentes de HonKit
 
-This page gathers common questions and answers concerning the HonKit format and toolchain.
+Esta página recopila preguntas y respuestas comunes sobre el formato HonKit y la cadena de herramientas.
 
-#### How can I host/publish my book?
+## ¿Cómo puedo alojar/publicar mi libro?
 
-Publish to [GitHub Pages](https://pages.github.com/) or [Netlify](https://www.netlify.com/), and more.
+Publique en [Páginas de GitHub](https://pages.github.com/) o [Netlify](https://www.netlify.com/), y más.
 
-#### Does not reload plugins?
+## ¿No recarga los complementos?
 
-HonKit use file cache per text content file by default.
+HonKit usa caché de archivos por archivo de contenido de texto de forma predeterminada.
 
-This file cache check file changes and reload it automatically.
-In some case, HonKit cannot detect the changes of plugins.
+Este archivo caché verifica los cambios del archivo y lo recarga automáticamente.
+En algunos casos, HonKit no puede detectar los cambios de complementos.
 
-If you want to refresh force, please use `--reload` flag.
+Si desea forzar el refresco, por favor use la opción `--reload`.
 
+```bash
+ honkit build --reload
 ```
-$ honkit build --reload
-```
 
-#### Does HonKit supports RTL/bi-directional text ?
+## ¿HonKit admite texto RTL/bidireccional?
 
 The HonKit format supports right to left, and bi-directional writing. To enable it, you either need to specify a language (ex: `ar`), or force HonKit to use RTL in your `book.json`:
 
@@ -33,31 +33,31 @@ The HonKit format supports right to left, and bi-directional writing. To enable 
 With version 3.0 of HonKit, it's automatically detected according to the content.
 _Note that, while the output book will indeed respect RTL, the Editor doesn't support RTL writing yet_.
 
-#### Should I use an `.html` or `.md` extensions in my links?
+## ¿Debo utilizar extensiones `.html` o `.md` en mis enlaces?
 
 You should always use paths and the `.md` extensions when linking to your files, HonKit will automatically replace these paths by the appropriate link when the pointing file is referenced in the Table of Contents.
 
-#### Can I create a HonKit in a sub-directory of my repository?
+## ¿Puedo crear un HonKit en un subdirectorio de mi repositorio?
 
-Yes, HonKits can be created in [sub-directories](structure.md#subdirectory). 
+Yes, HonKits can be created in [sub-directories](structure.md#subdirectory).  
 
-#### Does HonKit supports RTL languages?
+## ¿HonKit admite idiomas RTL?
 
 Yes, HonKit automatically detect the direction in your pages (`rtl` or `ltr`) and adjust the layout accordingly. The direction can also be specified globally in the [book.json](config.md).
 
 ---
 
-#### Does HonKit support Math equations?
+## ¿HonKit admite ecuaciones matemáticas?
 
 See following issues.
 
 - [Mathjax plugin does not build · Issue #325 · honkit/honkit](https://github.com/honkit/honkit/issues/325)
 - [KaTeX plugin · Issue #217 · honkit/honkit](https://github.com/honkit/honkit/issues/217)
 
-#### Can I customize/theme the output?
+## ¿Puedo personalizar/tematizar el resultado?
 
 Yes, both the website and ebook outputs can be customized using [themes](themes/README.md).
 
-#### Can I add interactive content (videos, etc)?
+## ¿Puedo agregar contenido interactivo (videos, etc)?
 
 HonKit is very [extensible](plugins/README.md). You can use [existing plugins](https://plugins.honkit.com) or create your own!

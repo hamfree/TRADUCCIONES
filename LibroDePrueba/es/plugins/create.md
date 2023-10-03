@@ -1,20 +1,20 @@
-# Create and publish a plugin
+# Crear y publicar un complemento
 
-A HonKit plugin is a node package published on NPM that follow a defined convention.
+Un complemento HonKit es un paquete de Node publicado en NPM que sigue una convención definida.
 
-## Structure
+## Estructura
 
-#### package.json
+### package.json
 
-The `package.json` is a manifest format for describing **Node.js modules**. HonKit plugins are built on top of Node modules. It declares dependencies, version, ownership, and other information required to run a plugin in HonKit. This document describes the schema in detail.
+`package.json` es un formato de manifiesto para describir **módulos de Node.js**. Los complementos de HonKit se crean sobre los módulos de Node. Declara dependencias, versión, propiedad y otra información necesaria para ejecutar un complemento en HonKit. Este documento describe el esquema en detalle.
 
-A plugin manifest `package.json` can also contain details about the required configuration. The configuration schema is defined in the `honkit` field of the `package.json` (This field follow the [JSON-Schema](http://json-schema.org) guidelines):
+Un manifiesto de complemento `package.json` también puede contener detalles sobre la configuración requerida. El esquema de configuración se define en el campo `honkit` de `package.json` (este campo sigue las pautas de [JSON-Schema](http://json-schema.org)):
 
 ```js
 {
-    "name": "honkit-plugin-mytest",
+    "name": "honkit-plugin-mitest",
     "version": "0.0.1",
-    "description": "This is my first HonKit plugin",
+    "description": "Este es mi primer complemento de HonKit",
     "engines": {
         "honkit": ">1.x.x"
     },
@@ -22,57 +22,57 @@ A plugin manifest `package.json` can also contain details about the required con
         "properties": {
             "myConfigKey": {
                 "type": "string",
-                "default": "it's the default value",
-                "description": "It defines my awesome config!"
+                "default": "esto es el valor por defecto",
+                "description": "¡esto define mi maravillosa configuración"
             }
         }
     }
 }
 ```
 
-You can learn more about `package.json` from the [NPM documentation](https://docs.npmjs.com/files/package.json).
+Puede obtener más información sobre `package.json` en [la documentación de NPM](https://docs.npmjs.com/files/package.json).
 
-The **package name** must begin with following patterns:
+El **nombre del paquete** debe comenzar con los siguientes patrones:
 
 - `@<scope>/honkit-plugin-`
 - `honkit-plugin-`
 - `@<scope>/gitbook-plugin-`
 - `gitbook-plugin-`
 
-Also, the **package engines** should contain `honkit` or `gitbook`.
+Además, los **motores de paquetes** deben contener `honkit` o `gitbook`.
 
-#### index.js
+### index.js
 
-The `index.js` is main entry point of your plugin runtime:
+`index.js` es el punto de entrada principal del tiempo de ejecución de su complemento:
 
 ```js
 module.exports = {
-    // Map of hooks
+    // Mapa de ganchos
     hooks: {},
 
-    // Map of new blocks
+    // Mapa de bloques nuevos
     blocks: {},
 
-    // Map of new filters
+    // Mapa de filtros nuevos
     filters: {}
 };
 ```
 
-## Publish your plugin
+## Publicar tu complemento
 
-HonKit plugins can be published on [NPM](https://www.npmjs.com).
+Los complementos de HonKit se pueden publicar en [NPM](https://www.npmjs.com).
 
-To publish a new plugin, you need to create an account on [npmjs.com](https://www.npmjs.com) then publish it from the command line:
+Para publicar un nuevo complemento, debe crear una cuenta en [npmjs.com](https://www.npmjs.com) y luego publicarlo desde la línea de comando:
 
+```bash
+npm publish
 ```
-$ npm publish
-```
 
-## Private plugins
+## Complementos privados
 
-Private plugins can be hosted on GitHub and included using `git` urls:
+Los complementos privados se pueden alojar en GitHub e incluir usando URL `git`:
 
-```
+```json
 {
     "plugins": [
         "myplugin@git+https://github.com/MyCompany/myhonkitplugin.git#1.0.0"

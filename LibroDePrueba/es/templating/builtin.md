@@ -1,18 +1,19 @@
-# Builtin Templating Helpers
+# Ayudantes de plantillas incorporados
 
-HonKit provides a serie of builtin filters and blocks to help you write templates.
+HonKit proporciona una serie de filtros y bloques integrados para ayudarte a escribir plantillas.
 
-### Filters
+## Filtros
 
-`value|default(default, [boolean])`If value is strictly undefined, return default, otherwise value. If boolean is true, any JavaScript falsy value will return default (false, "", etc)
+`value|default(default, [boolean])`
+Si el valor no está estrictamente definido, devuelve el valor predeterminado; en caso contrario, el valor. Si booleano es verdadero, cualquier valor falso de JavaScript devolverá el valor predeterminado (false, "", etc.)
 
 `arr|sort(reverse, caseSens, attr)`
-Sort arr with JavaScript's arr.sort function. If reverse is true, result will be reversed. Sort is case-insensitive by default, but setting caseSens to true makes it case-sensitive. If attr is passed, will compare attr from each item.
+Ordene arr con la función arr.sort de JavaScript. Si lo contrario es cierto, el resultado se invertirá. La clasificación no distingue entre mayúsculas y minúsculas de forma predeterminada, pero establecer caseSens en verdadero hace que sí lo haga. Si se pasa el atributo (attr), se comparará el atributo de cada elemento.
 
-### Blocks
+## Bloques
 
 `{% markdown %}Markdown string{% endmarkdown %}`
-Render inline markdown
+Representa markdown en línea
 
 `{% asciidoc %}AsciiDoc string{% endasciidoc %}`
-Render inline asciidoc
+Representa asciidoc en línea

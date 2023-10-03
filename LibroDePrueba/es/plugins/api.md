@@ -1,97 +1,97 @@
-# Context and APIs
+# Contexto e IPA
 
-HonKits provides different APIs and contexts to plugins. These APIs can vary according to the HonKit version being used, your plugin should specify the `engines.gitbook` field in `package.json` accordingly.
+HonKits proporciona diferentes API y contextos para los complementos. Estas API pueden variar según la versión de HonKit que se utilice; su complemento debe especificar el campo `engines.gitbook` en `package.json` en consecuencia.
 
-#### Book instance
+## Instancia Book
 
-The `Book` class is the central point of HonKit, it centralize all access read methods. This class is defined in [book.js](https://github.com/honkit/honkit/blob/master/lib/book.js).
+La clase `Book` es el punto central de HonKit, centraliza todos los métodos de lectura de acceso. Esta clase está definida en [book.js](https://github.com/honkit/honkit/blob/master/lib/book.js).
 
 ```js
-// Read configuration from book.json
-var value = book.config.get('title', 'Default Value');
+// Lee la configuración de book.json
+var value = book.config.get('title', 'Valor predeterminado');
 
-// Resolve a filename to an absolute path
+// Resuelve un nombre de archivo en una ruta absoluta
 var filepath = book.resolve('README.md');
 
-// Render an inline markup string
-book.renderInline('markdown', 'This is **Markdown**')
+// Representa una cadena de marcado en línea
+book.renderInline('markdown', 'Esto es **Markdown**')
     .then(function(str) { ... })
 
-// Render a markup string (block mode)
-book.renderBlock('markdown', '* This is **Markdown**')
+// Representa una cadena de marcado (modo bloque)
+book.renderBlock('markdown', '* Esto es **Markdown**')
     .then(function(str) { ... })
 ```
 
-#### Output instance
+## Instancia Output
 
-The `Output` class represent the output/write process.
+La clase `Output` representa el proceso de salida/escritura.
 
 ```js
-// Return root folder for the output
+// Devuelve la carpeta raíz para la salida
 var root = output.root();
 
-// Resolve a file in the output folder
-var filepath = output.resolve('myimage.png');
+// Resuelve un archivo en la carpeta de salida
+var filepath = output.resolve('miimagen.png');
 
-// Convert a filename to an URL (returns a path to an html file)
-var fileurl = output.toURL('mychapter/README.md');
+// Convierte un nombre de archivo en una URL (devuelve una ruta a un archivo html)
+var fileurl = output.toURL('micapitulo/README.md');
 
-// Write a file in the output folder
-output.writeFile('hello.txt', 'Hello World')
+// Escribe un archivo en la carpeta de salida
+output.writeFile('hola.txt', 'Hola Mundo')
     .then(function() { ... });
 
-// Copy a file to the output folder
-output.copyFile('./myfile.jpg', 'cover.jpg')
+// Copia un archivo a la carpeta de salida
+output.copyFile('./miarchivo.jpg', 'portada.jpg')
     .then(function() { ... });
 
-// Verify that a file exists
-output.hasFile('hello.txt')
+// Verfica que un archivo existe
+output.hasFile('hola.txt')
     .then(function(exists) { ... });
 ```
 
-#### Page instance
+## Instancia Page
 
-A page instance represent the current parsed page.
+Una instancia page representa la página actualmente analizada.
 
 ```js
-// Title of the page (from SUMMARY)
+// Título de la página (del  SUMMARY)
 page.title
 
-// Content of the page (Markdown/Asciidoc/HTML according to the stage)
+// Contenido de la página (Markdown/Asciidoc/HTML según la etapa)
 page.content
 
-// Relative path in the book
+// Ruta relativa en el libro.
 page.path
 
-// Absolute path to the file
+// Ruta absoluta al archivo.
 page.rawPath
 
-// Type of parser used for this file
+// Tipo de analizador utilizado para este archivo
 page.type ('markdown' or 'asciidoc')
 ```
 
-#### Context for Blocks and Filters
+## Contexto para bloques y filtros
 
-Blocks and filters have access to the same context, this context is bind to the template engine execution:
+Los bloques y filtros tienen acceso al mismo contexto, este contexto está vinculado a la ejecución del motor de plantillas:
 
 ```js
 {
-    // Current templating syntax
+    // Sintaxis de plantillas actual
     "ctx": {
-        // For example, after a {% set message = "hello" %}
+        // Por ejemplo, después de un {% set message = "hello" %}
         "message": "hello"
     },
 
-    // Book instance
+    // instancia Book
     "book" <Book>,
 
-    // Output instance
+    // instancia Output
     "output": <Output>
 }
 ```
 
-For example a filter or block function can access the current book using: `this.book`.
+Por ejemplo, una función de filtro o bloqueo puede acceder al libro actual usando: `this.book`.
 
-#### Context for Hooks
+## Contexto para los ganchos
 
-Hooks only have access to the `<Book>` instance using `this.book`.
+Los ganchos solo tienen acceso a la instancia `<Book>` usando `this.book`.

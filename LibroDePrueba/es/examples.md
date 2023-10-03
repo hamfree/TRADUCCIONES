@@ -1,31 +1,31 @@
 ---
-description: Real world examples of content published using HonKit.
+description: Ejemplos del mundo real de contenido publicado con HonKit.
 ---
 
-# Examples
+# Ejemplos
 
-Real world examples of content published using HonKit.
+Ejemplos del mundo real de contenido publicado usando HonKit.
 
-## Who's using HonKit
+## ¿Quién está usando HonKit?
 
-- Learn JavaScript
-    - [Website](https://javascript.sumankunwar.com.np/)
-    - [Source](https://github.com/sumn2u/learn-javascript)
-- JavaScript Primer
-    - [Website](https://jsprimer.net/)
-    - [Source](https://github.com/asciidwango/js-primer)
-- Arcane Algorithm Archive
-    - [Website](https://www.algorithm-archive.org/)
-    - [Source](https://github.com/algorithm-archivists/algorithm-archive)
-- Django Girls Tutorial
-    - [Website](https://tutorial.djangogirls.org/)
-    - [Source](https://github.com/DjangoGirls/tutorial)
-- MISP (the open source threat intelligence platform) book
-    - [Website](https://www.circl.lu/doc/misp/)
-    - [Source](https://github.com/MISP/misp-book)
+- Aprenda JavaScript (Learn JavaScript)
+  - [Sitio web](https://javascript.sumankunwar.com.np/)
+  - [Fuentes](https://github.com/sumn2u/learn-javascript)
+- Introducción a JavaScript (JavaScript Primer)
+  - [Sitio web](https://jsprimer.net/)
+  - [Fuentes](https://github.com/asciidwango/js-primer)
+- Archivo de algoritmos arcanos (Arcane Algorithm Archive)
+  - [Sitio web](https://www.algorithm-archive.org/)
+  - [Fuentes](https://github.com/algorithm-archivists/algorithm-archive)
+- Tutorial de chicas Django (Django Girls Tutorial)
+  - [Sitio web](https://tutorial.djangogirls.org/)
+  - [Fuentes](https://github.com/DjangoGirls/tutorial)
+- Libro MISP (la plataforma de inteligencia de amenazas de código abierto)
+  - [Sitio web](https://www.circl.lu/doc/misp/)
+  - [Fuentes](https://github.com/MISP/misp-book)
 
-## Add to examples
+## Añadir a ejemplos
 
-Is your project using HonKit?
+¿Su proyecto utiliza HonKit?
 
-Please [Edit this page](https://github.com/honkit/honkit/edit/master/docs/examples.md) with a Pull Request to add your book!
+Por favor, ¡[Edite esta página](https://github.com/honkit/honkit/edit/master/docs/examples.md) con una solicitud de extracción para agregar tu libro!

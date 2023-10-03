@@ -1,23 +1,23 @@
-# Testing your plugin
+# Prueba tu complemento
 
-### Testing your plugin locally
+## Prueba tu complemento localmente
 
-Testing your plugin on your book before publishing it is possible using [npm link](https://docs.npmjs.com/cli/link).
+Es posible probar el complemento en su libro antes de publicarlo usando [npm link](https://docs.npmjs.com/cli/link).
 
-In the plugin's folder, run:
+En la carpeta del complemento, ejecute:
 
-```
-$ npm link
-```
-
-Then in your book's folder:
-
-```
-$ npm link honkit-plugin-<plugin's name>
+```bash
+ npm link
 ```
 
-### Unit testing on Travis
+Luego en la carpeta de tu libro:
 
-[gitbook-tester](https://github.com/todvora/gitbook-tester) makes it easy to write **Node.js/Mocha** unit tests for your plugins. Using [Travis.org](https://travis.org), tests can be run on each commits/tags.
+```bash
+ npm link honkit-plugin-<nombre del complemento>
+```
 
-[honkit-tester](https://github.com/vowstar/honkit-tester) over time, in some cases gitbook-tester no longer works properly on the latest version of nodejs. This is a port of gitbook-tester, which could works on LTS version of nodejs v14.x v16.x v18.x, and using the honkit engine instead of gitbook to run test.
+## Pruebas unitarias en Travis
+
+[gitbook-tester](https://github.com/todvora/gitbook-tester) facilita la escritura de pruebas unitarias **Node.js/Mocha** para sus complementos. Usando [Travis.org](https://travis.org), se pueden ejecutar pruebas en cada confirmación/etiqueta.
+
+[honkit-tester](https://github.com/vowstar/honkit-tester) con el tiempo, en algunos casos, gitbook-tester ya no funciona correctamente en la última versión de nodejs. Este es un puerto de gitbook-tester, que podría funcionar en la versión LTS de nodejs v14.x v16.x v18.x y usar el motor honkit en lugar de gitbook para ejecutar la prueba.
