@@ -1,39 +1,38 @@
-# Theming
+# Tematización
 
-Since version 3.0.0, HonKit can be easily themed. Books use the [theme-default](https://github.com/honkit/honkit/tree/master/packages/%40honkit/theme-default) theme by default.
+Desde la versión 3.0.0, HonKit se puede personalizar fácilmente. Los libros usan el tema [theme-default](https://github.com/honkit/honkit/tree/master/packages/%40honkit/theme-default) de forma predeterminada.
 
-> **Caution**: Custom theming can block some plugins from working correctly.
+> **Precaución**: la temática personalizada puede impedir que algunos complementos funcionen correctamente.
 
-### Structure of a theme
+## Estructura de un tema
 
-A theme is a plugin containing templates and assets. Overriding any individual template is optional, since themes always extend the default theme.
+Un tema es un complemento que contiene plantillas y recursos. Anular cualquier plantilla individual es opcional, ya que los temas siempre amplían el tema predeterminado.
 
-| Folder | Description |
+| Carpeta | Descripción |
 | -------- | ----------- |
-| `_layouts` | Main folder containing all the templates |
-| `_layouts/website/page.html` | Template for a normal page |
-| `_layouts/ebook/page.html` | Template for a normal page during ebook generation (PDF< ePub, Mobi) |
+| `_layouts` | Carpeta principal que contiene todas las plantillas. |
+| `_layouts/website/page.html` | Plantilla para una página normal. |
+| `_layouts/ebook/page.html` | Plantilla para una página normal durante la generación de libros electrónicos (PDF< ePub, Mobi) |
 
+## Ampliar/Personalizar tema en un libro
 
-### Extend/Customize theme in a book
+Los autores pueden ampliar las plantillas de un tema directamente desde la fuente de su libro (sin crear un tema externo). Las plantillas se resolverán primero en la carpeta `_layouts` del libro y luego en los complementos/temas instalados.
 
-Authors can extend the templates of a theme directly from their book's source (without creating an external theme). Templates will be resolved in the `_layouts` folder of the book first, then in the installed plugins/themes.
+## Extender en lugar de bifurcar
 
-### Extend instead of Forking
-
-When you want to make your theme changes available to multiple books, instead of forking the default theme, you can extend it using the [templating syntax](../templating/README.md):
+Cuando desee que los cambios de tema estén disponibles para varios libros, en lugar de bifurcar el tema predeterminado, puede extenderlo usando la [sintaxis de plantilla](../templating/README.md):
 
 ```html
 {% extends template.self %}
 
 {% block body %}
     {{ super() }}
-    ... This will be added to the "body" block
+    ... Esto se agregará al bloque "body".
 {% endblock %}
 ```
 
-Take a look at the [API](https://github.com/GitbookIO/theme-api) theme for a more complete example.
+Eche un vistazo al tema [API](https://github.com/GitbookIO/theme-api) para ver un ejemplo más completo.
 
-### Publish a theme
+## Publicar un tema
 
-Themes are published as plugins ([see related docs](../plugins/README.md)) with a `theme-` prefix. For example the theme `awesome` will be loaded from the `theme-awesome` plugin, and then from the `honkit-plugin-theme-awesome` NPM package.
+Los temas se publican como complementos ([ver documentos relacionados](../plugins/README.md)) con un prefijo `theme-`. Por ejemplo, el tema `awesome` se cargará desde el complemento `theme-awesome` y luego desde el paquete NPM `honkit-plugin-theme-awesome`.
