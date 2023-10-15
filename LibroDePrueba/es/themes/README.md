@@ -6,7 +6,7 @@ Desde la versión 3.0.0, HonKit se puede personalizar fácilmente. Los libros us
 
 ## Estructura de un tema
 
-Un tema es un complemento que contiene plantillas y activos. Anular cualquier plantilla individual es opcional, ya que los temas siempre amplían el tema predeterminado.
+Un tema es un complemento que contiene plantillas y recursos. Anular cualquier plantilla individual es opcional, ya que los temas siempre amplían el tema predeterminado.
 
 | Carpeta | Descripción |
 | -------- | ----------- |

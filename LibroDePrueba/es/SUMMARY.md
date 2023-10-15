@@ -38,7 +38,7 @@
   * [Ganchos](plugins/hooks.md)
   * [Extender bloques](plugins/blocks.md)
   * [Extender filtros](plugins/filters.md)
-  * [IPA & Contexto](plugins/api.md)
+  * [Contexto e IPA](plugins/api.md)
   * [Prueba tu complemento](plugins/testing.md)
 * [Tematización](themes/README.md)
 

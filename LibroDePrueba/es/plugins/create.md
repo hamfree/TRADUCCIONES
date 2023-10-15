@@ -1,6 +1,6 @@
 # Crear y publicar un complemento
 
-Un complemento de HonKit es un paquete de node publicado en NPM que sigue una convención definida.
+Un complemento HonKit es un paquete de Node publicado en NPM que sigue una convención definida.
 
 ## Estructura
 
@@ -22,17 +22,17 @@ Un manifiesto de complemento `package.json` también puede contener detalles sob
         "properties": {
             "myConfigKey": {
                 "type": "string",
-                "default": "esto es el valor predeterminado",
-                "description": "¡Define mi increíble configuración!"
+                "default": "esto es el valor por defecto",
+                "description": "¡esto define mi maravillosa configuración"
             }
         }
     }
 }
 ```
 
-Puede aprender más sobre `package.json` de la [documentación de NPM](https://docs.npmjs.com/files/package.json).
+Puede obtener más información sobre `package.json` en [la documentación de NPM](https://docs.npmjs.com/files/package.json).
 
-El **nombre del paquete** debe empezar con los siguientes patrones:
+El **nombre del paquete** debe comenzar con los siguientes patrones:
 
 - `@<scope>/honkit-plugin-`
 - `honkit-plugin-`
@@ -47,31 +47,32 @@ Además, los **motores de paquetes** deben contener `honkit` o `gitbook`.
 
 ```js
 module.exports = {
-    // Mapa de los enganches
+    // Mapa de ganchos
     hooks: {},
 
-    // Mapa de los bloques nuevos
+    // Mapa de bloques nuevos
     blocks: {},
 
-    // Mapa de los filtros nuevos
+    // Mapa de filtros nuevos
     filters: {}
 };
 ```
 
 ## Publicar tu complemento
 
-Los complementos de HonKit pueden publicarse en [NPM](https://www.npmjs.com).
+Los complementos de HonKit se pueden publicar en [NPM](https://www.npmjs.com).
 
-Para publicar un complemento nuevo, necesita crear una cuenta en [npmjs.com](https://www.npmjs.com) y luego publíquelo desde la línea de comando:
+Para publicar un nuevo complemento, debe crear una cuenta en [npmjs.com](https://www.npmjs.com) y luego publicarlo desde la línea de comando:
 
 ```bash
-$ npm publish
+npm publish
 ```
 
 ## Complementos privados
 
-Los complementos privados se pueden alojar en GitHub e incluir usando urls `git`:
+Los complementos privados se pueden alojar en GitHub e incluir usando URL `git`:
 
+```json
 ```json
 {
     "plugins": [

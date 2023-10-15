@@ -4,22 +4,22 @@ Los ganchos son un método de aumentar o alterar el comportamiento del proceso, 
 
 ## Lista de ganchos
 
-### Relativos a la tubería global
+### Relativo a la tubería global
 
 | Nombre | Descripción | Argumentos |
 | ---- | ----------- | --------- |
 | `init` | Se llama después de analizar el libro, antes de generar resultados y páginas. | Ninguno |
-| `finish:before` | Se llama después de generar las páginas, antes de copiar activos, portada,... | Ninguno |
+| `finish:before` | Se llama después de generar las páginas, antes de copiar recursos, portada,... | Ninguno |
 | `finish` | Llamado después de todo lo demás. | Ninguno |
 
-### Relativos a la tubería de la página
+### Relativo a la tubería de la página
 
-> Se recomienda utilizar [plantillas](./templating.md) para ampliar el análisis de la página.
+> Se recomienda utilizar [templating](../templating/README.md) para ampliar el análisis de la página.
 
 | Nombre | Descripción | Argumentos |
 | ---- | ----------- | --------- |
-| `page:before` | Llamado antes de ejecutar el motor de plantillas en la página. | El objeto Page |
-| `page` | Se llama antes de generar e indexar la página. | El objeto Page |
+| `page:before` | Llamado antes de ejecutar el motor de plantillas en la página. | Objeto Page |
+| `page` | Se llama antes de generar e indexar la página. | Objeto Page |
 
 :memo: HonKit puede omitir estos enlaces de páginas en una página sin cambios cuando está en modo incremental (`honkit server`)
 
@@ -31,12 +31,13 @@ Los ganchos son un método de aumentar o alterar el comportamiento del proceso, 
     "type": "markdown",
 
     // Ruta del archivo relativa a la raíz del libro
+    // Ruta del archivo relativa a la raíz del libro
     "path": "page.md",
 
     // Ruta absoluta del archivo
     "rawpath": "/usr/...",
 
-    // Título de la página en el RESUMEN
+    // Título de la página en el fichero SUMMARY
     "title": "",
 
     // Contenido de la página
@@ -44,7 +45,7 @@ Los ganchos son un método de aumentar o alterar el comportamiento del proceso, 
     // HTML en "page"
     "content": "<h1>Hello</h1>"
 
-    // Nivel de la pagina
+    // Nivel de la página
     "level": "1.5.3.1"
 
     // Profundidad de la página
@@ -65,9 +66,9 @@ Los ganchos son un método de aumentar o alterar el comportamiento del proceso, 
 }
 ```
 
-##### Ejemplo para agregar un título
+#### Ejemplo para agregar un título
 
-En el gancho `page:before`, `page.content` es el contenido de markdown/asciidoc.
+En el gancho `page:before`, `page.content` es el contenido markdown/asciidoc.
 
 ```js
 {
@@ -78,9 +79,9 @@ En el gancho `page:before`, `page.content` es el contenido de markdown/asciidoc.
 }
 ```
 
-##### Ejemplo para reemplazar algunas páginas html
+#### Ejemplo para reemplazar algún html
 
-En el gancho `page`, `page.content` es el HTML generado a partir de la conversión markdown/asciidoc.
+En el gancho `page`, `page.content` es el HTML generado de la conversión markdown/asciidoc.
 
 ```js
 {
@@ -92,9 +93,9 @@ En el gancho `page`, `page.content` es el HTML generado a partir de la conversi�
 }
 ```
 
-### Operaciones asincrónicas
+### Operaciones asíncronas
 
-Las retrollamadas de los ganchos pueden ser asincrónicas y devolver promesas (objetos promises de JavaScript).
+Las retrollamadas de ganchos pueden ser asincrónicas y devolver promesas.
 
 Ejemplo:
 

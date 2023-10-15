@@ -4,7 +4,7 @@ Ampliar los bloques de plantillas es la mejor manera de proporcionar funcionalid
 
 El uso más común es procesar el contenido de algunas etiquetas en tiempo de ejecución. Es como los [filtros](./filters.md), pero con esteroides porque no estás limitado a una sola expresión.
 
-## Definiendo un nuevo bloque
+## Definir un bloque nuevo
 
 Los bloques están definidos por el complemento, los bloques son un mapa de nombre asociado con un descriptor de bloque. El descriptor de bloque debe contener al menos un método `process`.
 
@@ -20,14 +20,14 @@ module.exports = {
 };
 ```
 
-El `process` debería devolver el contenido html que reemplazará la etiqueta. Consulte [Contexto y API] (./api.md) para obtener más información sobre `this` y la API HonKit.
+El `process` debería devolver el contenido html que reemplazará la etiqueta. Consulte [Contexto e IPA](./api.md) para obtener más información sobre `this` y la API HonKit.
 
 ## Manejo de argumentos de bloque
 
 Los argumentos se pueden pasar a bloques:
 
 ```twig
-{% tag1 "argumento 1", "argumento 2", name="Prueba" %}
+{% tag1 "argumento 1", "argumento 2", name="Test" %}
 Este es el cuerpo del bloque.
 {% endtag1 %}
 ```
@@ -55,8 +55,8 @@ Un bloque definido se puede analizar en diferentes subbloques, por ejemplo, cons
 {% myTag %}
     Cuerpo principal
     {% subblock1 %}
-    Cuerpo del sub-block 1
+    Cuerpo del subbloque 1
     {% subblock 2 %}
-    Cuerpo del sub-block 2
+    Cuerpo del subbloque 2
 {% endmyTag %}
 ```

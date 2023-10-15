@@ -8,12 +8,12 @@ Los filtros son esencialmente funciones que se pueden aplicar a variables. Se ll
 {{ foo | replace("foo", "bar") | capitalize }}
 ```
 
-## Definiendo un nuevo filtro
+## Definir un filtro nuevo
 
 Los complementos pueden ampliar los filtros definiendo funciones personalizadas en su punto de entrada bajo el alcance de `filters`.
 
 Una función de filtro toma como primer argumento el contenido a filtrar y debe devolver el nuevo contenido.
-Consulte [Contexto y API](./api.md) para obtener más información sobre `this` y la API de HonKit.
+Consulte [Contexto e IPAs](./api.md) para aprender más sobre  `this` y la IPA de HonKit.
 
 ```js
 module.exports = {
@@ -27,20 +27,19 @@ module.exports = {
 
 El filtro `hello` se puede utilizar en el libro:
 
-
 ```twig
-{{ "Aaron"|hello }}, ¿Cómo estas?
+{{ "Aaron"|hello }}, ¿cómo estás?
 ```
 
 ## Manejo de argumentos de bloque
 
-Se pueden pasar argumentos a filtros:
+Se pueden pasar argumentos a los filtros:
 
 ```twig
 Hello {{ "Samy"|fullName("Pesse", man=true}} }}
 ```
 
-Los argumentos se pasan a la función, los argumentos con nombre se pasan como último argumento (objeto).
+Los argumentos se pasan a la función, los argumentos con nombre se pasan como último argumento (object).
 
 ```js
 module.exports = {

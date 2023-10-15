@@ -1,4 +1,4 @@
-# PF HonKit
+# Preguntas Frecuentes de HonKit
 
 Esta página recopila preguntas y respuestas comunes sobre el formato HonKit y la cadena de herramientas.
 
@@ -6,14 +6,14 @@ Esta página recopila preguntas y respuestas comunes sobre el formato HonKit y l
 
 Publique en [Páginas de GitHub](https://pages.github.com/) o [Netlify](https://www.netlify.com/), y más.
 
-## ¿No recargan los complementos?
+## ¿No recarga los complementos?
 
 HonKit usa caché de archivos por archivo de contenido de texto de forma predeterminada.
 
 Este archivo caché verifica los cambios del archivo y lo recarga automáticamente.
 En algunos casos, HonKit no puede detectar los cambios de complementos.
 
-Si desea forzar la actualización, utilice el indicador `--reload`.
+Si desea forzar el refresco, por favor use la opción `--reload`.
 
 ```bash
  honkit build --reload
