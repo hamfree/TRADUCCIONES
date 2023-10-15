@@ -1,31 +1,31 @@
 ---
-description: Real world examples of content published using HonKit.
+description: Ejemplos del mundo real de contenido publicado con HonKit.
 ---
 
-# Examples
+# Ejemplos
 
-Real world examples of content published using HonKit.
+Ejemplos del mundo real de contenido publicado con HonKit.
 
-## Who's using HonKit
+## ¿Quién está usando HonKit?
 
 - Learn JavaScript
-    - [Website](https://javascript.sumankunwar.com.np/)
-    - [Source](https://github.com/sumn2u/learn-javascript)
+  - [Sitio web](https://javascript.sumankunwar.com.np/)
+  - [Fuente](https://github.com/sumn2u/learn-javascript)
 - JavaScript Primer
-    - [Website](https://jsprimer.net/)
-    - [Source](https://github.com/asciidwango/js-primer)
+  - [Sitio web](https://jsprimer.net/)
+  - [Fuente](https://github.com/asciidwango/js-primer)
 - Arcane Algorithm Archive
-    - [Website](https://www.algorithm-archive.org/)
-    - [Source](https://github.com/algorithm-archivists/algorithm-archive)
+  - [Sitio web](https://www.algorithm-archive.org/)
+  - [Fuente](https://github.com/algorithm-archivists/algorithm-archive)
 - Django Girls Tutorial
-    - [Website](https://tutorial.djangogirls.org/)
-    - [Source](https://github.com/DjangoGirls/tutorial)
+  - [Sitio web](https://tutorial.djangogirls.org/)
+  - [Fuente](https://github.com/DjangoGirls/tutorial)
 - MISP (the open source threat intelligence platform) book
-    - [Website](https://www.circl.lu/doc/misp/)
-    - [Source](https://github.com/MISP/misp-book)
+  - [Sitio web](https://www.circl.lu/doc/misp/)
+  - [Fuente](https://github.com/MISP/misp-book)
 
-## Add to examples
+## Añadir a ejemplos
 
-Is your project using HonKit?
+¿Su proyecto utiliza HonKit?
 
-Please [Edit this page](https://github.com/honkit/honkit/edit/master/docs/examples.md) with a Pull Request to add your book!
+Por favor, ¡[edite esta página](https://github.com/honkit/honkit/edit/master/docs/examples.md) con una solicitud de cambio para agregar su libro!
