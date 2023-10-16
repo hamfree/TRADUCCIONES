@@ -1,12 +1,12 @@
-# 1. What are Design Patterns?
+# 1. ¿Qué son los patrones de diseño?
 
-Imagine that you have just been assigned the task of designing a software system. Your customer tells you that he needs to model the Gadgets his factory makes and that each Gadget comprises the same component parts but those parts are a bit different for each type of Gadget. And he also makes Gizmos, where each Gizmo comes with a selection of optional extras any combination of which can be chosen. And he also needs a unique sequential serial number stamped on each item made.
+Imagine que le acaban de asignar la tarea de diseñar un sistema de software. Su cliente le dice que necesita modelar los Gadgets que fabrica su fábrica y que cada Gadget consta de los mismos componentes, pero esas piezas son un poco diferentes para cada tipo de Gadget. Y también fabrica Gizmos, donde cada Gizmo viene con una selección de extras opcionales, de los cuales se puede elegir cualquier combinación. Y también necesita un número de serie secuencial único estampado en cada artículo fabricado.
 
-Just how would you go about designing these classes?
+¿Cómo harías para diseñar estas clases?
 
-The chances are that no matter what problem domain you are working in, somebody else has had to design a similar solution in the past. Not necessarily for Gadgets and Gizmos of course, but conceptually similar in terms of objectives and structure. In other words there's a good chance that a generic solution or approach already exists, and all you need to do is to apply that approach to solve your design conundrum.
+Lo más probable es que, sin importar en qué dominio del problema esté trabajando, alguien más haya tenido que diseñar una solución similar en el pasado. No necesariamente para Gadgets y Gizmos, por supuesto, pero conceptualmente similares en términos de objetivos y estructura. En otras palabras, existe una buena posibilidad de que ya exista una solución o enfoque genérico, y todo lo que necesita hacer es aplicar ese enfoque para resolver su enigma de diseño.
 
-This is what Design Patterns are for. They describe generic solutions to software design problems. Once versed in patterns, you might think to yourself "those Gadgets could be modelled using the *Abstract Factory* pattern, the Gizmos using the *Decorator* pattern, and the serial number generation using the *Singleton* pattern."
+Para eso están los patrones de diseño. Describen soluciones genéricas a problemas de diseño de software. Una vez versado en patrones, podrías pensar "esos Gadgets podrían modelarse usando el patrón *Abstract Factory*, los Gizmos usando el patrón *Decorator* y la generación de números de serie usando el patrón *Singleton*".
 
 ## Cómo utiliza este libro los patrones {#h2-1}
 
