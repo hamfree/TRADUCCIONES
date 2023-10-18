@@ -20,9 +20,9 @@ Now it would be possible, of course, to just have a series of if...else... state
 
 The following diagram shows the pattern:
 
-(IMAGEN)
+![Patrón cadena de responsabilidad](../images/000045.jpg)
 
-Figure 14.1 : Chain of Responsibility pattern
+Figura 14.1 : Patrón cadena de responsabilidad
 
 EmailHandler is the interface at the top of the hierarchy:
 
@@ -383,9 +383,9 @@ public class SpeechRecogniser {
 
 We can view what we have created diagrammatically as follows:
 
-(IMAGEN)
+![Patrón Comando](../images/000038.jpg)
 
-Figure 15.1 : Command pattern
+Figura 15.1 : Patrón Comando
 
 Client programs can now create Radio and ElectricWindow instances, along with their respective Command instances. The command instances are then passed to the SpeechRecogniser object so it knows what to do.
 
@@ -549,9 +549,9 @@ You will notice that for simplicity the latitude and longitude are stored as dou
 
 The classes to interpret the language are structured as follows:
 
-(IMAGEN)
+![Patrón Intérprete](../images/000028.jpg)
 
-Figure 16.1 : Interpreter pattern
+Figura 16.1 : Patrón Intérprete
 
 The Interpreter pattern resembles the Composite pattern in that it comprises an interface (or abstract class) with two types of concrete subclass; one type that represents the individual elements and the other type that represents repeating elements. We create one subclass to handle each type of element in the language.
 
@@ -941,9 +941,9 @@ The Mediator pattern helps to solve this through the definition of a separate cl
 
 We can see the connections diagrammatically below:
 
-(IMAGEN)
+![Patrón Mediador](../images/000012.jpg)
 
-Figure 18.1 : Mediator pattern
+Figura 18.1 : Patrón Mediador
 
 The two-way communication is achieved via each of the component classes' constructors, in that they each accept a reference to the mediator object (so they can send messages to it) and register themselves with the mediator (so they can receive messages from it). But each component class has no knowledge of any other component class; they only know about the mediator.
 
@@ -1244,9 +1244,9 @@ However, one of the instance variables in the Speedometer class does not have a 
 
 This chapter will present two different approaches, each having its advantages and disadvantages. In both cases, we make use of a separate class that performs the state saving and restoration, which we shall call SpeedometerMemento. This class takes a reference to the Speedometer object that needs to be externalised:
 
-(IMAGEN)
+![Patrón Recuerdo](../images/000066.jpg)
 
-Figure 19.1 : Memento pattern
+Figura 19.1 : Patrón Recuerdo
 
 ### Enfoque 1: utilizar la visibilidad privada del paquete{#h2-26}
 
@@ -1442,9 +1442,9 @@ The Observer pattern enables a loose-coupling to be established between a 'subje
 
 Because this is a very common need in object-oriented systems, the Java libraries already contains mechanisms that enable the pattern to be implemented. One of these is by utilising the Observable class and the Observer interface:
 
-(IMAGEN)
+![Patrón Observador](../images/000051.jpg)
 
-Figure 20.1 : Observer pattern
+Figura 20.1 : Patrón Observador
 
 The 'subject' (Speedometer) can have multiple observers (which can in fact be any class that implements the Observer interface, not just SpeedMonitor objects).
 
@@ -1719,9 +1719,9 @@ The problem with code such as the above is that the if...else... conditions woul
 
 The State pattern enables a hierarchy to be established that allows for state transitions such as necessitated by our clock setting example. We will create a ClockSetup class that initiates the states through the interface ClockSetupState, which has an implementing class for each individual state:
 
-(IMAGEN)
+![Patrón Estado](../images/000033.jpg)
 
-Figure 21.1 : State pattern
+Figura 21.1 : Patrón Estado
 
 The ClockSetupState interface defines methods for handling changes to the state, plus methods that can provide user instructions and return the actual selected value:
 
@@ -2086,9 +2086,9 @@ The Foobar Motor Company wishes to implement a new type of automatic gearbox for
 
 Just as with the discussion in the chapter for the State pattern, it would be inflexible to use a series of if...else... statements to control the different gearbox modes directly inside our vehicle classes. Instead, we shall encapsulate the concept that varies and define a separate hierarchy so that each different gearbox mode is a separate class, each in effect being a different 'strategy' that gets applied. This approach allows the actual strategy being used to be isolated from the vehicle. In our example, we shall only apply this to the cars:
 
-(IMAGEN)
+![Patrón Estrategia](../images/000055.jpg)
 
-Figure 22.1 : Strategy pattern
+Figure 22.1 : Patrón Estrategia
 
 The GearboxStrategy interface defines the method to control the gear:
 
@@ -2195,9 +2195,9 @@ Each vehicle made by the Foobar Motor Company needs a small number of printed bo
 
 The Template Method pattern enables the definition of one or more abstract methods that are called through a 'template method'. The simple hierarchy is as follows:
 
-(IMAGEN)
+![Patrón Método de Plantilla](../images/000001.jpg)
 
-Figure 23.1 : Template Method pattern
+Figura 23.1 : Patrón Método de Plantilla
 
 The AbstractBookletPrinter class defines several protected abstract methods and one public final 'template method' that makes use of the abstract methods (the method is made final to prevent it from being overridden):
 
@@ -2308,9 +2308,9 @@ Purpose: Represent a method to be performed on the elements of an object structu
 
 Sometimes a class hierarchy and its code become substantive, and yet it is known that future requirements will be inevitable. An example for the Foobar Motor Company is the Engine hierarchy which looks like this:
 
-(IMAGEN)
+![Jerarquía de la clase Engine](../images/000049.jpg)
 
-Figure 24.1 : Engine class hierarchy
+Figure 24.1 : Jerarquía de la clase Engine
 
 In reality, the code within the AbstractEngine class is likely to be composed of a multitude of individual components, such as a camshaft, piston, some spark plugs, etc. If we need to add some functionality that traverses these components then the natural way is to just add a method to AbstractEngine. But maybe we know there are potentially many such new requirements and we would rather not have to keep adding methods directly into the hierarchy?
 
@@ -2473,8 +2473,9 @@ public class EngineInventory implements EngineVisitor {
 
 The following diagram summarises how all of these classes interact:
 
-(IMAGEN)
-Figure 24.2 : Visitor pattern
+![Patrón Visitante](../images/000015.jpg)
+
+Figura 24.2 : Patrón Visitante
 
 Client programs now only need to invoke the acceptEngineVisitor() method on an instance of Engine, passing in the appropriate EngineVisitor object:
 

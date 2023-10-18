@@ -24,9 +24,9 @@ for (WarningLight currentLight : lights) {
 
 An approach that can help prevent the need to test for null is to create a 'null object' class as part of the class hierarchy. This class will implement the same interface but perform no actual function, as illustrated in the following figure:
 
-(IMAGEN)
+![Patrón de Objeto Nulo](../images/000029.jpg)
 
-Figure 25.1 : Null Object pattern
+Figura 25.1 : Patrón de Objeto Nulo
 
 The WarningLight interface defines the methods turnOn(), turnOff() and isOn():
 
@@ -140,9 +140,9 @@ While the above code will of course work, what happens if more than one client p
 
 Remembering the principle of encapsulating the concept that varies, we can instead delegate the selection and instantiation process to a specific class, known as the 'factory', just for that purpose. Client programs then only make use of the create() method of the factory, as illustrated in the diagram below:
 
-(IMAGEN)
+![Patrón de Factoría Simple](../images/000048.jpg)
 
-Figure 26.1 : Simple Factory pattern
+Figura 26.1 : Patrón de Factoría Simple
 
 The abstract Gearbox class in our simple example merely defines a no-argument constructor:
 
@@ -206,9 +206,9 @@ The Foobar Motor Company's satellite-navigation system includes a visual display
 
 The user interface will look like this:
 
-(IMAGEN)
+![Interfaz de usuario de navegación por satélite](../images/000027.jpg)
 
-Figure 27.1 : Satellite navigation user interface
+Figura 27.1 : Interfaz de usuario de navegación por satélite
 
 As you can see from the above, there are buttons to change direction and a slider to adjust the speed. The 'Feedback' section at the bottom of the screen automatically adjusts itself to your selections. Note that each time you click one of the direction buttons that button is disabled, and the previously selected button is re-enabled. The program initially starts by pointing North but with a speed of zero.
 
@@ -218,15 +218,15 @@ The Model View Controller pattern (often abbreviated to MVC) is a way of achievi
 
 1. The "Model". This is the 'data' (i.e. state) and associated application or 'business' logic. In our example, this comprises the values of the current direction of travel and the current speed together with methods to update and return them.
 
-2. The "View". This is the graphical display, as shown in Figure 27.1, automatically updating itself as necessary whenever the Model changes its state in some way.
+2. The "View". This is the graphical display, as shown in Figura 27.1, automatically updating itself as necessary whenever the Model changes its state in some way.
 
 3. The "Controller". This is the part that responds to all user input (button clicks, moving the slider, etc.) and liaises with both the Model and the View.
 
 Each of the above three parts will be in a separate class, which can be visualised as follows:
 
-(IMAGEN)
+![Patrón Modelo Vista Controlador](../images/000011.jpg)
 
-Figure 27.2 : Model View Controller pattern
+Figura 27.2 : Patrón Modelo Vista Controlador
 
 These classes interrelate in the following way:
 
@@ -556,17 +556,17 @@ As applications grow larger they can become unwieldy to manage, with lots of int
 
 A simple example of the Layers pattern would be the client-server model, where a "client" (such as a web browser) communicates with a "server" (such as a web server) in order to view a web page:
 
-(IMAGEN)
+![Arquitectura cliente-servidor](../images/000064.jpg)
 
-Figure 28.1 : Client-server architecture
+Figura 28.1 : Arquitectura cliente-servidor
 
-In Figure 28.1 you can see a browser sending a request to a web server which returns a response (such as a web page). If you imagine the client and server each being in their own package, then another way of viewing the above would be as follows:
+In Figura 28.1 you can see a browser sending a request to a web server which returns a response (such as a web page). If you imagine the client and server each being in their own package, then another way of viewing the above would be as follows:
 
-(IMAGEN)
+![Enlace del paquete cliente-servidor](../images/000046.jpg)
 
-Figure 28.2 : Client-server package link
+Figura 28.2 : Enlace del paquete cliente-servidor
 
-From Figure 28.2 you can infer that an object in the client package holds a reference to an object in the server package, such that the client can invoke a method on the server which may return a value in response.
+From Figura 28.2 you can infer that an object in the client package holds a reference to an object in the server package, such that the client can invoke a method on the server which may return a value in response.
 
 Note that the client-server architecture is also known as a 2-tier architecture. The terms layer and tier are often used interchangeably, but "layer" more accurately refers to a logical partitioning and "tier" to a physical partitioning when each tier is potentially located on a different piece of hardware.
 
@@ -576,20 +576,19 @@ Note that the client-server architecture is also known as a 2-tier architecture.
 
 A common extension of the client-server architecture is where access to a data store is required, and therefore a third layer (or tier) is added to make a 3-tier architecture:
 
-(IMAGEN)
+![Arquitectura de tres niveles](../images/000030.jpg)
 
-Figure 28.3 : 3-tier archiecture
+Figura 28.3 : Arquitectura de tres niveles
 
-Figure 28.3 shows the browser sending a request to a server, and the server in turn sending a request to a database to obtain the requested information. This is then returned to the server which in turn returns it to the browser. Viewing the above as packages gives the following structure:
+Figura 28.3 shows the browser sending a request to a server, and the server in turn sending a request to a database to obtain the requested information. This is then returned to the server which in turn returns it to the browser. Viewing the above as packages gives the following structure:
 
-(IMAGEN)
+![Enlaces de paquetes de 3 niveles](../images/000013.jpg)
 
-Figure 28.4 : 3-tier package links
+Figura 28.4 : Enlaces de paquetes de 3 niveles
 
-From figure 28.4 you can infer that an object in the client package holds a reference to an object in the server package, just as in the 2-tier model. In addition, an object in the server package holds a reference to an object in the database package. However, the client has no direct access to the database; it has to communicate via the server layer in the middle.
+From figura 28.4 you can infer that an object in the client package holds a reference to an object in the server package, just as in the 2-tier model. In addition, an object in the server package holds a reference to an object in the database package. However, the client has no direct access to the database; it has to communicate via the server layer in the middle.
 
 You are not limited to 3 tiers, of course. As applications grow in complexity additional layers may help to partition systems even further. This leads to the term n-tier, where n is the number of tiers.
-
 
 Although the examples above have shown the common usages that typically utilise separate hardware, there is no reason why you cannot apply the structure of the Layers pattern in your own self-contained applications. Another pattern you have already seen which can usefully be used in conjunction with Layers is the Facade pattern, where each layer defines a facade object that the layer above communicates with. This approach can help hide the complexity of each layer behind the facade.
 
