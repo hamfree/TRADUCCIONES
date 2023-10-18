@@ -84,7 +84,6 @@ Consequences: Isolates concrete classes. Enables easy exchange of product famili
 
 Client programs only use the interfaces declared by AbstractFactory and AbstractProductA and AbstractProductB.
 
-
 ---
 
 ### Adaptador (Adapter){#h2-52}

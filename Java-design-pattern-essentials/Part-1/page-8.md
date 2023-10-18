@@ -10,21 +10,21 @@ Para eso están los patrones de diseño. Describen soluciones genéricas a probl
 
 ## Cómo utiliza este libro los patrones {#h2-1}
 
-This book gives worked examples for each of the 23 patterns described in the classic reference work *Design Patterns: Elements of Reusable Object-Oriented Software* (Gamma, 1995) plus four additional useful patterns, including Model-View-Controller (MVC).
+Este libro ofrece ejemplos elaborados para cada uno de los 23 patrones descritos en la obra de referencia clásica *Patrones de diseño: elementos de software reutilizable orientado a objetos* (Gamma, 1995) más cuatro patrones útiles adicionales, incluido Modelo-Vista-Controlador (MVC).
 
-Each of the worked examples in this book uses a common theme drawn from the business world, being that of a fictional vehicle manufacturer called the Foobar Motor Company. The company makes a range of cars and vans together with the engines used to power the vehicles. You should therefore familiarise yourself with the classes described in this introduction.
+Cada uno de los ejemplos trabajados en este libro utiliza un tema común extraído del mundo empresarial, siendo el de un fabricante de vehículos ficticio llamado Foobar Motor Company. La empresa fabrica una gama de coches y furgonetas junto con los motores utilizados para propulsar los vehículos. Por lo tanto, debería familiarizarse con las clases descritas en esta introducción.
 
-The class hierarchy looks like this:
+La jerarquía de clases se ve así:
 
 ![Jerarquías de las clases Vehículo y Motor](../images/000061.jpg)
 
-Figure 1.1 : Vehicle and Engine class hierarchies
+Figura 1.1 : Jerarquías de las clases `Vehicle` y `Engine`
 
-Vehicle and Engine are the root interfaces of the hierarchies, with each vehicle object requiring a reference to an Engine object. AbstractVehicle is an abstract class that implements the Vehicle interface, and AbstractEngine likewise implements the Engine interface. For vehicles, we also have AbstractCar and AbstractVan together with concrete subclassses Saloon, Coupe and Sport as types of cars. AbstractVan has the concrete subclasses BoxVan and Pickup as types of van.
+`Vehicle` y `Engine` son las interfaces raíz de las jerarquías, y cada objeto de vehículo requiere una referencia a un objeto `Engine`. `AbstractVehicle` es una clase abstracta que implementa la interfaz `Vehicle`, y `AbstractEngine` también implementa la interfaz `Engine`. En cuanto a los vehículos, también tenemos como tipos de coches `AbstractCar` y `AbstractVan` junto con las subclases concretas `Saloon`, `Coupe` y `Sport`. `AbstractVan` tiene las subclases concretas `BoxVan` y `Pickup` como tipos de furgonetas.
 
-The concrete subclasses of AbstractEngine are StandardEngine and TurboEngine.
+Las subclases concretas de `AbstractEngine` son `StandardEngine` y `TurboEngine`.
 
-Despite there being several classes in the hierarchies the code for each has been kept deliberately simple so you can focus on understanding the patterns rather than having to decipher complex code. To illustrate this, here is the Java source code for the Engine interface:
+A pesar de que hay varias clases en las jerarquías, el código de cada una se ha mantenido deliberadamente simple para que puedas concentrarte en comprender los patrones en lugar de tener que descifrar código complejo. Para ilustrar esto, aquí está el código fuente de Java para la interfaz de `Engine`:
 
 ```java
 public interface Engine {  
@@ -33,7 +33,7 @@ public interface Engine {
 } 
 ```
 
-This simple interface merely requires method getters to return the engine size (in cubic centimetres) and whether it is turbocharged. The AbstractEngine class looks like this:
+Esta interfaz simple simplemente requiere métodos captadores para devolver el tamaño del motor (en centímetros cúbicos) y si tiene turbocompresor. La clase `AbstractEngine` se ve así:
 
 ```java
 public abstract class AbstractEngine implements Engine {  
@@ -59,33 +59,33 @@ public abstract class AbstractEngine implements Engine {
 } 
 ```
 
-This simplified implementation of an engine requires the appropriate attributes to be supplied in the constructor. The toString() method has been implemented to produce output in this format:
+Esta implementación simplificada de un motor requiere que los atributos apropiados en el constructor. El método `toString()` ha sido implementado para producir una salida en este formato:
 
 ```text
 StandardEngine (1300)  
 TurboEngine (2000) 
 ```
 
-The equals() and hashCode() methods will inherit from Object and therefore use object identity. This makes sense, since for example, two separate 1300cc Standard engines are logically different entities and so should be treated as such (one engine would go into one vehicle and the other engine into a different vehicle).
+Los métodos `equals()` y `hashCode()` heredarán de `Object` y, por lo tanto, utilizarán la identidad del objeto. Esto tiene sentido, ya que por ejemplo, dos motores estándar de 1300 cc separados son entidades lógicamente diferentes y así deberían ser tratadas como tales (un motor iría en un vehículo y el otro en un vehículo diferente).
 
-The concrete subclasses are trivially simple:
+Las subclases concretas son trivialmente simples:
 
 ```java
 public class StandardEngine extends AbstractEngine {  
     public StandardEngine(int size) {  
-        super(size, false); // not turbocharged  
+        super(size, false); // no turboalimentado  
     }  
 } 
 
 
 public class TurboEngine extends AbstractEngine {  
     public TurboEngine(int size) {  
-        super(size, true); // turbocharged  
+        super(size, true); // turboalimentado
     }  
 } 
 ```
 
-Now that you have seen the Engine hierarchy we can look at the Vehicle interface:
+Ahora que ha visto la jerarquía de `Engine`, podemos ver la interfaz de `Vehicle`:
 
 ```java
 public interface Vehicle {  
@@ -97,10 +97,9 @@ public interface Vehicle {
 } 
 ```
 
+Una `enum` anidada llamada `Colour` define los colores posibles que cada objeto `Vehicle` podría tener.
 
-A nested enum called Colour defines the possible colours that each Vehicle object could be.
-
-This is how the AbstractVehicle class implements Vehicle:
+Así es como la clase `AbstractVehicle` implementa `Vehicle`:
 
 ```java
 public abstract class AbstractVehicle implements Vehicle {  
@@ -134,16 +133,16 @@ public abstract class AbstractVehicle implements Vehicle {
 } 
 ```
 
-The overloaded constructors in AbstractVehicle require an Engine object and optionally a vehicle colour to be supplied.
+Los constructores sobrecargados en `AbstractVehicle` requieren que se proporcione un objeto `Engine` y, opcionalmente, un color de vehículo.
 
-The output of calls to toString() will be in this format:
+La salida de las llamadas a `toString()` serán en este formato:
 
 ```text
 Saloon (StandardEngine (1300), RED)  
 BoxVan (TurboEngine (2200), WHITE) 
 ```
 
-The AbstractCar and AbstractVan classes just forward to the constructors (obviously real classes would define whatever is different between cars and vans):
+Las clases `AbstractCar` y `AbstractVan` simplemente reenvían a los constructores (obviamente, las clases reales definirían las diferencias entre autómoviles y camionetas):
 
 ```java
 public abstract class AbstractCar extends AbstractVehicle {  
@@ -168,7 +167,7 @@ public abstract class AbstractVan extends AbstractVehicle {
 } 
 ```
 
-The concrete subclasses also just forward to the constructors:
+Las subclases concretas también reenvían a los constructores:
 
 ```java
 public class Saloon extends AbstractCar {  
@@ -226,34 +225,36 @@ public class Pickup extends AbstractVan {
 } 
 ```
 
-Many of the patterns in this book utilise one or more of the above classes in some way, often adding additional functionality or classes for the purposes of explaining the pattern in question. You will also frequently see reference to a Client class; this just refers to whatever class is making use of the pattern under discussion.
+Muchos de los patrones en este libro utilizan uno o más de las clases de arriba de alguna forma, a menudo agregando funcionalidad adicional o clases para los propósitos de explicar el patrón en cuestión. También verá frecuentemente la referencia a una clase `Client`; esto simplemente se refiere a cualquier clase que esté haciendo uso del patrón en discusión.
 
 ## Cómo se clasifican los patrones {#h2-2}
 
-Each of the patterns described in this book fall under one of three categories; *Creational*, *Structural* or *Behavioural*:
+Cada uno de los patrones descritos en este libro caen bajo una de las tres categorías; *Creacional*, *Estructural* o *Conductual*:
 
-+ *Creational* patterns provide approaches to object instantiation. Where you place the new keyword affects how tightly or loosely coupled your classes are;
-+ *Structural* patterns provide approaches for combining classes and objects to form larger structures. Deciding whether to use inheritance or composition affects how flexible and adaptable your software is;
-+ *Behavioural* patterns provide approaches for handling communication between objects.
++ Los patrones *creacionales* proporcionan enfoques para la creación de instancias de objetos. Donde coloque la palabra clave new afectará a qué tan estrechamente o débilmente están acopladas sus clases;
+
++ Los patrones *estructurales* proporcionan enfoques para combinar las clases y objetos para formar estructuras más grandes. Decidir si usar la herencia o la composición afecta a la flexibilidad y adaptación de su software;
+
++ Los patrones *de comportamiento* proporcionan enfoques para manejar la comunicación entre objetos.
 
 ## Principios comunes en patrones de diseño {#h2-3}
 
-Experience has shown that some object-oriented approaches are more flexible than others. Here is a summary of the main principles that the patterns in this book strive to adhere to:
+La experiencia ha demostrado que algunos enfoques orientados a objetos son más flexibles que otros. A continuación se incluye un resumen de los principios fundamentales que los patrones de este libro se esfuerzan por cumplir:
 
-1. ***Program to an interface, not an implementation.*** By "interface" is meant the general concept of abstraction, which could refer to a Java interface or an abstract class. To accomplish this, use the most general type (e.g. interface) possible when declaring variables, constructor and method arguments, etc. Doing so gives extra flexibility as to the actual types that are used at run-time.
+1. ***Programa para una interfaz, no para una implementación.*** Por "interfaz" se entiende el concepto general de abstracción, que podría referirse a una interfaz de Java o a una clase abstracto. Para lograr esto, use el tipo más general (por ejemplo, la interfaz) posible cuando declare las variables, el constructor y los argumentos del método, etc. Hacerlo brinda flexibilidad adicional en cuanto a los tipos reales que se usan en tiempo de ejecución.
 
-2. ***Prefer object composition over inheritance.*** Where a class is related to another in some way, you should distinguish between "is a" (or "is a type of") and "has a" relationships. In the Vehicle and Engine hierarchies described earlier, it is true to say that AbstractCar "is a" Vehicle, and that Saloon "is a" AbstractCar. But it would not be true to say that Vehicle "is a" Engine, but rather that a Vehicle "has a" Engine. Therefore, inheritance is legitimately used for AbstractCar and Saloon, but object composition is used between Vehicle and Engine. Do not be tempted to use inheritance just to save having to write some methods. Sometimes using a "has a" relationship is more flexible even when an "is a" relationship seems the natural choice. You will see an example of this in the *Decorator* pattern.
+2. ***Preferir la composición de objetos a la herencia.*** Cuando una clase está relacionada con otra de alguna manera, se debe distinguir entre relaciones "es un" (o "es un tipo de") y "tiene un". En las jerarquías `Vehicle` y `Engine` descritas anteriormente, es verdad decir que `AbstractCar` "es un" `Vehicle`, y que `Saloon` "es un" `AbstractCar`. Pero no sería verdad decir que `Vehicle` "es un" `Engine`, sino que un `Vehicle` "tiene un" `Engine`. Por lo tanto, la herencia se usa legítimamente para `AbstractCar` y `Saloon`, pero la composición de objetos se usa entre `Vehicle` y `Engine`. No caiga en la tentación de utilizar la herencia solo para evitar tener que escribir algunos métodos. Algunas veces usar una relación "tiene un" es más flexible incluso cuando una relación "es un" parece la elección natural. Verá un ejemplo de esto en el patrón *Decorador*.
 
-3. ***Keep objects loosely-coupled.*** Ideally, classes should model just one thing, and only be composed of other objects that are genuinely required (such as a Vehicle requiring an Engine). Ask yourself what would happen if you wanted to use a class you have written in a completely different application; what "baggage" (i.e. other classes) would also need to be copied? By keeping this to a minimum, you make your class more re-usable. A good example of a pattern that uses loose-coupling is *Observer*.
+3. ***Mantenga los objetos débilmente acoplados.*** Idealmente, las clases debería modelar simplemente una cosa, y solo estar compuestas de otros objetos que son genuinamente requeridas (tales como un `Vehicle` requiere un `Engine`). Pregúntese a usted mismo que ocurriría si quisiera usar una clase que ha escrito en una aplicación completamente diferente; ¿Qué "equipaje" (es decir, otras clases) también sería necesario copiar? Al mantener esto al mínimo, hace que su clase sea más reutilizable. Un buen ejemplo de un patrón que utiliza acoplamiento flexible es *Observador*.
 
-4. ***Encapsulate the concept that varies.*** If you've written a class in which some parts are the same for each instance but another part of the class varies for each instance, consider extracting the latter into a class of its own, which is referenced by the original class. An example pattern that uses principle is *Strategy*.
+4. ***Encapsula el concepto que varía.*** Si ha escrito una clase en la cual algunas partes son lo mismo para cada instancia pero otra parte de la clase varía para cada instancia, considere extraer este último en una clase propia, a la que hace referencia la clase original. Un ejemplo de patrón que usa este principio es *Estrategia*.
 
 ## Algunos consejos generales {#h2-4}
 
-The principles listed above will become more apparent as we explore the patterns in detail. You should also note that the patterns described in this book give a general approach to a particular problem. It is quite acceptable for you to modify or adapt them to better fit your particular problem. And it is very common for multiple patterns to be combined to solve complex problems.
+Los principios enumerados anteriormente se volverán más evidentes a medida que exploremos los patrones en detalle. También debe tener en cuenta que los patrones descritos en este libro dan un enfoque general a un problema particular. Es bastante aceptable que los modifique o adapte para que se ajusten mejor a su problema particular. Y es muy común que se combinen múltiples patrones para resolver problemas complejos.
 
-However, do remember that you should strive to keep things simple. It is easy, after reading a book such as this, to think that you have to find a pattern to solve a particular problem when an even simpler solution might be available. One of the mantras of Extreme Programming (XP) is *"You aren't going to need it"*, the idea being that you should avoid adding features before they are required, and this philosophy could also be applied to patterns; beware of adding an unnecessary feature just so you can apply a pattern. Patterns are not a "magic bullet", just another set of tools in your toolkit, albeit an indispensable set.
+Sin embargo, recuerde que debe esforzarse por mantener las cosas simples. Es fácil, después de leer un libro como este, pensar que hay que encontrar un patrón para resolver un problema particular cuando podría haber disponible una solución aún más simple. Uno de los mantras de la Programación Extrema (XP) es *"No lo vas a necesitar"*, la idea es que debes evitar agregar características antes de que sean requeridas, y esta filosofía también podría aplicarse a los patrones; tenga cuidado de agregar una característica innecesaria solo para poder aplicar un patrón. Los patrones no son una "bala mágica", sino simplemente otro conjunto de herramientas en su caja de herramientas, aunque sean un conjunto indispensable.
 
-Use your knowledge and experience to judge whether a pattern should be applied to your circumstances, and if so to what extent you need to adapt it. A good example of when applying patterns may be beneficial is when you are "refactoring" existing code. Refactoring is when you are changing the structure of some software but not its behaviour, to improve its maintainability and flexibility. This provides a good opportunity to examine your code to see if a pattern might provide a better structure, such as replacing conditionals, or defining factory classes to aid object instantiation.
+Utilice su conocimiento y experiencia para juzgar si un patrón debe aplicarse a sus circunstancias y, de ser así, en qué medida necesita adaptarlo. Un buen ejemplo de cuándo aplicar patrones puede resultar beneficioso es cuando se "refactoriza" código existente. La refactorización es cuando se cambia la estructura de algún software pero no su comportamiento, para mejorar su mantenibilidad y flexibilidad. Esto brinda una buena oportunidad para examinar su código para ver si un patrón podría proporcionar una mejor estructura, como reemplazar condicionales o definir clases de fábrica para ayudar a la creación de instancias de objetos.
 
-Patterns have been applied to many programming languages besides Java, particularly object-oriented languages, and indeed other fields, having originated by being applied to architectural design. And new patterns are being developed and applied on a regular basis, so you may view this book as merely a starting point in the subject.
+Los patrones se han aplicado a muchos lenguajes de programación además de Java, particularmente a los lenguajes orientados a objetos y, de hecho, a otros campos, y se originaron aplicándolos al diseño arquitectónico. Y periódicamente se desarrollan y aplican nuevos patrones, por lo que puede considerar este libro simplemente como un punto de partida en el tema.
