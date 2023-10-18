@@ -12,6 +12,8 @@ El editor y el autor han tenido cuidado en la preparación de este libro, pero n
 
 ## Publicado por
 
+![Logotipo Editorial](./images/000018.jpg)
+
 Ability First Limited, Dragon Enterprise Centre, 28 Stephenson Road, Leigh-on-Sea, Essex SS9 5LY, United Kingdom
 
 <www.abilityfirst.co.uk/books>
