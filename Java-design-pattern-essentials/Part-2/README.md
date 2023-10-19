@@ -1,9 +1,9 @@
 # Parte II. Patrones creacionales
 
-This part describes the five creational patterns, that is, those that help manage the instantiation of objects.
+Esta parte describe los cinco patrones creacionales, esto es, aquellos que ayudan a gestionar la instanciación de objetos.
 
-* Abstract Factory: Provide an interface for creating families of related or dependent objects without specifying their concrete classes;
-* Builder: Separate the construction of a complex object from its representation so that the same construction process can create different representations;
-* Factory Method: Define an interface for creating an object, but let subclasses decide which class to instantiate;
-* Prototype: Specify the kinds of objects to create using a prototypical instance, and create new objects by copying the prototype;
-* Singleton: Ensure a class allows only one object to be created, providing a single point of access to it.
+* _Factoría Abstracta (Abstract Factory)_: Proporciona una interfaz para crear familias de objetos relacionados o dependientes sin especificar sus clases concretas;
+* _Constructor (Builder)_: Separa la construcción de un objeto complejo de su representación de forma que el mismo proceso de construcción pueda crar diferentes representaciones;
+* _Método de Factoría (Factory Method)_: Define una interfaz para crear un objeto, pero permite a las subclases decidir qué clases van a instanciar;
+* _Prototipo (Prototype)_: Especifica las clases de objetos a crear usando una instancia prototípica, y crea objetos nuevos copiando el prototipo;
+* _Único (Singleton)_: Asegúra que una clase permita que solo se cree un objeto, proporcionando un único punto de acceso al mismo.

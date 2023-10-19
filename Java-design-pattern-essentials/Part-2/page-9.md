@@ -1,28 +1,28 @@
 # 2. Factoría abstracta (abstract factory)
 
-Type: Creational
+Tipo: Creacional
 
-Purpose: Provide an interface for creating families of related or dependent objects without specifying their concrete classes.
+Objetivo: Proporcionar una interfaz para crear familias de objetos relacionados o dependientes sin tener que especificar sus clases concretas.
 
-The Foobar Motor Company makes cars and vans, which when being built comprises (among lots of other things) a body shell, a chassis and glassware for the windows. Although both cars and vans need all of the same types of components, the specifics of each type differ depending upon whether it is being used for a car or a van.
+La Compañía de Motores Foobar fabrica coches y furgonetas que, durante su construcción, comprenden (entre muchas otras cosas) una carrocería, un chasis y cristalería para las ventanas. Aunque tanto los coches como las furgonetas necesitan los mismos tipos de componentes, las especificaciones de cada tipo difieren dependiendo de si se utiliza para un coche o una furgoneta.
 
-In other words:
+En otras palabras:
 
-* A car's body shell is different from a van's body shell;
-* A car's chassis is different from a van's chassis;
-* A car's windows are different from a van's windows.
+* La carrocería de un coche es diferente de la carrocería de una furgoneta;
+* El chasis de un coche es diferente del chasis de una furgoneta;
+* Las ventanas de un coche son diferentes de las ventanas de una furgoneta.
 
-Therefore, when we need to build a vehicle we can think of the components as coming from different 'families'; that is, when we build a car we use one family of components and when we build a van we use a different family of components.
+Por lo tanto, cuando necesitamos construir un vehículo podemos pensar que los componentes provienen de diferentes 'familias'; esto es, cuando construimos un coche usamos una familia de componentes y cuando construimos una furgoneta usamos una familia diferente de componentes.
 
-We can thus model the components into simple hierarchies, as illustrated in the following figure:
+De este modo podemos modelar los componentes en jerarquías simples, como se ilustra en la siguiente figura:
 
 ![Jerarquía de clases Body, Chassis y Windows](../images/000068.jpg)
 
-Figura 2.1 : Jerarquía de clases Body, Chassis y Windows
+Figura 2.1 : Jerarquía de clases _Body_, _Chassis_ y _Windows_
 
-As you can see, there is an interface for Body having implementations of CarBody and VanBody. Likewise we have similar separate hierarchies for Chassis and Windows.
+Como puede ver, hay una interfaz para _Body_ que tiene implementaciones de _CarBody_ y _VanBody_. Asimismo, tenemos jerarquías separadas similares para _Chassis_ y _Windows_.
 
-The code for the Body hierarchy is very simple:
+El código para la jerarquía de _Body_ es muy simple:
 
 ```java
 public interface Body {
@@ -32,19 +32,19 @@ public interface Body {
 
 public class CarBody implements Body {
     public String getBodyParts() {
-        return "Body shell parts for a car";
+        return "Piezas de carrocería para un coche.";
     }
 }
 
 
 public class VanBody implements Body {
     public String getBodyParts() {
-        return "Body shell parts for a van";
+        return "Piezas de carrocería para una caravana";
     }
 }
 ```
 
-The code for the Chassis hierarchy is almost identical:
+El código para la jerarquía de _Chassis_ es casi idéntico:
 
 ```java
 public interface Chassis {
@@ -54,19 +54,19 @@ public interface Chassis {
 
 public class CarChassis implements Chassis {
     public String getChassisParts() {
-        return "Chassis parts for a car";
+        return "Piezas de chasis para un coche.";
     }
 }
 
 
 public class VanChassis implements Chassis {
     public String getChassisParts() {
-        return "Chassis parts for a van";
+        return "Piezas de chasis para una furgoneta.";
     }
 }
 ```
 
-And likewise the code for the Windows hierarchy:
+Y lo mismo el código para la jerarquía de _Windows_:
 
 ```java
 public interface Windows {
@@ -76,25 +76,25 @@ public interface Windows {
 
 public class CarWindows implements Windows {
     public String getWindowParts() {
-        return "Window glassware for a car";
+        return "Cristalería para ventanas de un coche.";
     }
 }
 
 
 public class VanWindows implements Windows {
     public String getWindowParts() {
-        return "Window glassware for a van";
+        return "Cristalería para ventanas de una furgoneta.";
   }
 }
 ```
 
-Now we need a way of getting the correct family of parts (either for a car or for a van) but without having to explicitly instantiate the specific type in client programs each time we require them. To accomplish this, we shall define "factory" classes that will do this for us:
+Ahora necesitamos una forma de obtener la familia correcta de las piezas (o para un coche o para una furgoneta) pero sin tener que instanciar explícitamente el tipo específico en los programas cliente cada vez que lo requiramos. Para lograr esto, definiremos clases "factoría" que harán esto por nosotros:
 
 ![patrón de Factoría Abstracta](../images/000062.jpg)
 
 Figura 2.2 : Patrón de Factoría Abstracta
 
-The AbstractVehicleFactory class is an abstract class that defines the abstract methods createBody(), createChassis() and createWindows(), returning a Body, Chassis and Windows object respectively:
+La clase _AbstractVehicleFactory_ es una clase abstracta que define los métodos abstractos _createBody()_, _createChassis()_ y _createWindows()_, devolviendo un objeto _Body_, _Chassis_ y _Windows_ respectivamente:
 
 ```java
 public abstract class AbstractVehicleFactory {
@@ -104,7 +104,7 @@ public abstract class AbstractVehicleFactory {
 }
 ```
 
-The concrete subclass CarFactory returns the objects specific for the Car family:
+La subclase concreta _CarFactory_ devuelve los objetos específicos para la familia de _Car_:
 
 ```java
 public class CarFactory extends AbstractVehicleFactory {
@@ -122,7 +122,7 @@ public class CarFactory extends AbstractVehicleFactory {
 }
 ```
 
-The concrete subclass VanFactory returns the objects specific for the Van family:
+La subclase concrata _VanFactory_ devuelve los objetos específicos para la familia _Van_:
 
 ```java
 public class VanFactory extends AbstractVehicleFactory {
@@ -140,56 +140,56 @@ public class VanFactory extends AbstractVehicleFactory {
 }
 ```
 
-Now it just remains for client programs to instantiate the appropriate 'factory' after which it can obtain the correct parts without having to specify whether they are for a car or a van:
+Ahora solo queda que los programas clientes instancien la 'factoría' apropiada después de lo cual pueden obtener las piezas correctas sin tener que especificar si son para un coche o una furgoneta:
 
 ![Cómo usan los clientes la Factoría Abstracta](../images/000044.jpg)
 
 Figura 2.3 : Cómo usan los clientes la Factoría Abstracta
 
 ```java
-String whatToMake = "car"; // or "van"
+String whatToMake = "car"; // o "van"
 AbstractVehicleFactory factory = null;
  
-// Create the correct 'factory'...
+// Creamos la 'factoría' correcta...
 if (whatToMake.equals("car")) {
     factory = new CarFactory();
 } else {
     factory = new VanFactory();
 }
  
-// Create the vehicle's component parts...
-// These will either be all car parts or all van parts.
+// Creamos los componentes del vehículo
+// Estas serán todas las piezas de automóviles o todas las piezas de furgonetas.
 Body vehicleBody = factory.createBody();
 Chassis vehicleChassis = factory.createChassis();
 Windows vehicleWindows = factory.createWindows();
  
-// Show what we've created...
+// Mostramos qué hemos creado...
 System.out.println(vehicleBody.getBodyParts());
 System.out.println(vehicleChassis.getChassisParts());
 System.out.println(vehicleWindows.getWindowParts());
 ```
 
-Therefore your client program needs to know if it is making a car or a van, but once it has instantiated the correct factory all the methods to create the parts can be done using an identical set of method calls.
+Por lo tanto, su programa cliente necesita saber si está fabricando un automóvil o una camioneta, pero una vez que ha creado una instancia de la fábrica correcta, todos los métodos para crear las piezas se pueden realizar utilizando un conjunto idéntico de llamadas a métodos.
 
-The main disadvantage of the Abstract Factory pattern arises if you need to add additional 'products'. For example, if we now need to include Lights in the family of components, we would need to amend AbstractVehicleFactory, CarFactory and VanFactory, in addition to creating a new Lights hierarchy (CarLights and VanLights).
+La principal desventaja del patrón _**Abstract Factory**_ surge si necesita agregar 'productos' adicionales. Por ejemplo, si ahora necesitamos incluir _Lights_ en la familia de componentes, necesitaríamos modificar _AbstractVehicleFactory_, _CarFactory_ y _VanFactory_, además de crear una nueva jerarquía de _Lights_ (_CarLights_ y _VanLights_).
 
 ## 3. Constructor (Builder) {#h2-5}
 
-Type: Creational
+Tipo: Creacional
 
-Purpose: Separate the construction of a complex object from its representation so that the same construction process can create different representations.
+Objetivo: Separar la construcción de un objeto complejo de su representación de forma que el mismo proceso de construcción pueda crear representaciones diferentes.
 
-The Foobar Motor Company makes cars and vans, and the construction process of each differs in detail; for example, the body shell of a van comprises a cab area and a large reinforced storage area, whereas a saloon car comprises a passenger area and a luggage area (i.e. boot). And of course there a number of complex steps that have to be undertaken regardless of what type of vehicle is being built.
+La Compañía de Motores Foobar fabrica coches y furgonetas, y el proceso de construcción para cada uno difiere en el detalle; por ejemplo, la carrocería de una furgoneta se compone de una zona de cabina y una gran zona de almacenamiento reforzada, mientras que un coche berlina se compone de una zona de pasajeros y una zona de equipaje (por ejemplo, el maletero). Y, por supuesto, hay un número de pasos complejos que deben realizarse independientemente del tipo de vehículo se esté construyendo.
 
-The Builder pattern facilitates the construction of complex objects by separating the individual steps into separate methods in a Builder hierarchy, and then using a Director object to specify the required steps in the correct order. Finally, the finished product is retrieved from the Builder.
+El patrón _**Constructor**_ facilita la construcción de objetos complejos separando los pasos individuales en métodos separados en una jerarquía del _**Constructor**_, y después usa un objeto _**Director**_ para especificar los pasos requeridos en el orden correcto. Finalmente, el producto terminado se recupera del _**Constructor**_.
 
-The following diagram shows these relationships:
+El siguiente diagrama muestra estas relaciones:
 
 ![Patrón constructor](../images/000025.jpg)
 
 Figura 3.1 : Patrón constructor
 
-We start off with the abstract VehicleBuilder class:
+Comenzamos con la clase abstracta _VehicleBuilder_:
 
 ```java
 public abstract class VehicleBuilder {
@@ -203,9 +203,9 @@ public abstract class VehicleBuilder {
 }
 ```
 
-Note how this class defines all possible 'build' methods for both cars and vans, and provides empty implementations for each as a default. The abstract getVehicle() method is for returning the finished vehicle.
+Observe cómo esta clase define todos los métodos de 'construcción' posibles tanto para automóviles como para camionetas, y proporciona implementaciones vacías para cada uno de forma predeterminada. El método abstracto `getVehicle()` sirve para devolver el vehículo terminado.
 
-The CarBuilder class inherits from VehicleBuilder and overrides the appropriate methods:
+La clase `CarBuilder` hereda de `VehicleBuilder` y anula los métodos apropiados:
 
 ```java
 public class CarBuilder extends VehicleBuilder {
@@ -216,28 +216,28 @@ public class CarBuilder extends VehicleBuilder {
     }
  
     public void buildBody() {
-        // Add body to carInProgress
-        System.out.println("building car body");
+        // Agrega Body a carInProgress
+        System.out.println("Construyendo la carrocería del coche");
     }
  
     public void buildBoot() {
-        // Add boot to carInProgress
-        System.out.println("building car boot");
+        // Agrega el maeletero a carInProgress
+        System.out.println("Construyendo el maletero del coche");
     }
  
     public void buildChassis() {
-        // Add chassis to carInProgress
-        System.out.println("building car chassis");
+        // Agrega el chasis a carInProgress
+        System.out.println("Construyendo el chasis del coche");
     }
  
     public void buildPassengerArea() {
-        // Add passenger area to carInProgress
-        System.out.println("building car passenger area");
+        // Agrega la zona de pasajeros a carInProgress
+        System.out.println("Construyendo la zona de pasajeros");
     }
  
     public void buildWindows() {
-        // Add windows to carInProgress
-        System.out.println("building car windows");
+        // Agrega las ventanas a carInProgress
+        System.out.println("Construyendo las ventanas del coche");
     }
  
     public Vehicle getVehicle() {
@@ -246,7 +246,7 @@ public class CarBuilder extends VehicleBuilder {
 }
 ```
 
-Note that the buildReinforcedStorageArea() method was not overridden since it is not applicable to cars. The VanBuilder class overrides the appropriate methods to build a van:
+Observe que el método `buildReinforcedStorageArea()` no estaba sobreescrito ya que no es aplicable a los coches. La clase _VanBuilder_ sobreescribe los métodos apropiados para construir una furgoneta:
 
 ```java
 public class VanBuilder extends VehicleBuilder {
@@ -257,23 +257,23 @@ public class VanBuilder extends VehicleBuilder {
     }
  
     public void buildBody() {
-        // Add body to vanInProgress
-        System.out.println("building van body");
+        // Agrega la carrocería a vanInProgress
+        System.out.println("construyendo la carrocería de la furgoneta");
     }
  
     public void buildChassis() {
-        // Add chassis to vanInProgress
-        System.out.println("building van chassis");
+        // Agrega el chasis a vanInProgress
+        System.out.println("construyendo el chasis de la furgoneta");
     }
  
     public void buildReinforcedStorageArea() {
-        // Add storage area to vanInProgress
-        System.out.println("building van storage area");
+        // Agrega la zona de almacenamiento a vanInProgress
+        System.out.println("Construyendo la zona de almacenamiento de la furgoneta");
     }
  
     public void buildWindows() {
-        // Add windows to vanInProgress
-        System.out.println("building van windows");
+        // Agrega las ventanas a  vanInProgress
+        System.out.println("Construyendo las ventanas de la furgoneta");
     }
  
     public Vehicle getVehicle() {
@@ -282,7 +282,7 @@ public class VanBuilder extends VehicleBuilder {
 }
 ```
 
-Note that the buildBoot() and buildPassengerArea() methods were not overridden since they are not applicable to vans. The VehicleDirector abstract class requires a VehicleBuilder object passed to its build() method for implementation by subclasses:
+Observe que los métodos `buildBoot()` y `buildPassengerArea()` no fueron sobreescritos ya que no son aplicables a los furgonetas. La clase abstracta _VehicleDirector_ requiere que se pase un objeto _VehicleBuilder_ a su método `build()` para su implementación por las subclases:
 
 ```java
 public abstract class VehicleDirector {
@@ -290,7 +290,7 @@ public abstract class VehicleDirector {
 }
 ```
 
-The CarDirector class inherits from VehicleDirector and provides the step-by-step process for building a car:
+La clase _CarDirector_ heredas de _VehicleDirector_ y proporciona el proceso paso a paso para construir un coche:
 
 ```java
 public class CarDirector extends VehicleDirector {
@@ -305,7 +305,7 @@ public class CarDirector extends VehicleDirector {
 }
 ```
 
-The VanDirector class provides the step-by-step process for building a van:
+La clase VanDirector proporciona el proceso paso a paso para construir una furgoneta:
 
 ```java
 public class VanDirector extends VehicleDirector {
@@ -319,7 +319,7 @@ public class VanDirector extends VehicleDirector {
 }
 ```
 
-As an example of how to use the above classes, let's assume we want to build a Saloon car:
+Como ejemplo de cómo utilizar las clases anteriores, supongamos que queremos construir una berlina (Tipo `Saloon` en inglés):
 
 ```java
 AbstractCar car = new Saloon(new StandardEngine(1300));
@@ -329,38 +329,37 @@ Vehicle v = director.build(builder);
 System.out.println(v);
 ```
 
-You can see the required Builder object is constructed and passed to the required Director object, after which we invoke the method to build the product and then retrieve the finished article. The output should show:
+Puede ver que el objeto `Builder` requerido se construye y se pasa al objeto `Director` requerido, después de lo cual invocamos el método para construir el producto y luego recuperamos el artículo terminado. El resultado debería mostrar:
 
 ```text
-Building car chassis
-Building car body
-Building car passenger area
-Building car boot
-Building car windows
+Construyendo la carrocería del coche
+Construyendo la zona de pasajeros
+Construyendo el maletero del coche
+Construyendo las ventanas del coche
 Saloon (StandardEngine (1300), UNPAINTED)
 ```
 
 ## 4. Método de factoría (Factory Method) {#h2-6}
 
- Type: Creational
+Tipo: Creacional
 
-Purpose: Define an interface for creating an object, but let subclasses decide which class to instantiate.
+Objetivo: Define una interfaz para crear un objeto, pero deja que las subclases decidan con qué clase crear una instancia.
 
-You will recall from the introduction the following class hierarchy for the vehicles made by the Foobar Motor Company:
+Recordará de la introducción la siguiente jerarquía de clases para los vehículos fabricados por la Compañía de Motores Foobar:
 
 ![Jerarquía de la clase Vehicle](../images/000010.jpg)
 
 Figura 4.1 : Jerarquía de la clase Vehicle
 
-When we need to instantiate a particular type of vehicle (such as a Coupe) it is often more flexible to define a separate class whose responsibility it is to manage the instantiation. This separate class is known as a Factory.
+Cuando necesitamos crear instancias de un tipo particular de vehículo (como un Coupé), suele ser más flexible definir una clase separada cuya responsabilidad sea gestionar la instanciación. Esta clase separada se conoce como Fábrica (Factory en inglés).
 
-The Factory Method pattern defines an abstract class which serves as the 'factory' and that has an abstract method within to determine what product (in our case vehicle) to instantiate. Concrete subclasses of the factory make that determination. Here is how the Factory Method pattern could be used with the Vehicle class hierarchy:
+El patrón de Método de Factoría define una clase abstracta que sirve como 'fábrica' y que tiene un método abstracto dentro para determinar de qué producto (en nuestro caso, vehículo) crear una instancia. Las subclases concretas de la fábrica toman esa determinación. Así es como se podría usar el patrón Método de fábrica con la jerarquía de clases de Vehículo:
 
 ![Patrón del Método de Factoría](../images/000065.jpg)
 
 Figura 4.2 : Patrón del Método de Factoría
 
-In the above diagram we can see that we have created an abstract VehicleFactory class which has two concrete subclasses, CarFactory and VanFactory. Let us look at how VehicleFactory is defined:
+En el diagrama anterior podemos ver que hemos creado una clase abstracta _VehicleFactory_ que tiene dos subclases concretas, _CarFactory_ y _VanFactory_. Veamos cómo se define _VehicleFactory_:
 
 ```java
 public abstract class VehicleFactory {
@@ -377,9 +376,9 @@ public abstract class VehicleFactory {
 }
 ```
 
-VehicleFactory contains the public method build() that takes as arguments the driving style (economical, midrange or powerful) and the colour that the vehicle should be painted. The build() method calls the protected abstract selectVehicle() method, which is the "factory method" after which the pattern is named. The implementation of selectVehicle() is therefore delegated to the subclasses such that each subclass determines the specific type of vehicle to instantiate. The method is protected because we only want subclasses to utilise it; it is not intended to be invoked by clients.
+VehicleFactory contiene el método público build() que toma como argumentos el estilo de conducción (económico, medio o potente) y el color con el que  se debe pintar el vehículo. El método build() llama al método abstracto protegido selectVehicle(), que es el "método de fábrica" que da nombre al patrón. Por lo tanto, la implementación de selectVehicle() se delega a las subclases de modo que cada subclase determine el tipo específico de vehículo que se instanciará. El método está protegido porque sólo queremos que las subclases lo utilicen; no está destinado a ser invocado por los clientes.
 
-Here is the CarFactory concrete subclass:
+Aquí está la subclase concreta de CarFactory:
 
 ```java
 public class CarFactory extends VehicleFactory {
@@ -397,9 +396,9 @@ public class CarFactory extends VehicleFactory {
 }
 ```
 
-As you can see, the selectVehicle() method is implemented such that it works out from the supplied arguments exactly which type of car should be instantiated and returned.
+Como puede ver, el método selectVehicle() se implementa de tal manera que a partir de los argumentos proporcionados determina exactamente qué tipo de automóvil se debe instanciar y devolver.
 
-The VanFactory is similar, using the argument to decide which van to instantiate and return:
+VanFactory es similar, utiliza el argumento para decidir qué tipo de instancia de furgoneta va a crear y devolver:
 
 ```java
 public class VanFactory extends VehicleFactory {
@@ -415,21 +414,21 @@ public class VanFactory extends VehicleFactory {
 }
 ```
 
-Client programs instantiate the required factory and call its build() method:
+Los programas cliente crean una instancia de la fábrica requerida y llaman a su método build():
 
 ```java
-// I want an economical car, coloured blue...
+// Quiero un coche económico, pintado de azul...
 VehicleFactory carFactory = new CarFactory();
 Vehicle car = carFactory.build(VehicleFactory.DrivingStyle.ECONOMICAL, Vehicle.Colour.BLUE);
 System.out.println(car);
  
-// I am a "white van man"...
+// Soy un "hombre de furgoneta blanca"...
 VehicleFactory vanFactory = new VanFactory();
 Vehicle van = vanFactory.build(VehicleFactory.DrivingStyle.POWERFUL, Vehicle.Colour.WHITE);
 System.out.println(van);
 ```
 
-You should see the following output:
+Deberías ver el siguiente resultado:
 
 ```text
 Saloon (StandardEngine (1300), BLUE)
@@ -438,13 +437,13 @@ BoxVan (TurboEngine (2500), WHITE)
 
 ### Usando métodos de factoría estáticos {#h2-7}
 
-A common and useful variation is to define a static factory method. Let's assume we define the following additional enum in the VehicleFactory class:
+Una variación común y útil es definir un método de fábrica estático. Supongamos que definimos la siguiente enumeración adicional en la clase VehicleFactory:
 
 ```java
 public enum Category {CAR, VAN};
 ```
 
-Now we can define the following static make() method also in VehicleFactory that works out which subclass to instantiate:
+Ahora podemos definir el siguiente método estático make() también en VehicleFactory que determina qué subclase instanciar:
 
 ```java
 public static Vehicle make(Category category, DrivingStyle style, Vehicle.Colour colour) {
@@ -461,15 +460,15 @@ public static Vehicle make(Category category, DrivingStyle style, Vehicle.Colour
 }
 ```
 
-Using the static make() method is very straightforward:
+Usar el método estático make() es muy sencillo:
 
 ```java
-// Create a red sports car...
+// Creo un coche deportivo rojo...
 Vehicle sporty = VehicleFactory.make(VehicleFactory.Category.CAR, VehicleFactory.DrivingStyle.POWERFUL, Colour.RED);
 System.out.println(sporty);
 ```
 
-This should give the following output:
+Esto debería dar el siguiente resultado:
 
 ```text
 Sport (TurboEngine (2000), RED)
@@ -477,22 +476,22 @@ Sport (TurboEngine (2000), RED)
 
 ## 5. Prototipo (Prototype) {#h2-8}
 
-Type: Creational
+Tipo: Creacional
 
-Purpose: Specify the kinds of objects to create using a prototypical instance, and create new objects by copying the prototype.
+Objetivo: Especifica los tipos de objetos que se crearán utilizando una instancia prototípica y crea nuevos objetos copiando el prototipo.
 
-We shall assume in this chapter that instantiating car and van objects is a time-consuming process, and we therefore need to find a way of speeding up instantiation time whenever we need a new vehicle object. Here is a reminder of the Vehicle class hierarchy:
+En este capítulo asumiremos que crear instancias de objetos de automóviles y camionetas es un proceso que requiere mucho tiempo y, por lo tanto, necesitamos encontrar una manera de acelerar el tiempo de creación de instancias cada vez que necesitemos un nuevo objeto de vehículo. Aquí hay un recordatorio de la jerarquía de clases de vehículos:
 
 ![Jerarquía de la clase Vehicle](../images/000010.jpg)
 
 Figura 5.1 : Jerarquía de la clase Vehicle
 
-One approach that may improve instantiation time is to utilise Java's clone() method. We will therefore specify that the Vehicle interface extends Cloneable and define the method clone(). Code to perform the cloning will then be defined in AbstractVehicle. This chapter thus uses a modified version of the Vehicle interface and AbstractVehicle class as listed below, where the additional code is indicated in bold:
+Un enfoque que puede mejorar el tiempo de creación de instancias es utilizar el método clone() de Java. Por lo tanto, especificaremos que la interfaz Vehículo extiende Cloneable y definiremos el método clone(). El código para realizar la clonación se definirá en AbstractVehicle. Por lo tanto, este capítulo utiliza una versión modificada de la interfaz Vehicle y la clase AbstractVehicle como se enumera a continuación, donde el código adicional se indica en negrita:
 
 ```java
 public interface Vehicle extends Cloneable {
     public enum Colour {UNPAINTED, BLUE, BLACK, GREEN, RED, SILVER, WHITE, YELLOW};
-     public Engine getEngine();
+    public Engine getEngine();
     public Vehicle.Colour getColour();
     public void paint(Vehicle.Colour colour);
     public Object clone();
@@ -542,18 +541,18 @@ public abstract class AbstractVehicle implements Vehicle {
 }
 ```
 
-The overriding clone() method has been made public to more easily enable usage by other objects.
+El método clone() sobreescribible se ha hecho público para permitir más fácilmente su uso por parte de otros objetos.
 
-None of the car or van subclasses needs to change since they inherit from Vehicle at the root of the hierarchy.
+Ninguna de las subclases de automóviles o camionetas necesita cambiar ya que heredan de Vehicle en la raíz de la jerarquía.
 
-We will now define a VehicleManager class that will create the initial vehicles from which we can obtain clones:
+Ahora definiremos una clase VehicleManager que creará los vehículos iniciales de los que podremos obtener clones:
 
 ```java
 public class VehicleManager {
     private Vehicle saloon, coupe, sport, boxVan, pickup;
  
     public VehicleManager() {
-        // For simplicity all vehicles use same engine type...
+        // Para simplificar, todos los vehículos utilizan el mismo tipo de motor...
         saloon = new Saloon(new StandardEngine(1300));
         coupe = new Coupe(new StandardEngine(1300));
         sport = new Sport(new StandardEngine(1300));
@@ -569,7 +568,7 @@ public class VehicleManager {
         return (Vehicle) coupe.clone();
     }
 
-public Vehicle createSport() {
+    public Vehicle createSport() {
         return (Vehicle) sport.clone();
     }
  
@@ -583,7 +582,7 @@ public Vehicle createSport() {
 }
 ```
 
-Client programs can use VehicleManager as follows:
+Los programas cliente pueden utilizar VehicleManager de la siguiente manera:
 
 ```java
 VehicleManager manager = new VehicleManager();
@@ -592,7 +591,7 @@ Vehicle saloon2 = manager.createSaloon();
 Vehicle pickup1 = manager.createPickup();
 ```
 
-A drawback of VehicleManager as coded is that it always instantiates at least one vehicle of each type as part of the construction process. If not all types of vehicles will be needed, a more efficient technique would be to lazy-load by only instantiating the first time each is needed. This is illustrated in the modified version of the class (which we will call VehicleManagerLazy) below:
+Una desventaja de VehicleManager tal como está codificado es que siempre crea una instancia de al menos un vehículo de cada tipo como parte del proceso de construcción. Si no se necesitan todos los tipos de vehículos, una técnica más eficiente sería realizar una carga diferida creando solo una instancia de la primera vez que se necesita cada uno. Esto se ilustra en la versión modificada de la clase (que llamaremos VehicleManagerLazy) a continuación:
 
 ```java
 public class VehicleManagerLazy {
@@ -648,7 +647,7 @@ public class VehicleManagerLazy {
 }
 ```
 
-Before a clone is returned, a check is made to ensure that the 'prototype' object exists, and it will be instantiated if necessary. From then on it just clones the previously instantiated object. Client programs can use VehicleManagerLazy in the same way as before:
+Antes de devolver un clon, se realiza una verificación para garantizar que el objeto 'prototipo' existe y se creará una instancia si es necesario. A partir de entonces, simplemente clona el objeto instanciado previamente. Los programas cliente pueden usar VehicleManagerLazy de la misma manera que antes:
 
 ```java
 VehicleManagerLazy manager = new VehicleManagerLazy();
@@ -660,17 +659,17 @@ Vehicle pickup1 = manager.createPickup();
 
 ## 6. Único (Singleton) {#h2-9}
 
-Type: Creational
+Tipo: Creacional
 
-Purpose: Ensure a class allows only one object to be created, providing a single point of access to it.
+Objetivo: Asegúra de que una clase permita que solo se cree un objeto, proporcionando un único punto de acceso al mismo.
 
-The Foobar Motor Company, in common with all vehicle manufacturers, needs to stamp a unique serial number on all vehicles they produce. They want to model this requirement ensuring that there is just one easy place where the next available serial number can be obtained. If we were to have more than one object that generates the next number there is a risk that we could end up with separate numbering sequences, so we need to prevent this.
+La Compañía de Motores Foobar, al igual que todos los fabricantes de vehículos, necesita estampar un número de serie único en todos los vehículos que produce. Quieren modelar este requisito garantizando que haya un solo lugar sencillo donde se pueda obtener el siguiente número de serie disponible. Si tuviéramos más de un objeto que genere el siguiente número, existe el riesgo de que terminemos con secuencias de numeración separadas, por lo que debemos evitar esto.
 
-The Singleton pattern provides a way of ensuring that only one instance of a particular class can ever be created. So how can we stop other objects from just invoking new multiple times? There are several ways of accomplishing this, and the "traditional" approach that you may often encounter is to make your constructor private but provide a public static getter method that returns a static instance of the Singleton class. This is how it could look:
+El patrón Único proporciona una manera de garantizar que sólo se pueda crear una instancia de una clase particular. Entonces, ¿cómo podemos evitar que otros objetos simplemente invoquen new varias veces? Hay varias formas de lograr esto, y el enfoque "tradicional" que puede encontrar a menudo es hacer que su constructor sea privado pero proporcionar un método getter estático público que devuelva una instancia estática de la clase Singleton. Así es como podría verse:
 
 ```java
 public class SerialNumberGeneratorTraditional {
-    // static members
+    // miembros estáticos
     private static SerialNumberGeneratorTraditional instance;
     
     public synchronized static SerialNumberGeneratorTraditional getInstance() {
@@ -680,30 +679,30 @@ public class SerialNumberGeneratorTraditional {
         return instance;
     }
     
-    // instance variables
+    // variables de instancia
     private int count;
      
-    // private constructor
+    // constructor privado
     private SerialNumberGeneratorTraditional() {}
     
-    // instance methods
+    // métodos de instancia
     public synchronized int getNextSerial() {
         return ++count;
     }
 }
 ```
 
-Note that the getInstance() method will only instantiate the object once and so the same instance will always be returned. The constructor is private to prevent client programs from calling new, thus enforcing the fact that only one object can ever be created, since they can only go through the getInstance() method. The getInstance() and getNextSerial() methods are synchronized in case they are called by separate threads. The singleton could be used thus:
+Tenga en cuenta que el método getInstance() solo creará una instancia del objeto una vez, por lo que siempre se devolverá la misma instancia. El constructor es privado para evitar que los programas cliente llamen a new, lo que refuerza el hecho de que solo se puede crear un objeto, ya que solo pueden pasar por el método getInstance(). Los métodos getInstance() y getNextSerial() se sincronizan en caso de que sean llamados por subprocesos separados. El patrón único podría usarse así:
 
 ```java
-System.out.println("Using traditional singleton");
+System.out.println("Usando el patrón único tradicional");
 SerialNumberGeneratorTraditional generator = SerialNumberGeneratorTraditional.getInstance();
-System.out.println("next serial: " + generator.getNextSerial());
-System.out.println("next serial: " + generator.getNextSerial());
-System.out.println("next serial: " + generator.getNextSerial());
+System.out.println("próxima serie: " + generator.getNextSerial());
+System.out.println("próxima serie: " + generator.getNextSerial());
+System.out.println("próxima serie: " + generator.getNextSerial());
 ```
 
-An arguably better way of coding singletons has existed since Java 1.5 by utilising the enum type. The above class would then be:
+Podría decirse que existe una forma mejor de codificar singletons (objetos únicos) desde Java 1.5 mediante la utilización del tipo enum. La clase anterior sería entonces:
 
 ```java
 public enum SerialNumberGenerator {
@@ -717,18 +716,18 @@ public enum SerialNumberGenerator {
 }
 ```
 
-The constant name INSTANCE represents the singleton. As in the traditional approach there is an instance variable count and synchronized method getNextSerial(), but now there is no need to define any static members or worry about a constructor.
+El nombre de constante INSTANCE representa el objeto único. Como en el enfoque tradicional, hay un recuento de variables de instancia y un método sincronizado getNextSerial(), pero ahora no hay necesidad de definir ningún miembro estático ni preocuparse por un constructor.
 
-Using the enum singleton is as simple as this:
+Usar el enum de objeto único es tan simple como esto:
 
 ```java
-System.out.println("Using enum singleton");
-System.out.println("next vehicle: " + SerialNumberGenerator.INSTANCE.getNextSerial());
-System.out.println("next vehicle: " + SerialNumberGenerator.INSTANCE.getNextSerial());
-System.out.println("next engine: " + SerialNumberGenerator.INSTANCE.getNextSerial());
+System.out.println("Usando enum de objeto único");
+System.out.println("siguiente vehículo: " + SerialNumberGenerator.INSTANCE.getNextSerial());
+System.out.println("siguiente vehículo: " + SerialNumberGenerator.INSTANCE.getNextSerial());
+System.out.println("siguiente motor: " + SerialNumberGenerator.INSTANCE.getNextSerial());
 ```
 
-Sometimes you may want a specific number of different singletons that perform the same actions (a so-called Multiton, a contraction of "multiple singleton"). This is not that straightforward using the traditional approach, but when using the enum technique it is as easy as defining separate constants. For example, suppose you now need separate serial numbers for vehicles and engines where each increment independently of each other:
+A veces es posible que desee un número específico de singletons (objetos únicos) diferentes que realicen las mismas acciones (el llamado Multiton, una contracción de "singleton múltiple"). Esto no es tan sencillo con el enfoque tradicional, pero cuando se utiliza la técnica de enumeración es tan fácil como definir constantes separadas. Por ejemplo, supongamos que ahora necesita números de serie separados para vehículos y motores, donde cada uno se incrementa independientemente uno del otro:
 
 ```java
 public enum SerialNumberGenerator {
@@ -742,23 +741,23 @@ public enum SerialNumberGenerator {
 }
 ```
 
-The constant INSTANCE has been renamed as VEHICLE and a second constant ENGINE has been defined. You can access these as follows:
+La constante INSTANCE ha sido renombrada como VEHICLE y se ha definido una segunda constante ENGINE. Puede acceder a estas como sigue:
 
 ```java
-System.out.println("Using enum singleton");
-System.out.println("next vehicle: " + SerialNumberGenerator.VEHICLE.getNextSerial());
-System.out.println("next vehicle: " + SerialNumberGenerator.VEHICLE.getNextSerial());
-System.out.println("next engine: " + SerialNumberGenerator.ENGINE.getNextSerial());
-System.out.println("next vehicle: " + SerialNumberGenerator.VEHICLE.getNextSerial());
-System.out.println("next engine: " + SerialNumberGenerator.ENGINE.getNextSerial());
+System.out.println("Usando enum de objeto unico (multiton)");
+System.out.println("siguiente vehículo: " + SerialNumberGenerator.VEHICLE.getNextSerial());
+System.out.println("siguiente vehículo: " + SerialNumberGenerator.VEHICLE.getNextSerial());
+System.out.println("siguiente motor: " + SerialNumberGenerator.ENGINE.getNextSerial());
+System.out.println("siguiente vehículo: " + SerialNumberGenerator.VEHICLE.getNextSerial());
+System.out.println("siguiente motor: " + SerialNumberGenerator.ENGINE.getNextSerial());
 ```
 
 The output of which should be:
 
 ```text
-Next vehicle: 1
-Next vehicle: 2
-Next engine: 1
-Next vehicle: 3
-Next engine: 2
+siguiente vehículo: 1
+siguiente vehículo: 2
+siguiente motor: 1
+siguiente vehículo: 3
+siguiente motor: 2
 ```
