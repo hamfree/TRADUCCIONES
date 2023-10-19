@@ -1,15 +1,16 @@
 # 7. Adaptador (Adapter)
 
-Type: Structural
-Purpose: Convert the interface of a class into another interface clients expect. Adapter lets classes work together that couldn't otherwise because of incompatible interfaces.
+Tipo: Estructural
 
-You will recall from the introduction that the Foobar Motor Company makes the engines for their vehicles. Here is a reminder of the Engine hierarchy:
+Objetivo: Convierta la interfaz de una clase en otra interfaz que los clientes esperan. El adaptador permite que clases trabajen juntas que de otro modo no podrían hacerlo debido a interfaces incompatibles.
+
+Recordará de la introducción que la Compañía de Motores Foobar hace los motores para sus vehículos. Aquí hay un recordatorio de la jerarquía de Engine:
 
 ![Jerarquía de la clase Engine](../images/000049.jpg)
 
 Figura 7.1 : Jerarquía de la clase Engine
 
-And here is a reminder of the code of the abstract AbstractEngine class:
+Y aquí está el recordatorio del código de la clase abstracta AbstractEngine:
 
 ```java
 public abstract class AbstractEngine implements Engine {
@@ -34,7 +35,7 @@ public abstract class AbstractEngine implements Engine {
 }
 ```
 
-Let's say our client program takes engines stored in a collection and loops through them one at a time displaying the engine size and type:
+Digamos que nuestro programa cliente toma los motores almacenados en una colección y los recorre uno a la vez mostrando el tamaño y el tipo de motor:
 
 ```java
 List<Engine> engines = new ArrayList<Engine>();
@@ -48,7 +49,7 @@ System.out.println(engine);
 }
 ```
 
-Running the above code would result in the following display:
+Al ejecutar el código anterior se obtendría la siguiente pantalla:
 
 ```text
 StandardEngine (1300)
@@ -56,23 +57,24 @@ StandardEngine (1600)
 TurboEngine (2000)
 ```
 
-For this chapter we will assume that in addition to the two concrete subclasses (StandardEngine and TurboEngine) Foobar have decided to use a further engine class named SuperGreenEngine which is made by a different manufacturer. Because the SuperGreenEngine class is provided by a third-party it does not implement our Engine interface. Furthermore, Foobar do not have access to the Java source code and can therefore not modify it, but the following class details are known from the documentation:
+Para este capítulo asumiremos que además de las dos subclases concretas (StandardEngine y TurboEngine) Foobar ha decidido usar otra clase de motor llamado SuperGreenEngine el cual fabrica un manufacturador diferente. Debido a que la clase SuperGreenEngine es proporcionada por un tercero,  no implementa nuestro interfaz Engine. Además, Foobar no tiene acceso al código fuente en Java, y por tanto, no puede modificarlo, pero los siguientes detalles de la clase se conocen a partir de la documentación:
 
-* The class extends `Object`;
-* The constructor takes one argument for the engine size;
-* There is a `getEngineSize()` method that returns the engine size as an `int`;
-* These types of engines are never turbocharged;
-* The `toString()` method returns a String in the format: **SUPER ENGINE nnnn** (where nnnn is the engine size).
+* La clase extiende `Object`
+* El constructor recibe un argumento para el tamaño del motor
+* Hay un método `getEngineSize()` que devuelve el tamaño del motor como un `int`;
+* Estos tipos de motores nunca tienen turbocompresor
+* El método `toString()` devuelve una cadena en el formato: **SUPER ENGINE nnnn** (donde nnnn es el tamaño del motor).
 
-We can therefore see that SuperGreenEngine uses a different method name to access the engine size and there is no method related to whether it is turbocharged, and that it is not within the Engine hierarchy. As it stands it would not be possible to add instances of SuperGreenEngine to the reporting collection and even if you could the method names are different.
 
-The Adapter pattern provides an approach to resolve this through the definition of a new class that 'adapts' the class we want to use into the format existing classes require. For our purposes, therefore, we shall create a SuperGreenEngineAdapter class:
+Podemos, por lo tanto, ver que SuperGreenEngine usa un nombre de método diferente para acceder al tamaño del motor y que no hay método relacionado para saber si está turboalimentado, y que no está dentro de la jerarquía de Engine. Tal como está, no sería posible agregar instancias de SuperGreenEngine a la colección de informes en incluso si pudiera, los nombres de los métodos son diferentes.
+
+El patrón Adaptador proporciona un enfoque para resolver esto mediante la definición de una nueva clase que "adapta" la clase que queremos usar al formato que requieren las clases existentes . Para nuestro propósitos, por lo tanto, crearemos una clase SuperGreenEngineAdapter:
 
 ![Jerarquía de la clase Adapter](../images/000032.jpg)
 
 Figura 7.2 : Jerarquía de la clase Adapter
 
-The code for the adapter is as follows:
+El código para el adaptador es como sigue:
 
 ```java
 public class SuperGreenEngineAdapter extends AbstractEngine {
@@ -82,13 +84,13 @@ public class SuperGreenEngineAdapter extends AbstractEngine {
 }
 ```
 
-Note the following from the above Java code:
+Observe lo siguiente del código de Java anterior:
 
-We extend the class we are adapting to;
-We accept a reference in the constructor to the class we are adapting from;
-The constructor obtains the necessary state from the referenced object and passes it to the superclass constructor.
+* Extendemos la clase a la que nos estamos adaptando
+* Aceptamos una referencia en el constructor a la clase desde la que nos estamos adaptando
+* El constructor obtiene el estado necesario del objeto referenciado y lo pasa al constructor de la superclase.
 
-Now we are in a position to include SuperGreenEngine objects in our reporting collection (additional code indicated in bold):
+Ahora estamos en condiciones de incluir los objetos SuperGreenEngine en nuestra colección de informes (el código adicional indicado en negrita):
 
 ```java
 List<Engine> engines = new ArrayList<Engine>();
@@ -99,10 +101,10 @@ engines.add(new StandardEngine(1600));
 engines.add(new TurboEngine(2000));
 ```
 
-**`// "Adapt" the new engine type...`**  
+**`// "Adaptamos" el nuevo tipo de motor...`**  
 **`SuperGreenEngine greenEngine = new SuperGreenEngine(1200);`**  
 **`engines.add(new SuperGreenEngineAdapter(greenEngine));`**  
-**`// Unchanged from before...`**  
+**`// Sin cambios desde antes...`**  
 
 ```java
 for (Engine engine : engines) {
@@ -110,7 +112,7 @@ for (Engine engine : engines) {
 }
 ```
 
-The output should now be:
+La salida ahora debería ser:
 
 ```text
 StandardEngine (1300)
@@ -119,17 +121,17 @@ TurboEngine (2000)
 SuperGreenEngine (1200)
 ```
 
-Note how the output made use of the toString() method as inherited from AbstractEngine rather than that of SuperGreenEngine.
+Observe cómo la salida utilizó el método toString() heredado de AbstractEngine en lugar del de SuperGreenEngine.
 
 ## Variaciones para implementar adaptadores{#h2-10}
 
-We were somewhat fortunate in that the design of the Engine and SuperGreenEngine classes made it easy for the adapter class to do the work inside its constructor. Often however, we need to take a few additional steps inside the code of the adapter class, so here is a general formula to apply:
+Fuimos algo afortunados porque el diseño de las clases Engine y SuperGreenEngine facilitó que la clase adaptador hiciera el trabajo dentro de su constructor. Sin embargo, a menudo necesitamos realizar algunos pasos adicionales dentro del código de la clase de adaptador, por lo que aquí hay una fórmula general para aplicar:
 
-_1. Extend the class you are adapting to (or implement it, if it's an interface);_  
-_2. Specify the class you are adapting from in the constructor and store a reference to it in an instance variable;_  
-_3. For each method in the class you are extending (or interface you are implementing), override it to delegate to the corresponding method of the class you are adapting from._  
+_1. Extienda la clase que está adaptando (o impleméntela, si es una interfaz)_  
+_2. Especifique la clase desde la que está adaptando en el constructor y almacene una referencia a ella en una variable de instancia_  
+_3. Por cada método en la clase que está extendiendo (o la interfaz que está implementando), sobreescríbalo para delegar al método correspondiente de la clase desde la que está adaptando_  
 
-Here is a generic example adapter class:
+Aquí hay un ejemplo genérico de la clase adaptadora:
 
 ```java
 public class ObjectAdapter extends ClassAdaptingTo {
@@ -139,7 +141,7 @@ public class ObjectAdapter extends ClassAdaptingTo {
         this.fromObject = fromObject;
     }
 
-    // Overridden method
+    // Método sobreescrito
     public void methodInToClass() {
         fromObject.methodInFromClass();
     }
@@ -150,18 +152,19 @@ public class ObjectAdapter extends ClassAdaptingTo {
 
 ## 8. Puente (Bridge){#h2-11}
 
-Type: Structural
-Purpose: Decouple an abstraction from its implementation so that each may vary independently.
+Tipo: Estructural  
 
-The Foobar Motor Company manufactures engines for its vehicles. Here is a reminder of the Engine class hierarchy:
+Objetivo: Desacopla una abstracción de su implementación para que cada una pueda variar de forma independiente.
+
+La Compañía de Motores Foobar manufactura motores para sus vehículos. Aquí tiene un recordatorio de la jerarquía de la clase Engine:
 
 ![Jerarquía de la clase Engine](../images/000049.jpg)
 
 Figura 8.1 : Jerarquía de la clase Engine
 
-The implementation of the Engine classes as detailed in the introduction, merely stores the engine size (e.g. 1600cc) and whether it is turbocharged. For the purposes of this chapter this class will be enhanced to enable the engine to be started and stopped and for the power to the engine to be increased or decreased.
+La implementación de las clases Engine como se detallaron en la introducción, simplemente almacenan el tamaño del motor (por ejemplo, 1600cc) y si está turboalimentado. Para los propósitos de este capítulo esta clase será mejorada para permitir arrancar y detener el motor y aumentar y disminuir la potencia del motor.
 
-The modified version of the Engine interface and AbstractEngine class is listed below with the changes marked in bold:
+La versión modificada de la interfaz Engine y la clase AbstractEngine se lista debajo con los cambios marcados en negrita:
 
 ```java
 public interface Engine {
@@ -198,26 +201,26 @@ public abstract class AbstractEngine implements Engine {
 
     public void start() {
         running = true;
-        System.out.println("Engine started");
+        System.out.println("El motor arrancó");
     }
 
     public void stop() {
         running = false;
         power = 0;
-        System.out.println("Engine stopped");
+        System.out.println("Motor parado");
     }
 
     public void increasePower() {
         if (running && (power < 10)) {
             power++;
-            System.out.println("Engine power increased to " + power);
+            System.out.println("La potencia del motor aumentó a" + power);
         }
     }
 
     public void decreasePower() {
         if (running && (power > 0)) {
             power--;
-            System.out.println("Engine power decreased to " + power);
+            System.out.println("La potencia del motor disminuyó a" + power);
         }
     }
 
@@ -227,22 +230,23 @@ public abstract class AbstractEngine implements Engine {
 }
 ```
 
-Within a vehicle, the driver controls the functions of the engine indirectly by means of various hand and foot controls, such as the ignition switch, accelerator pedal and brake pedal. To retain flexibility, it is important to design the connection between the engine and the controls so that each can vary independently of the other. In other words:
+Dentro de un vehículo, el conductor controla las funciones del motor indirectamente mediante varios controles manuales y de pie, como el interruptor de encendido, el pedal del acelerador y el pedal del freno. Para conservar la flexibilidad, es importante diseñar la conexión entre el motor y los controles de modo que cada uno pueda variar independientemente del otro. En otras palabras:
 
-A new engine can be designed and plugged into a vehicle without needing any driver controls to be changed; and
-New driver controls (for example, to assist disabled drivers) can be designed and plugged into a vehicle without needing the engines to change.
+Se puede diseñar y conectar un nuevo motor a un vehículo sin necesidad de cambiar ningún control del conductor. Y
+se pueden diseñar nuevos controles del conductor (por ejemplo, para ayudar a los conductores discapacitados) y conectarlos a un vehículo sin necesidad de cambiar los motores.
 
-The Bridge pattern addresses this requirement by separating the 'abstraction' from the 'implementation' into two separate but connected hierarchies such that each can vary independently of the other. In our example, the 'abstraction' is the driver controls and the 'implementation' is the engine.
+El patrón Puente resuelve este requerimiento separando la "abstracción" de la "implementación" en dos jerarquías separadas pero conectadas, de tal forma que cada una puede variar independientemente de la otra. En nuestro ejemplo, la "abstracción" son los controles del conductor y la "implementación" es el motor.
 
-The following diagram shows this relationship:
+El siguiente diagrama muestra esta relación:
 
 ![Patrón puente](../images/000014.jpg)
 
 Figure 8.2 : Patrón puente
 
-As the above figure shows, there is an abstract AbstractDriverControls class with two concrete subclasses; StandardControls and SportControls:
+Como la figura de arriba muestra, hay una clase abstracta AbstractDriverControls con dos subclases concretas: StandardControls and SportControls:
 
-The AbstractDriverControls class requires an Engine object passed to its constructor and then delegates to the engine for each of its methods:
+
+La clase AbstractDriverControls requiere que se le pase un objeto Engine a su constructor y después delega al motor para cada uno de sus métodos:
 
 ```java
 public abstract class AbstractDriverControls {
@@ -274,7 +278,7 @@ public abstract class AbstractDriverControls {
 }
 ```
 
-Subclasses of AbstractDriverControls can either use the superclass methods as-is or define additional functionality. The StandardControls class uses AbstractDriverControls as-is:
+Las subclases de AbstractDriverControls pueden usar los métodos de la superclase tal cual o definir funcionalidades adicionales. La clase StandardControls usa AbstractDriverControls tal cual:  
 
 ```java
 public class StandardControls extends AbstractDriverControls {
@@ -282,15 +286,15 @@ public class StandardControls extends AbstractDriverControls {
     super(engine);
     }
 
-    // No extra features
+    // Sin funciones adicionales
 }
 ```
 
-Whereas the SportControls class defines an additional method:
+Mientras que la clase SportControls define un método adicional:
 
 ```java
-    public class SportControls extends AbstractDriverControls {
-        public SportControls(Engine engine) {
+public class SportControls extends AbstractDriverControls {
+    public SportControls(Engine engine) {
         super(engine);
     }
 
@@ -301,11 +305,12 @@ Whereas the SportControls class defines an additional method:
 }
 ```
 
-The important point to note from the above is that the additional method is coded in terms of the superclass 'abstraction' and not the 'implementation' (engine). So in the above example the accelerateHard() method invokes the accelerate() method as defined in AbstractDriverControls. It is this approach that allows the abstraction and the implementation to vary independently if needed.
+El punto importante a tener en cuenta de lo anterior es que el método adicional está codificado en términos de la superclase "abstracción" y no de "implementación" (motor). Entonces, en el ejemplo anterior, el método accelerateHard() invoca el método accelerate() tal como se define en AbstractDriverControls. Es este enfoque el que permite que la abstracción y la implementación varíen de forma independiente si es necesario.
 
-Thus we could incorporate a brand-new type of engine without modifying the driver controls classes, provided the engine adheres to the Engine contract. Conversely we could develop a new set of driver controls (such as enabling voice activation) without having to modify anything in the Engine hierarchy.
+De esta manera podríamos incorporar un nuevo tipo de motor sin modificar las clases de controles del conductor, siempre que el motor cumpla con el contrato de Engine. Por el contrario, podríamos desarrollar un nuevo conjunto de controles del conductor (como habilitar la activación por voz) sin tener que modificar nada en la jerarquía de Engine.
 
-Client programs can use the bridge as follows:
+
+Los programas del cliente pueden usar el puente de la siguiente manera:
 
 ```java
 Engine engine = new StandardEngine(1300);
@@ -315,7 +320,7 @@ controls1.accelerate();
 controls1.brake();
 controls1.ignitionOff();
 
-// Now use sport controls
+// Ahora usa controles deportivos
 SportControls controls2 = new SportControls(engine);
 controls2.ignitionOn();
 controls2.accelerate();
@@ -328,19 +333,19 @@ controls2.ignitionOff();
 
 ## 9. Compuesto (Composite) {#h2-12}
 
-Type: Structural
+Tipo: Estructural
 
-Purpose : Compose objects into tree structures to represent part-whole hierarchies. Composite lets clients treat individual objects and compositions of objects uniformly.
+Objetivo: Compone objetos en estructuras de árbol para representar jerarquías de parte y todo. Compuesto permite a los clientes tratar objetos individuales y composiciones de objetos de manera uniforme.
 
-In the Foobar Motor Company workshop they build various items from component parts such as nuts, bolts, panels, etc. Each individual component item has an associated description and unit cost, and when items are assembled into larger items the cost is therefore the sum of its component parts.
+En el taller de la Compañía de Motores Foobar construyen varios artículos a partir de componentes como tuercas, pernos, paneles, etc. Cada componente individual tiene una descripción asociada y un costo unitario, y cuando los artículos se ensamblan en artículos más grandes, el costo es, por lo tanto, la suma de sus partes componentes.
 
-The Composite pattern enables us to treat both individual parts and assemblies of parts as if they are the same, thus enabling them to be processed in a consistent manner, simplifying code. The class hierarchy looks like this:
+El patrón Compuesto nos permite tratar tanto piezas individuales como conjuntos de piezas como si fueran iguales, lo que permite procesarlos de manera consistente, simplificando el código. La jerarquía de clases se ve así:
 
 ![Patrón compuesto](../images/000067.jpg)
 
 Figura 9.1 : Patrón compuesto
 
-The abstract Item class defines all possible methods for both parts and assemblies of parts:
+La clase abstracta Item define todos los métodos posibles tanto para las piezas como para conjuntos de piezas:
 
 ```java
 public abstract class Item {
@@ -369,9 +374,9 @@ public abstract class Item {
 }
 ```
 
-The above class provides default implementations for getDescription() and getCost(), and defines the abstract methods addItem(), removeItem() and getItems().
+La clase de arriba proporciona implementaciones predeterminadas para  getDescription() and getCost(), and defines the abstract methods addItem(), removeItem() and getItems().
 
-Individual parts are modelled using the Part subclass:
+Las piezas individuales se modelan utilizando la subclase Part:
 
 ```java
 public class Part extends Item {
@@ -379,16 +384,16 @@ public class Part extends Item {
         super(description, cost);
     }
 
-    // Empty implementation for unit parts...
+    // Implementación vacía para piezas unitarias...
     public void addItem(Item item) {}
     public void removeItem(Item item) {}
     public Item[] getItems() {return new Item[0];}
 }
 ```
 
-As you can see, the methods related to managing assemblies of items have empty implementations since a 'part' is the smallest unit possible, and therefore unable to have sub-parts, unlike 'assemblies'.
+Como puede ver, los métodos relacionados con la gestión de conjuntos de artículos tienen implementaciones vacías ya que una 'parte' es la unidad más pequeña posible y, por lo tanto, no puede tener subpartes, a diferencia de los 'conjuntos'.
 
-Assemblies of parts are modelled using the Assembly subclass:
+Los conjuntos de piezas se modelan utilizando la subclase Assembly:
 
 ```java
 public class Assembly extends Item {
@@ -411,7 +416,7 @@ public class Assembly extends Item {
         return items.toArray(new Item[items.size()]);
     }
 
-    // Also have to override getCost() to add cost of items in list
+    // También hay que sobreescribir getCost() para agregar el costo de los artículos en la lista.
     public int getCost() {
         int total = 0;
         for (Item item : items) {
@@ -422,51 +427,51 @@ public class Assembly extends Item {
 }
 ```
 
- For assemblies, we have implemented the abstract methods to add other Item objects into an internal List collection. We have also overridden the getCost() method to loop through the collection to sum the cost of all contained items within this assembly.
+Para los conjuntos, hemos implementado métodos abstractos para agregar otros objetos Item a una colección List interna. También hemos sobreescrito el método getCost() para recorrer la colección y sumar el costo de todos los elementos contenidos en este conjunto.
 
-All types of Item objects can now be used in a uniform manner:
+Todos los tipos de objetos Item ahora se pueden usar de manera uniforme:
 
 ```java
-Item nut = new Part("Nut", 5);
-Item bolt = new Part("Bolt", 9);
-Item panel = new Part("Panel", 35);
+Item nut = new Part("Tuerca", 5);
+Item bolt = new Part("Tornillo", 9);
+Item panel = new Part("Salpicadero", 35);
 
-Item gizmo = new Assembly("Gizmo");
+Item gizmo = new Assembly("Chisme");
 gizmo.addItem(panel);
 gizmo.addItem(nut);
 gizmo.addItem(bolt);
 
-Item widget = new Assembly("Widget");
+Item widget = new Assembly("Artilugio");
 widget.addItem(gizmo);
 widget.addItem(nut);
 ```
 
-In the above extract, nuts, bolts and panels are defined as individual parts, a "Gizmo" is assembled from one nut, one bolt and one panel, and a "Widget" is assembled from one "Gizmo" and another nut. Displaying the objects would result in this output:
+En el extracto anterior, las tuercas, los pernos y los paneles se definen como partes individuales, un "Chisme" se ensambla a partir de una tuerca, un perno y un panel, y un "Artilugio" se ensambla a partir de un "Chisme" y otra tuerca. Mostrar los objetos daría como resultado este resultado:
 
 ```text
-Nut (cost 5)
-Bolt (cost 9)
-Panel (cost 35)
-Gizmo (cost 49)
-Widget (cost 54)
+Tuerca (cost 5)
+Tornillo (cost 9)
+Salpicadero (cost 35)
+Chisme (cost 49)
+Artilugio (cost 54)
 ```
 
-The assemblies have computed the total cost without the client program needing to know how.
+Se han calculado el coste total de los conjuntos sin que el programa cliente necesite saber cómo.
 
 ---
 
 ## 10. Decorador (Decorator){#h2-13}
 
-Type: Structural
+Tipo: Estructural
 
-Purpose: Attach additional responsibilities to an object dynamically. Decorators provide a flexible alternative to subclassing for extending functionality.
+Objetivo: Adjunte responsabilidades adicionales a un objeto de forma dinámica. Los decoradores proporcionan una alternativa flexible a la subclasificación para ampliar la funcionalidad.
 
-You will recall the Foobar Motor Company Vehicle class hierarchy:
+Recordará la jerarquía de clases de Vehicle de la Compañía de Motores Foobar:
 
 ![Jerarquía de la clase Vehicle](../images/000010.jpg)
 Figura 10.1 : Jerarquía de la clase Vehicle
 
-For the purposes of this chapter, we shall add one additional method called getPrice() to the Vehicle interface. We will also modify the toString() method in AbstractVehicle to include the price. The modified interface and class is shown below with the changes marked in bold:
+Para los propósitos de este capítulo, agregaremos un método adicional llamado getPrice() a la interfaz Vehicle. También modificaremos el método toString() en AbstractVehicle para incluir el precio. La interfaz y la clase modificadas se muestran a continuación con los cambios marcados en negrita:
 
 ```java
 public interface Vehicle {
@@ -508,7 +513,7 @@ public abstract class AbstractVehicle implements Vehicle {
 }
 ```
 
-Each of the concrete subclasses implement the getPrice() method as appropriate. For example, the Saloon class now looks like this (changes in bold):
+Cada una de las subclases concretas implementa el método getPrice() según corresponda. Por ejemplo, la clase Saloon ahora tiene este aspecto (los cambios están en negrita):
 
 ```java
 public class Saloon extends AbstractCar {
@@ -526,26 +531,27 @@ public class Saloon extends AbstractCar {
 }
 ```
 
-The other subclasses are similarly defined, and the getPrice() method returns:
+Las otras subclases se definen de manera similar y el método getPrice() devuelve:
 
-* 6,000 for Saloon objects;
-* 7,000 for Coupe objects;
-* 8,000 for Sport objects;
-* 9,000 for Pickup objects;
-* 10,000 for BoxVan objects.  
+* 6,000 para objetos Saloon;
+* 7,000 para objetos Coupe;
+* 8,000 para objetos Sport;
+* 9,000 para objetos Pickup;
+* 10,000 para objetos BoxVan.  
 
-When a customer buys a vehicle they have the choice of adding any number of optional extras. They can choose from an air-conditioning system, alloy wheels, leather seats, metallic paint, or a satellite-navigation unit. They can choose none at all, or any combination up to all five.
+Cuando un cliente compra un vehículo, tiene la opción de agregar cualquier número de extras opcionales. Pueden elegir entre un sistema de aire acondicionado, llantas de aleación, asientos de cuero, pintura metalizada o una unidad de navegación por satélite. No pueden elegir ninguno o cualquier combinación de hasta los cinco.
 
-The Decorator pattern is designed to facilitate the addition of state and/or behaviour without having to modify the inheritance hierarchy of the classes being added to. This is accomplished by defining a new hierarchy which itself extends the root of the main tree.
+El patrón Decorador está diseñado para facilitar la adición de estado y/o comportamiento sin tener que modificar la jerarquía de herencia de las clases a las que se agrega. Esto se logra definiendo una nueva jerarquía que a su vez extiende la raíz del árbol principal.
 
-This is shown diagrammatically below:
+Esto se muestra esquemáticamente a continuación:
 
 ![Jerarquía del patrón Decorator](../images/000052.jpg)
+
 Figura 10.2 : Jerarquía del patrón Decorator
 
-From the diagram you can see that a new abstract class has been defined called AbstractVehicleOption that inherits from AbstractVehicle. AbstractVehicleOption has five concrete subclasses; one for each option that can be selected.
+En el diagrama se puede ver que se ha definido una nueva clase abstracta llamada AbstractVehicleOption que hereda de AbstractVehicle. AbstractVehicleOption tiene cinco subclases concretas; uno para cada opción que se puede seleccionar.
 
-The AbstractVehicleOption class looks like this:
+La clase AbstractVehicleOption se ve así:
 
 ```java
 public abstract class AbstractVehicleOption extends AbstractVehicle {
@@ -558,9 +564,9 @@ public abstract class AbstractVehicleOption extends AbstractVehicle {
 }
 ```
 
-AbstractVehicleOption is the abstract "decorator" class and it requires a reference to the Vehicle class which is to be decorated.
+AbstractVehicleOption es la clase "decoradora" abstracta y requiere una referencia a la clase de Vehículo que se va a decorar.
 
-Each of the option subclasses is straightforward. They all override the getPrice() method to add the price of the option to the price of the object that is being decorated. In the case of the AirConditionedVehicle and SatNavVehicle classes, we have also defined an extra method:
+Cada una de las subclases de opciones es sencilla. Todos sobreescriben el método getPrice() para sumar el precio de la opción al precio del objeto que se está decorando. En el caso de las clases AirConditionedVehicle y SatNavVehicle, también hemos definido un método extra:
 
 ```java
 public class AirConditionedVehicle extends AbstractVehicleOption {
@@ -573,7 +579,7 @@ public class AirConditionedVehicle extends AbstractVehicleOption {
     }
 
     public void setTemperature(int value) {
-        // code to set the temperature...
+       // código para configurar la temperatura...
     }
 }
 
@@ -621,65 +627,65 @@ public class SatNavVehicle extends AbstractVehicleOption {
     }
 
     public void setDestination(String target) {
-        // code to set the destination...
+        // código para establecer el destino...
     }
 }
 ```
 
-To use the 'decorators' we initially instantiate the car or van we require and then "wrap" them inside the required decorator or decorators. Here is an example:
+Para utilizar los 'decoradores' inicialmente creamos una instancia del automóvil o camioneta que necesitamos y luego los "envolvemos" dentro del decorador o decoradores requeridos. Aquí hay un ejemplo:
 
 ```java
-// Create a blue saloon car...
+// Creamos un vehículo berlina de color azul...
 Vehicle myCar = new Saloon(new StandardEngine(1300));
 myCar.paint(Vehicle.Colour.BLUE);
 
-// Add air-conditioning to the car...
+// Agregarmos el aire acondicionado al coche...
 myCar = new AirConditionedVehicle(myCar);
 
-// Now add alloy wheels...
+// Ahora agregamos las llantas de aleación...
 myCar = new AlloyWheeledVehicle(myCar);
 
-// Now add leather seats...
+// Ahora agregamos los asientos de cuero...
 myCar = new LeatherSeatedVehicle(myCar);
 
-// Now add metallic paint...
+// Ahora agregamos la pintura metalizada...
 myCar = new MetallicPaintedVehicle(myCar);
 
-// Now add satellite-navigation...
+// Ahora agremamos la navegación por satelite...
 myCar = new SatNavVehicle(myCar);
 ```
 
-If you invoke System.out.prinln() on the myCar object at each stage you should see this output:
+Si invoca System.out.println() en el objeto myCar en cada etapa, debería ver este resultado:
 
 ```text
 Saloon (StandardEngine (1300), BLUE, price 6000)
 AirConditionedVehicle (StandardEngine (1300), BLUE, price 6600)
-AlloyWheeledVehicle (>StandardEngine (1300), BLUE, price 6850)
+AlloyWheeledVehicle (StandardEngine (1300), BLUE, price 6850)
 LeatherSeatedVehicle (StandardEngine (1300), BLUE, price 8050)
 MetallicPaintedVehicle (StandardEngine (1300), BLUE, price 8800)
 SatNavVehicle (StandardEngine (1300), BLUE, price 10300)
 ```
 
-The price shown at each stage is the total of the vehicle plus the selected options as each is "added".
+El precio mostrado en cada etapa es el total del vehículo más las opciones seleccionadas a medida que se "suman" cada una de ellas.
 
-The Decorator pattern is a good example of preferring object composition over inheritance. Had we attempted to use inheritance for the various vehicle options we would have needed to create many different combinations of subclasses to model each combination of selectable options.
+El patrón Decorador es un buen ejemplo de cómo preferir la composición de objetos a la herencia. Si hubiéramos intentado utilizar la herencia para las distintas opciones de vehículos, habríamos necesitado crear muchas combinaciones diferentes de subclases para modelar cada combinación de opciones seleccionables.
 
-Decorator classes are sometimes called "wrapper" classes, since they serve to "wrap" an object inside another object, usually to add or modify its functionality.
+Las clases decoradoras a veces se denominan clases "contenedoras", ya que sirven para "envolver" un objeto dentro de otro objeto, generalmente para agregar o modificar su funcionalidad.
 
 ---
 
 ## 11. Fachada (Facade){#h2-14}  
 
-Type: Structural
+Tipo: Estructural
 
-Purpose: Provide a unified interface to a set of interfaces in a subsystem. Facade defines a higher-level interface that makes the subsystem easier to use.
+Objetivo: Proporciona una interfaz unificada para un conjunto de interfaces en un subsistema. Facade define una interfaz de nivel superior que hace que el subsistema sea más fácil de usar.
 
-Sometimes you need to perform a series of steps to undertake a particular task, often involving multiple objects. The Facade pattern involves the creation of a separate object that simplifies the execution of such steps.
+A veces es necesario realizar una serie de pasos para realizar una tarea concreta, que a menudo implica varios objetos. El patrón Fachada implica la creación de un objeto separado que simplifica la ejecución de dichos pasos.
 
-As an example, when the Foobar Motor Company are preparing their vehicles for sale there are a number of steps they have to undertake that utilise various objects. In this chapter we shall assume that the Vehicle interface defines the following additional methods beyond those defined in the introduction.
+Por ejemplo, cuando la Compañía de Motores Foobar está preparando sus vehículos para la venta, debe seguir una serie de pasos que utilizan varios objetos. En este capítulo asumiremos que la interfaz Vehicle define los siguientes métodos adicionales además de los definidos en la introducción.
 
 ```java
-// Extra methods defined in Vehicle...
+// Métodos extra definidos en Vehicle...
 
 public void cleanInterior();
 public void cleanExteriorBody();
@@ -687,27 +693,27 @@ public void polishWindows();
 public void takeForTestDrive();
 ```
 
-The above methods are implemented in AbstractVehicle as follows:
+Los métodos anteriores se implementan en AbstractVehicle de la siguiente manera:
 
 ```java
 public void cleanInterior() {
-    System.out.println("Cleaning interior");
+    System.out.println("Limpiar interiores");
 }
 
 public void cleanExteriorBody() {
-    System.out.println("Cleaning exterior");
+    System.out.println("Limpiar exterior");
 }
 
 public void polishWindows() {
-    System.out.println("polishing windows");
+    System.out.println("Pulir ventanas");
 }
 
 public void takeForTestDrive() {
-    System.out.println("taking for test drive");
+    System.out.println("montar para prueba de conducción");
 }
 ```
 
-We shall introduce two further simple classes called Registration and Documentation:
+Introduciremos dos clases simples más llamadas Registration y Documentation:
 
 ```java
 public class Registration {
@@ -718,26 +724,26 @@ public class Registration {
     }
 
     public void allocateLicensePlate() {
-        // Code omitted...
-        System.out.println("License plate allocated");
+        // Código omitido...
+        System.out.println("Matrícula asignada");
     }
 
     public void allocateVehicleNumber() {
-        // Code omitted...
-        System.out.println("Vehicle number allocated");
+        // Código omitido...
+        System.out.println("Número de vehículo asignado");
     }
 }
  
 
 public class Documentation {
     public static void printBrochure(Vehicle vehicle) {
-        // code omitted...
-        System.out.println("Brochure printed");
+        // Código omitido...
+        System.out.println("Folleto impreso");
     }
 }
 ```
 
-To implement the pattern we will create a VehicleFacade class that defines a method to prepare the specified vehicle by using the above classes on our behalf:
+Para implementar el patrón, crearemos una clase VehicleFacade que define un método para preparar el vehículo especificado utilizando las clases anteriores en nuestro nombre:
 
 ![Patrón Facade](../images/000047.jpg)
 
@@ -760,36 +766,36 @@ public class VehicleFacade {
 }
 ```
 
-Client programs then only need invoke the prepareForSale() method on a VehicleFacade instance, and therefore need no knowledge of what needs to be done and what other objects are needed. And if something different is needed in a special circumstance, then the individual methods are still available for calling as required.
+Los programas cliente entonces solo necesitan invocar el método prepareForSale() en una instancia de VehicleFacade y, por lo tanto, no necesitan saber qué se debe hacer ni qué otros objetos se necesitan. Y si se necesita algo diferente en una circunstancia especial, entonces los métodos individuales todavía están disponibles para llamar según sea necesario.
 
 ---
 
 ## 12. Flyweight{#h2-15}
 
-Type: Structural
+Tipo: Estructural
 
-Purpose: Use sharing to support large numbers of fine-grained objects efficiently.
+Objetivo: Utiliza el uso compartido para admitir una gran cantidad de objetos detallados de manera eficiente.
 
-Some programs need to create a large number of objects of one particular type, and if those objects happen to have a large amount of state then instantiating lots of them can quickly use up memory. When considering object state, we often note that at least some of it could potentially be shared among a group of objects.
+Algunos programas necesitan crear una gran cantidad de objetos de un tipo particular, y si esos objetos tienen una gran cantidad de estado, crear instancias de muchos de ellos puede consumir memoria rápidamente. Al considerar el estado de un objeto, a menudo observamos que al menos una parte podría compartirse entre un grupo de objetos.
 
-For the Foobar Motor Company, the Engine hierarchy is a case in point:
+Para la Compañía de Motores Foobar, la jerarquía de Engine es un ejemplo de ello:
 
 ![Jerarquía de la clase Engine](../images/000049.jpg)
 
 Figura 12.1 : Jerarquía de la clase Engine
 
-Our simple implementation of Engine only defines two methods; getSize() and isTurbo(). Let's suppose we instantiate two engines as follows:
+Nuestra implementación simple de Engine solo define dos métodos; getSize() y isTurbo(). Supongamos que creamos instancias de dos motores de la siguiente manera:
 
 ```java
 Engine engine1 = new StandardEngine(1300);
 Engine engine2 = new StandardEngine(1300);
 ```
 
-The above would create two separate objects in memory, even though their state is identical. This can be thought of as its intrinsic state; i.e. all 1300cc standard engines will be storing 1300 for the engine size and false for whether it is turbocharged. Creating hundreds or thousands of these would be wasteful of memory, especially since a more realistic Engine class would require many more variables whose values would also be shared.
+Lo anterior crearía dos objetos separados en la memoria, aunque su estado sea idéntico. Esto puede considerarse como su estado intrínseco; es decir, todos los motores estándar de 1300 cc almacenarán 1300 para el tamaño del motor y false para saber si está turboalimentado. Crear cientos o miles de estos sería un desperdicio de memoria, especialmente porque una clase Engine más realista requeriría muchas más variables cuyos valores también se compartirían.
 
-For the purposes of this chapter another method will be added to the Engine interface, called diagnose(). This new method will take a DiagnosticTool object as its argument, and this argument can be thought of as its extrinsic state, since its value is not actually stored in the Engine object; it is used purely so that the engine can use it to run a diagnostic check.
+Para los propósitos de este capítulo, se agregará otro método a la interfaz de Engine, llamado diagnostic(). Este nuevo método tomará un objeto DiagnosticTool como argumento, y este argumento puede considerarse como su estado extrínseco, ya que su valor en realidad no está almacenado en el objeto Engine; se usa exclusivamente para que el motor pueda usarlo para realizar una verificación de diagnóstico.
 
-The DiagnosticTool interface looks like this:
+La interfaz de DiagnosticTool se ve así:
 
 ```java
 public interface DiagnosticTool {
@@ -797,36 +803,36 @@ public interface DiagnosticTool {
 }
 ```
 
-The EngineDiagnosticTool implements the above for running diagnostics on an engine:
+EngineDiagnosticTool implementa lo anterior para ejecutar diagnósticos en un motor:
 
 ```java
 public class EngineDiagnosticTool implements DiagnosticTool {
     public void runDiagnosis(Object obj) {
-        System.out.println("Starting engine diagnostic tool for " + obj);
+        System.out.println("Iniciando herramienta de diágnostico del motor para " + obj);
         try {
             Thread.sleep(5000);
-            System.out.println("Engine diagnosis complete");
+            System.out.println("Diagnosis del motor completada");
         } catch (InterruptedException ex) {
-            System.out.println("Engine diagnosis interrupted");
+            System.out.println("Diagnosis del motor interrumpida");
         }
     }
 }
 ```
 
-To simulate a long-running process the method pauses for five seconds. With the above in place we can now add a suitable method to the Engine interface:
+Para simular un proceso de larga duración, el método se detiene durante cinco segundos. Con lo anterior implementado, ahora podemos agregar un método adecuado a la interfaz Engine:
 
 ```java
 public interface Engine {
-    // Methods having intrinsic (i.e. shared) state
+    // Métodos que tienen estado intrínseco (es decir, compartido)
     public int getSize();
     public boolean isTurbo();
 
-    // Methods having extrinsic (i.e. unshared) state
+    // Métodos que tienen estado extrínseco (es decir, no compartido)
     public void diagnose(DiagnosticTool tool);
 }
 ```
 
-The implementation of this new method in AbstractEngine simply issues a call-back to the DiagnosticTool:
+La implementación de este nuevo método en AbstractEngine simplemente emite una devolución de llamada a DiagnosticTool:
 
 ```java
 public void diagnose(DiagnosticTool tool) {
@@ -834,13 +840,13 @@ public void diagnose(DiagnosticTool tool) {
 }
 ```
 
-The Flyweight pattern allows you to reference a multitude of objects of the same type and having the same state, but only by instantiating the minimum number of actual objects needed. This is typically done by allocating a 'pool' of objects which can be shared, and this is determined by a 'flyweight factory' class. Client programs get access to engines only through the factory:
+El patrón Flyweight le permite hacer referencia a una multitud de objetos del mismo tipo y que tienen el mismo estado, pero solo creando instancias de la cantidad mínima de objetos reales necesarios. Esto normalmente se hace asignando un "grupo" de objetos que se pueden compartir, y esto está determinado por una clase de "factoría de peso ligero". Los programas cliente obtienen acceso a los motores sólo a través de la factoría:
 
 ![Patrón Flyweight](../images/000026.jpg)
 
 Figura 12.2 : Patrón Flyweight
 
-The EngineFlyweightFactory class looks like this:
+La clase EngineFlyweightFactory tiene este aspecto:
 
 ```java
 public class EngineFlyweightFactory {
@@ -872,16 +878,16 @@ public class EngineFlyweightFactory {
 }
 ```
 
-This class utilises two maps (one for standard engines and the other for turbo engines). Each time an engine of a particular type and size is requested, if a similar one has already been created it is returned rather than instantiating a new one. Client programs use the factory like this:
+Esta clase utiliza dos mapas (uno para motores estándar y otro para motores turbo). Cada vez que se solicita un motor de un tipo y tamaño determinados, si ya se ha creado uno similar, se devuelve en lugar de crear una instancia de uno nuevo. Los programas cliente usan la fábrica de esta manera:
 
 ```java
-// Create the flyweight factory...
+// Se crea la fábrica de peso ligero....
 EngineFlyweightFactory factory = new EngineFlyweightFactory();
 
-// Create the diagnostic tool
+// Se crea la herramienta de diagnóstico
 DiagnosticTool tool = new EngineDiagnosticTool();
 
-// Get the flyweights and run diagnostics on them
+// Obtenemos los pesos ligeros y ejecutamos diagnósticos sobre ellos
 Engine standard1 = factory.getStandardEngine(1300);
 standard1.diagnose(tool);
 
@@ -897,7 +903,7 @@ standard4.diagnose(tool);
 Engine standard5 = factory.getStandardEngine(1600);
 standard5.diagnose(tool);
 
-// Show that objects are shared
+// Se muestra que los objetos se comparten
 System.out.println(standard1.hashCode());
 System.out.println(standard2.hashCode());
 System.out.println(standard3.hashCode());
@@ -905,34 +911,35 @@ System.out.println(standard4.hashCode());
 System.out.println(standard5.hashCode());
 ```
 
-In the above, the variables standard1, standard2 and standard3 all reference the same Engine object (since they all 1300cc standard engines). Likewise, standard4 references the same object as standard5. Of course, whether it is worth running the diagnostics multiple times on the same objects is arguable depending upon the circumstances!
+En lo anterior, las variables standard1, standard2 y standard3 hacen referencia al mismo objeto Engine (ya que todos son motores estándar de 1300 cc). Asimismo, standard4 hace referencia al mismo objeto que standard5. Por supuesto, dependiendo de las circunstancias, ¡es discutible si vale la pena ejecutar el diagnóstico varias veces en los mismos objetos!.
 
-If the arguments passed to the extrinsic method (DiagnosticTool in our example) need to be stored, this should be done in the client program.
+Si es necesario almacenar los argumentos pasados al método extrínseco (DiagnosticTool en nuestro ejemplo), esto debe hacerse en el programa cliente.
 
 ---
 
 ## 13. Apoderado (Proxy){#h2-16}
 
-Type: Structural
-Purpose: Provide a surrogate or place-holder for another object to control access to it.
+Tipo: Estructural
 
-Some methods can be time-consuming, such as those that load complex graphical components or need network connections. In these instances, the Proxy pattern provides a 'standin' object until such time that the time-consuming resource is complete, allowing the rest of your application to load.
+Objetivo: Proporcione un sustituto o marcador de posición para otro objeto para controlar el acceso a él.
 
-In the chapter discussing the Flyweight pattern, the Engine hierarchy was enhanced to define the additional method diagnose(). As you saw, the implementation of runDiagnosis() in EngineDiagnosticTool is slow (we made it sleep for five seconds to simulate this), so we might consider making this run is a separate thread.
+Algunos métodos pueden llevar mucho tiempo, como los que cargan componentes gráficos complejos o necesitan conexiones de red. En estos casos, el patrón Proxy proporciona un objeto 'independiente' hasta el momento en que se completa el recurso que consume mucho tiempo, lo que permite que se cargue el resto de la aplicación.
 
-Here is a reminder of the Engine hierarchy with the additional method:
+En el capítulo que analiza el patrón Flyweight, se mejoró la jerarquía de Engine para definir el método adicional diagnostic(). Como vio, la implementación de runDiagnosis() en EngineDiagnosticTool es lenta (lo hicimos dormir durante cinco segundos para simular esto), por lo que podríamos considerar hacer que esta ejecución se haga en un hilo separado.
+
+Aquí hay un recordatorio de la jerarquía de Engine con el método adicional:
 
 ![Jerarquía de la clase Engine](../images/000009.jpg)
 
 Figura 13.1 : Jerarquía de la clase Engine
 
-The Proxy pattern involves creating a class that implements the same interface that we are standing-in for, in our case Engine. The proxy then forwards requests to the "real" object which it stores internally. Clients just access the proxy:
+El patrón Proxy implica la creación de una clase que implemente la misma interfaz que reemplazamos, en nuestro caso Engine. Luego, el proxy reenvía solicitudes al objeto "real" que almacena internamente. Los clientes simplemente acceden al apoderado:
 
 ![Patrón Apoderado](../images/000063.jpg)
 
 Figure 13.2 : Patrón Apoderado
 
-Here is the code for the EngineProxy class:
+Aquí está el código para la clase EngineProxy:
 
 ```java
 public class EngineProxy implements Engine {
@@ -954,21 +961,21 @@ public class EngineProxy implements Engine {
         return engine.isTurbo();
     }
 
-    // This method is time-consuming...
+    // Este método lleva mucho tiempo...
     public void diagnose(final DiagnosticTool tool) {
-        // Run the method as a separate thread
+        // Ejecuta el método como un hilo separado
         Thread t = new Thread(new Runnable() {
             public void run() {
-                System.out.println("(Running tool as thread)");
+                System.out.println("(Ejecutando la herramienta como un hilo)");
                 engine.diagnose(tool);
             }
         });
     t.start();
-    System.out.println("EngineProxy diagnose() method finished");
+    System.out.println("El método diagnose() de EngineProxy terminó");
     }
 }
 ```
 
-The constructor creates either a StandardEngine or TurboEngine object and stores a reference to it as an instance variable. Calls to getSize() and isTurbo() simply forward to the referenced engine object. Calls to diagnose() will invoke a separate thread to run the actual diagnosis. This can be useful if you cannot modify the original source for some reason.
+El constructor crea un objeto StandardEngine o TurboEngine y almacena una referencia a él como una variable de instancia. Las llamadas a getSize() y isTurbo() simplemente reenvían al objeto del motor al que se hace referencia. Las llamadas a diagnostic() invocarán un hilo separado para ejecutar el diagnóstico real. Esto puede resultar útil si no puede modificar la fuente original por algún motivo.
 
-This leaves the question of how you can 'force' client programs to use the proxy class instead of the normal class. One approach would be to make the constructors of StandardEngine and TurboEngine package-private (i.e. using no access modifier); then provided EngineProxy is in the same package it will be able to instantiate them but outside objects won't. It is also common to have a 'factory' class to make instantiation simpler, e.g. by providing a createStandardEngine() method.
+Esto deja la pregunta de cómo se puede "forzar" a los programas cliente a utilizar la clase proxy en lugar de la clase normal. Un enfoque sería hacer que los constructores de los paquetes StandardEngine y TurboEngine sean privados (es decir, sin utilizar ningún modificador de acceso); luego, siempre que EngineProxy esté en el mismo paquete, podrá crear instancias de ellos, pero los objetos externos no. También es común tener una clase 'factoria' para simplificar la creación de instancias, por ejemplo, proporcionando un método createStandardEngine().
