@@ -1,15 +1,15 @@
 # Parte IV. Patrones de comportamiento
 
-This part describes the eleven behavioural patterns, that is, those that help manage what the classes actually do.
+Esta parte describe los once patrones de comportamiento, es decir, aquellos que ayudan a gestionar lo que las clases hacen realmente.
 
-* _Chain of Responsibility_: Avoid coupling the sender of a request to its receiver by giving more than one object the chance to handle the request;
-* _Command_: Encapsulate a request as an object, thereby letting you parameterise clients with different requests;
-* _Interpreter_: Define the representation of a language’s grammar;
-* _Iterator_: Provide a way to access the elements of an aggregate object sequentially without exposing its underlying representation;
-* _Mediator_: Define an object that encapsulates how a set of objects interact;
-* _Memento_: Capture and externalise an object’s state so that it can be restored to that state later;
-* _Observer_: Define a one-to-many dependency between objects so that when one object changes its state, all of its dependents are notified and updated automatically;
-* _State_: Allow an object to alter its behaviour when its internal state changes, as if it were a different class;
-* _Strategy_: Allow clients to change the algorithm that an object uses to perform a function;
-* _Template Method_: Define the skeleton of an algorithm in a method, deferring some steps to subclasses;
-* _Visitor_: Simulate the addition of a method to a class without needing to actually change the class.
+* _Cadena de responsabilidad_: Evite acoplar el remitente de una solicitud a su receptor dando a más de un objeto la oportunidad de manejar la solicitud
+* _Comando_: Encapsula una petición como un objeto, de forma que le permite parametrizar a los clientes con diferentes peticiones
+* _Intérprete_: Define la representación de la gramática de un lenguaje
+* _Iterador_: Proporciona una forma de acceder a los elementos de un objeto agregado secuencialmente sin exponer su representación subyacente
+* _Mediador_: Define un objeto que encapsula cómo un conjunto de objetos interactúan
+* _Recuerdo_: Captura y externaliza un estado del objeto para que pueda ser restaurado a ese estado más tarde
+* _Observador_: Define una dependencia de uno a muchos entre objetos para que cuando un objeto cambia su estado, todos sus dependientes sean notificados y actualizados automáticamente
+* _Estado_: Permite a un objeto alterar su comportamiento cuando cambia su estado interno, como si fuera una clase diferente
+* _Estrategia_: Permite a los clientes cambiar el algoritmo que un objeto usa para realizar una función
+* _Método de plantilla_: Define el esquelo de un algoritmo en un método, delegando algunos pasos a subclases
+* _Visitante_: Simula la adición de un método a una clase sin necesidad de cambiar realmente la clase  

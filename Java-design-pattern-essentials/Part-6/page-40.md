@@ -1,6 +1,4 @@
-# Parte VI. Patrones de diseño en la práctica
-
-## 29. Ejemplo de aplicación de 3 niveles{#h2-40}
+# 29. Ejemplo de aplicación de 3 niveles
 
 This chapter develops a small, sample 3-tier graphical application that makes use of a selection of commonly used design patterns. The application displays a list of engines that have come off the Foobar Motor Company production line (this means that the list may show the same engine type and size more than once), and provides facilities to build new engines and to save & restore the data to persistent storage. Please note that this is not intended to be production level software; the code has been greatly simplified in order to concentrate on the patterns involved.
 
@@ -26,7 +24,7 @@ Figura 29.3 : Patrón de capas de 3 niveles como paquetes.
 
 ---
 
-### El nivel de la base de datos{#h2-41}
+## El nivel de la base de datos{#h2-15}
 
 Starting with the db package, we will refer to an object as an Entity. Since it is common for database tables to have a primary key we will define the class EntityKeyGenerator using the Singleton pattern enum technique as described in Chapter 6:
 
@@ -259,7 +257,7 @@ Note how the business tier communicates only through the DatabaseFacade object. 
 
 ---
 
-### El nivel empresarial o de negocio{#h2-42}
+## El nivel empresarial o de negocio{#h2-16}
 
 Moving on to the business package, this will consist primarily of the Engine hierarchy as used throughout this book:
 
@@ -363,7 +361,7 @@ Note how the ui tier communicates only through the BusinessFacade object. This h
 
 ---
 
-### El nivel de interfaz de usuario{#h2-43}
+## El nivel de interfaz de usuario{#h2-17}
 
 The ui package includes a ManageEnginesPanel class which shows a scrollable list of engines and some buttons:
 
