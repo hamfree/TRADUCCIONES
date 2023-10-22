@@ -1,35 +1,35 @@
 # 21. Estado (State)
 
-Type: Behavioural
+Tipo: conductual
 
-Purpose: Allow an object to alter its behaviour when its internal state changes. The object will appear to change its class.
+Propósito: Permite que un objeto altere su comportamiento cuando cambia su estado interno. El objeto parecerá cambiar de clase.
 
-The Foobar Motor Company's vehicles each have a digital clock fitted that displays the current date and time. These values will need to be reset from time to time (such as after a change of battery) and this is accomplished by means of a particular knob on the dashboard. When the knob is initially pressed, the 'year' value can be set. Turning the knob to the left (i.e. anti-clockwise) causes the previous year to be show, whereas turning it to the right goes forward one year. When the knob is pressed again the year value becomes 'set' and the set-up process then automatically allows the month value to be set, also by making appropriate left or right movements with the knob.
+Cada vehículo de la Compañía de Motores Foobar tiene instalado un reloj digital que muestra la fecha y hora actuales. Estos valores deberán restablecerse de vez en cuando (por ejemplo, después de un cambio de batería) y esto se logra mediante una perilla particular en el tablero. Cuando se presiona inicialmente la perilla, se puede configurar el valor del "año". Al girar el mando hacia la izquierda (es decir, en el sentido contrario a las agujas del reloj), se muestra el año anterior, mientras que al girarlo hacia la derecha se avanza un año. Cuando se presiona nuevamente la perilla, el valor del año se "establece" y el proceso de configuración permite automáticamente establecer el valor del mes, también haciendo los movimientos apropiados hacia la izquierda o hacia la derecha con la perilla.
 
-This process continues for the day of the month, the hour and the minute. The following summarises the flow of events:
+Este proceso continúa para el día del mes, la hora y el minuto. A continuación se resume el flujo de eventos:
 
-* _When the knob is first pushed the clock goes into "setup" mode for setting the year;_
-* _If the knob is rotated left then 1 is deducted from the year value;_
-* _If the knob is rotated right then 1 is added to the year value;_
-* _When the knob is pushed the year becomes set and the clock goes into "setup" mode for setting the month;_
-* _If the knob is rotated left then 1 is deducted from the month value;_
-* _If the knob is rotated right then 1 is added to the month value;_
-* _When the knob is pushed the month becomes set and the clock goes into "setup" mode for setting the day;_
-* _If the knob is rotated left then 1 is deducted from the day value;_
-* _If the knob is rotated right then 1 is added to the day value;_
-* _When the knob is pushed the day becomes set and the clock goes into "setup" mode for setting the hour;_
-* _If the knob is rotated left then 1 is deducted from the hour value;_
-* _If the knob is rotated right then 1 is added to the hour value;_
-* _When the knob is pushed the hour becomes set and the clock goes into "setup" mode for setting the minute;_
-* _If the knob is rotated left then 1 is deducted from the minute value;_
-* _If the knob is rotated right then 1 is added to the minute value;_
-* _When the knob is pushed the minute becomes set and the clock goes into the "finished setup" mode;_
-* _If the knob is pushed again the full selected date and time are displayed._
+* _Cuando se presiona la perilla por primera vez, el reloj entra en modo de "configuración" para configurar el año;_
+* _Si se gira la perilla hacia la izquierda, se deduce 1 del valor del año;_
+* _Si se gira la perilla hacia la derecha, se suma 1 al valor del año;_
+* _Cuando se presiona la perilla, el año se configura y el reloj entra en modo de "configuración" para configurar el mes;_
+* _Si se gira la perilla hacia la izquierda, se deduce 1 del valor del mes;_
+* _Si se gira la perilla hacia la derecha, se suma 1 al valor del mes;_
+* _Cuando se presiona la perilla, el mes se configura y el reloj entra en modo de "configuración" para configurar el día;_
+* _Si se gira la perilla hacia la izquierda, se deduce 1 del valor del día;_
+* _Si se gira la perilla hacia la derecha, se suma 1 al valor del día;_
+* _Cuando se presiona la perilla, el día se configura y el reloj entra en modo de "configuración" para configurar la hora;_
+* _Si se gira la perilla hacia la izquierda, se deduce 1 del valor de la hora;_
+* _Si se gira la perilla hacia la derecha, se suma 1 al valor de la hora;_
+* _Cuando se presiona la perilla, la hora se configura y el reloj entra en modo de "configuración" para configurar los minutos;_
+* _Si se gira la perilla hacia la izquierda, se deduce 1 del valor de los minutos;_
+* _Si se gira la perilla hacia la derecha, se suma 1 al valor de los minutos;_
+* _Cuando se presiona la perilla, los minutos se configuran y el reloj pasa al modo de "configuración terminada";_
+* _Si se presiona nuevamente la perilla, se muestran la fecha y hora completas seleccionadas._
 
-From the above steps it is clear that different parts of the date & time get set when the knob is turned or pressed, and that there are transitions between those parts. A naive approach when coding a class to accomplish this would be to have a 'mode' variable and then a series of if...else... statements in each method, which might look like this:
+De los pasos anteriores queda claro que se configuran diferentes partes de la fecha y la hora cuando se gira o presiona la perilla, y que hay transiciones entre esas partes. Un enfoque ingenuo al codificar una clase para lograr esto sería tener una variable 'modo' y luego una serie de declaraciones if...else... en cada método, que podrían verse así:
 
 ```java
-// *** DON'T DO THIS! ***
+// *** ¡NO HAGA ESTO! ***
 public void rotateKnobLeft() {
     if (mode == YEAR_MODE) {
         year--;
@@ -48,15 +48,16 @@ public void rotateKnobLeft() {
 }
 ```
 
-The problem with code such as the above is that the if...else... conditions would have to be repeated in each action method (i.e. rotateKnobRight(), pushKnob(), etc.). Apart from making the code look unwieldy it also becomes hard to maintain, as if for example we now need to record seconds we would need to change multiple parts of the class.
+El problema con código como el anterior es que las condiciones if...else... tendrían que repetirse en cada método de acción (es decir, rotarKnobRight(), pushKnob(), etc.). Además de hacer que el código parezca difícil de manejar, también resulta difícil de mantener, como si, por ejemplo, ahora necesitáramos registrar segundos, tendríamos que cambiar varias partes de la clase.
 
-The State pattern enables a hierarchy to be established that allows for state transitions such as necessitated by our clock setting example. We will create a ClockSetup class that initiates the states through the interface ClockSetupState, which has an implementing class for each individual state:
+El patrón State permite establecer una jerarquía que permite transiciones de estado como las que requiere nuestro ejemplo de configuración del reloj. Crearemos una clase ClockSetup que inicia los estados a través de la interfaz ClockSetupState, que tiene una clase de implementación para cada estado individual:
+
 
 ![Patrón Estado](../images/000033.jpg)
 
 Figura 21.1 : Patrón Estado
 
-The ClockSetupState interface defines methods for handling changes to the state, plus methods that can provide user instructions and return the actual selected value:
+La interfaz ClockSetupState define métodos para manejar cambios en el estado, además de métodos que pueden proporcionar instrucciones al usuario y devolver el valor seleccionado real:
 
 ```java
 public interface ClockSetupState {
@@ -69,7 +70,7 @@ public interface ClockSetupState {
 }
 ```
 
-Looking first at YearSetupState, you will notice that it takes a reference to a ClockSetup object in the constructor (which is known in the language of design patterns as its 'context') and manages the setting of the year. Note in particular in the selectValue() method how it transitions internally to a different state:
+Si observa primero YearSetupState, notará que toma una referencia a un objeto ClockSetup en el constructor (que se conoce en el lenguaje de los patrones de diseño como su 'contexto') y administra la configuración del año. Observe en particular en el método selectValue() cómo pasa internamente a un estado diferente:
 
 ```java
 public class YearSetupState implements ClockSetupState {
@@ -90,12 +91,12 @@ public class YearSetupState implements ClockSetupState {
     }
  
     public void selectValue() {
-        System.out.println("Year set to " + year);
+        System.out.println("Año establecido en " + year);
         clockSetup.setState(clockSetup.getMonthSetupState());
     }
  
     public String getInstructions() {
-        return "Please set the year...";
+        return "Por favor establezca el año...";
     }
  
     public int getSelectedValue() {
@@ -104,7 +105,7 @@ public class YearSetupState implements ClockSetupState {
 }
 ```
 
-The other date & time state classes follow a similar process, each transitioning to the next appropriate state when required:
+Las otras clases de estado de fecha y hora siguen un proceso similar y cada una pasa al siguiente estado apropiado cuando es necesario:
 
 ```java
 public class MonthSetupState implements ClockSetupState {
@@ -129,12 +130,12 @@ public class MonthSetupState implements ClockSetupState {
     }
  
     public void selectValue() {
-        System.out.println("Month set to " + month);
+        System.out.println("Mes establecido en " + month);
         clockSetup.setState(clockSetup.getDaySetupState());
     }
  
     public String getInstructions() {
-        return "Please set the month...";
+        return "Por favor establezca el mes...";
     }
  
     public int getSelectedValue() {
@@ -164,12 +165,12 @@ public class DaySetupState implements ClockSetupState {
     }
  
     public void selectValue() {
-        System.out.println("Day set to " + day);
+        System.out.println("Día establecido en " + day);
         clockSetup.setState(clockSetup.getHourSetupState());
     }
  
     public String getInstructions() {
-        return "Please set the day...";
+        return "Por favor establezca el día...";
     }
  
     public int getSelectedValue() {
@@ -200,12 +201,12 @@ public class HourSetupState implements ClockSetupState {
     }
  
     public void selectValue() {
-        System.out.println("Hour set to " + hour);
+        System.out.println("Hora establecida en " + hour);
         clockSetup.setState(clockSetup.getMinuteSetupState());
     }
 
     public String getInstructions() {
-        return "Please set the hour...";
+        return "Por favor establezca la hora...";
     }
  
     public int getSelectedValue() {
@@ -236,12 +237,12 @@ public class MinuteSetupState implements ClockSetupState {
     }
  
     public void selectValue() {
-        System.out.println("Minute set to " + minute);
+        System.out.println("Minuto establecido en " + minute);
         clockSetup.setState(clockSetup.getFinishedSetupState());
     }
  
     public String getInstructions() {
-        return "Please set the minute...";
+        return "Por favor establezca el minuto...";
     }
  
     public int getSelectedValue() {
@@ -250,7 +251,7 @@ public class MinuteSetupState implements ClockSetupState {
 }
 ```
 
-This just leaves the FinishedSetupState class which doesn't need to transition to a different state:
+Esto simplemente deja la clase FinishedSetupState que no necesita realizar la transición a un estado diferente:
 
 ```java
 public class FinishedSetupState implements ClockSetupState {
@@ -261,34 +262,34 @@ public class FinishedSetupState implements ClockSetupState {
     }
  
     public void previousValue() {
-        System.out.println("Ignored...");
+        System.out.println("Ignorado...");
     }
  
     public void nextValue() {
-        System.out.println("Ignored...");
+        System.out.println("Ignorado...");
 
     }
  
     public void selectValue() {
         Calendar selectedDate = clockSetup.getSelectedDate();
-        System.out.println("Date set to: " + selectedDate.getTime());
+        System.out.println("Fecha fijada en: " + selectedDate.getTime());
     }
  
     public String getInstructions() {
-        return "Press knob to view selected date...";
+        return "Presione la perilla para ver la fecha seleccionada...";
     }
  
     public int getSelectedValue() {
-        throw new UnsupportedOperationException("Clock setup finished");
+        throw new UnsupportedOperationException("Configuración del reloj finalizada");
     }
 }
 ```
 
-As mentioned, the 'context' class is ClockSetup, which holds references to each state and forwards to whichever is the current state:
+Como se mencionó, la clase de 'contexto' es ClockSetup, que contiene referencias a cada estado y reenvía al estado actual:
 
 ```java
 public class ClockSetup {
-    // The various states the setup can be in...
+    // Los distintos estados en los que puede estar la configuración...
     private ClockSetupState yearState;
     private ClockSetupState monthState;
     private ClockSetupState dayState;
@@ -296,7 +297,7 @@ public class ClockSetup {
     private ClockSetupState minuteState;
     private ClockSetupState finishedState;
  
-    // The current state we are in...
+    // El estado actual en el que nos encontramos...
     private ClockSetupState currentState;
   
     public ClockSetup() {
@@ -307,7 +308,7 @@ public class ClockSetup {
         minuteState = new MinuteSetupState(this);
         finishedState = new FinishedSetupState(this);
  
-        // Initial state is to set the year
+        // El estado inicial es establecer el año.
         setState(yearState);
     }
  
@@ -357,52 +358,52 @@ public class ClockSetup {
 }
 ```
 
-We can simulate a user's example actions like this:
+Podemos simular acciones de ejemplo de un usuario como esta:
 
 ```java
 ClockSetup clockSetup = new ClockSetup();
 
-// Setup starts in 'year' state
+// La configuración comienza en estado 'año'
 clockSetup.rotateKnobRight();
-clockSetup.pushKnob(); // 1 year on
+clockSetup.pushKnob(); // 1 año después
 
-// Setup should now be in 'month' state
+// La configuración ahora debería estar en estado "mes"
 clockSetup.rotateKnobRight();
 clockSetup.rotateKnobRight();
-clockSetup.pushKnob(); // 2 months on
+clockSetup.pushKnob(); // 2 meses después
 
-// Setup should now be in 'day' state
+// La configuración ahora debería estar en estado "día"
 clockSetup.rotateKnobRight();
 clockSetup.rotateKnobRight();
 clockSetup.rotateKnobRight();
-clockSetup.pushKnob(); // 3 days on
+clockSetup.pushKnob(); // 3 diás después
 
-// Setup should now be in 'hour' state
+// La configuración ahora debería estar en estado de "hora"
 clockSetup.rotateKnobLeft();
 clockSetup.rotateKnobLeft();
-clockSetup.pushKnob(); // 2 hours back
+clockSetup.pushKnob(); // 2 horas atrás
 
-// Setup should now be in 'minute' state
+// La configuración ahora debería estar en estado "minuto"
 clockSetup.rotateKnobRight();
-clockSetup.pushKnob(); // 1 minute on
+clockSetup.pushKnob(); // 1 minuto después
 
-// Setup should now be in 'finished' state
-clockSetup.pushKnob(); // to display selected date
+// La configuración ahora debería estar en estado "finalizado"
+clockSetup.pushKnob(); // para mostrar la fecha seleccionada
 ```
 
-Running the above should result in the following output relative to your current system date and time, with the above adjustments made.
+La ejecución de lo anterior debería dar como resultado el siguiente resultado relativo a la fecha y hora actual de su sistema, con los ajustes anteriores realizados.
 
 ```text
-Please set the year...
-Year set to 2013
-Please set the month...
-Month set to 10
-Please set the day...
-Day set to 25
-Please set the hour...
-Hour set to 0
-Please set the minute...
-Minute set to 4
-Press knob to view selected date...
-Date set to: Mon Nov 25 04:17:00 GMT 2013
+Por favor establezca el año...
+Año fijado en 2013
+Por favor establezca el mes...
+Mes fijado en 10
+Por favor fija el día...
+Día fijado en 25
+Por favor establezca la hora...
+Hora establecida en 0
+Por favor, establezca el minuto...
+Minuto fijado en 4
+Presione la perilla para ver la fecha seleccionada...
+Fecha establecida en: lun 25 nov 04:17:00 GMT 2013
 ```

@@ -1,14 +1,14 @@
 # 19. Recuerdo (Memento)
 
-Type: Behavioural
+Tipo: Conductual
 
-Purpose: Without violating encapsulation, capture and externalise an object's internal state so that it can be restored to this state later.
+Objetivo: Sin violar la encapsulación, captura y externaliza el estado interno de un objeto para que pueda restaurarse a este estado más adelante.
 
-The Foobar Motor Company's vehicles naturally have a speedometer mounted on the dashboard, which not only records the current speed but also the previous speed. There is now a requirement for the state to be stored externally at periodic intervals (so that it could, for example, be integrated into a tachograph for goods vehicles).
+Naturalmente, los vehículos de la Compañía de Motores Foobar tienen un velocímetro montado en el salpicadero, que no sólo registra la velocidad actual sino también la anterior. Ahora es necesario que el estado se almacene periódicamente en el exterior (para poder integrarlo, por ejemplo, en un tacógrafo para vehículos de mercancías).
 
-However, one of the instance variables in the Speedometer class does not have a getter method, but to adhere to encapsulation and data-hiding principles it is correctly declared to be private. We also want to adhere to the principle that a class should not have multiple responsibilities, so don't want to also have to build in a state save & restore mechanism into the class. So how can we capture the state of the object?
+Sin embargo, una de las variables de instancia en la clase `Speedometer` no tiene un método getter, pero para cumplir con los principios de encapsulación y ocultación de datos, se declara correctamente como privada. También queremos adherirnos al principio de que una clase no debe tener múltiples responsabilidades, por lo que no queremos tener que incorporar un mecanismo de guardar y restaurar estado en la clase. Entonces, ¿cómo podemos capturar el estado del objeto?
 
-This chapter will present two different approaches, each having its advantages and disadvantages. In both cases, we make use of a separate class that performs the state saving and restoration, which we shall call SpeedometerMemento. This class takes a reference to the Speedometer object that needs to be externalised:
+En este capítulo se presentarán dos enfoques diferentes, cada uno con sus ventajas y desventajas. En ambos casos, hacemos uso de una clase separada que realiza el guardado y restauración del estado, a la que llamaremos `SpeedometerMemento`. Esta clase toma una referencia al objeto `Speedometer` que necesita ser externalizado:
 
 ![Patrón Recuerdo](../images/000066.jpg)
 
@@ -16,18 +16,18 @@ Figura 19.1 : Patrón Recuerdo
 
 ## Enfoque 1: utilizar la visibilidad privada del paquete{#h2-10}
 
-When the access modifier is omitted from class members it takes on 'package-private' visibility. This means it is only accessible to other classes in the same package, so is thus slightly more open than private visibility but not as much as protected (subclasses in different packages will be unable to access). Therefore we can place the Speedometer class into a package where we limit what other classes exist there, which in our case will just be SpeedometerMemento.
+Cuando el modificador de acceso se omite en los miembros de la clase, adquiere visibilidad de 'paquete privado'. Esto significa que solo es accesible para otras clases en el mismo paquete, por lo que es un poco más abierto que la visibilidad privada, pero no tanto como `protected` (las subclases en diferentes paquetes no podrán acceder). Por lo tanto, podemos colocar la clase `Speedometer` en un paquete donde limitamos qué otras clases existen allí, que en nuestro caso será simplemente `SpeedometerMemento`.
 
-Here is the very simple Speedometer class:
+Aquí está la clase `Speedometer` muy simple:
 
 ```java
 package mementosubpackage;
 
 public class Speedometer {
-    // Normal private visibility but has accessor method...
+    // Visibilidad privada normal pero tiene método de acceso...
     private int currentSpeed;
  
-    // package-private visibility and no accessor method...
+    // visibilidad privada del paquete y sin método de acceso...
     int previousSpeed;
     public Speedometer() {
         currentSpeed = 0;
@@ -45,7 +45,7 @@ public class Speedometer {
 }
 ```
 
-The SpeedometerMemento class exists in the same package. It saves the state of the passed in Speedometer object in the constructor and defines a method to restore that state:
+La clase `SpeedometerMemento` existe en el mismo paquete. Guarda el estado del objeto `Speedometer` pasado en el constructor y define un método para restaurar ese estado:
 
 ```java
 package mementosubpackage;
@@ -68,54 +68,55 @@ public class SpeedometerMemento {
 }
 ```
 
-Note that the accessor method getCurrentSpeed() was used for the currentSpeed instance variable but the previousSpeed variable had to be accessed directly, which is possible because the memento exists in the same package.
+Tenga en cuenta que el método de acceso `getCurrentSpeed()` se usó para la variable de instancia `currentSpeed` pero se tuvo que acceder directamente a la variable `previousSpeed`, lo cual es posible porque el recuerdo existe en el mismo paquete.
 
-We can test the memento with this code:
+Podemos probar el recuerdo con este código:
 
 ```java
 Speedometer speedo = new Speedometer();
 
 speedo.setCurrentSpeed(50);
 speedo.setCurrentSpeed(100);
-System.out.println("Current speed: " + speedo.getCurrentSpeed());
-System.out.println("Previous speed: " + speedo.previousSpeed);
+System.out.println("Velocidad actual: " + speedo.getCurrentSpeed());
+System.out.println("Velocidad previa: " + speedo.previousSpeed);
 
-// Save the state of 'speedo'...
+// Salva el estado de 'speedo'...
 SpeedometerMemento memento = new SpeedometerMemento(speedo);
 
-// Change the state of 'speedo'...
+// Cambia el estado 'speedo'...
 speedo.setCurrentSpeed(80);
-System.out.println("After setting to 80...");
-System.out.println("Current speed: " + speedo.getCurrentSpeed());
-System.out.println("Previous speed: " + speedo.previousSpeed);
+System.out.println("Después de configurar a 80...");
+System.out.println("Velocidad actual: " + speedo.getCurrentSpeed());
+System.out.println("Velocidad previa:" + speedo.previousSpeed);
 
-// Restore the state of 'speedo'...
-System.out.println("Now restoring state...");
+// Restaura el estado del 'speedo'...
+System.out.println("Ahora restaurando el estado...");
 memento.restoreState();
-System.out.println("Current speed: " + speedo.getCurrentSpeed());
-System.out.println("Previous speed: " + speedo.previousSpeed);
+System.out.println("Velocidad actual: " + speedo.getCurrentSpeed());
+System.out.println("Velocidad previa: " + speedo.previousSpeed);
 ```
 
-Running the above results in the following output:
+Al ejecutar lo anterior se obtiene el siguiente resultado:
 
 ```text
-Current speed: 100
-Previous speed: 50
+Velocidad actual: 100
+Velocidad anterior: 50
 
-After setting to 80...
-Current speed: 80
-Previous speed: 100
+Después de configurar a 80...
+Velocidad actual: 80
+Velocidad anterior: 100
 
-Now restoring state...
-Current speed: 100
-Previous speed: 50
+Ahora restaurando el estado...
+Velocidad actual: 100
+Velocidad anterior: 50
 ```
 
-The main disadvantage of this approach is that you either have to put the pair of classes in their own special package or accept that other classes in the package they are in will have direct access to the instance variables.
+La principal desventaja de este enfoque es que debe colocar el par de clases en su propio paquete especial o aceptar que otras clases en el paquete en el que se encuentran tendrán acceso directo a las variables de instancia.
 
 ## Enfoque 2: serialización de objetos{#h2-11}
 
-This approach allows you to make all the instance variables private, thus regaining full encapsulation. The Speedometer class has been modified for this and now includes a getPreviousSpeed() method, though this is purely to help us test the memento; it's not required by this approach. The class has also been changed to implement the Serializable interface (changes marked in bold):
+Este enfoque le permite hacer que todas las variables de instancia sean privadas, recuperando así la encapsulación completa. La clase `Speedometer` se ha modificado para esto y ahora incluye un método `getPreviousSpeed()`, aunque esto es únicamente para ayudarnos a probar el recuerdo; Este enfoque no lo requiere. La clase también ha sido cambiada para implementar la interfaz `Serializable` (cambios marcados en negrita):
+
 
 ```java
 public class Speedometer implements Serializable {
@@ -136,19 +137,19 @@ public class Speedometer implements Serializable {
         return currentSpeed;
     }
  
-    // Only defined to help testing...
+    // Sólo se define para ayudar en las pruebas...
     public int getPreviousSpeed() {
         return previousSpeed;
     }
 }
 ```
 
-The SpeedometerMemento class now uses object serialisation for the state saving and restoration:
+La clase `SpeedometerMemento` ahora utiliza la serialización de objetos para guardar y restaurar el estado:
 
 ```java
 public class SpeedometerMemento {
     public SpeedometerMemento(Speedometer speedometer) throws IOException {
-        // Serialize...
+        // Guardamos...
         File speedometerFile = new File("speedometer.ser");
         oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(speedometerFile)));
         oos.writeObject(speedometer);
@@ -156,7 +157,7 @@ public class SpeedometerMemento {
     }
  
     public Speedometer restoreState() throws IOException, ClassNotFoundException {
-        // Deserialize...
+        // Obtenemos...
         File speedometerFile = new File("speedometer.ser");
         ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(speedometerFile)));
         Speedometer speedo = (Speedometer) ois.readObject();
@@ -166,30 +167,30 @@ public class SpeedometerMemento {
 }
 ```
 
-We can check that this achieves the same as the first approach, the only difference being that the restoreState() method now returns the restored object reference:
+Podemos verificar que esto logra lo mismo que el primer enfoque, la única diferencia es que el método `restoreState()` ahora devuelve la referencia del objeto restaurado:
 
 ```java
 Speedometer speedo = new Speedometer();
 
 speedo.setCurrentSpeed(50);
 speedo.setCurrentSpeed(100);
-System.out.println("Current speed: " + speedo.getCurrentSpeed());
-System.out.println("Previous speed: " + speedo.previousSpeed);
+System.out.println("Velocidad actual: " + speedo.getCurrentSpeed());
+System.out.println("Velocidad anterior: " + speedo.previousSpeed);
 
-// Save the state of 'speedo'...
+// Salva el estado 'speedo'...
 SpeedometerMemento memento = new SpeedometerMemento(speedo);
 
-// Change the state of 'speedo'...
+// Cambia el estado de 'speedo'...
 speedo.setCurrentSpeed(80);
-System.out.println("After setting to 80...");
-System.out.println("Current speed: " + speedo.getCurrentSpeed());
-System.out.println("Previous speed: " + speedo.previousSpeed);
+System.out.println("Después de configurar a 80...");
+System.out.println("Velocidad actual: " + speedo.getCurrentSpeed());
+System.out.println("Velocidad anterior: " + speedo.previousSpeed);
 
-// Restore the state of 'speedo'...
-System.out.println("Now restoring state...");
+// Restaura el estado de 'speedo'...
+System.out.println("Ahora restaurando el estado...");
 speedo = memento.restoreState();
-System.out.println("Current speed: " + speedo.getCurrentSpeed());
-System.out.println("Previous speed: " + speedo.previousSpeed);
+System.out.println("Velocidad actual: " + speedo.getCurrentSpeed());
+System.out.println("Velocidad anterior: " + speedo.previousSpeed);
 ```
 
-Running the above should result in the same output as shown for the first approach. The main disadvantage of this approach is that writing to and reading from a disk file is much slower. Note also that while we have been able to make all fields private again, it might still be possible for someone who gained access to the serialized file to use a hex editor to read or change the data.
+La ejecución de lo anterior debería dar como resultado el mismo resultado que se muestra para el primer enfoque. La principal desventaja de este enfoque es que escribir y leer desde un archivo de disco es mucho más lento. Tenga en cuenta también que, si bien hemos podido volver a hacer que todos los campos sean `private`, aún es posible que alguien que haya obtenido acceso al archivo serializado utilice un editor hexadecimal para leer o cambiar los datos.

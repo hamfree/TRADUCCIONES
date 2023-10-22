@@ -1,18 +1,18 @@
 # 23. Método de plantilla (Template Method)
 
-Type: Behavioural
+Tipo: conductual
 
-Purpose: Define the skeleton of an algorithm in a method, deferring some steps to subclasses. Template Method lets subclasses redefine certain steps of an algorithm without changing the algorithm's structure.
+Objetivo: Define el esqueleto de un algoritmo en un método, difiriendo algunos pasos a subclases. El método de plantilla permite a las subclases redefinir ciertos pasos de un algoritmo sin cambiar la estructura del algoritmo.
 
-Each vehicle made by the Foobar Motor Company needs a small number of printed booklets to be produced and provided to the buyer, such as an Owner's Manual and a Service History booklet. The way booklets are produced always follows the same set of steps, but each different type of booklet might need to do each of the individual steps in a slightly different way.
+Cada vehículo fabricado por la Compañía de Motores Foobar necesita que se produzca una pequeña cantidad de folletos impresos y se los entregue al comprador, como un manual del propietario y un folleto del historial de servicio. La forma en que se producen los folletos siempre sigue el mismo conjunto de pasos, pero es posible que cada tipo diferente de folleto deba realizar cada uno de los pasos individuales de una manera ligeramente diferente.
 
-The Template Method pattern enables the definition of one or more abstract methods that are called through a 'template method'. The simple hierarchy is as follows:
+El patrón Método de plantilla permite la definición de uno o más métodos abstractos que se llaman a través de un 'método de plantilla'. La jerarquía simple es la siguiente:
 
 ![Patrón Método de Plantilla](../images/000001.jpg)
 
 Figura 23.1 : Patrón Método de Plantilla
 
-The AbstractBookletPrinter class defines several protected abstract methods and one public final 'template method' that makes use of the abstract methods (the method is made final to prevent it from being overridden):
+La clase AbstractBookletPrinter define varios métodos abstractos protegidos y un 'método de plantilla' final público que hace uso de los métodos abstractos (el método se vuelve final para evitar que se pueda sobreescribir):
 
 ```java
 public abstract class AbstractBookletPrinter {
@@ -22,7 +22,8 @@ public abstract class AbstractBookletPrinter {
     protected abstract void printPage(int pageNumber);
     protected abstract void printIndex();
     protected abstract void printBackCover();
-    // This is the 'template method'
+    
+    // Este es el 'método plantilla'
     public final void print() {
         printFrontCover();
         printTableOfContents();
@@ -35,7 +36,7 @@ public abstract class AbstractBookletPrinter {
 }
 ```
 
-Each concrete subclass now only needs to provide the implementing code for each abstract method, for example the SaloonBooklet class below:
+Cada subclase concreta ahora solo necesita proporcionar el código de implementación para cada método abstracto, por ejemplo, la siguiente clase SaloonBooklet:
 
 ```java
 public class SaloonBooklet extends AbstractBookletPrinter {
@@ -44,28 +45,28 @@ public class SaloonBooklet extends AbstractBookletPrinter {
     }
  
     protected void printFrontCover() {
-        System.out.println("Printing front cover for Saloon car booklet");
+        System.out.println("Impresión de portada para folleto de berlina");
     }
  
     protected void printTableOfContents() {
-        System.out.println("Printing table of contents for Saloon car booklet");
+        System.out.println("Impresión del índice del folleto de la berlina");
     }
  
     protected void printPage(int pageNumber) {
-        System.out.println("Printing page " + pageNumber + " for Saloon car booklet");
+        System.out.println("Página de impresión" + pageNumber + "para el libro de berlina");
     }
  
     protected void printIndex() {
-        System.out.println("Printing index for Saloon car booklet");
+        System.out.println("Impresión del Índice del folleto de berlinas");
     }
  
     protected void printBackCover() {
-        System.out.println("Printing back cover for Saloon car booklet");
+        System.out.println("Impresión de contraportada para folleto de berlina");
     }
 }
 ```
 
-The ServiceHistoryBooklet is very similar:
+El ServiceHistoryBooklet es muy similar:
 
 ```java
 public class ServiceHistoryBooklet extends AbstractBookletPrinter {
@@ -74,39 +75,39 @@ public class ServiceHistoryBooklet extends AbstractBookletPrinter {
     }
  
     protected void printFrontCover() {
-        System.out.println("Printing front cover for service history booklet");
+        System.out.println("Impresión de portada para folleto de historial de servicio");
     }
  
     protected void printTableOfContents() {
-        System.out.println("Printing table of contents for service history booklet");
+        System.out.println("Impresión del índice del folleto del historial de servicio");
     }
  
     protected void printPage(int pageNumber) {
-        System.out.println("Printing page " + pageNumber + " for service history booklet");
+        System.out.println("Impresión de la página " + pageNumber + " para el folleto del historial de servicio");
     }
  
     protected void printIndex() {
-        System.out.println("Printing index for service history booklet");
+        System.out.println("Impresión del Índice para el folleto de historial de servicio.");
     }
  
     protected void printBackCover() {
-        System.out.println("Printing back cover for service history booklet");
+        System.out.println("Impresión de contraportada para folleto de historial de servicio");
     }
 }
 ```
 
-While it is not essential from the point of view of the pattern for the abstract methods to be protected, it is often the case that this is the most appropriate access level to assign since they are only intended for over-riding and not for direct invocation by client objects.
+Si bien no es esencial desde el punto de vista del patrón que los métodos abstractos estén protegidos, a menudo ocurre que este es el nivel de acceso más apropiado para asignar, ya que solo están pensados para sobreescribirlos y no para invocarlos directamente. por objetos de cliente.
 
-Also note that it's perfectly acceptable for some of the methods called from the 'template method' to not be abstract but have a default implementation provided. But when at least one abstract method is being called, it qualifies as the Template Method pattern.
+También tenga en cuenta que es perfectamente aceptable que algunos de los métodos llamados desde el 'método de plantilla' no sean abstractos sino que tengan una implementación predeterminada proporcionada. Pero cuando se llama al menos a un método abstracto, se califica como patrón de método de plantilla.
 
-Client programs merely need to instantiate the required concrete class and invoke the print() method:
+Los programas cliente simplemente necesitan crear una instancia de la clase concreta requerida e invocar el método print():
 
 ```java
-System.out.println("About to print a booklet for Saloon cars");
+System.out.println("A punto de imprimir un folleto para turismos");
 AbstractBookletPrinter saloonBooklet = new SaloonBooklet();
 saloonBooklet.print();
 
-System.out.println("About to print a service history booklet");
+System.out.println("A punto de imprimir un folleto de historial de servicio");
 AbstractBookletPrinter serviceBooklet = new ServiceHistoryBooklet();
 serviceBooklet.print();
 ```

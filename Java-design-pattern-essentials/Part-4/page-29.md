@@ -1,42 +1,44 @@
 # 18. Mediador (Mediator)
 
-Type: Behavioural
+Tipo: Conductual
 
-Purpose: Define an object that encapsulates how a set of objects interact. Mediator promotes loose coupling by keeping objects from referring to each other explicitly, and it lets you vary their interaction independently.
+Objetivo: Define un objeto que encapsula cómo interactúa un conjunto de objetos. Mediator promueve un acoplamiento flexible al evitar que los objetos se refieran entre sí explícitamente y le permite variar su interacción de forma independiente.
 
-The Foobar Motor Company is looking to the future when vehicles can drive themselves. This, of course, would entail the various components (ignition, gearbox, accelerator and brakes, etc.) being controlled together and interacting in various ways. For example:
+La Compañía de Motores Foobar está mirando al futuro cuando los vehículos puedan conducirse solos. Esto, por supuesto, esto implicaría que los 
+diversos componentes (encendido, caja de cambios, acelerador y frenos, etc.) se controlaran juntos e interactuaran de varias formas. Por ejemplo:
 
-* _Until the ignition is switched on, the gearbox, accelerator and brakes do not operate (we will assume the parking brake is in effect);_
-* _When accelerating, the brakes should be disabled;_
-* _When braking the accelerator should be disabled;_
-* _The appropriate gear should be engaged dependent upon the speed of the vehicle._
+* _Hasta que no se pone el contacto, la caja de cambios, el acelerador y los frenos no funcionan (asumiremos que el freno de mano está puesto)_
+* _Al acelerar se deben desactivar los frenos_
+* _Al frenar se debe desactivar el acelerador_
+* _Se debe engranar la marcha adecuada dependiendo de la velocidad del vehículo_
 
-And all this should happen automatically so the driver can just enjoy the view! (we will assume the vehicle can sense it's position so as to avoid crashes, etc.).
+¡Y todo esto debería ocurrir automáticamente para que el conductor puede simplemente disfrutar de la vista! (asumiremos que el vehículo puede detectar su posición de forma que evite choques, etc.)
 
-We will naturally create Java classes to model the individual components, so there will be an Ignition class, a Gearbox class, an Accelerator class and a Brake class. But we can also see that there are some complex interactions between them, and yet one of our core object-oriented design principles is to keep classes loosely-coupled.
+Crearemos naturalmente las clases Java para modelar los componentes individuales, así que habrá una clase `Ignition` (Encendido), una clase `Gearbox` (Caja de cambios), una clase `Accelerator` (Acelerador) y una clase `Brake` (Freno). Pero también podemos ver que hay unas interacciones complejas entre ellos, y, sin embargo, uno de nuestros principios básicos del diseño orientado a objetos es mantener las clases debilmente acopladas.
 
-The Mediator pattern helps to solve this through the definition of a separate class (the mediator) that knows about the individual component classes and takes responsibility for managing their interaction. The component classes also each know about the mediator class, but this is the only coupling they have. For our example, we will call the mediator class EngineManagementSystem.
+El patrón _Mediator_ ayuda a resolver esto a través de la definción de una clase separada (el mediador) que conoce las clases componente individuales y asume la responsabilidad de gestionar su interacción. Cada una de las clases componentes también conoce la clase mediador, pero este es el único acoplamiento que tienen. Para nuestro ejemplo, llamaremos a la clase mediadora `EngineManagementSystem` (Sistema de Gestión del Motor).
 
-We can see the connections diagrammatically below:
+
+Podemos ver las conexiones esquemáticamente a continuación:
 
 ![Patrón Mediador](../images/000012.jpg)
 
 Figura 18.1 : Patrón Mediador
 
-The two-way communication is achieved via each of the component classes' constructors, in that they each accept a reference to the mediator object (so they can send messages to it) and register themselves with the mediator (so they can receive messages from it). But each component class has no knowledge of any other component class; they only know about the mediator.
+La comunicación bidreccional se consigue a través de cada uno de los constructores de las clases componente, en el sentido de que cada uno acepta una referencia al objeto mediador (poara poeder enviarle mensajes) y se registra con el mediador (para que puedan recibir mensajes de él). Pero cada clase componente no tiene conocimiento de ninguna otra clase de componente; solo conocen al mediador.
 
-We can see this by looking at the Ignition class:
+Podemos ver esto mirando la clase `Ignition`:
 
 ```java
 public class Ignition {
     private EngineManagementSystem mediator;
     private boolean on;
 
-    // Constructor accepts mediator as an argument
+    // El constructor acepta al mediador como un argumento
     public Ignition(EngineManagementSystem mediator) {
         this.mediator = mediator;
         on = false;
-        // Register back with the mediator...
+        // Se registra de vuelta con el mediador...
         mediator.registerIgnition(this);
     }
 
@@ -58,9 +60,9 @@ public class Ignition {
 }
 ```
 
-Note how the constructor establishes the two-way communication, and then how methods that perform events notify the mediator of those events.
+Observe como el constructor establece la comunicación bidireccional, y después, cómo los métodos que realizan los eventos notifican al mediador esos eventos.
 
-The Gearbox class applies the same principles:
+La clase `Gearbox` aplica los mismos principios:
 
 ```java
 public class Gearbox {
@@ -80,13 +82,13 @@ public class Gearbox {
     public void enable() {
         enabled = true;
         mediator.gearboxEnabled();
-        System.out.println("Gearbox enabled");
+        System.out.println("Caja de cambios habilitada");
     }
 
     public void disable() {
         enabled = false;
         mediator.gearboxDisabled();
-        System.out.println("Gearbox disabled");
+        System.out.println("Caja de cambios desactivada");
     }
 
     public boolean isEnabled() {
@@ -97,7 +99,7 @@ public class Gearbox {
         if ((isEnabled()) && (getGear() != g)) {
             currentGear = g;
             mediator.gearChanged();
-            System.out.println("Now in " + getGear() + " gear");
+            System.out.println("Ahora en la marcha " + getGear());
         }
     }
 
@@ -107,7 +109,7 @@ public class Gearbox {
 }
 ```
 
-The Accelerator and Brake classes follow a similar process:
+Las clases `Accelerator` y `Brake` siguen un proceso similar:
 
 ```java
 public class Accelerator {
@@ -125,13 +127,13 @@ public class Accelerator {
     public void enable() {
         enabled = true;
         mediator.acceleratorEnabled();
-        System.out.println("Accelerator enabled");
+        System.out.println("Acelerador habilitado");
     }
 
     public void disable() {
         enabled = false;
         mediator.acceleratorDisabled();
-        System.out.println("Accelerator disabled");
+        System.out.println("Acelerador desactivado");
     }
 
     public boolean isEnabled() {
@@ -142,7 +144,7 @@ public class Accelerator {
         if (isEnabled()) {
             this.speed = speed;
             mediator.acceleratorPressed();
-            System.out.println("Speed now " + getSpeed());
+            System.out.println("La velocidad ahora es de  " + getSpeed());
         }
     }
 
@@ -166,13 +168,13 @@ public class Brake {
     public void enable() {
         enabled = true;
         mediator.brakeEnabled();
-        System.out.println("Brakes enabled");
+        System.out.println("Frenos habilitados");
     }
 
     public void disable() {
         enabled = false;
         mediator.brakeDisabled();
-        System.out.println("Brakes disabled");
+        System.out.println("Frenos desactivados");
     }
 
     public boolean isEnabled() {
@@ -183,7 +185,7 @@ public class Brake {
         if (isEnabled()) {
             applied = true;
             mediator.brakePressed();
-            System.out.println("Now braking");
+            System.out.println("Ahora frenando");
         }
     }
 
@@ -195,7 +197,7 @@ public class Brake {
 }
 ```
 
-So we now need the EngineManagementSystem class to serve as the mediator. This will hold a reference to each of the component classes with methods enabling their registration with the mediator. It also has methods to handle the interaction between the various components when particular events occur:
+Entonces ahora necesitamos que la clase `EngineManagementSystem` sirva como el mediador. Este mantendrá una referencia a cada una de las clases componente con método que habilitan sus registros con el mediador. También tiene métodos para manejar la interacción entre los diversos componentes cuando ocurren eventos particulares:
 
 ```java
 public class EngineManagementSystem {
@@ -211,7 +213,7 @@ public class EngineManagementSystem {
     }
 
 
-    // Methods that enable registration with this mediator...
+    // Métodos que habilitan el registro con este mediador...
     public void registerIgnition(Ignition ignition) {
         this.ignition = ignition;
     }
@@ -228,7 +230,7 @@ public class EngineManagementSystem {
         this.brake = brake;
     }
 
-    // Methods that handle object interactions...
+    // Métodos que manejan las interacciones entre objetos...
     public void ignitionTurnedOn() {
         gearbox.enable();
         accelerator.enable();
@@ -242,31 +244,31 @@ public class EngineManagementSystem {
     }
 
     public void gearboxEnabled() {
-        System.out.println("EMS now controlling the gearbox");
+        System.out.println("EMS ahora controla la caja de cambios");
     }
 
     public void gearboxDisabled() {
-        System.out.println("EMS no longer controlling the gearbox");
+        System.out.println("El EMS ya no controla la caja de cambios");
     }
 
     public void gearChanged() {
-        System.out.println("EMS disengaging revs while gear changing");
+        System.out.println("EMS desactiva revoluciones al cambiar de marcha");
     }
 
     public void acceleratorEnabled() {
-        System.out.println("EMS now controlling the accelerator");
+        System.out.println("EMS ahora controla el acelerador");
     }
 
     public void acceleratorDisabled() {
-        System.out.println("EMS no longer controlling the accelerator");
+        System.out.println("EMS ya no controla el acelerador");
     }
     public void acceleratorPressed() {
         brake.disable();
         while (currentSpeed < accelerator.getSpeed()) {
             currentSpeed ++;
-            System.out.println("Speed currently " + currentSpeed);
+            System.out.println("Velocidad actual " + currentSpeed);
 
-            // Set gear according to speed...
+            // Ajusta la marcha según la velocidad...
             if (currentSpeed <= 10) {
                 gearbox.setGear(Gearbox.Gear.FIRST);
             } else if (currentSpeed <= 20) {
@@ -283,11 +285,11 @@ public class EngineManagementSystem {
     }
 
     public void brakeEnabled() {
-        System.out.println("EMS now controlling the brakes");
+        System.out.println("EMS ahora controla los frenos");
     }
 
     public void brakeDisabled() {
-        System.out.println("EMS no longer controlling the brakes");
+        System.out.println("El EMS ya no controla los frenos.");
     }
 
     public void brakePressed() {
@@ -304,6 +306,6 @@ public class EngineManagementSystem {
 
 ## Usos comunes{#h2-9}
 
-A common use of the Mediator pattern is to manage the interaction of graphical components on a dialog. This frequently involves controlling when buttons, text fields, etc. should be enabled or disabled, or for passing data between components.
+Un uso común del patrón _Mediator_ es gestionar la interacción de los componentes gráficos en un diálogo. Esto envuelve frecuentemente controlar cuando se deben habilitar o desactivar los botones, campos de texto, etc., o para pasar datos entre los componentes.
 
-Note that it may be possible to reduce the coupling further by using the Observer pattern in place of Mediator. This would mean that the component classes (i.e. Ignition, etc.) would not need to hold a reference to a mediator but would instead fire events. The EngineManagementSystem class would then be an observer of the component classes and would still be able to invoke messages on them.
+Tenga en cuenta que es posible reducir aún más el acoplamiento usando el patrón _Observer_ en lugar de _Mediator_. Esto significaría que las clases componentes (por ejemplo `Ignition`, etc.) no necesitarían mantener una referencia al mediador sino que activarían eventos. La clase `EngineManagementSystem` sería entonces un observador de las clases de componentes y aún podría invocar mensajes sobre ellas.

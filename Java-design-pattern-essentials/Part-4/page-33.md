@@ -1,18 +1,18 @@
 # 22. Estrategia (Strategy)
 
-Type: Behavioural
+Tipo: conductual
 
-Purpose: Define a family of algorithms, encapsulate each one, and make them interchangeable. Strategy lets the algorithm vary independently from clients that use it.
+Objetivo: Define una familia de algoritmos, encapsula cada uno y los hace intercambiables. La estrategia permite que el algoritmo varíe independientemente de los clientes que lo utilicen.
 
-The Foobar Motor Company wishes to implement a new type of automatic gearbox for their cars that will be able to be switched between its standard mode and a special 'sport' mode. The different modes will base the decision of which gear should be selected depending upon the speed of travel, size of the engine and whether it is turbocharged. And it's quite possible they will want other modes in the future, such as for off-road driving.
+La Compañía de Motores Foobar desea implementar un nuevo tipo de caja de cambios automática para sus coches que podrá cambiarse entre su modo estándar y un modo especial "deportivo". Los diferentes modos basarán la decisión de qué marcha se debe seleccionar dependiendo de la velocidad de desplazamiento, el tamaño del motor y si está turboalimentado. Y es muy posible que quieran otros modos en el futuro, como la conducción todoterreno.
 
-Just as with the discussion in the chapter for the State pattern, it would be inflexible to use a series of if...else... statements to control the different gearbox modes directly inside our vehicle classes. Instead, we shall encapsulate the concept that varies and define a separate hierarchy so that each different gearbox mode is a separate class, each in effect being a different 'strategy' that gets applied. This approach allows the actual strategy being used to be isolated from the vehicle. In our example, we shall only apply this to the cars:
+Al igual que con la discusión en el capítulo sobre el patrón State, sería inflexible usar una serie de declaraciones if...else... para controlar los diferentes modos de caja de cambios directamente dentro de nuestras clases de vehículos. En su lugar, resumiremos el concepto que varía y definiremos una jerarquía separada para que cada modo de caja de cambios diferente sea una clase separada, siendo cada uno de ellos una "estrategia" diferente que se aplica. Este enfoque permite aislar la estrategia real que se está utilizando del vehículo. En nuestro ejemplo, sólo aplicaremos esto a los coches:
 
 ![Patrón Estrategia](../images/000055.jpg)
 
 Figure 22.1 : Patrón Estrategia
 
-The GearboxStrategy interface defines the method to control the gear:
+La interfaz GearboxStrategy define el método para controlar el engranaje:
 
 ```java
 public interface GearboxStrategy {
@@ -20,7 +20,7 @@ public interface GearboxStrategy {
 }
 ```
 
-There are two implementing classes; StandardGearboxStrategy and SportGearboxStrategy:
+Hay dos clases de implementación; StandardGearboxStrategy y SportGearboxStrategy:
 
 ```java
 public class StandardGearboxStrategy implements GearboxStrategy {
@@ -28,10 +28,10 @@ public class StandardGearboxStrategy implements GearboxStrategy {
         int engineSize = engine.getSize();
         boolean turbo = engine.isTurbo();
  
-        //  Some complicated code to determine correct gear
-        //  setting based on engineSize, turbo & speed, etc.
-        //  ... omitted ...
-         System.out.println("Working out correct gear at " + speed + "mph for a STANDARD gearbox");
+        // Algún código complicado para determinar la marcha correcta
+        // configuración basada en el tamaño del motor, turbo y velocidad, etc.
+        //... omitido...
+         System.out.println("Calcula la marcha correcta a " + speed + " mph para una caja de cambios ESTÁNDAR");
     }
 }
 
@@ -41,15 +41,15 @@ public class SportGearboxStrategy implements GearboxStrategy {
         int engineSize = engine.getSize();
         boolean turbo = engine.isTurbo();
  
-        //  Some complicated code to determine correct gear
-        //  setting based on engineSize, turbo & speed, etc.
-        //  ... omitted ...
-        System.out.println("Working out correct gear at " + speed + "mph for a SPORT gearbox");
+        // Algún código complicado para determinar la marcha correcta
+        // configuración basada en el tamaño del motor, turbo y velocidad, etc.
+        //... omitido...
+        System.out.println("Calcula la marcha correcta a " + speed + " mph para una caja de cambios DEPORTIVA");
     }
 }
 ```
 
-Our AbstractCar class is defined to hold a reference to the interface type (i.e. GearboxStrategy) and provide accessor methods so different strategies can be switched. There is also a setSpeed() method that delegates to whatever strategy is in effect. The pertinent code is marked in bold:
+Nuestra clase AbstractCar está definida para contener una referencia al tipo de interfaz (es decir, GearboxStrategy) y proporcionar métodos de acceso para que se puedan cambiar diferentes estrategias. También hay un método setSpeed() que delega cualquier estrategia que esté vigente. El código correspondiente está marcado en negrita:
 
 ```java
 public abstract class AbstractCar extends AbstractVehicle {
@@ -62,11 +62,11 @@ public abstract class AbstractCar extends AbstractVehicle {
     public AbstractCar(Engine engine) {
         super(engine);
  
-        //  Starts in standard gearbox mode (more economical)
+        //  Arranca en modo caja de cambios estándar (más económico)
         gearboxStrategy = new StandardGearboxStrategy();
     }
  
-    // Allow the gearbox strategy to be changed...
+    // Permite cambiar la estrategia de la caja de cambios...
     public void setGearboxStrategy(GearboxStrategy gs) {
         gearboxStrategy = gs;
     }
@@ -76,31 +76,31 @@ public abstract class AbstractCar extends AbstractVehicle {
     }
  
     public void setSpeed(int speed) {
-        // Delegate to strategy in effect...
+        // Delegar a la estrategia vigente...
         gearboxStrategy.ensureCorrectGear(getEngine(), speed);
     }
 }
 ```
 
-Client programs just set the required strategy:
+Los programas cliente simplemente establecen la estrategia requerida:
 
 ```java
 AbstractCar myCar = new Sport(new StandardEngine(2000));
 myCar.setSpeed(20);
 myCar.setSpeed(40);
 
-System.out.println("Switching on sports mode gearbox...");
+System.out.println("Activando la caja de cambios en modo deportivo...");
 myCar.setGearboxStrategy(new SportGearboxStrategy());
 myCar.setSpeed(20);
 myCar.setSpeed(40);
 ```
 
-This should result in the following output:
+Esto debería dar como resultado la siguiente salida:
 
 ```text
-Working out correct gear at 20mph for a STANDARD gearbox
-Working out correct gear at 40mph for a STANDARD gearbox
-Switching on sports mode gearbox...
-Working out correct gear at 20mph for a SPORT gearbox
-Working out correct gear at 40mph for a SPORT gearbox
+Calcula la marcha correcta a 20 mph para una caja de cambios ESTÁNDAR
+Calcula la marcha correcta a 40 mph para una caja de cambios ESTÁNDAR
+Activando la caja de cambios en modo deportivo...
+Calcula la marcha correcta a 20 mph para una caja de cambios DEPORTIVA
+Calcula la marcha correcta a 40 mph para una caja de cambios DEPORTIVA
 ```
