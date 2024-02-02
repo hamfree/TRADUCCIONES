@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Solución de Problemas (Los Tutoriales de Java&trade; &gt; La IPA de Reflexión &gt; Clases)
+        </title>
+        <meta name="description" content="Este tutorial de reflexión de Java describe el uso de la reflexión para acceder y 
+              manipular clases, campos, métodos y constructores" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java reflection" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Clases</a></div>
+                <div class="linkAHEAD"><a href="classNew.html">Recuperando Objetos de la Clase</a></div>
+                <div class="linkAHEAD"><a href="classModifiers.html">Examinando Modificadores de Clases y Tipos</a></div>
+                <div class="linkAHEAD"><a href="classMembers.html">Descubriendo Miembros de Clases</a></div>
+                <div class="nolinkAHEAD">Solución de Problemas</div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> La IPA de Reflexión<br />
+                <b>Lección:</b> Clases
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">La IPA de Reflexión</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Clases</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="classMembers.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../member/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Solución de Problemas</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Los ejemplos siguientes muestran los errores típicos que se pueden encontrar al realizar la introspección en 
+                    las clases.
+                </p>
+                <h2>
+                    Advertencia del Compilador: &quot;Nota: ... utiliza operaciones no verificadas o inseguras&quot;
+                </h2>
+                <p>
+                    Cuando se invoca un método, los tipos de los valores de argumento son comprobados y posiblemente convertidos.
+                    <a class="SourceLink" target="_blank" href="example/ClassWarning.java" 
+                       onclick="showCode('../../displayCode.html', 'example/ClassWarning.java'); return false;">
+                        <code>ClassWarning</code></a> invoca 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getMethod-java.lang.String-java.lang.Class...-">
+                        <code>getMethod()</code></a> para causar una típica advertencia de conversión no comprobada:
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+import java.lang.reflect.Method;
+
+public class ClassWarning {
+    void m() {
+	try {
+	    Class c = ClassWarning.class;
+	    Method m = c.getMethod(&quot;m&quot;);  // warning
+
+        // production code should handle this exception more gracefully
+	} catch (NoSuchMethodException x) {
+    	    x.printStackTrace();
+    	}
+    }
+}
+                    </pre>
+                </div>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>javac ClassWarning.java</em>
+Note: ClassWarning.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+&#36; <em>javac -Xlint:unchecked ClassWarning.java</em>
+ClassWarning.java:6: warning: [unchecked] unchecked call to getMethod
+  (String,Class&lt;?&gt;...) as a member of the raw type Class
+Method m = c.getMethod("m");  // warning
+                      ^
+1 warning
+                    </pre>
+                </div>
+                <p>
+                    Muchos métodos de librería se han actualizado con declaraciones genéricas, incluidas varias en 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html"><code>Class</code></a>. Dado que 
+                    <code>c</code> se declara como un tipo <em>raw</em> (no tiene parámetros de tipo) y el parámetro 
+                    correspondiente  de
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getMethod-java.lang.String-java.lang.Class...-">
+                        <code>getMethod()</code></a> es un tipo parametrizado, ocurre una conversión no comprobada. Se requiere que 
+                    el compilador genere una advertencia. (Vea 
+                    <a href="https://docs.oracle.com/javase/specs/jls/se7/html/index.html">
+                        <em>La Especificación del Lenguaje Java, Java SE 7 Edición</em></a>, secciones 
+                    <a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.9">
+                        Conversión no Comprobada</a> y <a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.3">
+                        Conversión de Invocación de Método</a>).
+                </p>
+                <p>
+                    Hay dos posibles soluciones. La más preferible es modificar la declaración de <code>c</code> para incluir un 
+                    tipo genérico apropiado. En este caso, la declaración debe ser:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Class&lt;?&gt; c = warn.getClass();
+                    </pre>
+                </div>
+                <p>
+                    Alternativamente, la advertencia podría ser explícitamente suprimida usando la anotación predefinida 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/SuppressWarnings.html">
+                        <code>@SuppressWarnings</code></a> precediendo al enunciado problemático.
+                </p>
+                <div class="codeblock">
+                    <pre>
+Class c = ClassWarning.class;
+@SuppressWarnings("unchecked")
+Method m = c.getMethod("m");  
+// warning gone
+                    </pre>
+                </div>
+                <div class="note">
+                    <hr />
+                    <strong>Consejo:</strong>&nbsp;Como un principio general, las advertencias no deberían ser ignoradas ya que 
+                    pueden indicar la presencia de un error. Las declaraciones parametrizadas deben usarse según corresponda. Si 
+                    eso no es posible (quizás porque una aplicación debe interactuar con el código del proveedor de una biblioteca), 
+                    anote la línea ofensiva usando 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/SuppressWarnings.html">
+                        <code>@SuppressWarnings</code></a>.
+                    <hr />
+                </div>
+                <h2>
+                    InstantiationException cuando el Constructor No es Accesible
+                </h2>
+                <p>
+                    El método 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#newInstance--">
+                        <code>Class.newInstance()</code></a> lanzará una 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/InstantiationException.html">
+                        <code>InstantiationException</code></a> si se intenta crear una nueva instancia de la clase y el 
+                        constructor de argumento cero no es visible. El ejemplo 
+                    <a class="SourceLink" target="_blank" href="example/ClassTrouble.java"
+                       onclick="showCode('../../displayCode.html', 'example/ClassTrouble.java'); return false;">
+                        <code>ClassTrouble</code></a> ilustra el seguimiento de la pila resultante.
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+class Cls {
+    private Cls() {}
+}
+
+public class ClassTrouble {
+    public static void main(String... args) {
+	try {
+	    Class&lt;?&gt; c = Class.forName(&quot;Cls&quot;);
+	    c.newInstance();  // InstantiationException
+
+        // production code should handle these exceptions more gracefully
+	} catch (InstantiationException x) {
+	    x.printStackTrace();
+	} catch (IllegalAccessException x) {
+	    x.printStackTrace();
+	} catch (ClassNotFoundException x) {
+	    x.printStackTrace();
+	}
+    }
+}
+                    </pre>
+                </div>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java ClassTrouble</em>
+java.lang.IllegalAccessException: Class ClassTrouble can not access a member of
+  class Cls with modifiers "private"
+        at sun.reflect.Reflection.ensureMemberAccess(Reflection.java:65)
+        at java.lang.Class.newInstance0(Class.java:349)
+        at java.lang.Class.newInstance(Class.java:308)
+        at ClassTrouble.main(ClassTrouble.java:9)
+                    </pre>
+                </div>
+                <p>
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#newInstance--">
+                        <code>Class.newInstance()</code></a> se comporta de forma muy parecida a la palabra clave <code>new</code> 
+                        y fallará por las mismas razones que <code>new</code> fallaría. La solución típica en reflexion es 
+                        aprovechar la clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/AccessibleObject.html">
+                        <code>java.lang.reflect.AccessibleObject</code></a> que proporciona la habilidad de suprimir las 
+                        comprobaciones de control de acceso; sin embargo, este enfoque no funcionará porque 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html"><code>java.lang.Class</code></a> no 
+                       extiende
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/AccessibleObject.html">
+                        <code>AccessibleObject</code></a>. La única solución es modificar el código para usar 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Constructor.html#newInstance-java.lang.Object...-">
+                        <code>Constructor.newInstance()</code></a> que extiende a 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/AccessibleObject.html">
+                        <code>AccessibleObject</code></a>.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Consejo:</strong>&nbsp;En general , es preferible usar 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Constructor.html#newInstance-java.lang.Object...-">
+                        <code>Constructor.newInstance()</code></a> por las razones descritas en la sección 
+                    <a href="../member/ctorInstance.html">Creando Nuevas Instancias de Clase</a> en la lección 
+                    <a href="../member/index.html">Miembros</a>.
+                    <hr />
+                </div>
+                <p>
+                    Ejemplos adicionales de problemas potenciales usando 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Constructor.html#newInstance-java.lang.Object...-">
+                        <code>Constructor.newInstance()</code></a> se pueden encontrar en la sección 
+                    <a href="../member/ctorTrouble.html">Solución de Problemas</a> de la lección 
+                    <a href="../member/index.html">Miembros</a>.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="classMembers.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../member/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Descubriendo Miembros de Clases<br />
+            <b>Página siguiente:</b> Members
+        </div>
+    </body>
+</html> 

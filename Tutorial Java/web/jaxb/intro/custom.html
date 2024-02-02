@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Personalizando las Vinculaciones JAXB (Los Tutoriales de Java&trade; &gt; Arquitectura Java para Vinculación XML 
+            (JAXB) &gt; Introducción a JAXB)
+        </title>
+        <meta name="description" content="Este tutorial de JAXB describe la Arquitectura de Java para el Enlazado XML, y tópicos 
+              de XML relacionados" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jaxb, xml" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Introducción a JAXB</a></div>
+                <div class="linkAHEAD"><a href="arch.html">Arquitectura JAXB</a></div>
+                <div class="linkAHEAD"><a href="repcon.html">Representando Contenido XML</a></div>
+                <div class="linkAHEAD"><a href="bind.html">Vinculando Esquemas XML</a></div>
+                <div class="linkAHEAD"><a href="customize.html">Personalizando Clases Generadas y Elementos del Programa Java</a></div>
+                <div class="linkAHEAD"><a href="examples.html">Ejemplos de JAXB</a></div>
+                <div class="linkAHEAD"><a href="basic.html">Ejemplos Básicos</a></div>
+                <div class="nolinkAHEAD">Personalizando las Vinculaciones JAXB</div>
+                <div class="linkAHEAD"><a href="j2schema.html">Ejemplos Java-a-Schema</a></div>
+                <div class="linkAHEAD"><a href="info.html">Para Más Información</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Arquitectura Java para Vinculación XML (JAXB)<br />
+                <b>Lección:</b> Introducción a JAXB
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Arquitectura Java para Vinculación XML (JAXB)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Introducción a JAXB</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="basic.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="j2schema.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Personalizando las Vinculaciones JAXB</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    La sección siguiente describe varios ejemplos que se basan en los conceptos demostrados en los ejemplos 
+                    básicos.
+                </p>
+                <p>
+                    El objetivo de esta sección es ilustrar cómo personalizar los vínculos de JAXB usando declaraciones 
+                    personalizadas de vinculación, hechas de una de las dos maneras siguientes:
+                </p>
+                <ul>
+                    <li>
+                        Como anotaciones hechas en línea en el esquema XML
+                    </li>
+                    <li>
+                        Como sentencias en un fichero externo pasado al compilador de vinculación JAXB
+                    </li>
+                </ul>
+                <p>
+                    A diferencia de los ejemplos en los 
+                    <a class="TutorialLink" target="_top" href="basic.html">Ejemplos Básicos de JAXB</a>, que se enfocan en el 
+                    código Java en los ficheros de clases <code>Main.java</code> respectivos, los ejemplos aquí se enfocan en las 
+                    personalizaciones hechas al esquema XML <b>antes</b> de generar las clases de vinculación Java derivadas del 
+                    esquema.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Nota:</strong>&nbsp;Las personalizaciones de vinculación JAXB actualmente deben ser hechas a mano. Uno 
+                    de los objetivos de la tecnología JAXB es estandarizar el formato de las declaraciones de vinculación, lo que 
+                    hace posible crear herramientas de personalización y proporcionar un formato de intercambio estándar entre las 
+                    implementaciones JAXB.
+                    <hr />
+                </div>
+                <p>
+                    Esta sección introduce personalizaciones que pueden ser hechas a las vinculaciones JAXB y métodos de 
+                    validación. Para obtener más información, vea la 
+                    <a class="OutsideLink" target="_blank" href="http://jaxb.java.net">Especificación JAXB</a>.
+                </p>
+                <h2>
+                    <a id="bnbbg">¿Porqué Personalizar?</a>
+                </h2>
+                <p>
+                    En la mayoría de los casos, las vinculaciones predeterminadas generadas por el compilador de vinculación JAXB 
+                    son suficientes. Hay casos, sin embargo, en los cuales podría querer modificar las vinculaciones 
+                    predeterminadas. Algunos de estos incluyen:
+                </p>
+                <ul>
+                    <li>
+                        Crear documentación de la IPA para los paquetes, clases, métodos y constantes de JAXB derivados del 
+                        esquema: al agregar anotaciones personalizadas de la herramienta Javadoc a sus esquemas, puede explicar 
+                        conceptos, pautas, y reglas específicas a su implementación.
+                    </li>
+                    <li>
+                        Proporcionar nombres personalizados semánticamente significativos para los casos que la asignación 
+                        predeterminada de nombre XML a identificador de Java no puede manejar automáticamente; por ejemplo:
+                        <ul>
+                            <li>
+                                Para resolver colisiones de nombres (como se describen en el Apéndice D.2.1 de la 
+                                <i>Especificación JAXB</i>). Tenga en cuenta que el compilador de vinculación JAXB detecta e 
+                                informa todos los conflictos de nombres.
+                            </li>
+                            <li>
+                                Para proporcionar nombres para las constantes de enumeraciones typesafe que no son identificadores 
+                                válidos de Java; por ejemplo, enumeración sobre valores enteros.
+                            </li>
+                            <li>
+                                Para proporcionar mejores nombres para la representación Java de de modelos de grupos sin nombre 
+                                cuando están vinculados a una propiedad o clase de Java.
+                            </li>
+                            <li>
+                                Para proporcionar nombres de paquete más significativos que los que se pueden derivar de forma 
+                                predeterminada de la URI del espacio de nombres de destino.
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        Anular vinculaciones predeterminadas; por ejemplo:
+                        <ul>
+                            <li>
+                                Especificar que un modelo de grupo debe estar vinculado a una clase en lugar de a una lista.
+                            </li>
+                            <li>
+                                Especificar que un atributo fijo puede estar vinculado a una constante Java.
+                            </li>
+                            <li>
+                                Reemplazar la vinculación predeterminada especificada de los tipos de datos incorporados del 
+                                esquema XML a los tipos de datos de Java. En algunos casos, es posible que desee introducir una 
+                                clase Java alternativa que pueda representar características adicionales del tipo de datos de 
+                                esquema XML integrado.
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <h2>
+                    <a id="bnbbh"></a>Resumen de Personalización
+                </h2>
+                <p>
+                    Esta sección explica algunos conceptos básicos de la personalización de JAXB:
+                </p>
+                <ul>
+                    <li>
+                        Personalizaciones en línea y externas
+                    </li>
+                    <li>
+                        Alcance, herencia, y precedencia
+                    </li>
+                    <li>
+                        Sintaxis de personalización
+                    </li>
+                    <li>
+                        Personalización del prefijo del espacio de nombres.
+                    </li>
+                </ul>
+                <h2>
+                    <a id="bnbbi"></a>Personalizaciones En Línea y Externas
+                </h2>
+                <p>
+                    Las personalizaciones a las vinculaciones predeterminadas de JAXB están hechas en la forma de 
+                    <b>declaraciones de vinculación</b> pasadas al compilador de vinculación de JAXB. Estas declaraciones de 
+                    vinculación pueden ser realizadas de dos formas:
+                </p>
+                <ul>
+                    <li>
+                        Como anotaciones en línea en una fuente de esquema XML
+                    </li>
+                    <li>
+                        Como declaraciones en un fichero externo de personalizaciones de vinculación
+                    </li>
+                </ul>
+                <p>
+                    Para algunos, el uso de personalizaciones en línea es más fácil porque puede ver sus personalizaciones en el 
+                    contexto del esquema al que se aplican. Por el contrario, el uso de un archivo de personalización de 
+                    vinculación externo le permite personalizar vinculaciones JAXB sin modificar el esquema de origen y le permite 
+                    aplicar fácilmente personalizaciones a varios archivos de esquema a la vez.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Nota:</strong>&nbsp;Puede combinar los dos tipos de personalizaciones. Por ejemplo, podría incluir una 
+                    referencia a un fichero externo de personalizaciones de vinculación en una anotación en línea. Sin embargo, 
+                    no puede declarar una personalización en línea y externa en el mismo elemento de esquema.
+                    <hr />
+                </div>
+                <p>
+                    Cada uno de estos tipos de personalización se describe en más detalle en las siguientes secciones:
+                </p>
+                <h3>
+                    <a id="bnbbj"></a>Personalizaciones En Línea
+                </h3>
+                <p>
+                    Las personalizaciones para vinculaciones JAXB hechas por medio de <b>declaraciones de vinculación</b> en línea 
+                    en un fichero de esquema XML toman la forma de elementos <code>&lt;xsd:appinfo&gt;</code> embebidos en los 
+                    elementos de esquema <code>&lt;xsd:annotation&gt;</code> (<code>xsd:</code> es el prefijo del espacio de 
+                    nombres, como se define en <i>XML Schema Part 1: Structures</i> del W3C). La forma general para las 
+                    personalizaciones en línea se muestran en el ejemplo siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;xs:annotation&gt;
+    &lt;xs:appinfo&gt;
+        &lt;!--
+        ...
+        binding declarations     .
+        ...
+        --&gt;
+    &lt;/xs:appinfo&gt;
+&lt;/xs:annotation&gt;
+                    </pre>
+                </div>
+                <p>
+                    Las personalizaciones se aplican en la ubicación en la que se declaran en el esquema. Por ejemplo, una 
+                    declaración en el nivel de un elemento particular se aplica a ese elemento solo. Tenga en cuenta que el prefijo
+                    del espacio de nombres del esquema XML debe usarse con las etiquetas de declaración 
+                    <code>&lt;annotation&gt;</code> y <code>&lt;appinfo&gt;</code>. En el ejemplo previo, se usa <code>xs:</code> 
+                    como prefijo del espacio de nombres, así que las declaraciones son etiquetadas con 
+                    <code>&lt;xs:annotation&gt;</code> y <code>&lt;xs:appinfo&gt;</code>.
+                </p>
+                <h3>
+                    <a id="bnbbk"></a>Fichero Externo de Personalización de Vinculaciones
+                </h3>
+                <p>
+                    Las personalizaciones a las vinculaciones JAXB hechas usando un fichero externo conteniendo declaraciones de 
+                    vinculación, toman la forma general mostrada en el ejemplo siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;jxb:bindings schemaLocation = &quot;xs:anyURI&quot;&gt;
+    &lt;jxb:bindings node = &quot;xs:string&quot;&gt;*
+        &lt;!-- binding declaration --&gt;
+    &lt;jxb:bindings&gt;
+&lt;/jxb:bindings&gt;
+                    </pre>
+                </div>
+                <ul>
+                    <li>
+                        <code>schemaLocation</code> es una referencia URI al esquema remoto.
+                    </li>
+                    <li>
+                        <code>node</code> es una expresión XPath 1.0 que identifica el nodo del esquema dentro del 
+                        <code>schemaLocation</code> al que está asociada la declaración de vinculación dada.
+                    </li>
+                </ul>
+                <p>
+                    Por ejemplo la primera declaración <code>schemaLocation</code>/<code>node</code> en unas declaraciones de 
+                    vinculación JAXB del fichero especifica el nombre del esquema y el nodo raíz del esquema:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;jxb:bindings schemaLocation=&quot;po.xsd&quot; node=&quot;/xs:schema&quot;&gt;
+&lt;/jxb:bindings&gt;
+                    </pre>
+                </div>
+                <p>
+                    Una declaración <code>schemaLocation</code>/<code>node</code> subsecuente, tal como un elemento 
+                    <code>simpleType</code> llamada <code>ZipCodeType</code> en el ejemplo previo del esquema, toma la forma 
+                    siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;jxb:bindings node=&quot;//xs:simpleType [@name=&rsquo;ZipCodeType&rsquo;]&quot;&gt;
+                    </pre>
+                </div>
+                <h3>
+                    <a id="bnbbl"></a>Formato del Fichero de Personalización de Vinculaciones 
+                </h3>
+                <p>
+                    Los ficheros de personalización de vinculaciones deben estar en texto ASCII. El nombre o la extensión no 
+                    importan; aunque una extensión habitual, usada en este capítulo, es <code>.xjb</code>.
+                </p>
+                <h3>
+                    <a id="bnbbm"></a>Pasar Archivos de Personalización al Compilador de Enlace JAXB
+                </h3>
+                <p>
+                    Los ficheros de personalización contienen declaraciones de vinculación que se pasan al compilador de 
+                    vinculación de JAXB, <code>xjc</code>, usando la sintaxis siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+xjc -b fichero esquema
+                    </pre>
+                </div>
+                <p> 
+                    donde <i>fichero</i> es el nombre del fichero de personalización de vínculos, y <i>esquema</i> es el nombre de 
+                    los esquemas que quiere pasar al compilador de vinculación.
+                </p>
+                <p>
+                    Puede tener un fichero de vinculación único que contiene personalizaciones para múltiples esquemas, o puede 
+                    separar las personalizaciones en ficheros de vinculación múltiples; por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+xjc schema1.xsd schema2.xsd schema3.xsd \
+    -b bindings123.xjb
+xjc schema1.xsd schema2.xsd schema3.xsd \
+    -b bindings1.xjb \
+    -b bindings2.xjb \
+    -b bindings3.xjb
+                    </pre>
+                </div>
+                <p>
+                    Tenga en cuenta que el orden de los ficheros de esquema y ficheros de vinculación en la línea de comandos no 
+                    importa; aunque cada fichero de personalización de vinculación debe estar precedido por su propia opción 
+                    <code>-b</code> en la línea de comandos.
+                </p>
+                <p>
+                    Para obtener más información sobre las opciones del compilador <code>xjc</code> en general, vea 
+                    <a class="TutorialLink" target="_top" href="examples.html#bnbal">Opciones del Compilador JAXB</a>.
+                </p>
+                <h3>
+                    <a id="bnbbn"></a>Restricciones para las Personalizaciones Externas de Vinculaciones
+                </h3>
+                <p>
+                    Hay varias reglas que aplican a las declaraciones de vinculación hechas en un fichero externo de  
+                    personalización de vinculaciones que no aplican a declaraciones similares hechas en línea en un esquema fuente:
+                </p>
+                <ul>
+                    <li>
+                        El fichero de personalización de vinculación debe empezar con el atributo 
+                        <code>jxb:bindings version</code>, mas los atributos para los espacios de nombres de JAXB y XMLSchema:
+                        <div class="codeblock">
+                            <pre>
+&lt;jxb:bindings version=&quot;1.0&quot; 
+    xmlns:jxb=&quot;http://java.sun.com/xml/ns/jaxb&quot; 
+    xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        El esquema remoto al que se aplica la declaración de vinculación debe identificarse explícitamente en 
+                        notación XPath mediante una declaración <code>jxb:bindings</code> especificando <code>schemaLocation</code> 
+                        y los atributos <code>node</code>:
+                        <ul>
+                            <li>
+                                <code>schemaLocation</code> especifica una referencia URI al esquema remoto.
+                            </li>
+                            <li>
+                                <code>node</code> especifica una expresión XPath 1.0 que identifica el nodo del esquema dentro de
+                                <code>schemaLocation</code> al cual la declaración de vinculación dada se asocia; en el caso de la 
+                                declaración inicial <code>jxb:bindings</code> en el fichero de personalización de vinculaciones, 
+                                este nodo es habitualmente <code>&quot;/xs:schema&quot;</code>.
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <p>
+                    De forma similar, los nodos individuales dentro del esquema al cual las personalizaciones van a ser aplicadas 
+                    deben ser especificadas usando notación XPath; por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;jxb:bindings node=&quot;//xs:complexType [@name=&rsquo;USAddress&rsquo;]&quot;&gt;
+                    </pre>
+                </div>
+                <p>
+                    En tales casos, la personalización se aplica al nodo por el compilador de vinculación como si la declaración 
+                    fuera embebida en línea en el elemento <code>&lt;xs:appinfo&gt;</code> del nodo.
+                </p>
+                <p>
+                    Para resumir estas reglas, el elemento de vinculación externa <code>&lt;jxb:bindings&gt;</code> es sólo 
+                    reconocido para procesar por un compilador de vinculación JAXB en tres casos:
+                </p>
+                <ul>
+                    <li>
+                        Cuando su padre es un elemento <code>&lt;xs:appinfo&gt;</code>.
+                    </li>
+                    <li>
+                        Cuando es un ancestro de otro elemento <code>&lt;jxb:bindings&gt;</code>.
+                    </li>
+                    <li>
+                        Cuando es el elemento raíz de un documento. Un documento XML que tiene un elemento 
+                        <code>&lt;jxb:bindings&gt;</code> como su raíz se denomina archivo de declaración de vinculación externo.
+                    </li>
+                </ul>
+                <h3>
+                    <a id="bnbbo"></a>Alcance, Herencia, y Precedencia
+                </h3>
+                <p>
+                    Las vinculaciones JAXB predeterminadas pueden ser personalizadas o sobrescritas a cuatro niveles diferentes, 
+                    o <b>alcances</b>.
+                </p>
+                <p>
+                    La figura siguiente ilustra la herencia y precedencia de las declaraciones de personalización. Específicamente, 
+                    las declaraciones hacia la parte superior de la pirámide heredan y reemplazan las declaraciones debajo de ellas.
+                </p>
+                <p>
+                    Las declaraciones de componentes heredan y reemplazan a las declaraciones de definición; Las declaraciones de 
+                    definición heredan y reemplazan a las declaraciones de esquema; y las declaraciones de esquema heredan y 
+                    reemplazan a las declaraciones globales.
+                </p>
+                <p>
+                    <a id="bnbbp"></a>Figura:&nbsp;Herencia y Precedencia del Alcance de Personalización
+                </p>
+                <div class="centrado">
+                    <img src="../../figures/jaxb/jaxb-customInheritance.gif" width="400" height="340"
+                         alt="Herencia y Precedencia del Alcance de Personalización" />
+                </div>
+                <br />
+                <h3>
+                    Sintaxis de la Personalización
+                </h3>
+                <p>
+                    La sintaxis para los cuatro tipos de declaraciones de vinculación JAXB, la sintaxis para las declaraciones 
+                    de vinculación de tipos de datos XML a Java, y la personalización del prefijo de espacio de nombres se describen 
+                    en la sección siguiente.
+                </p>
+                <ul>
+                    <li><a href="#bnbbr">Declaraciones de Vinculación Global</a></li>
+                    <li><a href="#bnbbs">Declaraciones de Vinculación del Esquema</a></li>
+                    <li><a href="#bnbbt">Declaraciones de Vinculación de la Clase</a></li>
+                    <li><a href="#bnbbu">Declaraciones de Vinculación de la Propiedad</a></li>
+                    <li><a href="#bnbbv">Declaraciones de Vinculación del Tipo Java</a></li>
+                    <li><a href="#bnbbw">Declaraciones de Vinculación de Enumeraciones Typesafe</a></li>
+                    <li><a href="#bnbbx">Declaraciones de Vinculación de javadoc</a></li>
+                </ul>
+                <h3>
+                    <a id="bnbbr"></a>Declaraciones de Vinculación Global
+                </h3>
+                <p>
+                    Las personalizaciones de alcance global se declaran con <code>&lt;globalBindings&gt;</code>. La sintaxis para 
+                    las personalizaciones de alcance global es la siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;globalBindings&gt;
+    [ collectionType = &quot;collectionType&quot; ]
+    [ fixedAttributeAsConstantProperty = &quot;true&quot; | &quot;false&quot; | &quot;1&quot; | &quot;0&quot; ]
+    [ generateIsSetMethod = &quot;true&quot; | &quot;false&quot; | &quot;1&quot; | &quot;0&quot; ]
+    [ enableFailFastCheck = &quot;true&quot; | &quot;false&quot; | &quot;1&quot; | &quot;0&quot; ]
+    [ choiceContentProperty = &quot;true&quot; | &quot;false&quot; | &quot;1&quot; | &quot;0&quot; ]
+    [ underscoreBinding = &quot;asWordSeparator&quot; | &quot;asCharInWord&quot; ]
+    [ typesafeEnumBase = &quot;typesafeEnumBase&quot; ]
+    [ typesafeEnumMemberName = &quot;generateName&quot; | &quot;generateError&quot; ]
+    [ enableJavaNamingConventions = &quot;true&quot; | &quot;false&quot; 
+    | &quot;1&quot; | &quot;0&quot; ]
+    [ bindingStyle = &quot;elementBinding&quot; | &quot;modelGroupBinding&quot; ]
+    [ &lt;javaType&gt; ... &lt;/javaType&gt; ]*
+&lt;/globalBindings&gt;
+                    </pre>
+                </div>
+                <ul>
+                    <li>
+                        <code>collectionType</code> puede ser <code>indexed</code> o cualquier nombre de clase completamente 
+                        cualificado que implementa <code>java.util.List</code>.
+                    </li>
+                    <li>
+                        <code>fixedAttributeAsConstantProperty</code> puede ser <code>true</code>, <code>false</code>,
+                        <code>1</code>, o <code>0</code>. El valor predeterminado es <code>false</code>.
+                    </li>
+                    <li>
+                        <code>generateIsSetMethod</code> puede ser <code>true</code>, <code>false</code>, <code>1</code>, o
+                        <code>0</code>. El valor predeterminado es <code>false</code>.
+                    </li>
+                    <li>
+                        <code>enableFailFastCheck</code> puede ser <code>true</code>, <code>false</code>, <code>1</code>, o
+                        <code>0</code>. Si <code>enableFailFastCheck</code> es <code>true</code> o <code>1</code> y la 
+                        implementación JAXB admite esta comprobación opcional, la comprobación de restricciones de tipo se realiza 
+                        al establecer una propiedad. El valor por defecto es <code>false</code>. Por favor tenga en cuenta que la 
+                        implementación de JAXB no admite la validación a prueba de fallos.
+                    </li>
+                    <li>
+                        <code>choiceContentProperty</code> puede ser <code>true</code>, <code>false</code>, <code>1</code>, o
+                        <code>0</code>. El valor predeterminado es <code>false</code>. <code>choiceContentProperty</code> no es 
+                        relevante cuando el <code>bindingStyle</code> es <code>elementBinding</code>. Por lo tanto, si 
+                        <code>bindingStyle</code> se especifica como <code>elementBinding</code>, entonces 
+                        <code>choiceContentProperty</code> debe resultar en una personalización no válida.
+                    </li>
+                    <li>
+                        <code>underscoreBinding</code> puede ser <code>asWordSeparator</code> o <code>asCharInWord</code>. El valor 
+                        predeterminado es <code>asWordSeparator</code>.
+                    </li>
+                    <li>
+                        <code>typesafeEnumBase</code> puede ser una lista de QNames, cada uno de los cuales debe resolverse en una 
+                        definición de tipo simple.  El valor predeterminado es <code>xs:NCName</code>. Vea 
+                        <a href="#bnbbw">Declaraciones de Vinculación de Enumeraciones Typesafe</a> para obtener información sobre 
+                        la asignación localizada de las definiciones <code>simpleType</code> a las clases Java 
+                        <code>typesafe enum</code>.
+                    </li>
+                    <li>
+                        <code>typesafeEnumMemberName</code> puede ser <code>generateError</code> o <code>generateName</code>. El 
+                        valor predeterminado es <code>generateError</code>.
+                    </li>
+                    <li>
+                        <code>enableJavaNamingConventions</code> puede ser <code>true</code>, <code>false</code>,
+                        <code>1</code>, o <code>0</code>. El valor predeterminado es <code>true</code>.
+                    </li>
+                    <li>
+                        <code>bindingStyle</code> puede ser <code>elementBinding</code>, o <code>modelGroupBinding</code>.
+                        El valor predeterminado es <code>elementBinding</code>.
+                    </li>
+                    <li>
+                        <code>&lt;javaType&gt;</code> puede ser cero o más declaraciones de vinculación javaType. Para más 
+                        información, vea <a  href="#bnbbv">Declaraciones de Vinculación del Tipo Java</a>.
+                    </li>
+                </ul>
+                <p>
+                    Las declaraciones <code>&lt;globalBindings&gt;</code> sólo son válidas en el elemento <code>annotation</code> 
+                    del elemento <code>schema</code> de más alto nivel. Ahí puede sólo ser una instancia única de una declaración 
+                    <code>&lt;globalBindings&gt;</code> en cualquier esquema o fichero de declaraciones vinculados dados. Si un 
+                    esquema fuente incluye o importa un segundo esquema fuente, la declaración <code>&lt;globalBindings&gt;</code> 
+                    debe ser declarada en el primer esquema fuente.
+                </p>
+                <h3>
+                    <a id="bnbbs"></a>Declaraciones de Vinculación del Esquema
+                </h3>
+                <p>
+                    Las personalizaciones de alcance de esquema se declaran con <code>&lt;schemaBindings&gt;</code>. La sintaxis 
+                    para la personalización del alcance de esquema es: 
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;schemaBindings&gt;
+[ &lt;package&gt; package &lt;/package&gt; ]
+[ &lt;nameXmlTransform&gt; ... &lt;/nameXmlTransform&gt; ]*
+&lt;/schemaBindings&gt;
+    
+&lt;package 
+    [ name = &quot;packageName&quot; ]
+    [ &lt;javadoc&gt; ... &lt;/javadoc&gt; ]
+&lt;/package&gt;
+
+&lt;nameXmlTransform&gt;
+[ &lt;typeName 
+    [ suffix=&quot;suffix&quot; ]
+    [ prefix=&quot;prefix&quot; ] /&gt; ]
+[ &lt;elementName 
+    [ suffix=&quot;suffix&quot; ]
+    [ prefix=&quot;prefix&quot; ] /&gt; ]
+[ &lt;modelGroupName 
+    [ suffix=&quot;suffix&quot; ]
+    [ prefix=&quot;prefix&quot; ] /&gt; ]
+[ &lt;anonymousTypeName 
+    [ suffix=&quot;suffix&quot; ]
+    [ prefix=&quot;prefix&quot; ] /&gt; ]
+&lt;/nameXmlTransform&gt;
+                    </pre>
+                </div>
+                <p>
+                    Como se muestra arriba, las declaraciones <code>&lt;schemaBinding&gt;</code> incluyen dos componentes:
+                </p>
+                <ul>
+                    <li>
+                        <code>&lt;package&gt;...&lt;/package&gt;</code> especifica el nombre del paquete y, si se desea, la 
+                        ubicación de la documentación IPA para las clases derivadas del esquema.
+                    </li>
+                    <li>
+                        <code>&lt;nameXmlTransform&gt;...&lt;/nameXmlTransform&gt;</code> especifica las personalizaciones a ser 
+                        aplicadas.
+                    </li>
+                </ul>
+                <h3>
+                    <a id="bnbbt"></a>Declaraciones de Vinculación de la Clase
+                </h3>
+                <p>
+                    La declaración de vinculación <code>&lt;class&gt;</code> le permite personalizar la vinculación de un 
+                    elemento esquema a una interfaz de contenido Java o una interfaz <code>Element</code> de Java. Las declaraciones 
+                    de <code>&lt;class&gt;</code> pueden ser usadas para personalizar:
+                </p>
+                <ul>
+                    <li>Un nombre para la interfaz de Java derivada del esquema</li>
+                    <li>Una clase de implementación para la interfaz de contenido Java derivada del esquema</li>
+                </ul>
+                <p>
+                    La sintaxis para las personalizaciones de <code>&lt;class&gt;</code> es:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;class 
+    [ name = &quot;className&quot;]
+    [ implClass= &quot;implClass&quot; ] &gt;
+    [ &lt;javadoc&gt; ... &lt;/javadoc&gt; ]
+&lt;/class&gt;
+                    </pre>
+                </div>
+                <ul>
+                    <li>
+                        <code>name</code> es el nombre de la interfaz Java derivada. Debe ser un nombre de interfaz válida de Java 
+                        y no debe contener un prefijo de paquete. El prefijo de paquete es heredado desde el valor actual del 
+                        paquete.
+                    </li>
+                    <li>
+                        <code>implClass</code> es el nombre de la clase de implementación para <i>className</i> y debe incluir el 
+                        nombre de paquete completo.
+                    </li>
+                    <li>
+                        El elemento <code>&lt;javadoc&gt;</code> especifica las anotaciones de la herramienta Javadoc para la 
+                        interfaz de Java derivada del esquema. La cadena introducida aquí debe usar <code>CDATA</code> o 
+                        <code>&lt;</code> para escapar las etiquetas HTML embebidas.
+                    </li>
+                </ul>
+                <h3>
+                    <a id="bnbbu"></a>Declaraciones de Vinculación de la Propiedad
+                </h3>
+                <p>
+                    La declaración de vinculación de <code>&lt;property&gt;</code> le permite personalizar la vinculación de un 
+                    elemento de esquema XML a su representación de Java como una propiedad. El alcance de la personalización puede 
+                    estar en el nivel de definición o en el nivel de componente, dependiendo de dónde se especifique la declaración 
+                    de vinculación de <code>&lt;property&gt;</code>.
+                </p>
+                <p>
+                    La sintaxis para las personalizaciones <code>&lt;property&gt;</code> es:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;property
+    [ name = &quot;propertyName&quot;]
+    [ collectionType = &quot;propertyCollectionType&quot; ]
+    [ fixedAttributeAsConstantProperty = &quot;true&quot; |
+    &quot;false&quot; | &quot;1&quot; | &quot;0&quot; ]
+    [ generateIsSetMethod = &quot;true&quot; | 
+    &quot;false&quot; | &quot;1&quot; | &quot;0&quot; ]
+    [ enableFailFastCheck =&quot;true&quot; | 
+    &quot;false&quot; | &quot;1&quot; | &quot;0&quot; ]
+    [ &lt;baseType&gt; ... &lt;/baseType&gt; ]
+    [ &lt;javadoc&gt; ... &lt;/javadoc&gt; ]
+&lt;/property&gt;
+
+&lt;baseType&gt;
+    &lt;javaType&gt; ... &lt;/javaType&gt;
+&lt;/baseType&gt;
+                    </pre>
+                </div>
+                <ul>
+                    <li>
+                        <code>name</code> define el valor de personalización <code>propertyName</code>; debe ser un identificador 
+                        Java válido.
+                    </li>
+                    <li>
+                        <code>collectionType</code> define el valor de personalización <code>propertyCollectionType</code>,  que es 
+                        el tipo colección  para la propiedad, <code>propertyCollectionType</code>. Si se especifica, la propiedad 
+                        puede ser <code>indexed</code> o cualquier nombre de clase completamente cualificado que implementa 
+                        <code>java.util.List</code>.
+                    </li>
+                    <li>
+                        <code>fixedAttributeAsConstantProperty</code> define el valor personalizado 
+                        <code>fixedAttributeAsConstantProperty</code>. El valor puede ser <code>true</code>,
+                        <code>false</code>, <code>1</code>, o <code>0</code>.
+                    </li>
+                    <li>
+                        <code>generateIsSetMethod</code> define el valor de personalización de <code>generateIsSetMethod</code>. El 
+                        valor puede ser <code>true</code>, <code>false</code>, <code>1</code>, o <code>0</code>.
+                    </li>
+                    <li>
+                        <code>enableFailFastCheck</code> define el valor de personalización <code>enableFailFastCheck</code>. El 
+                        valor puede ser <code>true</code>, <code>false</code>, <code>1</code>, o <code>0</code>. Por favor tenga en 
+                        cuenta que la implementación JAXB no soporta validación a prueba de fallos.
+                    </li>
+                    <li>
+                        <code>&lt;javadoc&gt;</code> personaliza las anotaciones de la herramienta Javadoc para el método getter 
+                        de la propiedad.
+                    </li>
+                </ul>
+                <h3>
+                    <a id="bnbbv"></a>Declaraciones de Vinculación del Tipo Java
+                </h3>
+                <p>
+                    La declaración <code>&lt;javaType&gt;</code> proporciona una forma de personalizar la traducción de tipos de 
+                    datos XML hacia y desde tipos de datos Java. XML proporciona más tipos de datos que Java, así que la 
+                    declaración <code>&lt;javaType&gt;</code> le habilita a especificar vinculaciones de tipos de datos 
+                    personalizados cuando la vinculación JAXB predeterminada no puede representar suficientemente su esquema.
+                </p>
+                <p>
+                    El tipo de dato Java destino puede ser un tipo de dato integrado en Java o un tipo de dato Java específico de 
+                    la aplicación. Si un tipo de dato Java específico de la aplicación se usa como el objetivo, su implementación 
+                    debe también proporcionar los métodos parse y print para los datos agrupados y separados. Para este final, 
+                    la especificación JAXB admite un <code>parseMethod</code> y <code>printMethod</code>:
+                </p>
+                <ul>
+                    <li>
+                        Se llama a <code>parseMethod</code> durante la separación para convertir una cadena desde el documento 
+                        de entrada a un valor del tipo de dato Java objetivo.
+                    </li>
+                    <li>
+                        Se llama a <code>printMethod</code> durante el agrupamiento para convertir un valor del tipo objetivo 
+                        en una representación léxica.
+                    </li>
+                </ul>
+                <p>
+                    Si usted prefiere definir sus propias conversiones de tipos de datos, JAXB define una clase estática, 
+                    <code>DatatypeConverter</code>, para asistir en el análisis e impresión de representaciones léxicas válidas 
+                    de tipos de datos integrados  en el Esquema XML.
+                </p>
+                <p>
+                    La sintaxis para la personalización <code>&lt;javaType&gt;</code> es:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;javaType name= &quot;<i>javaType</i>&quot;
+    [ xmlType= &quot;<i>xmlType</i>&quot; ]
+    [ hasNsContext = &quot;true&quot; | &quot;false&quot; ]
+    [ parseMethod= &quot;<i>parseMethod</i>&quot; ]
+    [ printMethod= &quot;<i>printMethod</i>&quot; ]&gt;
+                    </pre>
+                </div>
+                <ul>
+                    <li>
+                        <code>name</code> es el tipo de dato Java al cual <code>xmlType</code> va a ser vinculado.
+                    </li>
+                    <li>
+                        <code>xmlType</code> es el nombre del tipo de dato del Esquema XML al cual <code>javaType</code> va a ser 
+                        vinculado; se requiere este atributo cuando el padre de la declaración <code>&lt;javaType&gt;</code> es 
+                        <code>&lt;globalBindings&gt;</code>.
+                    </li>
+                    <li>
+                        <code>hasNsContext</code> permite que un contexto de espacio de nombres sea especificado como segundo 
+                        parámetro en un método print o parse; puede ser <code>true</code>, <code>false</code>, <code>1</code>, o 
+                        <code>0</code>. De forma predeterminada, este atributo es <code>false</code>, y en la mayoría de los casos, 
+                        no hay necesidad de cambiarlo.
+                    </li>
+                    <li>
+                        <code>parseMethod</code> es el nombre del método parse que va a ser llamado durante la separación.
+                    </li>
+                    <li>
+                        <code>printMethod</code> es el nombre del método print que va a ser llamado durante la agrupación.
+                    </li>
+                </ul>
+                <p>
+                    La declaración <code>&lt;javaType&gt;</code> se puede usar en:
+                </p>
+                <ul>
+                    <li>
+                        Una declaración <code>&lt;globalBindings&gt;</code>
+                    </li>
+                    <li>
+                        Un elemento de anotación para definiciones de tipos simples, <code>GlobalBindings</code>, y declaraciones 
+                        <code>&lt;basetype&gt;</code>
+                    </li>
+                    <li>
+                        Una declaración <code>&lt;property&gt;</code>
+                    </li>
+                </ul>
+                <p>
+                    Vea la Clase <a href="#bnbch"><code>MyDatatypeConverter</code></a> para un ejemplo de cómo las declaraciones 
+                    <code>&lt;javaType&gt;</code> y la interfaz <code>DatatypeConverterInterface</code> son implementadas en una 
+                    clase personalizada que convierte el tipo de dato.
+                </p>
+                <h3>
+                    <a id="bnbbw"></a>Declaraciones de Vinculación de Enumeraciones Typesafe
+                </h3>
+                <p>
+                    Las declaraciones de enumeración typesafe proporcionan una forma localizada de asignar elementos XML 
+                    <code>simpleType</code> a clases de Java <code>typesafe enum</code>. Hay dos tipos de declaraciones de 
+                    enumeraciones typesafe que puede hacer:
+                </p>
+                <ul>
+                    <li>
+                        <code>&lt;typesafeEnumClass&gt;</code> le permite asignar una clase <code>simpleType</code> entera a clases
+                        <code>typesafe enum</code>.
+                    </li>
+                    <li>
+                        <code>&lt;typesafeEnumMember&gt;</code> le permite asignar solo miembros seleccionados de una clase 
+                        <code>simpleType</code> a clases <code>typesafe enum</code>.
+                    </li>
+                </ul>
+                <p>
+                    En ambos casos, hay dos limitaciones primarias en este tipo de personalización:
+                </p>
+                <ul>
+                    <li>
+                        Solo las definiciones <code>simpleType</code> con facetas de enumeración se pueden personalizar utilizando 
+                        esta declaración de vinculación.
+                    </li>
+                    <li>
+                        Esta personalización solo se aplica a una definición <code>simpleType</code> única a la vez. Para asignar 
+                        conjuntos de definiciones <code>simpleType</code> similares  en un nivel global, use el atributo 
+                        <code>typesafeEnumBase</code> en una declaración <code>&lt;globalBindings&gt;</code>, como se describe en 
+                        <a href="#bnbbr">Declaraciones de Vinculación Global</a>.
+                    </li>
+                </ul>
+                <p>
+                    La sintaxis para la personalización <code>&lt;typesafeEnumClass&gt;</code> es:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;typesafeEnumClass 
+    [ name = &quot;enumClassName&quot; ]
+    [ &lt;typesafeEnumMember&gt; ... &lt;/typesafeEnumMember&gt; ]*
+    [ &lt;javadoc&gt; enumClassJavadoc &lt;/javadoc&gt; ]
+&lt;/typesafeEnumClass&gt;
+                    </pre>
+                </div>
+                <ul>
+                    <li>
+                        <code>name</code> debe ser un Identificador de Java válido, y no debe tener un prefijo de paquete.
+                    </li>
+                    <li>
+                        Puede tener cero o más declaraciones <code>&lt;typesafeEnumMember&gt;</code> embebidas en una declaración 
+                        <code>&lt;typesafeEnumClass&gt;</code>.
+                    </li>
+                    <li>
+                        <code>&lt;javadoc&gt;</code> personaliza las anotaciones de la herramienta Javadoc para la clase de 
+                        enumeración.
+                    </li>
+                </ul>
+                <p>
+
+                    La sintaxis para la personalización <code>&lt;typesafeEnumMember&gt;</code> es:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;typesafeEnumMember 
+    name = &quot;enumMemberName&quot;&gt;
+    [ value = &quot;enumMemberValue&quot; ]
+    [ &lt;javadoc&gt; enumMemberJavadoc &lt;/javadoc&gt; ]
+&lt;/typesafeEnumMember&gt;
+                    </pre>
+                </div>
+                <ul>
+                    <li>
+                        <code>name</code> debe ser especificada siempre y debe ser un identificador de Java válido.
+                    </li>
+                    <li>
+                        <code>value</code> debe ser el valor de enumeración especificados en el esquema fuente.
+                    </li>
+                    <li>
+                        <code>&lt;javadoc&gt;</code> personaliza las anotaciones de la herramienta Javadoc para la constante de 
+                        enumeración.
+                    </li>
+                </ul>
+                <p>
+                    Para anotaciones en línea, la declaración <code>&lt;typesafeEnumClass&gt;</code> debe ser especificada en el 
+                    elemento de anotación del elemento <code>&lt;simpleType&gt;</code>. La <code>&lt;typesafeEnumMember&gt;</code> 
+                    debe especificarse en el elemento de anotación del miembro de la enumeración. Esto habilita al miembro de la 
+                    enumeración  a ser personalizado independientemente de la clase enumeración.
+                </p>
+                <p>
+                    Para obtener información sobre los patrones de diseño de las enumeraciones typesafe,vea el capítulo de ejemplo 
+                    de <i>Effective Java Programming</i> de Joshua Bloch en la Red de Tecnología de Oracle (Oracle Technology 
+                    Network, en inglés).
+                </p>
+                <h3>
+                    <a id="bnbbx"></a>Declaraciones de Vinculación de javadoc
+                </h3>
+                <p>
+                    Las declaraciones <code>&lt;javadoc&gt;</code> le permiten agregar anotaciones de personalización de la 
+                    herramienta Javadoc a los paquetes, clases, interfaces, métodos, y campos JAXB derivados de esquema. Tenga en 
+                    cuenta que las declaraciones <code>&lt;javadoc&gt;</code> no se pueden aplicar globalmente; son solo válidas 
+                    como elementos de otras personalizaciones de vinculación.
+                </p>
+                <p>
+                    La sintaxis para la personalización <code>&lt;javadoc&gt;</code> es:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;javadoc&gt;
+    Contents in &lt;b&gt;Javadoc&lt;\b&gt; format.
+&lt;/javadoc&gt;
+                    </pre>
+                </div>
+                <p>
+                    o
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;javadoc&gt;
+    &lt;&lt;![CDATA[Contents in &lt;b&gt;Javadoc&lt;\b&gt; format ]]&gt;
+&lt;/javadoc&gt;
+                    </pre>
+                </div>
+                <p>
+                    Tenga en cuenta que las cadenas de documentación en las declaraciones <code>&lt;javadoc&gt;</code> aplicadas 
+                    en el nivel de paquete deben contener etiquetas <code>&lt;body&gt;</code> de apertura y cierre; por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;jxb:package 
+    name=&quot;primer.myPo&quot;&gt;
+    &lt;jxb:javadoc&gt;
+        &lt;![CDATA[&lt;body&gt;
+            Package level documentation for generated package primer.myPo.
+        &lt;/body&gt;]]&gt;
+    &lt;/jxb:javadoc&gt;
+&lt;/jxb:package&gt;
+                    </pre>
+                </div>
+                <h3>
+                    <a id="bnbby"></a>Prefijo del Espacio de Nombres de Personalización
+                </h3>
+                <p>
+                    Todas las declaraciones de vinculación JAXB estándar deben estar precedidas por un prefijo de espacio de nombres 
+                    que asigna la UR de espacio de nombres JAXB <a class="OutsideLink" target="_blank"
+                           href="http://java.sun.com/xml/ns/jaxb">http://java.sun.com/xml/ns/jaxb</a>. Por ejemplo, en este ejemplo, 
+                           las declaraciones <b>deben</b> incluir la declaración del espacio de nombres JAXB y el número de versión 
+                           JAXB en la parte superior del fichero de esquema. Por ejemplo, en <code>po.xsd</code> para el ejemplo 
+                           de Personalización En Línea, la declaración de espacio de nombres es la siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;xsd:schema 
+    xmlns:xsd= &quot;http://www.w3.org/2001/XMLSchema&quot;
+    xmlns:jxb= &quot;http://java.sun.com/xml/ns/jaxb&quot;
+    jxb:version=&quot;1.0&quot;&gt;
+                    </pre>
+                </div>
+                <p>
+                    Una declaración de vinculación con el prefijo de espacio de nombres <code>jxb</code> toma la forma siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;xsd:annotation&gt;
+    &lt;xsd:appinfo&gt;
+    &lt;jxb:globalBindings 
+        <i>binding declarations</i> /&gt;
+    &lt;jxb:schemaBindings&gt;
+        ...
+        <i>declaraciones de vinculación</i>         .
+        ...
+    &lt;/jxb:schemaBindings&gt;
+    &lt;/xsd:appinfo&gt;
+&lt;/xsd:annotation&gt;
+                    </pre>
+                </div>
+                <p>
+                    Tenga en cuenta que en este ejemplo, las declaraciones <code>globalBindings</code> y <code>schemaBindings</code> 
+                    se usan para especificar, respectivamente, las personalizaciones para el alcance global y el alcance de 
+                    esquema. Estos alcances de personalización se describen en más detalle en 
+                    <a href="#bnbbo">Alcance, Herencia, y Precedencia</a>.
+                </p>
+                <h4>
+                    <a id="bnbbz"></a>Ejemplo de Personalización En Línea
+                </h4>
+                <p>
+                    El ejemplo de Personalización En Línea ilustra algunas personalizaciones básicas hechas en la forma de 
+                    anotaciones en línea en un esquema XML llamado <code>po.xsd</code>. Además, este ejemplo implementa una clase 
+                    convertidora de tipos de datos personalizada, <code>MyDatatypeConverter.java</code>, que ilustra los métodos 
+                    print y parse en la personalización <code>&lt;javaType&gt;</code> par manejar conversiones de tipos de datos 
+                    personalizados.
+                </p>
+                <p>
+                    Para resumir este ejemplo:
+                </p>
+                <ol>
+                    <li>
+                        <code>po.xsd</code> es un esquema XML que contiene personalizaciones de vinculación en línea.
+                    </li>
+                    <li>
+                        <code>MyDatatypeConverter.java</code> es un fichero de clase Java que implementa los métodos parse y print 
+                        especificados por las personalizaciones <code>&lt;javaType&gt;</code> en <code>po.xsd</code>.
+                    </li>
+                    <li>
+                        <code>Main.java</code> es el fichero de clase primaria en el ejemplo Personalización En Línea, que usa las 
+                        clases derivadas de esquema generadas por el compilador JAXB.
+                    </li>
+                </ol>
+                <h3>
+                    <a id="bnbcb"></a>Construir y Ejecutar el Ejemplo de Personalización Usando Ant
+                </h3>
+                <p>
+                    Para compilar y ejecutar el ejemplo Personalizar en Línea usando Ant, en una ventana de terminal, vaya al 
+                    directorio <i>jaxb-ri-install</i><code>/samples/inline-customize/</code> y teclee lo siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+ant 
+                    </pre>
+                </div>
+                <p>
+                    Las personalizaciones clave en este ejemplo y la clase <code>MyDatatypeConverter.java</code> personalizada se 
+                    describe en más detalle en la siguiente sección.
+                </p>
+                <h3>
+                    <a id="bnbcc"></a>Esquema Personalizado
+                </h3>
+                <p>
+                    El esquema personalizado usado en el ejemplo Personalizar en Línea está en el fichero 
+                    <i>jaxb-ri-install</i><code>/samples/inline-customize/po.xsd</code>. Las personalizaciones están en las 
+                    etiquetas <code>&lt;xsd:annotation&gt;</code>.
+                </p>
+                <h3>
+                    <a id="bnbcd"></a>Declaraciones de Vinculación Global
+                </h3>
+                <p>
+                    El siguiente ejemplo de código muestra las declaraciones <code>globalBindings</code> en <code>po.xsd</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;jxb:globalBindings
+    fixedAttributeAsConstantProperty=&quot;true&quot;
+    collectionType=&quot;java.util.Vector&quot;
+    typesafeEnumBase=&quot;xsd:NCName&quot;
+    choiceContentProperty=&quot;false&quot;
+    typesafeEnumMemberName=&quot;generateError&quot;
+    bindingStyle=&quot;elementBinding&quot;
+    enableFailFastCheck=&quot;false&quot;
+    generateIsSetMethod=&quot;false&quot;
+    underscoreBinding=&quot;asCharInWord&quot;/&gt;
+                    </pre>
+                </div>
+                <p>
+                    En este ejemplo, todos los valores se establecen en valores predeterminados excepto para 
+                    <code>collectionType</code>.
+                </p>
+                <ul>
+                    <li>
+                        Establecer <code>fixedAttributeAsConstantProperty</code> a verdadero indica que todos los atributos fijos 
+                        deben estar vinculados a constantes Java. De forma predeterminada, los atributos fijos se asignan a una 
+                        propiedad simple o una colección, lo que sea más apropiado.
+                    </li>
+                    <li>
+                        Establecer <code>collectionType</code> a <code>java.util.Vector</code> especifica que todas las listas en 
+                        las clases de implementación generadas se representan internamente como vectores. Tenga en cuenta que el 
+                        nombre de clase que especifique para <code>collectionType</code> debe implementar 
+                        <code>java.util.List</code> y poder ser llamado por <code>newInstance</code>.
+                    </li>
+                    <li>
+                        Si se establece <code>typesafeEnumBase</code> a <code>xsd:string</code>, es una forma global para 
+                        especificar que todas las definiciones de tipo <code>simple</code> derivadas directa o indirectamente desde 
+                        <code>xsd:string</code> y que tengan facetas de enumeración, deben ser vinculadas de forma predeterminada a 
+                        una <code>enumeración typesafe</code>. Si se establece <code>typesafeEnumBase</code> a una cadena vacía 
+                        (<code>&quot;&quot;</code>), ninguna definición de tipo <code>simple</code> es vinculada a una clase 
+                        <code>enumeración typesafe</code> de forma predeterminada. El valor de <code>typesafeEnumBase</code> puede 
+                        ser cualquier definición de tipo simple atómica excepto <code>xsd:boolean</code> y ambos tipos binarios.
+                    </li>
+                    <li>
+                        La implementación de JAXB no admite el atributo <code>enableFailFastCheck</code>.
+                        <div class="note">
+                            <hr />
+                            <strong>Nota:</strong>&nbsp;Usar clases de enumeración typesafe le habilita a asignar valores de 
+                            enumeración del esquema a constantes Java, lo que hace posible hacer comparaciones sobre constantes de 
+                            Java en vez de sobre valores de cadena.
+                            <hr />
+                        </div>
+                    </li>
+                </ul>
+                <h3>
+                    <a id="bnbce"></a>Declaraciones de Vinculación de Esquema
+                </h3>
+                <p>
+                    El código siguiente muestra las declaraciones de vinculación de esquema en <code>po.xsd</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;jxb:schemaBindings&gt;
+&lt;jxb:package name=&quot;primer.myPo&quot;&gt;
+    &lt;jxb:javadoc&gt;
+        &lt;![CDATA[&lt;body&gt;
+            Package level documentation for generated package primer.myPo.
+        &lt;/body&gt;]]&gt;
+    &lt;/jxb:javadoc&gt;
+&lt;/jxb:package&gt;
+    &lt;jxb:nameXmlTransform&gt;
+        &lt;jxb:elementName suffix=&quot;Element&quot;/&gt;
+    &lt;/jxb:nameXmlTransform&gt;
+&lt;/jxb:schemaBindings&gt;
+                    </pre>
+                </div>
+                <ul>
+                    <li>
+                        <code>&lt;jxb:package name=&quot;primer.myPo&quot;/&gt;</code> especifica a <code>primer.myPo</code> como 
+                        el paquete en el que se generan las clases derivadas del esquema.
+                    </li>
+                    <li>
+                        <code>&lt;jxb:nameXmlTransform&gt;</code> especifica que todas las interfaces de elementos Java generadas 
+                        tengan agregado <code>Element</code> a los nombres generados de forma predeterminada. Por ejemplo, cuando 
+                        el compilador JAXB se ejecuta contra este esquema, las interfaces de elemento <code>CommentElement</code> y 
+                        <code>PurchaseOrderElement</code> se generan. Por el contrario, sin esta personalización, la vinculación 
+                        predeterminada genera <code>Comment</code> y <code>PurchaseOrder</code>. Esta personalización es útil si un 
+                        esquema usa el mismo nombre en diferentes espacios de símbolos; por ejemplo, en el elemento global y 
+                        definiciones de tipos. En tales casos, esta personalización le habilita a resolver la colisión con una 
+                        declaración en vez de tener que resolver individualmente cada colisión con una declaración separada de 
+                        vinculación.
+                    </li>
+                    <li>
+                        <code>&lt;jxb:javadoc&gt;</code> especifica anotaciones personalizadas para la herramienta Javadoc para el 
+                        paquete <code>primer.myPo</code>. Tenga en cuenta que, a diferencia de las declaraciones 
+                        <code>&lt;javadoc&gt;</code> en el nivel de clase, como se muestra en el ejemplo siguiente, las etiquetas 
+                        de apertura y cierre <code>&lt;body&gt;</code> deben ser incluídas cuando la declaración 
+                        <code>&lt;javadoc&gt;</code> se hace a nivel de paquete.
+                    </li>
+                </ul>
+                <h3>
+                    <a id="bnbcf"></a>Declaraciones de Vinculación de Clase
+                </h3>
+                <p>
+                    El código siguiente muestra las declaraciones de vinculación de la clase en <code>po.xsd</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;xsd:complexType name=&quot;PurchaseOrderType&quot;&gt;
+    &lt;xsd:annotation&gt;
+        &lt;xsd:appinfo&gt;
+            &lt;jxb:class name=&quot;POType&quot;&gt;
+                &lt;jxb:javadoc&gt;
+                    A &amp;lt;b&gt;Purchase Order&amp;lt;/b&gt;
+                    consists of addresses and items.
+                &lt;/jxb:javadoc&gt;
+            &lt;/jxb:class&gt;
+        &lt;/xsd:appinfo&gt;
+    &lt;/xsd:annotation&gt;
+    &lt;!-- ... --&gt;
+&lt;/xsd:complexType&gt;
+                    </pre>
+                </div>
+                <p>
+                    Las anotaciones de la herramienta Javadoc para la clase <code>POType</code> derivada del esquema contendrá la 
+                    descripción 
+                    <code>&quot;A &amp;lt;b&gt;Purchase Order&amp;lt;/b&gt; consists of addresses and items.&quot;</code>. La 
+                    <code>&amp;lt;</code> se usa para escapar el cursor de apertura en las etiquetas HTML <code>&lt;b&gt;</code>.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Nota:</strong>&nbsp;Cuando se especifica una personalización <code>&lt;class&gt;</code> en el elemento 
+                    <code>appinfo</code> de una definición <code>complexType</code>, como se muestra en el ejemplo previo, la 
+                    definición <code>complexType</code> se vincula a una interfaz de contenido Java.
+                    <hr />
+                </div>
+                <p>
+                    Más tarde en <code>po.xsd</code>, otra personalización <code>&lt;javadoc&gt;</code> se declara en este nivel 
+                    de clase, pero esta vez la cadena HTML se escapa con <code>CDATA</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;xsd:annotation&gt;
+    &lt;xsd:appinfo&gt;
+        &lt;jxb:class&gt;
+            &lt;jxb:javadoc&gt;
+                &lt;![CDATA[
+                    First line of documentation for a
+                    &lt;b&gt;USAddress&lt;/b&gt;.]]&gt;
+            &lt;/jxb:javadoc&gt;
+        &lt;/jxb:class&gt;
+    &lt;/xsd:appinfo&gt;
+&lt;/xsd:annotation&gt;
+                    </pre>
+                </div>
+                <div class="note">
+                    <hr />
+                    <strong>Nota:</strong>&nbsp;Si quiere incluir etiquetas HTML en una personalización 
+                    <code>&lt;jaxb:javadoc&gt;</code>, debe encerrar los datos dentro de una sección <code>CDATA</code> o escapar
+                    todos los cursores izquierdos usando <code>&amp;lt;</code>. Vea 
+                    <a class="OutsideLink" target="_blank"
+                       href="http://www.w3.org/TR/2000/REC-xml-20001006#sec-cdata-sect">XML 1.0 2nd Edition</a> para obtener más 
+                       información.<hr />
+                </div>
+                <h3>
+                    <a id="bnbcg"></a>Declaraciones de Vinculación de Propiedad
+                </h3>
+                <p>
+                    De particular interés aquí es la personalización <code>generateIsSetMethod</code>, que causa que se generen dos 
+                    métodos de propiedades adicionales, <code>isSetQuantity</code> y <code>unsetQuantity</code>. Estos métodos 
+                    habilitan a una aplicación cliente para distinguir entre los valores predeterminados del esquema y los valores 
+                    que aparecen explícitamente dentro de un documento de instancia.
+                </p>
+                <p>
+                    Por ejemplo, en <code>po.xsd</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;xsd:complexType name=&quot;Items&quot;&gt;
+    &lt;xsd:sequence&gt;
+        &lt;xsd:element name=&quot;item&quot; 
+            minOccurs=&quot;1&quot;  
+            maxOccurs=&quot;unbounded&quot;&gt;
+            &lt;xsd:complexType&gt;
+                &lt;xsd:sequence&gt;
+                    &lt;xsd:element 
+                        name=&quot;productName&quot; 
+                        type=&quot;xsd:string&quot;/&gt;
+                    &lt;xsd:element 
+                        name=&quot;quantity&quot; 
+                        default=&quot;10&quot;&gt;
+                        &lt;xsd:annotation&gt;
+                            &lt;xsd:appinfo&gt;
+                                &lt;jxb:property 
+                                    generateIsSetMethod=&quot;true&quot;/&gt;
+                            &lt;/xsd:appinfo&gt;
+                        &lt;/xsd:annotation&gt;
+                        &lt;!-- ... --&gt;
+                    &lt;/xsd:complexType&gt;
+            &lt;/xsd:element&gt;
+    &lt;/xsd:sequence&gt;
+&lt;/xsd:complexType&gt;
+                    </pre>
+                </div>
+                <p>
+                    El <code>@generateIsSetMethod</code> se aplica al elemento <code>quantity</code>, el cual se vincula a una 
+                    propiedad dentro de la interfaz <code>Items.ItemType</code>. Se generan los métodos 
+                    <code>unsetQuantity</code> y <code>isSetQuantity</code> en la interfaz <code>Items.ItemType</code>.
+                </p>
+                <h3>
+                    <a id="bnbch"></a>Clase <code>MyDatatypeConverter</code>
+                </h3>
+                <p>
+                    La clase <i>jaxb-ri-install</i>
+                    <code>/samples/inline-customize/src/inlinecustomize/primer/MyDatatypeConverter</code>, mostrada en el ejemplo 
+                    siguiente, proporciona una forma de personalizar la traducción de los tipos de datos XML a y desde tipos de 
+                    datos Java usando una personalización <code>&lt;javaType&gt;</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+package primer;
+import java.math.BigInteger;
+import javax.xml.bind.DatatypeConverter;
+
+public class MyDatatypeConverter {
+
+    public static short parseIntegerToShort(String value) {
+        BigInteger result = DatatypeConverter.parseInteger(value);
+        return (short)(result.intValue());
+    }
+
+    public static String printShortToInteger(short value) {
+        BigInteger result = BigInteger.valueOf(value);
+        return DatatypeConverter.printInteger(result);
+    }
+
+    public static int parseIntegerToInt(String value) {
+        BigInteger result = DatatypeConverter.parseInteger(value);
+        return result.intValue();
+    }
+
+    public static String printIntToInteger(int value) {
+        BigInteger result = BigInteger.valueOf(value);
+        return DatatypeConverter.printInteger(result);
+    }
+};
+                    </pre>
+                </div>
+                <p>
+                    El código siguiente muestra cómo la clase <code>MyDatatypeConverter</code> se referencia en una declaración 
+                    <code>&lt;javaType&gt;</code> en <code>po.xsd</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;xsd:simpleType name=&quot;ZipCodeType&quot;&gt;
+<b>&lt;xsd:annotation&gt;</b>
+    <b>&lt;xsd:appinfo&gt;</b>
+    <b>&lt;jxb:javaType name=&quot;int&quot;</b>
+        <b>parseMethod=&quot;primer.MyDatatypeConverter.parseIntegerToInt&quot;</b>
+        <b>printMethod=&quot;primer.MyDatatypeConverter.printIntTo Integer&quot; /&gt;</b>
+    <b>&lt;/xsd:appinfo&gt;</b>
+<b>&lt;/xsd:annotation&gt;</b>
+    &lt;xsd:restriction base=&quot;xsd:integer&quot;&gt;
+    &lt;xsd:minInclusive value=&quot;10000&quot;/&gt;
+    &lt;xsd:maxInclusive value=&quot;99999&quot;/&gt;
+    &lt;/xsd:restriction&gt;
+&lt;/xsd:simpleType&gt;
+                    </pre>
+                </div>
+                <p>
+                    En este ejemplo, la declaración de vinculación <code>jxb:javaType</code> sobrescribe la vinculación 
+                    predeterminada de JAXB de este tipo a <code>java.math.BigInteger</code>. Para los propósitos del ejemplo 
+                    Personalizar en Línea, las restricciones en <code>ZipCodeType</code> (específicamente, los códigos postales 
+                    válidos de los Estados Unidos de América se limitan a cinco dígitos) hacen posible que todos los valores 
+                    válidos posibles puedan encajar dentro del tipo de datos primitivo de Java <code>int</code>. Tenga en cuenta 
+                    también que, ya que se declara <code>&lt;jxb:javaType name=&quot;int&quot;/&gt;</code> dentro de 
+                    <code>ZipCodeType</code>, la personalización se aplica a todas las propiedades JAXB que hacen referencia a esta 
+                    definición <code>simpleType</code>, incluyendo los métodos <code>getZip</code> y <code>setZip</code>.
+                </p>
+                <h4>
+                    <a id="bnbci"></a>Ejemplo Convertidor de Tipos de Datos
+                </h4>
+                <p>
+                    El ejemplo Convertidor de Tipos de Datos es similar al ejemplo de Personalizar en Línea. Como con el ejemplo 
+                    de Personalizar en Línea, las personalizaciones en el ejemplo Convertidor de Tipos de Datos se hacen usando 
+                    declaraciones de vinculación en línea en el esquema XML para la aplicación, <code>po.xsd</code>.
+                </p>
+                <p>
+                    Las personalizaciones globales, de esquema, y paquete, y casi todas las de clase para los ejemplos de 
+                    Personalizar en Línea y Convertidor de Tipos de Datos  son idénticas. Donde el ejemplo de Convertidor de Tipos 
+                    de Datos difiere del ejemplo Personalizar en Línea es en el <code>parseMethod</code> y 
+                    <code>printMethod</code> usados para convertir datos XML al tipo <code>int</code> de Java.
+                </p>
+                <p>
+                    Específicamente, en vez de usar métodos en la clase personalizada <code>MyDataTypeConverter</code> para 
+                    realizar estas conversiones de tipos de datos, el ejemplo de Convertidor de Tipos de Datos usa los métodos 
+                    integrados proporcionados por <code>javax.xml.bind.DatatypeConverter</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;xsd:simpleType name=&quot;ZipCodeType&quot;&gt;
+    &lt;xsd:annotation&gt;
+        &lt;xsd:appinfo&gt;
+            &lt;jxb:javaType 
+                name=&quot;int&quot;
+                parseMethod=&quot;javax.xml.bind.DatatypeConverter.parseInt&quot;
+                printMethod=&quot;javax.xml.bind.DatatypeConverter.printInt&quot;/&gt;
+        &lt;/xsd:appinfo&gt;
+    &lt;/xsd:annotation&gt;
+    &lt;xsd:restriction base=&quot;xsd:integer&quot;&gt;
+        &lt;xsd:minInclusive value=&quot;10000&quot;/&gt;
+        &lt;xsd:maxInclusive value=&quot;99999&quot;/&gt;
+    &lt;/xsd:restriction&gt;
+&lt;/xsd:simpleType&gt;
+                    </pre>
+                </div>
+                <h3>
+                    <a id="bnbck"></a>Construir y Ejecutar el Ejemplo de Convertidor de Tipos de Datos Usando Ant
+                </h3>
+                <p>
+                    Para compilar y ejecutar el ejemplo Convertidor de Tipos de Datos usando Ant, en una ventana de terminal, vaya 
+                    al directorio <i>jaxb-ri-install</i><code>/samples/datatypeconverter/</code> y teclee lo siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+ant
+                    </pre>
+                </div>
+                <h4>
+                    <a id="bnbcl"></a>Ficheros de Declaración de Vinculación
+                </h4>
+                <p>
+                    Las secciones siguientes proporcionan información sobre los ficheros de declaración de vinculación:
+                </p>
+                <ul>
+                    <li>
+                        <a href="#bnbcm">Version JAXB, Espacio de Nombres, y Atributos de Esquema</a>
+                    </li>
+                    <li>
+                        <a href="#bnbcq">Declaraciones de Vinculación Global y de Esquema</a>
+                    </li>
+                    <li>
+                        <a href="#bnbcr">Declaraciones de Clase</a>
+                    </li>
+                </ul>
+                <h3>
+                    <a id="bnbcm"></a>Version JAXB, Espacio de Nombres, y Atributos de Esquema
+                </h3>
+                <p>
+                    Todos los ficheros de declaración de vinculación de JAXB deben empezar con:
+                </p>
+                <ul>
+                    <li>
+                        Número de versión JAXB
+                    </li>
+                    <li>
+                        Declaraciones del Espacio de Nombres
+                    </li>
+                    <li>
+                        Nombre y nodo del Esquema
+                    </li>
+                </ul>
+                <p>
+                    La versión, espacio de nombres, y declaraciones de esquema en <code>bindings.xjb</code> son las siguientes:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;jxb:bindings 
+    version=&quot;1.0&quot;
+    xmlns:jxb=&quot;http://java.sun.com/xml/ns/jaxb&quot;
+    xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+    &lt;jxb:bindings 
+        schemaLocation=&quot;po.xsd&quot; 
+        node=&quot;/xs:schema&quot;&gt;
+            &lt;!-- ...
+            <i>binding-declarations</i> 
+            ... --&gt;
+    &lt;/jxb:bindings&gt;
+    &lt;!-- 
+    schemaLocation=&quot;po.xsd&quot; 
+    node=&quot;/xs:schema&quot; --&gt;
+&lt;/jxb:bindings&gt;
+                    </pre>
+                </div>
+                <h3>
+                    <a id="bnbcn"></a>Número de Versión JAXB
+                </h3>
+                <p>
+                    Un fichero XML con un elemento raíz de <code>&lt;jaxb:bindings&gt;</code> se considera un fichero de 
+                    vinculación externo. El elemento raíz debe especificar el atributo de versión JAXB con el cual deben cumplir 
+                    sus declaraciones vinculantes; específicamente el elemento raíz <code>&lt;jxb:bindings&gt;</code> debe 
+                    contener una declaración &lt;<code>jxb:version&gt;</code> o un atributo <code>version</code>. Por contraste, 
+                    cuando se hacen declaraciones de vinculación en línea, el número de versión JAXB se hace como atributo de la 
+                    declaración <code>&lt;xsd:schema&gt;</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;xsd:schema 
+    xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;
+    xmlns:jxb=&quot;http://java.sun.com/xml/ns/jaxb&quot;
+    jxb:version=&quot;1.0&quot;&gt;
+                    </pre>
+                </div>
+                <h3>
+                    <a id="bnbco"></a>Declaraciones de Espacios de Nombres
+                </h3>
+                <p>
+                    Como se mostró en <a href="#bnbcm">Version JAXB, Espacio de Nombres, y Atributos de Esquema</a>, las 
+                    declaraciones de espacio de nombres en el fichero externo de declaraciones de vinculación incluyen el espacio 
+                    de nombres JAXB y el espacio de nombres XMLSchema. Tenga en cuenta que los prefijos usados en este ejemplo 
+                    podrían ser de hecho cualquiera que usted quisiera; lo importante es usar consistentemente cualquier prefijo 
+                    que defina aquí en las declaraciones siguientes en el fichero.
+                </p>
+                <h3>
+                    <a id="bnbcp"></a>Nombre de Esquema y Nodo de Esquema
+                </h3>
+                <p>
+                    La cuarta línea del código en <a href="#bnbcm">Version JAXB, Espacio de Nombres, y Atributos de Esquema</a> 
+                    especifica el nombre del esquema a cual estas declaraciones de vinculación del fichero aplican, y el nodo del 
+                    esquema en el cual las personalizaciones tomarán primero efecto. Las declaraciones de vinculación siguientes 
+                    en este fichero pueden hacer referencia a nodos específicos dentro del esquema, pero esta primera declaración 
+                    debería abarcar el esquema como un todo; por ejemplo, en <code>bindings.xjb</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;jxb:bindings schemaLocation=&quot;po.xsd&quot; node=&quot;/xs:schema&quot;&gt;
+                    </pre>
+                </div>
+                <h3>
+                    <a id="bnbcq"></a>Declaraciones de Vinculación Global y de Esquema
+                </h3>
+                <p>
+                    Las declaraciones de vinculación globales del esquema en <code>bindings.xjb</code> son las mismas que aquellas 
+                    en <code>po.xsd</code> para el ejemplo Convertidor de Tipos de Datos. La única diferencia es que ya que las 
+                    declaraciones en <code>po.xsd</code> se realizan en línea, debe embeberlas en elementos 
+                    <code>&lt;xs:appinfo&gt;</code>, los cuales son innecesarios en el fichero externo de vinculaciones.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;jxb:globalBindings
+    fixedAttributeAsConstantProperty=&quot;true&quot;
+    collectionType=&quot;java.util.Vector&quot;
+    typesafeEnumBase=&quot;xs:NCName&quot;
+    choiceContentProperty=&quot;false&quot;
+    typesafeEnumMemberName=&quot;generateError&quot;
+    bindingStyle=&quot;elementBinding&quot;
+    enableFailFastCheck=&quot;false&quot;
+    generateIsSetMethod=&quot;false&quot;
+    underscoreBinding=&quot;asCharInWord&quot;/&gt;
+    &lt;jxb:schemaBindings&gt;
+        &lt;jxb:package name=&quot;primer.myPo&quot;&gt;
+            &lt;jxb:javadoc&gt;
+                &lt;![CDATA[&lt;body&gt;
+                    Package level documentation for generated package
+                    primer.myPo.&lt;/body&gt;]]&gt;
+                &lt;/jxb:javadoc&gt;
+        &lt;/jxb:package&gt;
+        &lt;jxb:nameXmlTransform&gt;
+            &lt;jxb:elementName suffix=&quot;Element&quot;/&gt;
+        &lt;/jxb:nameXmlTransform&gt;
+    &lt;/jxb:schemaBindings&gt;
+                    </pre>
+                </div>
+                <p>
+                    En comparación, la sintaxis usada en <code>po.xsd</code> para el ejemplo Convertidor de Tipos de Datos es:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;xsd:annotation&gt;
+    &lt;xsd:appinfo&gt;
+        &lt;jxb:globalBindings
+            ...
+            <i>binding-declarations</i>
+            ...
+        &lt;jxb:schemaBindings&gt;
+            ...
+            <i>binding-declarations</i>
+            ...
+        &lt;/jxb:schemaBindings&gt;
+    &lt;/xsd:appinfo&gt;
+&lt;/xsd:annotation&gt;
+                    </pre>
+                </div>
+                <h3>
+                    <a id="bnbcr"></a>Declaraciones de Clase
+                </h3>
+                <p>
+                    Las declaraciones de vinculación de nivel de clase en <code>bindings.xjb</code> difieren de las declaraciones 
+                    análogas en <code>po.xsd</code> para el ejemplo Convertidor de Tipos de Datos en dos formas:
+                </p>
+                <ul>
+                    <li>
+                        Como con todas las otras declaraciones de vinculación en <code>bindings.xjb</code>, no necesita embeber sus 
+                        personalizaciones en elementos <code>&lt;xsd:appinfo&gt;</code> del esquema.
+                    </li>
+                    <li>
+                        Debe especificar el nodo del esquema al cual se aplica la personalización. La sintaxis general para este 
+                        tipo de declaración es:
+                        <div class="codeblock">
+                            <pre>
+&lt;jxb:bindings node=&quot;//<i>node-type</i>[@name=&rsquo;<i>node-name</i>&rsquo;]&quot;&gt;
+                            </pre>
+                        </div>
+                    </li>
+                </ul>
+                <p>
+                    Por ejemplo, el código siguiente muestra las declaraciones de vinculación para el <code>complexType</code> 
+                    llamado <code>USAddress</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;jxb:bindings node=&quot;//xs:complexType [@name=&rsquo;USAddress&rsquo;]&quot;&gt;
+    &lt;jxb:class&gt;
+        &lt;jxb:javadoc&gt;
+            &lt;![CDATA[
+                First line of documentation for a &lt;b&gt;USAddress&lt;/b&gt;.
+            ]]&gt;
+        &lt;/jxb:javadoc&gt;
+    &lt;/jxb:class&gt;
+
+&lt;jxb:bindings node=&quot;.//xs:element [@name=&rsquo;name&rsquo;]&quot;&gt;
+    &lt;jxb:property name=&quot;toName&quot;/&gt;
+&lt;/jxb:bindings&gt;
+
+&lt;jxb:bindings node=&quot;.//xs:element [@name=&rsquo;zip&rsquo;]&quot;&gt;
+    &lt;jxb:property name=&quot;zipCode&quot;/&gt;
+&lt;/jxb:bindings&gt;
+&lt;/jxb:bindings&gt;
+&lt;!-- 
+    node=&quot;//xs:complexType
+    [@name=&rsquo;USAddress&rsquo;]&quot; --&gt;
+                    </pre>
+                </div>
+                <p>
+                    Tenga en cuenta en este ejemplo que <code>USAddress</code> es el padre de los elementos hijos <code>name</code> 
+                    y <code>zip</code>, y por lo tanto una etiqueta <code>&lt;/jxb:bindings&gt;</code> encierra las declaraciones
+                    <code>bindings</code> para los elementos hijos y la declaración de nivel de clase <code>javadoc</code>.
+                </p>
+                <h4>
+                    <a id="bnbcs"></a>Ejemplo de Personalización Externa
+                </h4>
+                <p>
+                    El ejemplo Personalización Externa es idéntico al ejemplo Convertidor de Tipos de Datos, excepto que las 
+                    declaraciones de vinculación en el ejemplo Personalización Externa se hacen usando un fichero externo de 
+                    declaraciones de vinculación en lugar de en línea en el esquema XML de origen.
+                </p>
+                <p>
+                    El fichero de personalización de vinculación usado en el ejemplo Personalización Externa es 
+                    <i>jaxb-ri-install</i><code>/samples/external-customize/binding.xjb</code>.
+                </p>
+                <p>
+                    Esta sección compara las declaraciones de personalización en <code>bindings.xjb</code> con las declaraciones 
+                    análogas usadas en el esquema XML, <code>po.xsd</code>, en el ejemplo Convertidor de Tipos De Datos. Los dos 
+                    conjuntos de declaraciones logran exactamente el mismo resultado.
+                </p>
+                <h3>
+                    <a id="bnbcu"></a>Construir y Ejecutar el Ejemplo de Personalización Externa Usando Ant
+                </h3>
+                <p>
+                    Para compilar y ejecutar el ejemplo Personalización Externa usando Ant, en una ventana de terminal, vaya al 
+                    directorio <i>jaxb-ri-install</i><code>/samples/external-customize/</code> y teclee lo siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+ant
+                    </pre>
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="basic.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="j2schema.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Ejemplos Básicos<br />
+            <b>Página siguiente:</b> Ejemplos Java-a-Schema
+        </div>
+    </body>
+</html> 

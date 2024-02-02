@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Transacciones Gestionadas por Contenedores</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="transactions003.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="transactions005.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BNCIJ">
+      <h2 id="container-managed-transactions">Transacciones Gestionadas por Contenedores</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            En un enterprise bean con demarcación de transacciones administradas por contenedor, el contenedor 
+            EJB establece los límites de las transacciones. Puede utilizar transacciones gestionadas por 
+            contenedor con cualquier tipo de enterprise bean: sesión o mensaje. Las transacciones 
+            administradas por contenedores simplifican el desarrollo porque el código del enterprise bean no 
+            marca explícitamente los límites de la transacción. El código no incluye declaraciones que 
+            comiencen y finalicen la transacción. De forma predeterminada, si no se especifica ninguna 
+            demarcación de transacciones, los enterprise beans utilizan la demarcación de transacciones 
+            administrada por contenedor.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Normalmente, el contenedor inicia una transacción inmediatamente antes de que se inicie un método 
+            de enterprise bean y confirma la transacción justo antes de que finalice el método. Cada método se 
+            puede asociar con una sola transacción. No se permiten transacciones anidadas o múltiples dentro 
+            de un método.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Las transacciones administradas por contenedor no requieren que todos los métodos estén asociados 
+            con transacciones. Al desarrollar un bean, puede configurar los atributos de transacción para 
+            especificar cuáles de los métodos del bean están asociados con las transacciones.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Los enterprise beans que utilizan la demarcación de transacciones gestionadas por contenedor no 
+            deben utilizar ningún método de gestión de transacciones que interfiera con los límites de 
+            demarcación de transacciones del contenedor. Ejemplos de tales métodos son los métodos 
+            <code>commit</code>, <code>setAutoCommit</code> y <code>rollback</code> de 
+            <code>java.sql.Connection</code> o métodos <code>commit</code> y <code>rollback</code> de 
+            <code>javax.jms.Session</code>. Si necesita control sobre la demarcación de transacciones, debe 
+            usar la demarcación de transacciones administrada por la aplicación.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Los enterprise beans que utilizan la demarcación de transacciones gestionadas por contenedores 
+            tampoco deben utilizar la interfaz <code>javax.transaction.UserTransaction</code>.
+          </p>
+        </div>
+        <div class="sect2" id="BNCIK">
+          <h3 id="transaction-attributes">Atributos de Transacción</h3>
+          <div class="paragraph">
+            <p>
+              Un atributo de transacción controla el alcance de una transacción. La 
+              <a href="#BNCIL">Figura 54-1</a> ilustra por qué es importante controlar el alcance. En el 
+              diagrama, <code>method-A</code> comienza una transacción y luego invoca <code>method-B</code> de 
+              <code>Bean-2</code>. Cuando se ejecuta <code>method-B</code>, ¿se ejecuta dentro del alcance de 
+              la transacción iniciada por <code>method-A</code> o se ejecuta con una nueva transacción? La 
+              respuesta depende del atributo de transacción de <code>method-B</code>.
+            </p>
+          </div>
+          <div id="BNCIL" class="paragraph">
+            <div class="title">
+              <strong>Figura 54-1 Alcance de la transacción</strong>
+            </div>
+            <p>
+              <span class="image">
+                <img src="img/javaeett_dt_050.png" alt="Un diagrama que muestra una transacción entre dos 
+                     beans.">
+              </span>
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Un atributo de transacción puede tener uno de los siguientes valores:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p><code>Required</code></p>
+              </li>
+              <li>
+                <p><code>RequiresNew</code></p>
+              </li>
+              <li>
+                <p><code>Mandatory</code></p>
+              </li>
+              <li>
+                <p><code>NotSupported</code></p>
+              </li>
+              <li>
+                <p><code>Supports</code></p>
+              </li>
+              <li>
+                <p><code>Never</code></p>
+              </li>
+            </ul>
+          </div>
+          <div class="sect3" id="BNCIM">
+            <h4 id="required-attribute">Atributo Required</h4>
+            <div class="paragraph">
+              <p>
+                Si el cliente se ejecuta dentro de una transacción e invoca el método del enterprise bean, el 
+                método se ejecuta dentro de la transacción del cliente. Si el cliente no está asociado con una 
+                transacción, el contenedor inicia una nueva transacción antes de ejecutar el método.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                El atributo <code>Required</code> es el atributo de transacción implícito para todos los 
+                métodos de enterprise beans que se ejecutan con demarcación de transacción administrada por 
+                contenedor. Por lo general, no establece el atributo <code>Required</code> a menos que 
+                necesite anular otro atributo de transacción. Debido a que los atributos de transacción son 
+                declarativos, puede cambiarlos fácilmente más adelante.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="BNCIN">
+            <h4 id="requiresnew-attribute">Atributo RequiresNew</h4>
+            <div class="paragraph">
+              <p>
+                Si el cliente se ejecuta dentro de una transacción e invoca el método del enterprise bean, el 
+                contenedor realiza los siguientes pasos:
+              </p>
+            </div>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>Suspende la transacción del cliente</p>
+                </li>
+                <li>
+                  <p>Comienza una nueva transacción</p>
+                </li>
+                <li>
+                  <p>Delega la llamada al método.</p>
+                </li>
+                <li>
+                  <p>Reanuda la transacción del cliente después de que se completa el método</p>
+                </li>
+              </ol>
+            </div>
+            <div class="paragraph">
+              <p>
+                Si el cliente no está asociado con una transacción, el contenedor inicia una nueva transacción 
+                antes de ejecutar el método.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Debe usar el atributo <code>RequiresNew</code> cuando desee asegurarse de que el método 
+                siempre se ejecute dentro de una nueva transacción.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="BNCIO">
+            <h4 id="mandatory-attribute">Atributo Mandatory</h4>
+            <div class="paragraph">
+              <p>
+                Si el cliente se ejecuta dentro de una transacción e invoca el método del enterprise bean, el 
+                método se ejecuta dentro de la transacción del cliente. Si el cliente no está asociado con una 
+                transacción, el contenedor lanza una <code>TransactionRequiredException</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Utilice el atributo <code>Mandatory</code> si el método del enterprise bean debe utilizar la 
+                transacción del cliente.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="BNCIP">
+            <h4 id="notsupported-attribute">Atributo NotSupported</h4>
+            <div class="paragraph">
+              <p>
+                Si el cliente se está ejecutando dentro de una transacción e invoca el método del enterprise 
+                bean, el contenedor suspende la transacción del cliente antes de invocar el método. Una vez 
+                que se ha completado el método, el contenedor reanuda la transacción del cliente.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Si el cliente no está asociado con una transacción, el contenedor no inicia una nueva 
+                transacción antes de ejecutar el método.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Utilice el atributo <code>NotSupported</code> para los métodos que no necesitan transacciones. 
+                Debido a que las transacciones implican sobrecargas, este atributo puede mejorar el 
+                rendimiento.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="BNCIQ">
+            <h4 id="supports-attribute">Atributo Supports</h4>
+            <div class="paragraph">
+              <p>
+                Si el cliente se ejecuta dentro de una transacción e invoca el método del enterprise bean, el 
+                método se ejecuta dentro de la transacción del cliente. Si el cliente no está asociado con una 
+                transacción, el contenedor no inicia una nueva transacción antes de ejecutar el método.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Debido a que el comportamiento transaccional del método puede variar, debe usar el atributo 
+                <code>Supports</code> con precaución.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="BNCIR">
+            <h4 id="never-attribute">Atributo Never</h4>
+            <div class="paragraph">
+              <p>
+                Si el cliente se ejecuta dentro de una transacción e invoca el método del enterprise bean, el 
+                contenedor genera una <code>RemoteException</code>. Si el cliente no está asociado con una 
+                transacción, el contenedor no inicia una nueva transacción antes de ejecutar el método.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="BNCIS">
+            <h4 id="summary-of-transaction-attributes">Resumen de los Atributos de Transacción</h4>
+            <div class="paragraph">
+              <p>
+                La <a href="#BNCIT">Tabla 54-1</a> resume los efectos de los atributos de transacción. Tanto 
+                las transacciones <code>T1</code> como <code>T2</code> están controladas por el contenedor. 
+                Una transacción <code>T1</code> está asociada con el cliente que llama a un método en el 
+                enterprise bean. En la mayoría de los casos, el cliente es otro enterprise bean. El contenedor 
+                inicia una transacción <code>T2</code> justo antes de que se ejecute el método.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                En la última columna de la <a href="#BNCIT">Tabla 54-1</a>, la palabra "Ninguno" significa que 
+                el método de negocio no se ejecuta dentro de una transacción controlada por el contenedor. 
+                Sin embargo, las llamadas a la base de datos en dicho método de negocio pueden ser controladas 
+                por el administrador de transacciones del sistema de administración de la base de datos.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p><a id="sthref235"></a><a id="BNCIT"></a></p>
+            </div>
+            <div class="paragraph">
+              <p><strong>Tabla 54-1 Atributos y Alcance de la Transacción</strong></p>
+            </div>
+            <table class="tableblock frame-all grid-all" style="width: 60%;">
+              <colgroup>
+                <col style="width: 33.3333%;">
+                <col style="width: 33.3333%;">
+                <col style="width: 33.3334%;">
+              </colgroup>
+              <tbody>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><strong>Atributo de Transacción</strong></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><strong>Transacción del Cliente</strong></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">Transacción del <strong>Método de Negocio</strong></p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>Required</code></p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">Ninguno</p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">T2</p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>Required</code></p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">T1</p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">T1</p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>RequiresNew</code></p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">Ninguno</p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">T2</p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>RequiresNew</code></p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">T1</p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">T2</p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>Mandatory</code></p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">Ninguno</p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">Error</p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>Mandatory</code></p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">T1</p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">T1</p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>NotSupported</code></p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">Ninguno</p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">Ninguno</p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>NotSupported</code></p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">T1</p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">Ninguno</p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>Supports</code></p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">Ninguno</p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">Ninguno</p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>Supports</code></p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">T1</p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">T1</p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>Never</code></p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">Ninguno</p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">Ninguno</p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>Never</code></p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">T1</p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">Error</p></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="sect3" id="BNCIU">
+            <h4 id="setting-transaction-attributes">Configuración de Atributos de Transacción</h4>
+            <div class="paragraph">
+              <p>
+                Los atributos de transacción se especifican decorando la clase o método del enterprise bean 
+                con una anotación <code>javax.ejb.TransactionAttribute</code> y estableciéndola en una de las 
+                constantes <code>javax.ejb.TransactionAttributeType</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Si decora la clase de enterprise bean con <code>@TransactionAttribute</code>, el 
+                <code>TransactionAttributeType</code> especificado se aplica a todos los métodos de negocio de 
+                la clase. Decorar un método de negocio con <code>@TransactionAttribute</code> aplica el 
+                <code>TransactionAttributeType</code> solo a ese método. Si una anotación 
+                <code>@TransactionAttribute</code> decora tanto la clase como el método, el método 
+                <code>TransactionAttributeType</code> anula la clase <code>TransactionAttributeType</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Las constantes <code>TransactionAttributeType</code> que se muestran en la 
+                <a href="#GKCFD">Tabla 54-2</a> encapsulan los atributos de transacción descritos 
+                anteriormente en esta sección.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p><a id="sthref236"></a><a id="GKCFD"></a></p>
+            </div>
+            <div class="paragraph">
+              <p><strong>Tabla 54-2 Constantes de TransactionAttributeType</strong></p>
+            </div>
+            <table class="tableblock frame-all grid-all" style="width: 34%;">
+              <colgroup>
+                <col style="width: 99.0099%;">
+                <col style="width: 0.9901%;">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th class="tableblock halign-left valign-top">Atributo de Transacción</th>
+                  <th class="tableblock halign-left valign-top">Constante TransactionAttributeType</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>Required</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>TransactionAttributeType.REQUIRED</code></p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>RequiresNew</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>TransactionAttributeType.REQUIRES_NEW</code></p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>Mandatory</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>TransactionAttributeType.MANDATORY</code></p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>NotSupported</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>TransactionAttributeType.NOT_SUPPORTED</code></p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>Supports</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>TransactionAttributeType.SUPPORTS</code></p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>Never</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>TransactionAttributeType.NEVER</code></p></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="paragraph">
+              <p>
+                El siguiente fragmento de código demuestra cómo usar la anotación 
+                <code>@TransactionAttribute</code>:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@TransactionAttribute(NOT_SUPPORTED)
+@Stateful
+public class TransactionBean implements Transaction {
+...
+    @TransactionAttribute(REQUIRES_NEW)
+    public void firstMethod() {...}
+    @TransactionAttribute(REQUIRED)
+    public void secondMethod() {...}
+    public void thirdMethod() {...}
+    public void fourthMethod() {...}
+}
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                En este ejemplo, el atributo de transacción de la clase <code>TransactionBean</code> se ha 
+                establecido en <code>NotSupported</code>, <code>firstMethod</code> se ha establecido en 
+                <code>RequiresNew</code>, y <code>secondMethod</code> se ha establecido en 
+                <code>Required</code>. Debido a que un <code>@TransactionAttribute</code> establecido en un 
+                método anula la clase <code>@TransactionAttribute</code>, las llamadas a 
+                <code>firstMethod</code> crearán una nueva transacción y las llamadas a 
+                <code>secondMethod</code> se ejecutará en la transacción actual o iniciará una nueva 
+                transacción. Las llamadas a <code>thirdMethod</code> o <code>fourthMethod</code> no tienen 
+                lugar dentro de una transacción.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="BNCIV">
+          <h3 id="rolling-back-a-container-managed-transaction">
+            Revertir una Transacción Gestionada por Contenedor
+          </h3>
+          <div class="paragraph">
+            <p>
+              Hay dos formas de revertir una transacción administrada por contenedor. Primero, si se lanza una 
+              excepción del sistema, el contenedor revertirá automáticamente la transacción. En segundo lugar, 
+              al invocar el método <code>setRollbackOnly</code> de la interfaz <code>EJBContext</code>, el 
+              método bean instruye al contenedor para revertir la transacción. Si el bean arroja una excepción 
+              de aplicación, la reversión no es automática, pero puede iniciarse mediante una llamada a 
+              <code>setRollbackOnly</code>.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BNCIW">
+          <h3 id="synchronizing-a-session-beans-instance-variables">
+            Sincronización de las Variables de Instancia de un Bean de Sesión
+          </h3>
+          <div class="paragraph">
+            <p>
+              La interfaz <code>SessionSynchronization</code>, que es opcional, permite que las instancias de 
+              beans de sesión con estado reciban notificaciones de sincronización de transacciones. Por 
+              ejemplo, podría sincronizar las variables de instancia de un enterprise bean con sus valores 
+              correspondientes en la base de datos. El contenedor invoca los métodos 
+              <code>SessionSynchronization</code> (<code>afterBegin</code>, <code>beforeCompletion</code> y 
+              <code>afterCompletion</code>) en cada una de las etapas principales de un transacción.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El método <code>afterBegin</code> informa a la instancia que ha comenzado una nueva transacción. 
+              El contenedor invoca <code>afterBegin</code> inmediatamente antes de invocar el método de 
+              negocio.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El contenedor invoca el método <code>beforeCompletion</code> después de que el método de negocio 
+              haya finalizado, pero justo antes de que se confirme la transacción. El método 
+              <code>beforeCompletion</code> es la última oportunidad para que el bean de sesión revierta la 
+              transacción (llamando a <code>setRollbackOnly</code>).
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El método <code>afterCompletion</code> indica que la transacción se ha completado. Este método 
+              tiene un único parámetro <code>boolean</code> cuyo valor es <code>true</code> si la transacción 
+              se confirmó y <code>false</code> si se revirtió.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BNCIX">
+          <h3 id="methods-not-allowed-in-container-managed-transactions">
+            Métodos no Permitidos en Transacciones Gestionadas por Contenedor
+          </h3>
+          <div class="paragraph">
+            <p>
+              No debe invocar ningún método que pueda interferir con los límites de transacción establecidos 
+              por el contenedor. Los siguientes métodos están prohibidos:
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  Los métodos <code>commit</code>, <code>setAutoCommit</code> y <code>rollback</code> de 
+                  <code>java.sql.Connection</code>
+                </p>
+              </li>
+              <li>
+                <p>El método <code>getUserTransaction</code> de <code>javax.ejb.EJBContext</code></p>
+              </li>
+              <li>
+                <p>Cualquier método de <code>javax.transaction.UserTransaction</code></p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Sin embargo, puede usar estos métodos para establecer límites en las transacciones administradas 
+              por la aplicación.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="transactions003.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="transactions005.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

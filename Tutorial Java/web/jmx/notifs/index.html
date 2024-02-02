@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Lección: Notificaciones (Los Tutoriales de Java&trade; &gt; Extensiones de Gestión de Java (JMX))
+        </title>
+        <meta name="description" content="Este tutorial de JMX Java describe la tecnología de Extensiones de Gestión de Java (JMX): 
+              mbeans, notificaciones y gestión remota" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jmx, java management extension, mbeans,
+              mxbeans" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body>
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="MainFlow_wide">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Extensiones de Gestión de Java (JMX)
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Extensiones de Gestión de Java (JMX)</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="../mbeans/index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../remote/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Lección: Notificaciones</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    La IPA de JMX define un mecanismo para habilitar que los MBeans generen notificaciones, por ejemplo, para 
+                    señalar un cambio de estado, un evento detectado, o un problema.
+                </p>
+                <p>
+                    Para generar notificaciones, un MBean debe implementar la interfaz 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/NotificationEmitter.html">
+                        <code>NotificationEmitter</code></a> o extender 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/NotificationBroadcasterSupport.html">
+                        <code>NotificationBroadcasterSupport</code></a>. Para enviar una notificación, necesita construir una 
+                        instancia de la clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/Notification.html">
+                        <code>javax.management.Notification</code></a> o una subclase (tal como 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/AttributeChangeNotification.html">
+                        <code>AttributeChangedNotification</code></a>), y pasar la instancia a 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/NotificationBroadcasterSupport.html#sendNotification-javax.management.Notification">
+                        <code>NotificationBroadcasterSupport.sendNotification</code></a>.
+                </p>
+                <p>
+                    Cada notificación tiene un origen. El origen es el objeto de nombre del MBean que generó la notificación.
+                </p>
+                <p>
+                    Cada notificacaión tiene un número de secuencia. Este número puede usarse para ordenar las notificaciones que 
+                    vienen de la misma fuente cuando el orden importa y hay un riesgo de que las notificaciones sean gestionadas 
+                    en el orden equivocado. La secuencia de números puede ser cero, pero preferiblemente el número se incrementa 
+                    por cada notificación desde un MBean dado.
+                </p>
+                <p>
+                    La implementación del MBean 
+                    The
+                    <a class="SourceLink" target="_blank" href="../examples/Hello.java"
+                       onclick="showCode('../../displayCode.html', '../examples/Hello.java'); return false;">
+                        <code>Hello</code></a> en los 
+                    <a class="TutorialLink" target="_top" href="../mbeans/standard.html">MBeans Estándar</a> en realidad implementa 
+                    el mecanismo de notificación. Sin embargo, este código fue omitido en essa lección por simplicidad. El código 
+                    completo para <code>Hello</code> a continuación:
+                </p>
+                <div class="codeblock">
+                    <pre>
+package com.example;
+
+import javax.management.*;
+
+public class Hello
+        extends NotificationBroadcasterSupport
+        implements HelloMBean {
+
+    public void sayHello() {
+        System.out.println("hello, world");
+    }
+
+    public int add(int x, int y) {
+        return x + y;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public int getCacheSize() {
+        return this.cacheSize;
+    }
+
+    public synchronized void setCacheSize(int size) {
+        int oldSize = this.cacheSize;
+        this.cacheSize = size;
+
+        System.out.println("Cache size now " + this.cacheSize);
+
+        Notification n = new AttributeChangeNotification(this,
+                                sequenceNumber++, System.currentTimeMillis(),
+                                "CacheSize changed", "CacheSize", "int",
+                                oldSize, this.cacheSize);
+
+        sendNotification(n);
+    }
+
+    @Override
+    public MBeanNotificationInfo[] getNotificationInfo() {
+        String[] types = new String[]{
+            AttributeChangeNotification.ATTRIBUTE_CHANGE
+        };
+
+        String name = AttributeChangeNotification.class.getName();
+        String description = "An attribute of this MBean has changed";
+        MBeanNotificationInfo info = 
+                new MBeanNotificationInfo(types, name, description);
+        return new MBeanNotificationInfo[]{info};
+    }
+    
+    private final String name = "Reginald";
+    private int cacheSize = DEFAULT_CACHE_SIZE;
+    private static final int DEFAULT_CACHE_SIZE = 200;
+    private long sequenceNumber = 1;
+}
+                    </pre>
+                </div>
+                <p>
+                    Esta implementación del MBean <code>Hello</code> extiende la clase <code>NotificationBroadcasterSupport</code>.
+                    <code>NotificationBroadcasterSupport</code> implementa la interfaz <code>NotificationEmitter</code>.
+                </p>
+                <p>
+                    Las operaciones y atributos son establecidos de la misma forma que en el ejmplo del MBean estándar, con la 
+                    excepción de que el método setter del atributo <code>CacheSize</code> ahora define un valor de 
+                    <code>oldSize</code>. Este valor registra el valor anterior del atributo <code>CacheSize</code> a la operación 
+                    de establecimiento.
+                </p>
+                <p>
+                    La notificación se construye desde una instancia, <code>n</code>, de la clase JMX 
+                    <code>AttributeChangeNotification</code>, la cual extiende <code>javax.management.Notification</code>. La 
+                    notificación se construye dentro de la definición del método <code>setCacheSize()</code> desde la información 
+                    siguiente. Esta información se pasa a <code>AttributeChangeNotification</code> como parámetros.
+                </p>
+                <ul>
+                    <li>
+                        El objeto de nombre de la fuente de la notificación, a saber, el MBean <code>Hello</code>, representado por 
+                        <code>this</code>
+                    </li>
+                    <li>
+                        Un número de secuencia, a saber, <code>sequenceNumber</code>, que se establece en 1 y que aumenta de forma 
+                        incremental
+                    </li>
+                    <li>
+                        Una marca de tiempo
+                    </li>
+                    <li>
+                        El contenido del mensaje de notificación
+                    </li>
+                    <li>
+                        El nombre del atributo que ha cambiado, en este caso, <code>CacheSize</code>
+                    </li>
+                    <li>
+                        El tipo del atributo que ha cambiado
+                    </li>
+                    <li>
+                        El valor viejo del atributo, en este caso, <code>oldSize</code>
+                    </li>
+                    <li>
+                        El valor nuevo del atributo, en este caso, <code>this.cacheSize</code>
+                    </li>
+                </ul>
+                <p>
+                    La notificación <code>n</code> es después pasada al método 
+                    <code>NotificationBroadcasterSupport.sendNotification()</code>.
+                </p>
+                <p>
+                    Finalmente, la instancia 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/MBeanNotificationInfo.html">
+                        <code>MBeanNotificationInfo</code></a> se define para describir las características de las diferentes 
+                        instancias de notificación generadas por el MBean para un tipo dado de notificación. En este caso el tipo 
+                        de notificaciones enviadas son notificaciones <code>AttributeChangeNotification</code>.
+                </p>
+                <h2>
+                    Ejecutar el Ejemplo de Notificación MBean
+                </h2>
+                <p>
+                    Una vez de nuevo, usará JConsole para interactuar con el MBean <code>Hello</code>, esta vez para enviar y 
+                    recibir notificaciones. Este ejemplo requiere de la versión 6 de la plataforma Java SE.
+                </p>
+                <ol>
+                    <li>
+                        Si no lo ha hecho ya, salve 
+                        <a class="SourceLink" target="_blank" href="../examples/jmx_examples.zip"
+                           onclick="showCode('../../displayCode.html', '../examples/jmx_examples.zip'); return false;">
+                            <code>jmx_examples.zip</code></a> dentro de su directorio <code>work_dir</code>.
+                    </li>
+                    <li>
+                        Descomprima el paquete de clases de ejemplo usando el comando siguiente en una ventana terminal.
+                        <div class="codeblock">
+                            <pre>
+unzip jmx_examples.zip
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        Compile las clases Java de ejemplo desde dentro del directorio <code>work_dir</code>.
+                        <div class="codeblock">
+                            <pre>
+javac com/example/*.java
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        Inicie la aplicación <code>Main</code>.
+                        <div class="codeblock">
+                            <pre>
+java com.example.Main
+                            </pre>
+                        </div>
+                        <p>
+                            Se genera una confirmación de que <code>Main</code> está esperando a que ocurra algo.
+                        </p>
+                    </li>
+                    <li>
+                        Inicie JConsole en una ventana terminal diferente en la misma máquina.
+                        <div class="codeblock">
+                            <pre>
+jconsole
+                            </pre>
+                        </div>
+                        <p>
+                            El cuadro de diálogo Nueva Conexión se visualiza, presentando una lista de los agentes JMX en ejecución 
+                            a los que puede conectar.
+                        </p>
+                    </li>
+                    <li>
+                        En el cuadro de diálogo Nueva Conexión, seleccione <code>com.example.Main</code> de la lista y pulse 
+                        Conectar.
+                        <p>
+                            Se visualiza un resumen de la actividad actual de su plataforma.
+                        </p>
+                    </li>
+                    <li>
+                        Pulse la pestaña MBeans.
+                        <p>
+                            Este panel muestra todos los MBeans que están actualmente registrados en el servidor MBean.
+                        </p>
+                    </li>
+                    <li>
+                        En el marco izquierdo, expanda el nodo <code>com.example</code> en el árbol MBean.
+                        <p>
+                            Verá el ejemplo del MBean <code>Hello</code> que fue creado y registrado por <code>Hello</code>. Si 
+                            pulsa <code>Hello</code>, verá su nodo de Notificaciones en el árbol MBean.
+                        </p>
+                    </li>
+                    <li>
+                        Expanda el nodo de Notificaciones del MBean <code>Hello</code> en el árbol MBean.
+                        <p>
+                            Note que el panel está en blanco.
+                        </p>
+                    </li>
+                    <li>
+                        Pulse el botón Subscribir.
+                        <p>
+                            El número actual de notificaciones recibidas (0) se visualia en la etiqueta del nodo Notificaciones.
+                        </p>
+                    </li>
+                    <li>
+                        Expanda el nodo Atributos del MBean <code>Hello</code> en el árbol MBean , y cambie el valor del atributo 
+                        <code>CacheSize</code> a 150.
+                        <p>
+                            En la ventana termina en la cual inició <code>Main</code>, se visualiza una confirmación de este cambio 
+                            del atributo. Dese cuenta de que el número de notificaciones recibidas visualizadas en el nodo 
+                            Notificaciones ha cambiado a 1.
+                        </p>
+                    </li>
+                    <li>
+                        Expanda de nuevo el nodo Notificaciones del MBean <code>Hello</code> en el árbol MBean.
+                        <p>
+                            Se visualizan Los detalles de las notificación.
+                        </p>
+                    </li>
+                    <li>
+                        Para cerrar JConsole, seleccione Conexión -&gt; Salir.
+                    </li>
+                </ol>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="../mbeans/index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../remote/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Lección Anterior<br />
+            <b>Página siguiente:</b> Gestión Remota
+        </div>
+    </body>
+</html> 

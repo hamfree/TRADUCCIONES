@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Persistencia del Bean (Los Tutoriales de Java&trade; &gt; JavaBeans(TM) &gt; Temas Avanzados de JavaBeans)
+        </title>
+        <meta name="description" content="Este tutorial de Java JavaBean describe el uso de la IPA de JavaBeans para desarrollar 
+              componentes JavaBean" />
+        <meta name="keywords" content="java programming, learn java, java sample code, javabean, bean persistence, java
+              introspection, beancontext" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Temas Avanzados de JavaBeans</a></div>
+                <div class="nolinkAHEAD">Persistencia del Bean</div>
+                <div class="linkAHEAD"><a href="longpersistence.html">La Persistencia a Largo Plazo</a></div>
+                <div class="linkAHEAD"><a href="customization.html">Personalización del Bean</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> JavaBeans(TM)<br />
+                <b>Lección:</b> Temas Avanzados de JavaBeans
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">JavaBeans(TM)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Temas Avanzados de JavaBeans</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="longpersistence.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Persistencia del Bean</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Un bean tiene la propiedad de persistencia cuando sus propiedades, campos, e información de estado son 
+                    salvados a y recuperados desde el almacenamiento. Los modelos de componentes proporciona un mecanismo de 
+                    persistencia que habilita que el estado de los componentes se almacenen en un lugar no volátil para 
+                    recuperación posterior.
+                </p>
+                <p>
+                    El mecanismo que hace la persistencia posible se llama <em class="emphasis">serialización</em>. La 
+                    serialización de un objeto significa convertir un objeto en un flujo de datos y escribirlo en almacenamiento. 
+                    Cualquier applet, aplicación, o herramienta que usa ese bean puede entonces &quot;reconstituirlo&quot; por 
+                    deserialización. El objeto es entonces restaurado a su estado original.
+                </p>
+                <p>
+                    Por ejemplo, un aplicación de Java puede serializar una ventana Frame en una máquina con Microsoft Windows, 
+                    el fichero serializado puede ser enviado con correo electrónico a una máquina Solaris, y después una aplicación 
+                    Java puede restaurar la ventana Frame al estado exacto en el cual existía en la máquina con Microsoft Windows.
+                </p>
+                <p>
+                    Cualquier applet, aplicación, o herramienta que usa ese bean puede después &quot;reconstituirlo&quot; por 
+                    <i>deserialización</i>.
+                </p>
+                <p>
+                    Todos los beans deben persistir. Para persistir, sus beans deben soportar la serialización implementando o la 
+                    interfaz 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html">
+                        <code>java.io.Serializable</code></a> (en la documentación de la referencia IPA), o la interfaz 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/io/Externalizable.html">
+                        <code>java.io.Externalizable</code></a> (en la documentación de la referencia IPA). Estas interfaces le 
+                        ofrecen las elecciones de serialización automática y serialización personalizada. Si cualquier clase en una 
+                        jerarquia de herencia de clases implementa <code>Serializable</code> o <code>Externalizable</code>, 
+                        entonces esa clase es serializable.
+                </p>
+                <h2>
+                    Clases Que Son Serializables
+                </h2>
+                <p>
+                    Cualquier clase es serializable tan pronto como esa clase o una clase padre implemente la interfaz 
+                    <code>java.io.Serializable</code>. Ejemplos de clases serializables incluyen <code>Component</code>, 
+                    <code>String</code>, <code>Date</code>, <code>Vector</code>, y <code>Hashtable</code>. Así, cualquier subclase 
+                    de la clase <code>Component</code>, incluyendo <code>Applet</code>, puede ser serializada. Clases notables que 
+                    no soportan la serialización incluyen <code>Image</code>, <code>Thread</code>, <code>Socket</code>, y  
+                    <code>InputStream</code>. Intentar serializar objetos de estos tipos resultarán en una 
+                    <code>NotSerializableException</code>.
+                </p>
+                <p>
+                    La IPA de Serialización de Objetos de Java automáticamente serializa la mayoría de los campos de un objeto 
+                    Serializable al flujo de almacenamiento. Esto incluye los tipos primitivos, los vectores, y las cadenas. La IPA 
+                    no serializa o deserializa campos que estén marcados como transitorios o estáticos.
+                </p>
+                <h2>
+                    Controlar la Serialización
+                </h2>
+                <p>
+                    Puede controlar el nivel de serialización que sus beans experimentan. Hay tres formas de controlar la 
+                    serialización:
+                </p>
+                <ul>
+                    <li>
+                        Serialización automática, implmementada por la interfaza <code>Serializable</code>. El software de 
+                        serialización de Java serializa el objeto entero, excepto los campos estáticos y transitorios.
+                    </li>
+                    <li>
+                        Serialización personalizada. Excluye selectivamente los campos que no quiere serializados marcándlos con 
+                        los modificadores <code>transient</code> (o <code>static</code>).
+                    </li>
+                    <li>
+                        El formato de fichero personalizado, implementado por la interfaz <code>Externalizable</code> y sus dos 
+                        métodos. Los beans están escritos en un formato de fichero específico.
+                    </li>
+                </ul>
+                <h2>
+                    Serialización por Defecto: La Interfaz Serializable
+                </h2>
+                <p>
+                    La interfaz <code>Serializable</code> proporciona serialización automática usando las herramientas de la 
+                    Serialización de Objetos de Java. <code>Serializable</code> no declara métodos; actúa como un marcador, 
+                    diciéndole a las herramientas de Serialización de Objetos que su clase bean es serializable. Marcando su clase 
+                    como <code>Serializable</code> significa que le está diciendo a la Máquina Virtual de Java (MVJ) que se ha 
+                    asegurado de que su clase funcione con la serialización predeterminada. Aquí hay algunos puntos importantes 
+                    sobre el trabajo con la interfaz <code>Serializable</code>:
+                </p>
+                <ul>
+                    <li>
+                        Las clases que implementan <code>Serializable</code> deben tener un acceso a un 
+                        <em>constructor sin argumentos</em> de supertipo. Este constructor será llamado cuando un objeto es 
+                        &quot;reconstituido&quot; desde un fichero <code>.ser</code>.
+                    </li>
+                    <li>
+                        No necesita implementar <code>Serializable</code> en su clase si ya está implementada en una superclase.
+                    </li>
+                    <li>
+                        Todos los campos excepto los campos estáticos y transitorios son serializados. Use el modificador 
+                        <code>transient</code> para especificar los campos que no quiere que sean serializados, y para especificar 
+                        las clases que no son serializables.
+                    </li>
+                </ul>
+                <h2>
+                    Serialización Selectiva Usando la Palabra Clave transient
+                </h2>
+                <p>
+                    Para excluir los campos desde la serialización en un objeto <code>Serializable</code> marque los campos con el 
+                    modificador <code>transient</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+transient int status;
+                    </pre>
+                </div>
+                <p>
+                    La serialización predeterminada no serializará los campos <code>transient</code> y <code>static</code>.
+                </p>
+                <h2>
+                    Serialización Selectiva: writeObject y readObject
+                </h2>
+                <p>
+                    Si su clase serializable contiene uno de los dos métodos siguientes (las firmas deben ser exactas), entonces 
+                    no se llevará a cabo la serialización predeterminada.
+                </p>
+                <div class="codeblock">
+                    <pre>
+private void writeObject(java.io.ObjectOutputStream out)
+    throws IOException;
+private void readObject(java.io.ObjectInputStream in)
+    throws IOException, ClassNotFoundException;
+                    </pre>
+                </div>
+                <p>
+                    Puede controlar cómo se serializan objetos más complejos, escribiendo sus propias implementaciones de los 
+                    métodos <code>writeObject</code> y <code>readObject</code>. Implemente <code>writeObject</code> cuando necesite 
+                    ejercitar mayor control sobre lo que se serializa cuando necesite serializar objetos que la serialización 
+                    predeterminada no puede manejar, o cuando necesite agregar datos al flujo de serialización que no sea un 
+                    miembro de datos de objeto. Implemente <code>readObject</code> para reconstruir el flujo de datos que escribió 
+                    con <code>writeObject</code>.
+                </p>
+                <h2>
+                    La Interfaz Externalizable
+                </h2>
+                <p>
+                    Use la interfaz <code>Externalizable</code> cuando necesite completo control sobre la serialización de su 
+                    bean (por ejemplo, cuando escribe y lee un formato de fichero específico). Para uar la interfaz 
+                    <code>Externalizable</code> necesita implementar dos métodos: <code>readExternal</code> y 
+                    <code>writeExternal</code>. Las clases que implementan <code>Externalizable</code> no deben tener un 
+                    constructor sin argumentos.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="longpersistence.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Temas Avanzados de JavaBeans<br />
+            <b>Página siguiente:</b> La Persistencia a Largo Plazo
+        </div>
+    </body>
+</html> 

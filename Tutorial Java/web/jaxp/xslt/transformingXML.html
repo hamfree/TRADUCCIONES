@@ -1,0 +1,1856 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Transformando Datos de XML con XSLT (Los Tutoriales de Java&trade; &gt; IPA de Java para Procesado de XML (JAXP) &gt; 
+            Transformaciones del Lenguaje Extensible de Hojas de Estilo (XLST))
+        </title>
+        <meta name="description" content="Este tutorial de Java JAXP describe la IPA de Java para el procesado de XML (jaxp), XSLT, 
+              SAX, y tópicos de XML relacionados" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jaxp, xml, xslt, sax" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Transformaciones del Lenguaje Extensible de Hojas de Estilo (XLST)</a></div>
+                <div class="linkAHEAD"><a href="intro.html">Introduciendo XSL, XSLT, y XPath</a></div>
+                <div class="linkAHEAD"><a href="xpath.html">Cómo trabaja XPath</a></div>
+                <div class="linkAHEAD"><a href="writingDom.html">Escribiendo un DOM como si fuera un archivo XML</a></div>
+                <div class="linkAHEAD"><a href="generatingXML.html">Generando XML desde una Estructura de Datos Arbitraria</a></div>
+                <div class="nolinkAHEAD">Transformando Datos de XML con XSLT</div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> IPA de Java para Procesado de XML (JAXP)<br />
+                <b>Lección:</b> Transformaciones del Lenguaje Extensible de Hojas de Estilo (XLST)
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">IPA de Java para Procesado de XML (JAXP)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Transformaciones del Lenguaje Extensible de Hojas de Estilo (XLST)</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="generatingXML.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../stax/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Transformando Datos de XML con XSLT</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Las IPAs de las Transformaciones del Lenguaje Extensible de Hojas de Estilo (XLST) (XSLT) IPA pueden ser 
+                    usadas para muchos propósitios. Por ejemplo, con una hoja de estilos suficientemente inteligente, podría generar 
+                    un PDF o una salida PostScript de los datos XML. Pero generalmente, XSLT se usa para generar salida formateada 
+                    en HTML, o para crar un representación XML alternativa de los datos.
+                </p>
+                <p>
+                    En esta sección, una transformación XSLT se usa para traducir datos entrada XML a salida HTML.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> La 
+                    <a class="OutsideLink" target="_blank" href="http://www.w3.org/TR/xslt20/">especificación XSLT</a> es grande y 
+                    compleja, así que este tutorial puede sólo rayar la superficie. Le proporcionará un poco de información básica 
+                    para que pueda comprender tareas sencillas de procesamiento XSLT, pero no examina en detalle como escribir una 
+                    transformación XSLT, sino que se concetra en cómo usar la IPA de transformación XSLT de JAXP. Para una 
+                    comprensión más completa de XSLT, consulte un buen manual de referencia, como el de Michael Kay 
+                    <i>XSLT 2.0 and XPath 2.0: Programmer&#39;s Reference</i> (Wrox, 2008).
+                </p>
+                <hr />
+                <p>
+                    <a id="ggyvk"></a>
+                </p>
+                <h2>
+                    Definir un Tipo de Documento Simple
+                </h2>
+                <p>
+                    Empieze definiendo un tipo de documento muy simple que pueda ser usado para escribir artículos. Nuestros 
+                    documentos <code>article</code>  contendrán estas etiquetas de estructura:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>&lt;TITLE&gt;</code>: El título del artículo
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;SECT&gt;</code>: Una sección, que consiste de una cabecera y un cuerpo
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;PARA&gt;</code>: Un párrafo
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;LIST&gt;</code>: Una lista
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;ITEM&gt;</code>: Una entrada en la lista
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;NOTE&gt;</code>: Un aparte, que está desplazado del texto principal
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    El aspecto un poco inusual de esta estructura es que no crearemos una etiqueta de elemento separada para un 
+                    encabezado de sección. Tales elementos son creados comunmente para distinguir entre el texto de cabecera (y 
+                    cualquier etiqueta que contenga) del cuerpo de la sección (es decir, cualquier elemento de estructura debajo 
+                    del encabezado).
+                </p>
+                <p>
+                    En su lugar, permitiremos que el encabezado se combine sin problemas con el cuerpo de una sección. Ese arreglo 
+                    agrega algo de complejidad a la hoja de estilo, pero nos dará la oportunidad de explorar los mecanismos de 
+                    selección de las plantillas XSLT. También coincide con nuestras expectativas intuitivas sobre la estructura del 
+                    documento, donde el texto de un encabezado es seguido directamente por elementos de estructura, una disposición 
+                    que puede simplificar la edición orientada a esquemas.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> Esta clase de estructura no se valida facilmente, porque el modelo de contenido mezclado de 
+                    XML permite texto en cualquier parte en una sección, mientras que queremos limitar el texto y los elementos en 
+                    línea para que aparezcan solo antes del primer elemento de estructura del cuerpo de la sección. El validador 
+                    basado en afirmaciones puede hacerlo, pero la mayoría de los otros mecanismos de esquema no pueden hacerlo. Así 
+                    que prescindiremos de definir una DTD para el tipo de documento.
+                </p>
+                <hr />
+                <p>
+                    En esta estructura, las secicones pueden estar anidadas. La profundidad del anidado determinará qué clase de 
+                    formato HTML usar para la cabecera de la sección (por ejemplo, <code>h1</code> o <code>h2</code>). Usando una 
+                    etiqueta plana <code>SECT</code> (en vez de secciones numeradas) es tambíen útil con la edición orientada a 
+                    esquemas, ya que le permite mover secciones a voluntad sin tener que preocuparse por cambiar la numeración de 
+                    cualquiera de las secciones afectadas.
+                </p>
+                <p>
+                    Para las lista, usaremos un atributo de tipo para especificar si las entradas de lista son 
+                    &quot;unordered&quot; (con viñetas), alpha (enumeradas con letras minúsculas), ALPHA (enumeradas con letras 
+                    mayúsculas), o numeradas.
+                </p>
+                <p>
+                    También permitiremos algunas etiquetas en línea que cambien la apariencia del texto.
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>&lt;B&gt;</code>: Negrita
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;I&gt;</code>: Cursiva
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;U&gt;</code>: Subrayado
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;DEF&gt;</code>: Definición
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;LINK&gt;</code>: Enlace a una URL
+                        </p>
+                    </li>
+                </ul>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> 
+                    Una etiqueta en línea no genera un salto de línea, así que un cambio de estilo causado por una etiqueta en 
+                    línea no afecta al flujo del texto en la página (aunque afectará la apariencia de ese texto). Una etiqueta de 
+                    estructura, por otro lado, delimita un nuevo segmento de texto, por lo que, como mínimo, siempre genera un 
+                    salto de línea además de otros cambios de formato.
+                </p>
+                <hr />
+                <p>
+                    La etiqueta <code>&lt;DEF&gt;</code> será usada para los términos que son definidos en el texto. Tales términos 
+                    serán visualizados en cursiva, la forma en la que ellos están ordinariamente en un documento. Pero usar una 
+                    etiqueta especial en el XML permitirá a un programa de índices encontrar tales definiciones y agregarlas a un 
+                    índice, junto con las palabras clave en las cabeceras. En la Nota precedente, por ejemplo, las definiciones de 
+                    las etiquetas en línea y las etiquetas de estructura podrían hacer sido marcadas con etiquetas 
+                    <code>&lt;DEF&gt;</code> para una indexación futura.
+                </p>
+                <p>
+                    Finalmente, la etiqueta <code>LINK</code> sirve para dos propósitos. Primero, nos permitirá crear un enlace a 
+                    una URL sin tener que colocar la URL dos veces; así podemos codificar 
+                    <code>&lt;link&gt;http//...&lt;/link&gt;</code> en vez de 
+                    <code>&lt;a href=&quot;http//...&quot;&gt;http//...&lt;/a&gt;</code>. Por supuesto, también querremos 
+                    permitir una forma que parezca como <code>&lt;link target=&quot;...&quot;&gt;...name...&lt;/link&gt;</code>. 
+                    Eso conduce al segundo motivo de la etiqueta <code>&lt;link&gt;</code>. Nos dará una oportunidad de jugar con 
+                    las expresiones condicionales en XSLT.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> Aunque la estructura de artículo es extremadamente simple (consta de sólo once etiquetas), 
+                    plantea suficientes problemas interesantes como para darnos una buena visión de las capacidades básicas de 
+                    XSLT. Pero todavía dejaremos grandes áreas de la especificación intactas. En 
+                    <a href="#ggyut">¿Que Más Puede Hacer XSLT?</a>, señalaremos las características principales que omitimos.
+                </p>
+                <hr />
+                <p>
+                    <a id="gghmv"></a>
+                </p>
+                <h2>
+                    Crear un Documento de Prueba
+                </h2>
+                <p>
+                    Aquí, creará un simple documento de prueba usando elementos <code>&lt;SECT&gt;</code> anidados, unos pocos 
+                    elementos &lt;PARA&gt;, un elemento <code>&lt;NOTE&gt;</code>, un <code>&lt;LINK&gt;</code>, y un 
+                    <code>&lt;LIST type=&quot;unordered&quot;&gt;</code>. La idea es crear un documetno con uno de todo para que 
+                    podamos explorar los mecanismos de traducción más interesantes.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> El código descrito en esta sección está en <code>article1.xml</code>, que se encuentra en 
+                    el directorio <code>xslt/data</code> después de que descomprima los 
+                    <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                       onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                        <code>ejemplos XSLT</code></a> dentro del directorio 
+                    <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                </p>
+                <hr />
+                <p>
+                    Para hacer el documento de prueba, cree un fichero llamado <code>article.xml</code> e introduzca los siguientes 
+                    datos XML.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;?xml version="1.0"?>
+&lt;ARTICLE>
+   &lt;TITLE>A Sample Article&lt;/TITLE>
+   &lt;SECT>The First Major Section
+      &lt;PARA>This section will introduce a subsection.&lt;/PARA>
+      &lt;SECT>The Subsection Heading
+         &lt;PARA>This is the text of the subsection.
+         &lt;/PARA>
+      &lt;/SECT>
+   &lt;/SECT>
+&lt;/ARTICLE>
+                    </pre>
+                </div>
+                <p>
+                    Dese cuenta de que en el fichero XML, la subsección está totalmente contenida dentro de la sección principal. 
+                    (En HTML, por otro lado, las cabeceras no contienen el cuerpo de una sección). El resultado es una estructura de 
+                    esquema que es más difícil de editar en forma de texto sin formato, como esta, pero es mucho más fácil de 
+                    editar con un editor orientado a esquemas.
+                </p>
+                <p>
+                    Algún día, con un editor XML orientado a árboles que comprenda etiquetas en línea como <code>&lt;B&gt;</code> 
+                    y <code>&lt;I&gt;</code>, debería ser posible editar un artículo de este tipo en forma de esquema, sin requerir 
+                    una hoja de estilo complicada. (Tal editor permitiría al escritor enfocarse en la estructura del artículo, 
+                    dejando el diseño hasta mucho más tarde en el proceso). En un editor de este tipo, el fragmento del artículo 
+                    se vería así:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;ARTICLE> 
+ &lt;TITLE>A Sample Article 
+  &lt;SECT>The First Major Section 
+   &lt;PARA>This section will 
+            introduce a subsection.
+    &lt;SECT>The Subheading 
+     &lt;PARA>This is the text of the subsection. 
+         Note that ...
+                    </pre>
+                </div>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> Por el momento, existen editores estructurados en árbol, pero tratan las etiquetas en línea 
+                    como <code>&lt;B&gt;</code> y <code>&lt;I&gt;</code> de la misma manera que tratan las etiquetas de 
+                    estructura, y eso puede hacer que el &quot;esquema&quot; sea un poco difícil de leer.
+                </p>
+                <hr />
+                <p>
+                    <a id="gghnb"></a>
+                </p>
+                <h2>
+                    Escribir una Transformación XSLT
+                </h2>
+                <p>
+                    Ahora es el momento de comenzar a escribir una transformación XSLT que convertirá el artículo XML y lo 
+                    representará en HTML.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> El código descrito en esta sección está en <code>article1a.xsl</code>, que se encuentra en 
+                    el directorio <code>xslt/data</code> después de que descomprima los 
+                    <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                       onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                        <code>ejemplos XSLT</code></a> dentro del directorio 
+                    <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                </p>
+                <hr />
+                <p>
+                    Empiece creando un documento XML normal:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;?xml version="1.0" encoding="ISO-8859-1"?>
+                    </pre>
+                </div>
+                <p>
+                    Luego agregue las siguientes líneas remarcadas para crear una hoja de estilos XSL:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;?xml version="1.0" encoding="ISO-8859-1"?>
+<b>&lt;xsl:stylesheet </b>
+<b> xmlns:xsl=
+    "http://www.w3.org/1999/XSL/Transform" </b>
+<b> version="1.0"</b>
+<b> ></b>
+<b></b>
+<b>&lt;/xsl:stylesheet></b>
+                    </pre>
+                </div>
+                <p>
+                    Ahora configúrela para que produzca una salida compatible con HTML.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;xsl:stylesheet 
+[...]
+
+   >
+<b>&lt;xsl:output method="html"/></b>
+
+[...]
+
+&lt;/xsl:stylesheet>
+                    </pre>
+                </div>
+                <p>
+                    Entraremos en los motivos detallados de esa entrada más adelante en esta sección. Por ahora, tenga en cuenta 
+                    que si quiere emitir cualquier cosa distinta que XML bien formado, entonces necesitará una etiqueta 
+                    <code>&lt;xsl:output&gt;</code> como la mostrada, especificando <code>text</code> o <code>html</code>. (El 
+                    valor predeterminado es <code>xml</code>).
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> Cuando especifica salida XML, puede agregar el atributo de sangría para producir una salida 
+                    XML con sangría agradable. la especificación se ve así:
+                    <code>&lt;xsl:output method=&quot;xml&quot; indent=&quot;yes&quot;/&gt;</code>.
+                </p>
+                <hr />
+                <p>
+                    <a id="ggyvc"></a>
+                </p>
+                <h2>
+                    Procesar los Elementos de la Estructura Básica
+                </h2>
+                <p>
+                    Comenzará a completar la hoja de estilos procesando los elementos necesarios para crear una tabla de contenido:
+                    el elemento raíz, el elemento título, y las cabeceras. También procesará el elemento <code>PARA</code> definido 
+                    en el documento de prueba.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> Si en la primera lectura se saltó la sección que trata sobre los mecanismos de 
+                    direccionamiento XPath, <a class="TutorialLink" target="_top" href="xpath.html">Cómo trabaja XPath</a>, ahora 
+                    es un buen momento de volver atrás y revisar esa sección.
+                </p>
+                <hr />
+                <p>
+                    Empieze agregando la instrucción principal que procesa el elemento raíz:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b> &lt;xsl:template match="/"></b>
+      &lt;html>&lt;body>
+         <b>&lt;xsl:apply-templates/></b>
+      &lt;/body>&lt;/html>
+   <b>&lt;/xsl:template></b>
+
+&lt;/xsl:stylesheet>
+                    </pre>
+                </div>
+                <p>
+                    Los comandos XSL nuevos se muestran en negrita. (Tenga en cuenta que están definidos en el espacio de nombres 
+                    <code>xsl</code>). La instrucción <code>&lt;xsl:apply-templates&gt;</code> procesa los hijos del nodo actual. 
+                    En este caso, el nodo actual es el nodo raíz.
+                </p>
+                <p>
+                    A pesar de su simplicidad, este ejemplo ilustra una serie de ideas importantes, por lo que vale la pena 
+                    comprenderlo a fondo. El primer concepto es que una hoja de estilos contiene un número de plantillas, definidas 
+                    con la etiqueta <code>&lt;xsl:template&gt;</code>. Cada plantilla contiene un atributo de coincidencia, que 
+                    usa los mecanismos de direccionamiento de XPath descritos en 
+                    <a class="TutorialLink" target="_top" href="xpath.html">Cómo trabaja XPath</a> para seleccionar los elementos a 
+                    los que se aplicará la plantilla.
+                </p>
+                <p>
+                    Dentro de la plantilla, las etiquetas que no empiezan con el prefijo <code>xsl: namespace</code> son 
+                    simplemente copiadas. Las líneas nuevas y espacios en blanco que las siguen son también copiadas, y eso ayuda a 
+                    hacer que la salida resultante sea legible.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> Cuando no hay una nueva línea, los espacios en blanco generalmente se ignoran. Para incluir 
+                    espacio en blanco en la salida en tales casos, o para incluir otros texto, puede usar la etiqueta 
+                    <code>&lt;xsl:text&gt;</code>. Básicamente, una hoja de estilos XSLT espera procesar etiquetas. Por lo tanto, 
+                    todo lo que ve debe ser una etiqueta <code>&lt;xsl:..&gt;</code>, alguna otra etiqueta o un espacio en blanco.
+                </p>
+                <hr />
+                <p>
+                    En este caso, las etiquetas no XSL son etiquetas HTML. Entonces, cuando la etiqueta raíz coincide, XSLT genera 
+                    las etiquetas de inicio HTML, procesa cualquier plantilla que se aplique a los hijos de la raíz, y luego genera
+                    las etiquetas finales de HTML.
+                </p>
+                <p>
+                    <a id="ggyxi"></a>
+                </p>
+                <h2>
+                    Procesar el Elemento <code>&lt;TITLE&gt;</code>
+                </h2>
+                <p>
+                    A continuación, agregue una plantilla para procesar el título del artículo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b> &lt;xsl:template match="/ARTICLE/TITLE"></b>
+<b> &lt;h1 align="center"> 
+    &lt;xsl:apply-templates/> &lt;/h1></b>
+<b> &lt;/xsl:template></b>
+
+&lt;/xsl:stylesheet>
+                    </pre>
+                </div>
+                <p>
+                    En este caso, especifica una ruta completa al elemento TITLE y emite algo de HTML para convertir el texto del 
+                    título en un encabezado grande y centrado. En este caso, la etiqueta <code>apply-templates</code> se asegura 
+                    que  si el título contiene cualquier etiqueta en línea como cursivas, enlaces, o subrayado, también serán 
+                    procesadas.
+                </p>
+                <p>
+                    Más importante aún, la instrucción <code>apply-templates</code> hace que se procese el texto del título.
+                    Como en el modelo de datos DOM, el modelo de datos XSLT se basa en el concepto de nodos de texto contenidos en 
+                    nodos de elemento (los cuales, a su vez, pueden estar conteindos en otros nodos de elemento, etcétera).
+                    Esa estructura jerárquica constituye el árbol fuente. Hay también un árbol resultado, el cual contiene la 
+                    salida.
+                </p>
+                <p>
+                    XSLT trabaja transformando el árbol fuente en el árbol resultado. Para visualizar el resultado de las 
+                    operaciones XSLT, es útil entender las estructuras de esos árboles, y sus contenidos. (Para obtener más 
+                    información sobre este tema, consulte 
+                    <a class="TutorialLink" target="_top" href="xpath.html#gchlm">Modelo De Datos XSLT/XPath</a>).
+                </p>
+                <p>
+                    <a id="ggyuk"></a>
+                </p>
+                <h2>
+                    Procesar Cabeceras
+                </h2>
+                <p>
+                    Para continuar procesando los elementos de la estructura básica, agregue una plantilla para procesar los 
+                    encabezados de nivel superior:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b> &lt;xsl:template match=
+    "/ARTICLE/SECT"></b>
+<b> &lt;h2> &lt;xsl:apply-templates</b>
+<b> select="text()|B|I|U|DEF|LINK"/> 
+&lt;/h2></b>
+<b> &lt;xsl:apply-templates select=
+    "SECT|PARA|LIST|NOTE"/></b>
+<b> &lt;/xsl:template></b>
+
+&lt;/xsl:stylesheet>
+                    </pre>
+                </div>
+                <p>
+                    Aquí, especifica la ruta a los elementos <code>SECT</code> superiores. Pero esta vez, aplica las plantillas en 
+                    dos fases usando el atributo <code>select</code>. Para la primera fase, selecciona los nodos de texto, como 
+                    también las etiquetas en línea tales como las negritas y las cursivas, usando la función <code>text()</code> de 
+                    XPath. (La tubería vertical (<code>|</code>) se usa para hacer coincidir múltiples elementos: texto o una 
+                    etiqueta de negrita o una etiqueta de cursiva, etc). En la segunda fase, selecciona los otros elementos de 
+                    estructura contenidos en el fichero, para secciones, párrafos, listas, y notas.
+                </p>
+                <p>
+                    Usar el atributo select le permite colocar el texto y los elementos en línea entre las etiquetas 
+                    <code>&lt;h2&gt;...&lt;/h2&gt;</code>, mientras se asegura de que todas las etiquetas de estructura de la 
+                    sección se procesen posteriormente. En otras palabras, se asegura de que el anidamiento de los encabezados en el 
+                    documento XML no se reflejen en el formato HTML, una distinción que es importante para la salida HTML.
+                </p>
+                <p>
+                    En general, usar la cláusula select le permite aplicar todas las plantillas a un subconjunto de la información 
+                    disponible en el contexto actual. Como otro ejemplo, esta plantilla selecciona todos los atributos del nodo 
+                    actual:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;xsl:apply-templates select="@*"/>&lt;/attributes>
+                    </pre>
+                </div>
+                <p>
+                    A continuación, agregue la plantilla prácticamente idéntica para procesar los subtítulos que están anidados un 
+                    nivel más profundo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b> &lt;xsl:template match=
+    "/ARTICLE/SECT/SECT"></b>
+<b> &lt;h3> &lt;xsl:apply-templates</b>
+<b> select="text()|B|I|U|DEF|LINK"/> 
+&lt;/h3></b>
+<b> &lt;xsl:apply-templates select=
+    "SECT|PARA|LIST|NOTE"/></b>
+<b> &lt;/xsl:template></b>
+
+&lt;/xsl:stylesheet>
+                    </pre>
+                </div>
+                <p>
+                    <a id="ggyuo"></a>
+                </p>
+                <h2>
+                    Generar un Mensaje en Tiempo de Ejecución
+                </h2>
+                <p>
+                    También puede agregar plantillas para títulos más profundos, pero en algun momento debe detenerse, aunque sólo 
+                    sea porque HTML desciende sólo a cinco niveles. Para este ejemplo, se detendrá en dos niveles de encabezados de 
+                    sección. Pero si la entrada XML contiene un tercer nivel, querrá enviar un mensaje de error al usuario. Esta 
+                    sección le muestra cómo hacer eso.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> Podríamos continuar procesando elementos <code>SECT</code> que están más abajo, 
+                    seleccionándolos con la expresión <code>/SECT/SECT//SECT</code>. El <code>//</code> selecciona cualquier 
+                    elemento <code>SECT</code>, a cualquier profundidad, como se define en el mecanismo de direccionamiento de 
+                    XPath. Pero en cambio aprovecharemos para jugar con la mensajería.
+                </p>
+                <hr />
+                <p>
+                    Agregue la plantilla siguiente para generar un error cuando se encuentre una sección que esté anidada demasiado 
+                    profundamente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b> &lt;xsl:template match=
+    "/ARTICLE/SECT/SECT/SECT"></b>
+<b> &lt;xsl:message terminate="yes"></b>
+<b> Error: Sections can only be nested 2 deep.</b>
+<b> &lt;/xsl:message></b>
+<b> &lt;/xsl:template></b>
+
+&lt;/xsl:stylesheet>
+                    </pre>
+                </div>
+                <p>
+                    La cláusula <code>terminate=&quot;yes&quot;</code> causa que el proceso de transformación pare después de que 
+                    se genere el mensaje. Sin él, el procesado podría aún continuar, ignorando todo en esa sección.
+                </p>
+                <p>
+                    Como un ejercicio adicional, podría expandir la hoja de estilos para manejar secciones anidadas hasta cuatro 
+                    secciones de profundidad, generando etiquetas <code>&lt;h2&gt;...&lt;h5&gt;</code>. Genere un error en 
+                    cualquier sección anidada a cinco niveles de profundidad.
+                </p>
+                <p>
+                    Finalmente, finalize la hoja de estilos agregando una plantilla para procesar la etiqueta <code>PARA</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b> &lt;xsl:template match="PARA"></b>
+<b> &lt;p>&lt;xsl:apply-templates/>&lt;/p></b>
+<b> &lt;/xsl:template></b>
+&lt;/xsl:stylesheet>
+                    </pre>
+                </div>
+                <p>
+                    <a id="ggyvn"></a>
+                </p>
+                <h2>
+                    Escribir el Programa Básico
+                </h2>
+                <p>
+                    Ahora modificará el programa que usa XSLT para hacer eco de un archivo XML sin cambios, cambiándolo de forma 
+                    que use su hoja de estilos.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> El código descrito en esta sección está en <code>Stylizer.java</code>, que se encuentra en 
+                    el directorio <code>xslt</code> después de que descomprima los 
+                    <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                       onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                        <code>ejemplos XSLT</code></a> dentro del directorio 
+                    <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>. El resultado es 
+                    <code>stylizer1a.html</code>, encontrado en <code>xslt/data</code>.
+                </p>
+                <hr />
+                <p>
+                    El ejemplo <code>Stylizer</code> es adaptado de <code>TransformationApp02</code>, el cual analiza un fichero 
+                    XML y lo escribe a <code>System.out</code>. Las principales diferencias entre los dos programas se describen 
+                    abajo.
+                </p>
+                <p>
+                    En primer lugar, <code>Stylizer</code> usa la hoja de estilo al crear el objeto <code>Transformer</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+// ...
+import javax.xml.transform.dom.DOMSource; 
+<b>import javax.xml.transform.stream.StreamSource;</b> 
+import javax.xml.transform.stream.StreamResult; 
+// ... 
+
+public class Stylizer {
+    // ...
+    public static void main (String argv[]) {
+        // ...
+        try {
+            <b>File stylesheet = new File(argv[0]);</b>
+            <b>File datafile = new File(argv[1]);</b>
+
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            document = builder.parse(<b>datafile</b>);
+            // ...
+            <b>StreamSource stylesource = new StreamSource(stylesheet); </b>
+            Transformer transformer = Factory.newTransformer(<b>stylesource</b>);
+        }
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Este código usa el fichero para crar un objeto <code>StreamSource</code> y entonces pasa el objeto fuente a la 
+                    clase factoría para obtener el transformador.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> Puede simplificar un poco el código eliminando la clase <code>DOMSource</code>. En vez de 
+                    crear un objeto <code>DOMSource</code> para el fichero XML, cree un objeto <code>StreamSource</code> para este, 
+                    así como para la hoja de estilo.
+                </p>
+                <hr />
+                <p>
+                    <a id="ghbeu"></a>
+                </p>
+                <h3>
+                    Ejecutar el Ejemplo <code>Stylizer</code>
+                </h3>
+                <ol>
+                    <li>
+                        <b>Navegue al directorio <code>samples</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+% cd <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>
+                            <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                               onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                                <code>Descargue los ejemplos XSLT pulsando este enlace</code></a> y descomprímalos dentro del 
+                            directorio <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                        </b>
+                    </li>
+                    <li>
+                        <b>Navegue al directorio <code>xslt</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+cd xslt
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Compile el ejemplo <code>Stylizer</code>.</b>
+                        <p>
+                            Ejecute el siguiente comando:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+% javac Stylizer.java
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Ejecute el ejemplo <code>Stylizer</code> sobre <code>article1.xml</code> usando la hoja de estilo 
+                            <code>article1a.xsl</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+% java Stylizer data/article1a.xsl  data/article1.xml
+                            </pre>
+                        </div>
+                        <p>
+                            Verá la siguiente salida:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+&lt;html>
+&lt;body>
+
+&lt;h1 align="center">A Sample Article&lt;/h1>
+&lt;h2>The First Major Section
+
+&lt;/h2>
+&lt;p>This section will introduce a subsection.&lt;/p>
+&lt;h3>The Subsection Heading
+
+&lt;/h3>
+&lt;p>This is the text of the subsection.
+&lt;/p>
+
+&lt;/body>
+&lt;/html>
+                            </pre>
+                        </div>
+                        <p>
+                            En este punto, hay bastante espacio en blanco en exceso en la salida. En la siguiente sección, verá 
+                            cómo eliminar la mayor parte.
+                        </p>
+                    </li>
+                </ol>
+                <p>
+                    <a id="ggyxa"></a>
+                </p>
+                <h2>
+                    Recortar el Espacio en Blanco
+                </h2>
+                <p>
+                    Recuerde que cuando observa la estructura de un DOM, hay muchos nodos de texto que no contienen nada más que 
+                    espacios en blanco ignorables. La mayoría de ese exceso de espacios en blanco en la salida viene de esos nodos. 
+                    Afortunadamente, XSL le da una forma de eliminarlos. (Para más información sobre la estructura de nodos, vea 
+                    <a class="TutorialLink" target="_top" href="xpath.html#gchlm">Modelo de Datos XSLT/XPath</a>).
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> La hoja de estilo descrita en esta sección está en <code>article1b.xsl</code>, que se 
+                    encuentra en el directorio <code>xslt/data</code> después de que descomprima los 
+                    <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                       onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                        <code>ejemplos XSLT</code></a> dentro del directorio 
+                    <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>. El resultado es 
+                    <code>stylizer1b.html</code>, encontrado en <code>xslt/data</code>.
+                </p>
+                <hr />
+                <p>
+                    Para eliminar algo de ese espacio en blanco en exceso, agrege la siguiente línea remarcada a la hoja de estilo.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;xsl:stylesheet ...
+   >
+&lt;xsl:output method="html"/> 
+<b>&lt;xsl:strip-space elements="SECT"/></b>
+
+[...]
+                    </pre>
+                </div>
+                <p>
+                    Esta instrucción le indica a XSL que elimine cualquier nodo de texto bajo los elementos <code>SECT</code> que 
+                    no contengan nada más que espacios en blanco. Los nodos que contienen texto que no sea un espacio en blanco no 
+                    se verán afectados, ni otros tipos de nodos.
+                </p>
+                <p>
+                    <a id="ghbaw"></a>
+                </p>
+                <h3>
+                    Ejecutar el Ejemplo <code>Stylizer</code> con Espacio en Blanco Recortado
+                </h3>
+                <ol>
+                    <li>
+                        <b>Navegue al directorio <code>samples</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+% cd <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>
+                            <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                               onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                                <code>Descargue los ejemplos XSLT pulsando este enlace</code></a> y descomprímalos dentro del 
+                            directorio <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                        </b>
+                    </li>
+                    <li>
+                        <b>Navegue al directorio <code>xslt</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+cd xslt
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Compile el ejemplo <code>Stylizer</code>.</b>
+                        <p>
+                            Ejecute el siguiente comando:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+% javac Stylizer.java
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Ejecute el ejemplo <code>Stylizer</code> sobre <code>article1.xml</code> usando la hoja de estilo 
+                            <code>article1b.xsl</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+% java Stylizer 
+  data/article1b.xsl  
+  data/article1.xml
+                            </pre>
+                        </div>
+                        <p>
+                            Verá la siguiente salida:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+&lt;html>
+&lt;body>
+
+&lt;h1 align="center">A Sample Article&lt;/h1>
+
+&lt;h2>The First Major Section
+   &lt;/h2>
+&lt;p>This section will introduce a subsection.&lt;/p>
+&lt;h3>The Subsection Heading
+      &lt;/h3>
+&lt;p>This is the text of the subsection.
+      &lt;/p>
+
+&lt;/body>
+&lt;/html>
+                            </pre>
+                        </div>
+                        <p>
+                            Eso es una gran mejora. Hay aún caracteres de nueva línea y espacios en blanco después de los 
+                            encabezados, pero esos vienen de la forma en que está escrito XML:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+&lt;SECT>The First Major Section
+____&lt;PARA>This section will introduce a subsection.&lt;/PARA>
+^^^^
+                            </pre>
+                        </div>
+                        <p>
+                            Aquí, puede ver que la sección de encabezado termina con una nueva línea y un espacio de indentación, 
+                            antes de que la entrada PARA empiece. Eso no es una gran preocupación, porque los navegadores que 
+                            procesarán el HTML comprimen e ignoran el exceso de espacio de forma rutinaria. Pero todavía hay una 
+                            herramienta de formato más a nuestra disposición.
+                        </p>
+                    </li>
+                </ol>
+                <p>
+                    <a id="ghbbz"></a>
+                </p>
+                <h2>
+                    Eliminar el Último Espacio en Blanco
+                </h2>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> La hoja de estilo descrita en esta sección está en <code>article1c.xsl</code>, que se 
+                    encuentra en el directorio <code>xslt/data</code> después de que descomprima los 
+                    <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                       onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                        <code>ejemplos XSLT</code></a> dentro del directorio 
+                    <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>. El resultado es 
+                    <code>stylizer1c.html</code>, encontrado en <code>xslt/data</code>.
+                </p>
+                <hr />
+                <p>
+                    Ese último pequeño espacio en blanco se elimina agregando lo siguiente a la hoa de estilo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+   <b>&lt;xsl:template match="text()"></b>
+<b> &lt;xsl:value-of select="normalize-space()"/></b>
+<b> &lt;/xsl:template></b>
+
+&lt;/xsl:stylesheet>
+                    </pre>
+                </div>
+                <p>
+                    Ejecutar <code>Stylizer</code> con esta hoja de estilo eliminará todos los espacios en blanco que queden.
+                </p>
+                <p>
+                    <a id="ghbah"></a>
+                </p>
+                <h3>
+                    Ejecutar el Ejemplo <code>Stylizer</code> con Todo el Espacio en Blanco Recortado
+                </h3>
+                <ol>
+                    <li>
+                        <b>Navegue al directorio <code>samples</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+% cd <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>
+                            <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                               onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                                <code>Descargue los ejemplos XSLT pulsando este enlace</code></a> y descomprímalos dentro del 
+                            directorio <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                        </b>
+                    </li>
+                    <li>
+                        <b>Navegue al directorio <code>xslt</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+cd xslt
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Compile el ejemplo <code>Stylizer</code>.</b>
+                        <p>
+                            Ejecute el siguiente comando:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+% javac Stylizer.java
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Ejecute el ejemplo <code>Stylizer</code> sobre <code>article1.xml</code> usando la hoja de estilo 
+                            <code>article1c.xsl</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+% java Stylizer 
+  data/article1c.xsl  
+  data/article1.xml
+                            </pre>
+                        </div>
+                        <p>
+                            La salida ahora se ve así:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+&lt;html>
+&lt;body>
+&lt;h1 align="center">A Sample Article
+&lt;/h1>
+&lt;h2>The First Major Section&lt;/h2>
+&lt;p>This section will introduce a subsection.
+&lt;/p>
+&lt;h3>The Subsection Heading&lt;/h3>
+&lt;p>This is the text of the subsection.
+&lt;/p>
+&lt;/body>
+&lt;/html>
+                            </pre>
+                        </div>
+                        <p>
+                            Eso es un poco mejor. Por supuesto, sería mejor si estuviera sangrando, pero resulta ser algo más 
+                            difícil de lo esperado. Estas son algunas posibles vías de ataque, junto con las dificultades:
+                        </p>
+                        <dl>
+                            <dt>
+                                Opción Indent
+                            </dt>
+                            <dd>
+                                <p>
+                                    Desafortunadamente, la opción <code>indent=&quot;yes&quot;</code> que puede ser aplicada a la 
+                                    salida XML no está disponible para la salida HTML. Incluso si esta opción estuviera disponible, 
+                                    no ayudaría, ¡porque los elementos HTML rara vez están anidados! Aunque el código fuente HTML 
+                                    se sangra con frecuencia para mostrar la estructura implícita, las etiquetas HTML en sí mismas 
+                                    no están anidadas de una manera que cree una estructura real.
+                                </p>
+                            </dd>
+                            <dt>
+                                Variables Indent
+                            </dt>
+                            <dd>
+                                <p>
+                                    La función <code>&lt;xsl:text&gt;</code> le permite agregar cualquier texto que quiera, 
+                                    incluyendo espacios en blanco. Por lo tanto, podría usarse para generar espacio de sangría. El 
+                                    problema es variar la cantidad de espacio de sangría. Las variables XSLT pueden parecer una 
+                                    buena idea, pero no funcionan aquí. La razón es que cuando asigna un valor a una variable en 
+                                    una plantilla, el valor sólo se conoce dentro de esa plantilla (estáticamente, en tiempo de 
+                                    compilación). Incluso si la variable se define globalmente, el valor asignado no se almacena de 
+                                    una forma que permita ser dinámicamente conocido por otras plantillas en tiempo de ejecución. 
+                                    Cuando se invoca <code>&lt;apply-templates/&gt;</code> en otras plantillas, esas plantillas 
+                                    desconocen la configuración de variables realizada en otro lugar.
+                                </p>
+                            </dd>
+                            <dt>
+                                Plantillas parametrizadas
+                            </dt>
+                            <dd>
+                                <p>
+                                    Usar una plantilla parametrizada es otra forma de modificar el comportamiento de una plantilla. 
+                                    Pero determinar la cantidad de espacio de sangría que debe pasar como parámetro sigue siendo el 
+                                    meoolo del problema.
+                                </p>
+                            </dd>
+                        </dl>
+                        <p>
+                            Por el momento, entonces, no parece haber ninguna buena forma de controlar la sangría de la salida con 
+                            formato HTML. Eso sería un inconveniente si necesita visualizar o editar el HTML como texto plano. Pero 
+                            no es un problema si hace su edición en la forma XML, usando la versión HTML sólo para visualizar en 
+                            un navegador. (Cuando ve <code>stylizer1c.html</code>, por ejemplo, ve los resultados que espera).
+                        </p>
+                    </li>
+                </ol>
+                <p>
+                    <a id="ghbam"></a>
+                </p>
+                <h2>
+                    Procesar los Elementos de Estructura Restantes
+                </h2>
+                <p>
+                    En esta sección, procesará los elementos <code>LIST</code> y <code>NOTE</code>, que agregan más estructura a un 
+                    artículo.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> El documento de ejemplo descrito en esta sección es <code>article2.xml</code>, y la hoja de 
+                    estilo usada para manipularlo es <code>article2.xsl</code>. El resultado es <code>stylizer2.html</code>. Estos 
+                    ficheros se encuentran en el directorio <code>xslt/data</code> después de que descomprima los 
+                    <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                       onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                        <code>ejemplos XSLT</code></a> dentro del directorio 
+                    <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                </p>
+                <hr />
+                <p>
+                    Comience agregando algunos datos de prueba al documento de ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;?xml version="1.0"?>
+&lt;ARTICLE>
+&lt;TITLE>A Sample Article&lt;/TITLE>
+ &lt;SECT>The First Major Section
+    ...
+  &lt;/SECT>
+  &lt;SECT>The Second Major Section
+  &lt;PARA>This section adds a LIST and a NOTE.
+    &lt;PARA>Here is the LIST:
+      &lt;LIST type="ordered">
+        &lt;ITEM>Pears&lt;/ITEM>
+        &lt;ITEM>Grapes&lt;/ITEM>
+      &lt;/LIST>
+  &lt;/PARA>
+  &lt;PARA>And here is the NOTE:
+  &lt;NOTE>Don't forget to go to the 
+           hardware store on your way
+           to the grocery!
+  &lt;/NOTE>
+  &lt;/PARA>
+ &lt;/SECT> 
+&lt;/ARTICLE>
+                    </pre>
+                </div>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> Aunque la <code>list</code> y <code>note</code> en el fichero están contenidos en sus 
+                    párrafos respectivos, realmente no importa si están contenidos o no; el HTML generado será el mismo de 
+                    cualquier manera. Pero tenerlos contenidos facilitará su manejo en un editor orientado a esquemas.
+                </p>
+                <hr />
+                <p>
+                    <a id="ggywf"></a>
+                </p>
+                <h2>
+                    Modificar el Manejo de <code>&lt;PARA&gt;</code>
+                </h2>
+                <p>
+                    A continuación, modifique la plantilla <code>PARA</code> para tener en cuenta el hecho de que ahora permitimos 
+                    que algunos de los elementos de estructura se incrusten con un párrafo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;xsl:template match="PARA">
+<b>&lt;p> &lt;xsl:apply-templates select=
+    "text()|B|I|U|DEF|LINK"/></b>
+<b> &lt;/p></b>
+<b> &lt;xsl:apply-templates select=
+    "PARA|LIST|NOTE"/></b>
+&lt;/xsl:template>
+                    </pre>
+                </div>
+                <p>
+                    Esta modificación usa la misma técnica que usó para la sección de encabezados. La única diferencia es que no se 
+                    esperan elementos <code>SECT</code> dentro de un párrafo. (Sin embargo, un párrafo podría fácilmente existir 
+                    dentro de otro párrafo, por ejemplo, como material citado).
+                </p>
+                <p>
+                    <a id="ggyua"></a>
+                </p>
+                <h2>
+                    Procesar los Elementos <code>&lt;LIST&gt;</code> y <code>&lt;ITEM&gt;</code>
+                </h2>
+                <p>
+                    Ahora está listo para agregar una plantilla para procesar los elementos <code>LIST</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;xsl:template match="LIST">
+ &lt;xsl:if test="@type='ordered'"> 
+  &lt;ol>
+   &lt;xsl:apply-templates/>
+    &lt;/ol>
+    &lt;/xsl:if>
+    &lt;xsl:if test="@type='unordered'">
+     &lt;ul>
+      &lt;xsl:apply-templates/>
+     &lt;/ul>
+ &lt;/xsl:if>
+&lt;/xsl:template>
+
+&lt;/xsl:stylesheet>
+                    </pre>
+                </div>
+                <p>
+                    La etiqueta <code>&lt;xsl:if&gt;</code> usa el atributo <code>test=&quot;&quot;</code> para especificar una 
+                    condición Booleana. En este caso, el valor del atributo type se comprueba, y la lista que se genera cambia 
+                    dependiendo de si el valor es &quot;ordered&quot; o &quot;unordered&quot;.
+                </p>
+                <p>
+                    Tenga en cuenta dos cosas importantes en este ejemplo:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            No hay cláusula els, ni una declaración de retorno o salida, por lo que se necesitan dos etiquetas 
+                            <code>&lt;xsl:if&gt;</code> para cubrir las dos opciones. (O podría haber sido utilizada la etiqueta 
+                            <code>&lt;xsl:choose&gt;</code>, que proporciona la funcionalidad de 
+                            declaración de casos).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Las comillas simples se requieren alrededor de los valores del atributo. De otra forma, el procesador 
+                            XSLT intenta interpretar la palabra ordered como una función XPath en vez de como una cadena.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Ahora finalizamos el procesamiento de LIST manejando los elementos ITEM:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b> &lt;xsl:template match="ITEM"></b>
+<b> &lt;li>&lt;xsl:apply-templates/></b>
+<b> &lt;/li></b>
+<b> &lt;/xsl:template></b>
+
+&lt;/xsl:stylesheet>
+                    </pre>
+                </div>
+                <p>
+                    <a id="ggyvs"></a>
+                </p>
+                <h2>
+                    Ordenar las Plantillas en una Hoja de Estilos
+                </h2>
+                <p>
+                    Por ahora, debería tener la idea de que las plantillas son independientes unas de otras, por lo que 
+                    generalmente no importa dónde se encuentran en un archivo. Entonces, a partir de este punto, mostraremos sólo 
+                    la plantilla que necesita agregar. (En aras de la comparación, siempre se agregan al final de la hoja de estilo 
+                    de ejemplo).
+                </p>
+                <p>
+                    El orden marca la diferencia cuando se pueden aplicar dos plantillas al mismo nodo. En ese caso, la que se 
+                    define en último lugar es la que se encuentra y procesa. Por ejemplo, para cambiar el orden de una lista con 
+                    sangría para usar alfabéticos en minúsculas, podría especificar un patrón de plantilla que se vea así:
+                    <code>//LIST//LIST</code>. En esa plantilla, usaría la opción HTML para generar una enumeración alfabética, en 
+                    vez de una numérica.
+                </p>
+                <p>
+                    Pero dicho elemento también podría identificarse mediante el patrón <code>//LIST</code>. Para asegurarse de que 
+                    se realiza el procesamiento adecuado, la plantilla que especifica <code>//LIST</code> debería aparecer antes 
+                    que la plantilla que especifica <code>//LIST//LIST</code>.
+                </p>
+                <p>
+                    <a id="ggywm"></a>
+                </p>
+                <h2>
+                    Procesar Elementos <code>&lt;NOTE&gt;</code>
+                </h2>
+                <p>
+                    El último elemento de estructura que queda es el elemento <code>NOTE</code>. Agregue la siguiente plantilla 
+                    para manejar eso.
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b> &lt;xsl:template match="NOTE"></b>
+<b> &lt;blockquote>&lt;b>Note:&lt;/b>&lt;br/></b>
+<b> &lt;xsl:apply-templates/></b>
+<b> &lt;/p>&lt;/blockquote></b>
+<b> &lt;/xsl:template></b>
+
+&lt;/xsl:stylesheet>
+                    </pre>
+                </div>
+                <p>
+                    Este códio trae a colación un problema interesante que resulta de la inclusión de la etiqueta 
+                    <code>&lt;br/&gt;</code>. Para que el fichero sea un XML bien formado, la etiqueta debe especificarse en la 
+                    hoja de estilo como <code>&lt;br/&gt;</code>, pero esa etiqueta no es reconocida por muchos navegadores. Y 
+                    aunque la mayoría de los navegadores reconocen la secuencia <code>&lt;br&gt;&lt;/br&gt;</code>, todos la 
+                    tratarán como un salto de párrafo en lugar de un solo salto de línea.
+                </p>
+                <p>
+                    En otras palabras, la transformación debe generar una etiqueta <code>&lt;br&gt;</code>, pero la hoja de estilo 
+                    debe especificar <code>&lt;br/&gt;</code>. Eso nos lleva a la razón principal de esa etiqueta de salida 
+                    especial que agregamos al principio de la hoja de estilo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;xsl:stylesheet ... >
+   <b>&lt;xsl:output method="html"/></b>
+   [...]
+&lt;/xsl:stylesheet>
+                    </pre>
+                </div>
+                <p>
+                    Esa especificación de salida convierte las etiquetas vacías tales como <code>&lt;br/&gt;</code> a su forma 
+                    HTML, <code>&lt;br&gt;</code>, en la salida. Esa conversión es importante, porque la mayoría de los navegadores 
+                    no reconocen las etiquetas vacías. Aquí tiene una lista de las etiquetas afectadas:
+                </p>
+                <div class="codeblock">
+                    <pre>
+area      frame   isindex
+base      hr      link
+basefont  img     meta
+br        input   param
+col
+                    </pre>
+                </div>
+                <p>
+                    Para resumir, de forma predeterminada XSLT produce XML bien formado en la salida. Y porque una hoja de estilo 
+                    XSL es un XML bien formado para empezar, no es fácil poner una etiqueta como <code>&lt;br&gt;</code> en el 
+                    medio. La etiqueta <code>&lt;xsl:output method=&quot;html&quot;/&gt;</code> resuelve este problea de forma que 
+                    pueda codificar <code>&lt;br/&gt;</code> en la hoja de estilo pero obtener <code>&lt;br&gt;</code> en la 
+                    salida.
+                </p>
+                <p>
+                    La otra razón principal para especificar <code>&lt;xsl:output method=&quot;html&quot;/&gt;</code> es que, como 
+                    con la especificación <code>&lt;xsl:output method=&quot;text&quot;/&gt;</code>, el texto generado no se 
+                    escapa. Por ejemplo, si la hoja de estilo incluye la referencia de entidad <code>&lt;</code>, aparecerá como un 
+                    carácter <code>&lt;</code> en el texto generado. Cuando se genera XML, por otro lado, la referencia de entidad 
+                    <code>&lt;</code> en la hoja de estilo no cambiaría, por lo que aparecería como <code>&lt;</code> en el texto 
+                    generado.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> Si en realidad quiere que <code>&lt;</code> sea generado como parte de la salida HTML, 
+                    necesita codificarla como <code>&amp;lt;</code>. Esa secuencia se convierte en <code>&lt;</code> en la salida, 
+                    porque sólo se convierte <code>&amp;</code> en un carácter <code>&amp;</code>.
+                </p>
+                <hr />
+                <p>
+                    <a id="ghbeb"></a>
+                </p>
+                <h3>
+                    Ejecutar el Ejemplo <code>Stylizer</code> Con los Elementos <code>LIST</code> y <code>NOTE</code> Definidos
+                </h3>
+                <ol>
+                    <li>
+                        <b>Navegue al directorio <code>samples</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+% cd <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>
+                            <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                               onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                                <code>Descargue los ejemplos XSLT pulsando este enlace</code></a> y descomprímalos dentro del 
+                            directorio <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                        </b>
+                    </li>
+                    <li>
+                        <b>Navegue al directorio <code>xslt</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+cd xslt
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Compile el ejemplo <code>Stylizer</code>.</b>
+                        <p>
+                            Ejecute el siguiente comando:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+% javac Stylizer.java
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Ejecute el ejemplo <code>Stylizer</code> sobre <code>article2.xml</code> usando la hoja de estilo 
+                            <code>article2.xsl</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+% java Stylizer data/article2.xsl  data/article2.xml
+                            </pre>
+                        </div>
+                        <p>
+                            Aquí está el HTML que se genera para la segunda sección cuando ejecuta el programa ahora:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+...
+&lt;h2>The Second Major Section
+&lt;/h2>
+&lt;p>This section adds a LIST and a NOTE.
+&lt;/p>
+&lt;p>Here is the LIST:
+&lt;/p>
+&lt;ol>
+&lt;li>Pears&lt;/li>
+&lt;li>Grapes&lt;/li>
+&lt;/ol>
+&lt;p>And here is the NOTE:
+&lt;/p>
+&lt;blockquote>
+&lt;b>Note:&lt;/b>
+&lt;br>Do not forget to go to the hardware store on your way to the grocery!
+&lt;/blockquote>
+                            </pre>
+                        </div>
+                    </li>
+                </ol>
+                <p>
+                    <a id="ggywl"></a>
+                </p>
+                <h2>
+                    Procesar Elementos en Línea (Contenido)
+                </h2>
+                <p>
+                    Las únicas etiquetas restantes en el tipo <code>ARTICLE</code> son las etiquetas en línea, las que no crean un 
+                    salto de línea en la salida, sino que están integradas en el flujo de texto del que forman parte.
+                </p>
+                <p>
+                    Los elementos en línea se diferencian de los elementos de estructura en que los elementos en línea son parte 
+                    del contenido de una etiqueta. Si piensa en un elemento como un nodo en un árbol de documento, entonces cada 
+                    nodo tiene contenido y estructura. El contenido está compuesto por el texto y las etiquetas en línea que 
+                    contiene. La estructura consta de los otros elementos (elementos de estructura) debajo de la etiqueta.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> El documento de ejemplo descrito en esta sección es <code>article3.xml</code>, y la hoja de 
+                    estilo usada para manipularlo es <code>article3.xsl</code>. El resultado es <code>stylizer3.html</code>.
+                </p>
+                <hr />
+                <p>
+                    Comience agregando un poco más de datos de prueba al documento de ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;?xml version="1.0"?>
+&lt;ARTICLE>
+ &lt;TITLE>A Sample Article&lt;/TITLE>
+  &lt;SECT>The First Major Section
+      [...]
+  &lt;/SECT>
+  &lt;SECT>The Second Major Section
+      [...]
+  &lt;/SECT> 
+<b>&lt;SECT>The &lt;i>Third&lt;/i> 
+    Major Section</b>
+<b> &lt;PARA>In addition to the inline tag
+    in the heading, </b>
+<b> this section defines the term  
+    &lt;DEF>inline&lt;/DEF>,</b>
+<b> which literally means "no line break". </b>
+<b> It also adds a simple link to the main page 
+    for the Java platform </b>
+<b>(&lt;LINK>http://java.sun.com&lt;/LINK>),</b>
+<b> as well as a link to the </b>
+<b> &lt;LINK target="http://java.sun.com/xml">
+   XML &lt;/LINK></b> 
+<b> page.</b>
+<b> &lt;/PARA></b>
+<b> &lt;/SECT></b> 
+&lt;/ARTICLE>
+                    </pre>
+                </div>
+                <p>
+                    Ahora procese los elementos en línea <code>&lt;DEF&gt;</code> en los párrafos, renombrándolos en etiquetas de 
+                    cursiva HTML:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>&lt;xsl:template match="DEF"></b>
+<b> &lt;i> &lt;xsl:apply-templates/> &lt;/i> </b>
+<b>&lt;/xsl:template></b>
+                    </pre>
+                </div>
+                <p>
+                    A continuación, comente la normalización del nodo de texto. Ha cumplido su propósito, y ahora ha llegado al 
+                    punto de que necesita preservar espacios importantes:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>&lt;!--</b>  
+&lt;xsl:template match="text()">
+  &lt;xsl:value-of select="normalize-space()"/>
+   &lt;/xsl:template>
+<b>--></b>
+                    </pre>
+                </div>
+                <p>
+                    Esta modificación evita que perdamos espacios antes de etiquetas como <code>&lt;I&gt;</code> y 
+                    <code>&lt;DEF&gt;</code>. (Intente el programa sin esta modificación para ver el resultado).
+                </p>
+                <p>
+                    Ahora procese los elementos en línea básicos de HTML como <code>&lt;B&gt;</code>, <code>&lt;I&gt;</code>, y
+                    <code>&lt;U&gt;</code> para la negrita, la cursiva, y el subrayado.
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>&lt;xsl:template match="B|I|U"></b>
+<b> &lt;xsl:element name="{name()}"></b>
+<b> &lt;xsl:apply-templates/></b>
+<b> &lt;/xsl:element> </b>
+<b>&lt;/xsl:template></b>
+                    </pre>
+                </div>
+                <p>
+                    La etiqueta <code>&lt;xsl:element&gt;</code> le permite calcular el elemento que desea generar. Aquí, usted 
+                    genera la etiqueta en línea apropiada usando el nombre del elemento actual. En particular, tenga en cuenta el 
+                    uso de las llaves (<code>{}</code>) en la expresión <code>name=&quot;..&quot;</code>. Esas llaves causan que 
+                    el texto dentro de las comillas sea procesado como una expresión XPath en vez de ser interpretado como una 
+                    cadena literal. Aquí, ellos causan que la función XPath <code>name()</code> devuelve el nombre del nodo actual.
+                </p>
+                <p>
+                    Las llaves se reconocen en cualquier lugar donde pueda aparecer una plantilla de valor de atributo. (Las 
+                    plantillas de valor de atributo se definen en la sección 7.6.2 de la especificación XSL, y aparecen en varios 
+                    lugares en las definiciones de plantillas). En tales expresiones, las llaves pueden también usarse para 
+                    referirse al valor de un atributo, <code>{@foo}</code>, o al contenido de un elemento <code>{foo}</code>.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> Puede también generar atributos usando <code>&lt;xsl:attribute&gt;</code>. Para obtener 
+                    más información, consulte la sección 7.1.3 de las especificación XSLT..
+                </p>
+                <hr />
+                <p>
+                    El último elemento restante es la etiqueta <code>LINK</code>. La forma más fácil de procesar esa etiqueta será 
+                    configurar una plantilla nombrada que podamos controlar con un parámetro:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>&lt;xsl:template name="htmLink"></b>
+<b> &lt;xsl:param name="dest" 
+    select="UNDEFINED"/> </b>
+<b> &lt;xsl:element name="a"></b>
+<b> &lt;xsl:attribute name="href"></b>
+<b> &lt;xsl:value-of select=""/></b>
+<b> &lt;/xsl:attribute></b>
+<b> &lt;xsl:apply-templates/> </b>
+<b> &lt;/xsl:element> </b>
+<b>&lt;/xsl:template></b>
+                    </pre>
+                </div>
+                <p>
+                    La diferencia mayor en esta plantilla es que, en vez de especificar una cláusula de coincidencia, le da a la 
+                    plantilla un nombre usando la cláusula <code>name=&quot;&quot;</code>. Así esta plantilla se ejecuta sólo 
+                    cuando la invoca.
+                </p>
+                <p>
+                    Dentro de la plantilla, también especifica un parámetro llamado <code>dest</code> usando la etiqueta 
+                    <code>&lt;xsl:param&gt;</code>. Para un poco de verificación de errores, use la cláusula select para dar a ese 
+                    parámetro un valor predeterminado de <code>UNDEFINED</code>. Para referenciar la variable en la etiqueta 
+                    <code>&lt;xsl:value-of&gt;</code>, especifique <code></code>.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> Recuerde que una entrada entre comillas es interpretada como una expresión a menos que 
+                    se incluya entre comillas simples. Eso es porque las comillas simples fueron necesarias anteriormente en 
+                    <code>&quot;@type=&#39;ordered&#39;&quot;</code> para asegurar que &quot;ordered&quot; fuese interpretada 
+                    como una cadena.
+                </p>
+                <hr />
+                <p>
+                    La etiqueta <code>&lt;xsl:element&gt;</code> genera un elemento. Anteriormente, ha sido capaz de simplemente 
+                    especificar el elemento que queremos codificando algo como <code>&lt;html&gt;</code>. Pero aquí usted está 
+                    dinámicamente generando el contenido de un ancla HTML (<code>&lt;a&gt;</code>) en el cuerpo de la etiqueta 
+                    <code>&lt;xsl:element&gt;</code>. Y está generando dinámicamente el atributo <code>href</code> del ancla usando 
+                    la etiqueta <code>&lt;xsl:attribute&gt;</code>.
+                </p>
+                <p>
+                    La última parte importante de la plantilla es la etiqueta <code>&lt;apply-templates&gt;</code>, que inserta el 
+                    texto del nodo de texto bajo el elemento <code>LINK</code>. Sin ella, no habría texto en el enlace HTML 
+                    generado.
+                </p>
+                <p>
+                    A continuación, agregue la plantilla para la etiqueta <code>LINK</code>, y llame a la plantilla nombrada desde 
+                    dentro de ella:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>&lt;xsl:template match="LINK"></b>
+<b> &lt;xsl:if test="@target"></b>
+<b> &lt;!--Target attribute specified.--></b>
+<b> &lt;xsl:call-template 
+    name="htmLink"></b>
+<b> &lt;xsl:with-param name="dest" 
+    select="@target"/> </b>
+<b> &lt;/xsl:call-template></b>
+<b> &lt;/xsl:if></b>
+<b>&lt;/xsl:template></b>
+&lt;xsl:template name="htmLink">
+
+[...]
+                    </pre>
+                </div>
+                <p>
+                    La cláusula <code>test=&quot;@target&quot;</code> devuelve verdadero si el atributo target existe en la 
+                    etiqueta LINK. Así esta etiqueta <code>&lt;xsl-if&gt;</code> genera enlaces HTML cuando el texto del enlace y el 
+                    destino definido para éste son diferentes.
+                </p>
+                <p>
+                    La etiqueta <code>&lt;xsl:call-template&gt;</code> invoca la plantilla nombrada, mientras que 
+                    <code>&lt;xsl:with-param&gt;</code> especifia un parámetros usando la cláusula name y especifica su valor 
+                    usando la cláusula select.
+                </p>
+                <p>
+                    Como último paso en el proceso de construcción de la hoja de estilo, agregue la etiqueta 
+                    <code>&lt;xsl-if&gt;</code> a las etiquetas que procesan <code>LINK</code> que no tienen un atributo target.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;xsl:template match="LINK">
+   &lt;xsl:if test="@target">
+      [...]
+   &lt;/xsl:if>
+
+   <b>&lt;xsl:if test="not(@target)"></b>
+<b> &lt;xsl:call-template name="htmLink"></b>
+<b> &lt;xsl:with-param name="dest"></b>
+<b> &lt;xsl:apply-templates/></b>
+<b> &lt;/xsl:with-param></b>
+<b> &lt;/xsl:call-template></b>
+<b> &lt;/xsl:if></b>
+&lt;/xsl:template>
+                    </pre>
+                </div>
+                <p>
+                    La cláusula <code>not(...)</code> invierte el test anterior (recuerde, no hay cláusula else). Así esta parte de 
+                    la plantilla se interpresta cuando el atributo target no se especifica. Esta vez, el parámetro value no viene 
+                    de una cláusula select, sino de los contenidos del elemento <code>&lt;xsl:with-param&gt;</code>.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> Para hacerlo explícito: los parámetros y las variables (que se discuten en unos momentos en 
+                    <a href="#ggyut">¿Que Más Puede Hacer XSLT?</a>) pueden tener su valor especificado por una cláusula select, 
+                    que le permite utilizar expresiones XPath, o por el contenido del elemento, que le permite utilizar etiquetas 
+                    XSLT.
+                </p>
+                <hr />
+                <p>
+                    En este caso, el contenido del parámetro se genera por la etiqueta <code>&lt;xsl:apply-templates/&gt;</code>, 
+                    que inserta los contenidos del nodo de texto bajo el elemento <code>LINK</code>.
+                </p>
+                <p>
+                    <a id="ghbdo"></a>
+                </p>
+                <h3>
+                    Ejecutar el Ejemplo <code>Stylizer</code> Con los Elementos En Línea Definidos
+                </h3>
+                <ol>
+                    <li>
+                        <b>Navegue al directorio <code>samples</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+% cd <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>
+                            <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                               onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                                <code>Descargue los ejemplos XSLT pulsando este enlace</code></a> y descomprímalos dentro del 
+                            directorio <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                        </b>
+                    </li>
+                    <li>
+                        <b>Navegue al directorio <code>xslt</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+cd xslt
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Compile el ejemplo <code>Stylizer</code>.</b>
+                        <p>
+                            Ejecute el siguiente comando:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+% javac Stylizer.java
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Ejecute el ejemplo <code>Stylizer</code> sobre <code>article3.xml</code> usando la hoja de estilo 
+                            <code>article3.xsl</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+% java Stylizer data/article3.xsl  data/article3.xml
+                            </pre>
+                        </div>
+                        <p>
+                            Cuando ejecute el programa ahora, los resultados debería verse así:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+[...]
+&lt;h2>The &lt;i>Third&lt;/i> Major Section&lt;/h2>
+&lt;p>In addition to the inline tag in the heading, this section  defines the term &lt;i>inline&lt;/i>, which literally means "no line break". It also adds a simple link to the main page for the Java platform (&lt;a href="http://java.sun.com">http://java.sun.com&lt;/a>),  as well as a link to the &lt;a href="http://java.sun.com/xml">XML&lt;/a> page.&lt;/p>
+                            </pre>
+                        </div>
+                        <p>
+                            ¡Buen trabajo! Ahora ha convertido un archivo XML bastante complejo a HTML. (Tan simple como parece al 
+                            principio, ciertamente brinda muchas oportunidades para la exploración).
+                        </p>
+                    </li>
+                </ol>
+                <p>
+                    <a id="ggywy"></a>
+                </p>
+                <h2>
+                    Imprimir el HTML
+                </h2>
+                <p>
+                    Tiene ahora convertido un fichero XML a HTML. Un día, alguien producirá un motor de impresión compatible con 
+                    HTML que podrá encontrar y utilizar a través de la IPA del Servicio de Impresión de Java. En ese momento, podrá 
+                    imprimir un archivo XML arbitrario generando HTML. Todo lo que tendrá que hacer es configurar una hoja de 
+                    estilo y usar su navegador.
+                </p>
+                <p>
+                    <a id="ggyut"></a>
+                </p>
+                <h2>
+                    ¿Que Más Puede Hacer XSLT?
+                </h2>
+                <p>
+                    A pesar de lo extensa que ha sido esta sección, sólo ha arañado la superficie de las capacidades de XSLT. 
+                    Muchas posibilidades adicionales le esperan en la especificación XSLT. Aquí hay algunas cosas que debe buscar:
+                </p>
+                <dl>
+                    <dt>
+                        <code>import</code> (Sección 2.6.2) y <code>include</code> (sección 2.6.1)
+                    </dt>
+                    <dd>
+                        <p>
+                            <code>rt</code> (Sección 2.6.2) y include (sección 2.6.1) Use estas sentencias para modularizar y 
+                            combinar hojas de estilo XSLT. La sentencia include simplemente inserta todas las definicioens del 
+                            fichero incluído. La sentencia import le permite sobreescribir definiciones en el fichero importado 
+                            con definiciones en su propia hoja de estilos.
+                        </p>
+                    </dd>
+                    <dt>
+                        bucles <code>for-each</code> (sección 8)
+                    </dt>
+                    <dd>
+                        <p>
+                            Recorra una colección de elementos y procese cada uno por turno.
+                        </p>
+                    </dd>
+                    <dt>
+                        <code>choose</code> (sentencia case) para procesado condicional (sección 9.2)
+                    </dt>
+                    <dd>
+                        <p>
+                            Bifurque a una de las múltiples rutas de procesamiento dependiendo de un valor de entrada.
+                        </p>
+                    </dd>
+                    <dt>
+                        Generar números (sección 7.7)
+                    </dt>
+                    <dd>
+                        <p>
+                            Genere dinámicamente secciones numeradas, elementos nuerados, y literales numéricos. XSLT proporciona 
+                            tres modos de numeración:
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    Único: numera los elementos en un solo encabezado, como una lista ordenada en HTML
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Múltiple: produce numeración multinivel como &quot;A.1.3&quot;
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Cualquiera: numera de forma consecutiva los elementos dondequiera que aparezcan, como ocurre 
+                                    con las notas al pie de página en una lección.
+                                </p>
+                            </li>
+                        </ul>
+                    </dd>
+                    <dt>
+                        Dar formato a números (sección 12.3)
+                    </dt>
+                    <dd>
+                        <p>
+                            Contrla el formato de la enumeración de forma que obtiene numéricos 
+                            (<code>format=&quot;1&quot;</code>), alfabéticos en mayúsculas (<code>format=&quot;A&quot;</code>), 
+                            alfabéticos en minúsculas (<code>format=&quot;a&quot;</code>), o números compuestos, como 
+                            &quot;A.1,&quot;. así como números y montos de moneda adecuados para un lugar internacional específico.
+                        </p>
+                    </dd>
+                    <dt>
+                        Clasificación de salida (sección 10)
+                    </dt>
+                    <dd>
+                        <p>
+                            Produce la salida en el orden de clasificación deseado.
+                        </p>
+                    </dd>
+                    <dt>
+                        Plantillas basadas en modo (sección 5.7)
+                    </dt>
+                    <dd>
+                        <p>
+                            Procese un elemento múltiples veces, cada vez en un &quot;mode&quot; diferente. Agregue un atributo de 
+                            modo a las plantillas y despuñes especifique <code>&lt;apply-templates mode=&quot;...&quot;&gt;</code> 
+                            para aplicar sólo las plantillas con un modo coincidente. Combine con el atributo 
+                            <code>&lt;apply-templates select=&quot;...&quot;&gt;</code> para aplicar procesado basado en modo a un 
+                            subconjunto de los datos de entrada.
+                        </p>
+                    </dd>
+                    <dt>
+                        Variables (sección 11)
+                    </dt>
+                    <dd>
+                        <p>
+                            Las variables son algo como los parámetros de método, en que le permiten controlar el comportamiento de 
+                            una plantilla. Pero no son tan valiosas como podría pensar. El valor de una variable sólo es conocido 
+                            dentro del alcance de la plantilla actual o la etiqueta <code>&lt;xsl:if&gt;</code> (por ejemplo) en la 
+                            cual está definida. No puede pasar un valor de una plantilla a otra, o incluso de una parte adjunta de 
+                            una plantilla a otra parte de la misma plantilla.
+                        </p>
+                        <p>
+                            Estas declaraciones son verdaderas incluso para una variable &quot;global&quot;. Puede cambiar su 
+                            valor en una plantilla, pero el cambio se aplica sólo a esa plantilla. Y cuando la expresión usada par 
+                            define la variable global se evalúa, esa evaluación toma lugar en el contexto del nodo raíz de la 
+                            estructura. En otras palabras, las variables globales son esencialmente constantes en tiempo de 
+                            ejecución. Esas constantes pueden ser útiles para cambiar el comportamiento de una plantilla, 
+                            especialmente cuando se combinan con declaraciones de inclusión e importación. Pero las variables 
+                            no son un mecanismo de gestión de datos de propósito general.
+                        </p>
+                    </dd>
+                </dl>
+                <p>
+                    <a id="ggyuy"></a>
+                </p>
+                <h2>
+                    El Problema con las Variables
+                </h2>
+                <p>
+                    Es tentador crear una única plantilla y establecer una variable para el destino del enlace, en lugar de 
+                    tomarse la molestia de configurar una plantilla parametrizada y llamarla de dos formas diferentes. La idea 
+                    es establecer la variable a un valor predeterminado (digamos, el texto de la etiqueta <code>LINK</code>) y 
+                    después, si el atributo target existe, establecer la variable de destino al valor del atributo target.
+                </p>
+                <p>
+                    Esa sería una buena ídea, si funcionara. Pero de nuevo, el problema es que las variables son sólo conocidas en 
+                    el alcance dentro de cual son definidas. Así cuando usted codifica una etiqueta <code>&lt;xsl:if&gt;</code> 
+                    para cambiar el valor de la variable, el valor sólo se conoce dentro del contexto de la etiqueta 
+                    <code>&lt;xsl:if&gt;</code>. Una vez se encuentra <code>&lt;/xsl:if&gt;</code>, cualquier cambio a la 
+                    configuración de la variable se pierde.
+                </p>
+                <p>
+                    Una idea igualmente tentadora es la posibilidad de reemplazar la especificación 
+                    <code>text()|B|I|U|DEF|LINK</code> con una variable (<code></code>). Pero debido a que el valor de una variable 
+                    se determina donde se define, el valor de una variable en línea global consiste de nodos de texto, nodos 
+                    <code>&lt;B&gt;</code>, etcétera, que existen en el nivel de raíz. En otras palabras, el valor de dicha 
+                    variable, en este caso, es nulo.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="generatingXML.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../stax/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Generando XML desde una Estructura de Datos Arbitraria<br />
+            <b>Página siguiente:</b> Streaming IPA for XML
+        </div>
+    </body>
+</html> 

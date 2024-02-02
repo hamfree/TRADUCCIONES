@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Uso de la IPA de Metamodelo para Modelar Clases de Entidades</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="persistence-criteria001.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="persistence-criteria003.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GJIUP">
+      <h2 id="using-the-metamodel-api-to-model-entity-classes">
+        Uso de la IPA de Metamodelo para Modelar Clases de Entidades
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Utilice la IPA Metamodel para crear un metamodelo de las entidades administradas en una unidad de 
+            persistencia particular. Para cada clase de entidad en un paquete en particular, se crea una clase 
+            de metamodelo con un guión bajo al final y con atributos que corresponden a los campos o 
+            propiedades persistentes de la clase de entidad.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            La siguiente clase de entidad, <code>com.example.Pet</code>, tiene cuatro campos persistentes: 
+            <code>id</code>, <code>name</code>, <code>color</code>, y <code>owners</code>:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+package com.example;
+...
+@Entity
+public class Pet {
+    @Id
+    protected Long id;
+    protected String name;
+    protected String color;
+    @ManyToOne
+    protected Set&lt;Person&gt; owners;
+    ...
+}
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>La clase Metamodel correspondiente es la siguiente:</p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+package com.example;
+...
+@Static Metamodel(Pet.class)
+public class Pet_ {
+    public static volatile SingularAttribute&lt;Pet, Long&gt; id;
+    public static volatile SingularAttribute&lt;Pet, String&gt; name;
+    public static volatile SingularAttribute&lt;Pet, String&gt; color;
+    public static volatile SetAttribute&lt;Pet, Person&gt; owners;
+}
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Las consultas de criterios utilizan la clase de metamodelo y sus atributos para hacer referencia 
+            a las clases de entidad gestionada y su estado persistente y sus relaciones.
+          </p>
+        </div>
+        <div class="sect2" id="GJIVL">
+          <h3 id="using-metamodel-classes">Uso de Clases de Metamodelos</h3>
+          <div class="paragraph">
+            <p>
+              Las clases de metamodelo que corresponden a las clases de entidad son del siguiente tipo:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+javax.persistence.metamodel.EntityType&lt;T&gt;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los procesadores de anotaciones suelen generar clases de metamodelos en tiempo de desarrollo o 
+              en tiempo de ejecución. Los desarrolladores de aplicaciones que usan consultas Criteria pueden 
+              hacer cualquiera de las siguientes cosas:
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  Generar clases de metamodelos estáticos utilizando el procesador de anotaciones del proveedor de persistencia
+                </p>
+              </li>
+              <li>
+                <p>
+                  Obtener la clase de metamodelo realizando una de las siguientes acciones:
+                </p>
+                <div class="ulist">
+                  <ul>
+                    <li>
+                      <p>
+                        Llamar al método <code>getModel</code> en el objeto raíz de consulta
+                      </p>
+                    </li>
+                    <li>
+                      <p>
+                        Obtener una instancia de la interfaz <code>Metamodel</code> y luego pasar el tipo de 
+                        entidad al método <code>entity</code> de la instancia
+                      </p>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              El siguiente fragmento de código muestra cómo obtener la clase de metamodelo de la entidad 
+              <code>Pet</code> llamando a <code>Root&lt;T&gt;.getModel</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+EntityManager em = ...;
+CriteriaBuilder cb = em.getCriteriaBuilder();
+CriteriaQuery cq = cb.createQuery(Pet.class);
+Root&lt;Pet&gt; pet = cq.from(Pet.class);
+EntityType&lt;Pet&gt; Pet_ = pet.getModel();
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El siguiente fragmento de código muestra cómo obtener la clase de metamodelo de la entidad 
+              <code>Pet</code> obteniendo primero una instancia de metamodelo usando 
+              <code>EntityManager.getMetamodel</code> y luego llamando a <code>entity</code> en la instancia 
+              del metamodelo:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+EntityManager em = ...;
+Metamodel m = em.getMetamodel();
+EntityType&lt;Pet&gt; Pet_ = m.entity(Pet.class);
+                </code>
+              </pre>
+            </div>
+          </div>
+          <table class="tableblock frame-all grid-all spread">
+            <colgroup>
+              <col style="width: 100%;">
+            </colgroup>
+            <tbody>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <div>
+                    <div class="paragraph">
+                      <p>Nota:</p>
+                    </div>
+                    <div class="paragraph">
+                      <p>
+                        El caso de uso más común es generar clases de metamodelo estático con seguridad de 
+                        tipos en el momento del desarrollo. Obtener las clases del metamodelo dinámicamente, 
+                        llamando a <code>Root&lt;T&gt;.getModel</code> o 
+                        <code>EntityManager.getMetamodel</code> y luego al método <code>entity</code>, no 
+                        permite seguridad de tipos y no permite que la aplicación llame a campos persistentes 
+                        o nombres de propiedad en la clase de metamodelo.
+                      </p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="persistence-criteria001.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="persistence-criteria003.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

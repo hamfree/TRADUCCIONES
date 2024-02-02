@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>
+      Uso de la IPA de Criteria y la IPA de Metamodelo para Crear Consultas Básicas con Seguridad de Tipos
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="persistence-criteria002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="persistence-string-queries.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GJIVM">
+      <h2 id="using-the-criteria-api-and-metamodel-api-to-create-basic-typesafe-queries">
+        Uso de la IPA de Criteria y la IPA de Metamodelo para Crear Consultas Básicas con Seguridad de Tipos
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            La semántica básica de una consulta Criteria consta de una cláusula <code>SELECT</code>, una 
+            cláusula <code>FROM</code> y una cláusula <code>WHERE</code> opcional, similar a una consulta 
+            JPQL. Las consultas de criterios establecen estas cláusulas mediante el uso de objetos del 
+            lenguaje de programación Java, por lo que la consulta se puede crear con seguridad de tipos.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p><a href="#GJIVS">Crear una Consulta de Criteria</a></p>
+            </li>
+            <li>
+              <p><a href="#GJIVQ">Raíces de Consulta</a></p>
+            </li>
+            <li>
+              <p><a href="#GJIUV">Consultar Relaciones Mediante Uniones</a></p>
+            </li>
+            <li>
+              <p><a href="#GJIVE">Navegación de Ruta en consultas Criteria</a></p>
+            </li>
+            <li>
+              <p><a href="#GJIVI">Restricción de Resultados de Consultas de Criteria</a></p>
+            </li>
+            <li>
+              <p><a href="#GJIXE">Gestión de Resultados de Consultas Criteria</a></p>
+            </li>
+            <li>
+              <p><a href="#GJIVY">Ejecutar Consultas</a></p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="GJIVS">
+          <h3 id="creating-a-criteria-query">Crear una Consulta de Criteria</h3>
+          <div class="paragraph">
+            <p>
+              La interfaz <code>javax.persistence.criteria.CriteriaBuilder</code> se utiliza para construir
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>Consultas basadas en criterios</p>
+              </li>
+              <li>
+                <p>Selecciones</p>
+              </li>
+              <li>
+                <p>Expresiones</p>
+              </li>
+              <li>
+                <p>Predicados</p>
+              </li>
+              <li>
+                <p>Ordenamiento</p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para obtener una instancia de la interfaz <code>CriteriaBuilder</code>, llame al método 
+              <code>getCriteriaBuilder</code> en una instancia <code>EntityManager</code> o 
+              <code>EntityManagerFactory</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El código siguiente muestra cómo obtener una instancia de <code>CriteriaBuilder</code> 
+              utilizando el método <code>EntityManager.getCriteriaBuilder</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+EntityManager em = ...;
+CriteriaBuilder cb = em.getCriteriaBuilder();
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las consultas basadas en criterios se construyen obteniendo una instancia de la siguiente 
+              interfaz:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+javax.persistence.criteria.CriteriaQuery
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los objetos <code>CriteriaQuery</code> definen una consulta particular que navegará sobre una o 
+              más entidades. Obtenga instancias de <code>CriteriaQuery</code> llamando a uno de los métodos 
+              <code>CriteriaBuilder.createQuery</code>. Para crear consultas con seguridad de tipos, llame al 
+              método <code>CriteriaBuilder.createQuery</code> de la siguiente manera:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El tipo de objeto <code>CriteriaQuery</code> debe establecerse en el tipo de resultado esperado 
+              de la consulta. En el código anterior, el tipo de objeto se establece en 
+              <code>CriteriaQuery&lt;Pet&gt;</code> para una consulta que encontrará instancias de la entidad 
+              <code>Pet</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El siguiente fragmento de código crea un objeto <code>CriteriaQuery</code> para una consulta que 
+              devuelve una <code>String</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;String&gt; cq = cb.createQuery(String.class);
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GJIVQ">
+          <h3 id="query-roots">Raíces de Consulta</h3>
+          <div class="paragraph">
+            <p>
+              Para un objeto <code>CriteriaQuery</code> particular, la entidad raíz de la consulta, a partir 
+              de la cual se origina toda la navegación, se denomina raíz de consulta. Es similar a la cláusula 
+              <code>FROM</code> en una consulta JPQL.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Cree la raíz de la consulta llamando al método <code>from</code> en la instancia de 
+              <code>CriteriaQuery</code>. El argumento del método <code>from</code> es la clase de entidad o 
+              una instancia de <code>EntityType&lt;T&gt;</code> para la entidad.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El siguiente código establece la raíz de la consulta en la entidad <code>Pet</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+Root&lt;Pet&gt; pet = cq.from(Pet.class);
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El siguiente código establece la raíz de la consulta en la clase <code>Pet</code> mediante una 
+              instancia de <code>EntityType&lt;T&gt;</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+EntityManager em = ...;
+Metamodel m = em.getMetamodel();
+EntityType&lt;Pet&gt; Pet_ = m.entity(Pet.class);
+Root&lt;Pet&gt; pet = cq.from(Pet_);
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las consultas de criterios pueden tener más de una raíz de consulta. Esto suele ocurrir cuando 
+              la consulta navega desde varias entidades.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El siguiente código tiene dos instancias de <code>Root</code>:
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+Root&lt;Pet&gt; pet1 = cq.from(Pet.class);
+Root&lt;Pet&gt; pet2 = cq.from(Pet.class);
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GJIUV">
+          <h3 id="querying-relationships-using-joins">Consultar Relaciones Mediante Uniones</h3>
+          <div class="paragraph">
+            <p>
+              Para consultas que navegan a clases de entidades relacionadas, la consulta debe definir una 
+              unión a la entidad relacionada llamando a uno de los métodos <code>From.join</code> en el objeto 
+              raíz de la consulta u otro objeto de unión. Los métodos <code>join</code> son similares a la 
+              palabra clave <code>JOIN</code> en JPQL.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El objetivo de la combinación utiliza la clase Metamodel de tipo 
+              <code>EntityType&lt;T&gt;</code> para especificar el campo persistente o la propiedad de la 
+              entidad combinada.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los métodos <code>join</code> devuelven un objeto de tipo <code>Join&lt;X, Y&gt;</code>, donde 
+              <code>X</code> es la entidad fuente y <code>Y</code > es el destino de la unión. En el siguiente 
+              fragmento de código, <code>Pet</code> es la entidad de origen, <code>Owner</code> es el destino 
+              y <code>Pet_</code> es una clase de metamodelo generada estáticamente:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+Root&lt;Pet&gt; pet = cq.from(Pet.class);
+Join&lt;Pet, Owner&gt; owner = pet.join(Pet_.owners);
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Puede encadenar uniones para navegar a entidades relacionadas de la entidad de destino sin tener 
+              que crear una instancia de <code>Join&lt;X, Y&gt;</code> para cada unión:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+Root&lt;Pet&gt; pet = cq.from(Pet.class);
+Join&lt;Owner, Address&gt; address = pet.join(Pet_.owners).join(Owner_.addresses);
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GJIVE">
+          <h3 id="path-navigation-in-criteria-queries">Navegación de Ruta en consultas Criteria</h3>
+          <div class="paragraph">
+            <p>
+              Los objetos <code>Path</code>, que se utilizan en las cláusulas <code>SELECT</code> y 
+              <code>WHERE</code> de una consulta Criteria, pueden ser entidades raíz de consulta, entidades de 
+              unión u otras  objetos <code>Ruta</code>. Utilice el método <code>Path.get</code> para navegar a 
+              los atributos de las entidades de una consulta.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El argumento del método <code>get</code> es el atributo correspondiente de la clase Metamodel de 
+              la entidad. El atributo puede ser un atributo de un solo valor, especificado por 
+              <code>@SingularAttribute</code> en la clase Metamodel, o un atributo con valor de colección, 
+              especificado por uno de <code>@CollectionAttribute</code>, <code >@SetAttribute</code>, 
+              <code>@ListAttribute</code> o <code>@MapAttribute</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La siguiente consulta devuelve los nombres de todas las mascotas en el almacén de datos. El 
+              método <code>get</code> se llama en la raíz de la consulta, <code>pet</code>, con el atributo 
+              <code>name</code> de la clase Metamodel de la entidad <code>Pet</code> , <code>Pet_</code>, como 
+              argumento:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;String&gt; cq = cb.createQuery(String.class);
+Root&lt;Pet&gt; pet = cq.from(Pet.class);
+cq.select(pet.get(Pet_.name));
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GJIVI">
+          <h3 id="restricting-criteria-query-results">Restricción de Resultados de Consultas de Criteria</h3>
+          <div class="paragraph">
+            <p>
+              Las condiciones que se establecen llamando al método <code>CriteriaQuery.where</code> pueden 
+              restringir los resultados de una consulta en el objeto <code>CriteriaQuery</code>. Llamar al 
+              método <code>where</code> es similar a establecer la cláusula <code>WHERE</code> en una consulta 
+              JPQL.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El método <code>where</code> evalúa instancias de la interfaz <code>Expression</code> para 
+              restringir los resultados según las condiciones de las expresiones. Para crear instancias de 
+              <code>Expression</code>, use métodos definidos en las interfaces <code>Expression</code> y 
+              <code>CriteriaBuilder</code>.
+            </p>
+          </div>
+          <div class="sect3" id="GJIWN">
+            <h4 id="the-expression-interface-methods">Los Métodos de la Interfaz de Expresión</h4>
+            <div class="paragraph">
+              <p>
+                Un objeto <code>Expression</code> se utiliza en la cláusula <code>SELECT</code>, 
+                <code>WHERE</code> o <code>HAVING</code> de una consulta. <a href="#GJIWW">Tabla 43-1</a> 
+                muestra métodos condicionales que puede usar con objetos <code>Expression</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p><a id="sthref180"></a><a id="GJIWW"></a></p>
+            </div>
+            <div class="paragraph">
+              <p>
+                <strong>
+                  Tabla 43-1 Métodos Condicionales en la Interfaz de Expression
+                </strong>
+              </p>
+            </div>
+            <table class="tableblock frame-all grid-all" style="width: 50%;">
+              <colgroup>
+                <col style="width: 30%;">
+                <col style="width: 70%;">
+              </colgroup>
+              <tbody>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><strong>Método</strong></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><strong>Descripción</strong></p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>isNull</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">Comprueba si una expresión es nula</p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>isNotNull</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">Comprueba si una expresión no es nula</p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>in</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">
+                      Comprueba si una expresión está dentro de una lista de valores
+                    </p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="paragraph">
+              <p>
+                La siguiente consulta usa el método <code>Expression.isNull</code> para encontrar todas las 
+                mascotas donde el atributo <code>color</code> es nulo:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+Root&lt;Pet&gt; pet = cq.from(Pet.class);
+cq.where(pet.get(Pet_.color).isNull());
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                La siguiente consulta usa el método <code>Expression.in</code> para encontrar todas las 
+                mascotas marrones y negras:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+Root&lt;Pet&gt; pet = cq.from(Pet.class);
+cq.where(pet.get(Pet_.color).in("brown", "black"));
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                El método <code>in</code> también puede verificar si un atributo es miembro de una colección.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="GJIXA">
+            <h4 id="expression-methods-in-the-criteriabuilder-interface">
+              Métodos de Expresión en la Interfaz CriteriaBuilder
+            </h4>
+            <div class="paragraph">
+              <p>
+                La interfaz <code>CriteriaBuilder</code> define métodos adicionales para crear expresiones. 
+                Estos métodos corresponden a los operadores y funciones aritméticos, de cadena, de fecha, de 
+                hora y de caso de JPQL. La <a href="#GJIXL">Tabla 43-2</a> muestra métodos condicionales que 
+                puede usar con objetos <code>CriteriaBuilder</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p><a id="sthref181"></a><a id="GJIXL"></a></p>
+            </div>
+            <div class="paragraph">
+              <p><strong>Tabla 43-2 Métodos Condicionales en la Interfaz CriteriaBuilder</strong></p>
+            </div>
+            <table class="tableblock frame-all grid-all" style="width: 60%;">
+              <colgroup>
+                <col style="width: 25%;">
+                <col style="width: 75%;">
+              </colgroup>
+              <tbody>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><strong>Método Condicional</strong></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><strong>Descripción</strong></p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>equal</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">Comprueba si dos expresiones son iguales</p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>notEqual</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">Comprueba si dos expresiones no son iguales</p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock"><code>gt</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">
+                      Comprueba si la primera expresión numérica es mayor que la segunda expresión numérica
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock"><code>ge</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">
+                      Comprueba si la primera expresión numérica es mayor o igual que la segunda expresión 
+                      numérica
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock"><code>lt</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">
+                      Comprueba si la primera expresión numérica es menor que la segunda expresión numérica
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock"><code>le</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">
+                      Comprueba si la primera expresión numérica es menor o igual que la segunda expresión 
+                      numérica
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>between</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">
+                      Comprueba si la primera expresión está entre la segunda y la tercera expresión en valor
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>like</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">Comprueba si la expresión coincide con un patrón dado</p></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="paragraph">
+              <p>
+                El siguiente código usa el método <code>CriteriaBuilder.equal</code>:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+Root&lt;Pet&gt; pet = cq.from(Pet.class);
+cq.where(cb.equal(pet.get(Pet_.name), "Fido"));
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                El siguiente código usa el método <code>CriteriaBuilder.gt</code>:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+Root&lt;Pet&gt; pet = cq.from(Pet.class);
+Date someDate = new Date(...);
+cq.where(cb.gt(pet.get(Pet_.birthday), date));
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                El siguiente código usa el método <code>CriteriaBuilder. between</code>:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+Root&lt;Pet&gt; pet = cq.from(Pet.class);
+Date firstDate = new Date(...);
+Date secondDate = new Date(...);
+cq.where(cb.between(pet.get(Pet_.birthday), firstDate, secondDate));
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                El siguiente código usa el método <code>CriteriaBuilder.like</code>:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+Root&lt;Pet&gt; pet = cq.from(Pet.class);
+cq.where(cb.like(pet.get(Pet_.name), "*do"));
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                Para especificar múltiples predicados condicionales, use los métodos de predicado compuesto de 
+                la interfaz <code>CriteriaBuilder</code>, como se muestra en la 
+                <a href="#GJIWU">Tabla 43-3</a>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p><a id="sthref182"></a><a id="GJIWU"></a></p>
+            </div>
+            <div class="paragraph">
+              <p><strong>Tabla 43-3 Métodos de Predicado Compuesto en la Interfaz CriteriaBuilder</strong></p>
+            </div>
+            <table class="tableblock frame-all grid-all" style="width: 50%;">
+              <colgroup>
+                <col style="width: 30%;">
+                <col style="width: 70%;">
+              </colgroup>
+              <tbody>
+                <tr>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">
+                      <strong>Método</strong></p></td>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock">
+                      <strong>Descripción</strong></p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>and</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">Una conjunción lógica de dos expresiones booleanas</p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top"><p class="tableblock"><code>or</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">Una disyunción lógica de dos expresiones booleanas</p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>not</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">Una negación lógica de la expresión booleana dada</p></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="paragraph">
+              <p>
+                El siguiente código muestra el uso de predicados compuestos en las consultas:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+Root&lt;Pet&gt; pet = cq.from(Pet.class);
+cq.where(cb.equal(pet.get(Pet_.name), "Fido")
+        .and(cb.equal(pet.get(Pet_.color), "brown")));
+                  </code>
+                </pre>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GJIXE">
+          <h3 id="managing-criteria-query-results">Gestión de Resultados de Consultas Criteria</h3>
+          <div class="paragraph">
+            <p>
+              Para las consultas que devuelven más de un resultado, suele ser útil organizar esos resultados. 
+              La interfaz <code>CriteriaQuery</code> define los siguientes métodos de ordenación y agrupación:
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  El método <code>orderBy</code> ordena los resultados de la consulta según los atributos de 
+                  una entidad
+                </p>
+              </li>
+              <li>
+                <p>
+                  El método <code>groupBy</code> agrupa los resultados de una consulta según los atributos de 
+                  una entidad, y el método <code>have</code> restringe esos grupos según una condición.
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>Aquí se tratan los siguientes temas:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p><a href="#GJIWO">Ordenar Resultados</a></p>
+              </li>
+              <li>
+                <p><a href="#GJIXG">Agrupar Resultados</a></p>
+              </li>
+            </ul>
+          </div>
+          <div class="sect3" id="GJIWO">
+            <h4 id="ordering-results">Ordenar Resultados</h4>
+            <div class="paragraph">
+              <p>
+                Para ordenar los resultados de una consulta, llama al método 
+                <code>CriteriaQuery.orderBy</code>, pasando un objeto <code>Order</code>. Para crear un objeto 
+                <code>Order</code>, llame al método <code>CriteriaBuilder.asc</code> o 
+                <code>CriteriaBuilder.desc</code>. El método <code>asc</code> se utiliza para ordenar los 
+                resultados por valor ascendente del parámetro de expresión pasado. El método <code>desc</code> 
+                se utiliza para ordenar los resultados por valor descendente del parámetro de expresión 
+                pasado. La siguiente consulta muestra el uso del método <code>desc</code>:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+Root&lt;Pet&gt; pet = cq.from(Pet.class);
+cq.select(pet);
+cq.orderBy(cb.desc(pet.get(Pet_.birthday)));
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                En esta consulta, los resultados estarán ordenados por el cumpleaños de la mascota de mayor a 
+                menor. Es decir, las mascotas nacidas en diciembre aparecerán antes que las nacidas en mayo.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                La siguiente consulta muestra el uso del método <code>asc</code>:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+Root&lt;Pet&gt; pet = cq.from(Pet.class);
+Join&lt;Owner, Address&gt; address = pet.join(Pet_.owners).join(Owner_.address);
+cq.select(pet);
+cq.orderBy(cb.asc(address.get(Address_.postalCode)));
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                En esta consulta, los resultados estarán ordenados por el código postal del dueño de la 
+                mascota de menor a mayor. Es decir, las mascotas cuyo dueño vive en el código postal 10001 
+                aparecerán antes que las mascotas cuyo dueño vive en el código postal 91000.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Si se pasa más de un objeto <code>Order</code> a <code>orderBy</code>, la prioridad está 
+                determinada por el orden en que aparecen en la lista de argumentos de <code>orderBy</code>. El 
+                primer objeto <code>Order</code> tiene prioridad.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                El siguiente código ordena los resultados por varios criterios:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+Root&lt;Pet&gt; pet = cq.from(Pet.class);
+Join&lt;Pet, Owner&gt; owner = pet.join(Pet_.owners);
+cq.select(pet);
+cq.orderBy(cb.asc(owner.get(Owner_.lastName)), owner.get(Owner_.firstName)));
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                Los resultados de esta consulta se ordenarán alfabéticamente por el apellido del dueño de la 
+                mascota, luego por el nombre.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="GJIXG">
+            <h4 id="grouping-results">Agrupar Resultados</h4>
+            <div class="paragraph">
+              <p>
+                El método <code>CriteriaQuery.groupBy</code> divide los resultados de la consulta en grupos. 
+                Para establecer estos grupos, pase una expresión a <code>groupBy</code>:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+Root&lt;Pet&gt; pet = cq.from(Pet.class);
+cq.groupBy(pet.get(Pet_.color));
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                Esta consulta devuelve todas las entidades <code>Pet</code> y agrupa los resultados por el 
+                color de la mascota.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Utilice el método <code>CriteriaQuery.have</code> junto con <code>groupBy</code> para filtrar 
+                los grupos. El método <code>have</code>, que toma una expresión condicional como parámetro, 
+                restringe el resultado de la consulta según la expresión condicional:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+Root&lt;Pet&gt; pet = cq.from(Pet.class);
+cq.groupBy(pet.get(Pet_.color));
+cq.having(cb.in(pet.get(Pet_.color)).value("brown").value("blonde"));
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                En este ejemplo, la consulta agrupa las entidades <code>Pet</code> devueltas por color, como 
+                en el ejemplo anterior. Sin embargo, los únicos grupos devueltos serán las entidades 
+                <code>Pet</code> donde el atributo <code>color</code> está establecido en <code>brown</code> o 
+                <code>blonde</code>. Es decir, no se devolverán mascotas de color gris en esta consulta.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GJIVY">
+          <h3 id="executing-queries">Ejecutar Consultas</h3>
+          <div class="paragraph">
+            <p>
+              Para preparar una consulta para su ejecución, cree un objeto <code>TypedQuery&lt;T&gt;</code> 
+              con el tipo del resultado de la consulta, pasando el objeto <code>CriteriaQuery</code> a 
+              <code>EntityManager.createQuery</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para ejecutar una consulta, llame a <code>getSingleResult</code> o <code>getResultList</code> en 
+              el objeto <code>TypedQuery&lt;T&gt;</code>.
+            </p>
+          </div>
+          <div class="sect3" id="GJIUR">
+            <h4 id="single-valued-query-results">Resultados de Consultas de un Solo Valor</h4>
+            <div class="paragraph">
+              <p>
+                Usa el método <code>TypedQuery&lt;T&gt;.getSingleResult</code> para ejecutar consultas que 
+                arrojan un solo resultado:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+...
+TypedQuery&lt;Pet&gt; q = em.createQuery(cq);
+Pet result = q.getSingleResult();
+                  </code>
+                </pre>
+              </div>
+            </div>
+          </div>
+          <div class="sect3" id="GJIVP">
+            <h4 id="collection-valued-query-results">Resultados de Consultas con Valores de Colección</h4>
+            <div class="paragraph">
+              <p>
+                Usa el método <code>TypedQuery&lt;T&gt;.getResultList</code> para ejecutar consultas que 
+                devuelven una colección de objetos:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+...
+TypedQuery&lt;Pet&gt; q = em.createQuery(cq);
+List&lt;Pet&gt; results = q.getResultList();
+                  </code>
+                </pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="persistence-criteria002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="persistence-string-queries.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

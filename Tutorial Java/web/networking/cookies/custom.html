@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            CookieManager Personalizado (Los Tutoriales de Java&trade; &gt; Personalizando la Red &gt; Trabajando con Cookies)
+        </title>
+        <meta name="description" content="Este tutorial de Java sobre redes describe las capacidades de red de la plataforma Java, 
+              trabajando con URL, sockets, datagramas y cookies." />
+        <meta name="keywords" content="java programming, learn java, java sample code, java networking, java url, java socket,
+              datagram, java cookie" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Trabajando con Cookies</a></div>
+                <div class="linkAHEAD"><a href="definition.html">Gestión del Estado HTTP Con Cookies</a></div>
+                <div class="linkAHEAD"><a href="cookiehandler.html">Mecanismo de LLamada de Vuelta del CookieHandler</a></div>
+                <div class="linkAHEAD"><a href="cookiemanager.html">CookieManager por Defecto</a></div>
+                <div class="nolinkAHEAD">CookieManager Personalizado</div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Personalizando la Red<br />
+                <b>Lección:</b> Trabajando con Cookies
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Personalizando la Red</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Trabajando con Cookies</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="cookiemanager.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../end.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>CookieManager Personalizado</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Dos aspectos de la clase <code>CookieManager</code> pueden ser personalizados, la <code>CookiePolicy</code> y 
+                    el <code>CookieStore</code>.
+                </p>
+                <h2>
+                    CookiePolicy
+                </h2>
+                <p>
+                    Por conveniencia, <code>CookiePolicy</code> define las siguietnes políticas predefinidas para aceptar cookies:
+                </p>
+                <ul>
+                    <li>
+                        <code>CookiePolicy.ACCEPT_ORIGINAL_SERVER</code> sólo acepta cookies desde el servidor original.
+                    </li>
+                    <li>
+                        <code>CookiePolicy.ACCEPT_ALL</code> acepta todas las cookies.
+                    </li>
+                    <li>
+                        <code>CookiePolicy.ACCEPT_NONE</code> no acepta cookies.
+                    </li>
+                    <li>
+                        Puede también definir su propia política de cookies implementando el método <code>shouldAccept</code> de 
+                        <code>CookiePolicy</code>. Puede usar luego esta <code>CookiePolicy</code> pasándola al constructor 
+                        multi-argumento de <code>CookieManager</code> o llamando al método 
+                        <code>setCookiePolicy(cookiePolicy)</code> para cambiar un gestor de cookies ya existente.
+                        <p>
+                            Lo siguiente es un ejemplo de una política de cookies que rechaza las cookies desde dominios que están 
+                            en una lista negra, antes de aplicaar la política <code>CookiePolicy.ACCEPT_ORIGINAL_SERVER</code>:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+import java.net.*;
+
+public class BlacklistCookiePolicy implements CookiePolicy {
+    String[] blacklist;
+
+    public BlacklistCookiePolicy(String[] list) {
+        blacklist = list;
+    }
+
+    public boolean shouldAccept(URI uri, HttpCookie cookie)  {
+        String host;
+        try {
+            host =  InetAddress.getByName(uri.getHost()).getCanonicalHostName();
+        } catch (UnknownHostException e) {
+            host = uri.getHost();
+        }
+
+        for (int i = 0; i&lt;blacklist.length; i++) {
+	    if (HttpCookie.domainMatches(blacklist[i], host)) {
+                return false;
+            }
+        }
+
+        return CookiePolicy.ACCEPT_ORIGINAL_SERVER.shouldAccept(uri, cookie);
+    }
+}
+                            </pre>
+                        </div>
+                        Cuando crea un instancia de <code>BlacklistCookiePolicy</code>, le pasa un vector de cadenas representando 
+                        los dominios de los que usted no quiere que se acepten cookies. Entonces, establece esta instancia 
+                        <code>BlacklistCookiePolicy</code> como la política de cookies para su <code>CookieManager</code>. Por 
+                        ejemplo:
+                        <div class="codeblock">
+                            <pre>
+String[] list = new String[]{ ".example.com" };
+CookieManager cm = new CookieManager(null, new BlacklistCookiePolicy(list));
+CookieHandler.setDefault(cm);
+                            </pre>
+                        </div>
+                        El código de ejemplo no aceptará cookies de máquinas tales como las siguientes:
+                        <div class="codeblock">
+                            <pre>
+host.example.com
+domain.example.com
+                            </pre>
+                        </div>
+                        Sin embargo, este código de ejemplo aceptará cookies de máquinas tales como las siguientes:
+                        <div class="codeblock">
+                            <pre>
+example.com
+example.org
+myhost.example.org
+                            </pre>
+                        </div>
+                        <h2>
+                            CookieStore
+                        </h2>
+                        Una <code>CookieStore</code> es una interfaz que representa un área de almacenamiento para cookies. 
+                        <code>CookieManager</code> agrega las cookies a la <code>CookieStore</code> para cada respuesta HTTP y 
+                        recupera cookies desde la <code>CookieStore</code> para cada petición HTTP.
+                        <p>
+                            Puede implementar esta interfaz proporcionando su propia <code>CookieStore</code> y pasarla al 
+                            <code>CookieManager</code> durante la creación. No puede establecer la <code>CookieStore</code> después 
+                            de que la instancia de <code>CookieManager</code> se haya creado. Sin embargo, puede obtener una 
+                            referencia al almacén de cookies llamando a <code>CookieManager.getCookieStore()</code>. Hacerlo puede 
+                            resultar útil, ya que le permite aprovechar la implementación predeterminada de 
+                            <code>CookieStore</code> en memoria que proporciona Java SE y complementar su funcionalidad.
+                        </p>
+                        <p>
+                            Por ejemplo, podría querer crear un almacén persistente de cookies que salvaría las cookies de forma que 
+                            ellas puedan usarse incluso si la Máquina Virtual de Java se reinició. Su implementación trabajaría de 
+                            forma similar a lo siguiente:
+                        </p>
+                        <ol>
+                            <li>
+                                Las cookies que fueron previamente salvadas son leídas.
+                            </li>
+                            <li>
+                                Durante la ejecución, las cookies son almacenadas y recuperadas desde la memoria.
+                            </li>
+                            <li>
+                                Las cookies son escritas en el almacén persistente antes de salir.
+                            </li>
+                        </ol>
+                        <p>
+                            Lo siguiente es un ejemplo incompleto de este almacén de cookies. Este ejemplo le muestra como 
+                            aprovechar el almacén de cookies en memoria por defecto de Java SE y cómo podría extender su 
+                            funcionalidad.
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+import java.net.*;
+import java.util.*;
+
+public class PersistentCookieStore implements CookieStore, Runnable {
+    CookieStore store;
+
+    public PersistentCookieStore() {
+        // get the default in memory cookie store
+        store = new CookieManager().getCookieStore();
+
+        // todo: read in cookies from persistant storage
+        // and add them store
+
+        // add a shutdown hook to write out the in memory cookies
+        Runtime.getRuntime().addShutdownHook(new Thread(this)); 
+    }
+
+    public void run() {
+        // todo: write cookies in store to persistent storage
+    }
+
+    public void	add(URI uri, HttpCookie cookie) {
+        store.add(uri, cookie);
+    }
+
+    public List&lt;HttpCookie&gt; get(URI uri) {
+        return store.get(uri);
+    }
+
+    public List&lt;HttpCookie&gt; getCookies() {
+        return store.getCookies();
+    }
+    
+    public List&lt;URI&gt; getURIs() {
+        return store.getURIs();
+    }
+
+    public boolean remove(URI uri, HttpCookie cookie) {
+        return store.remove(uri, cookie);
+    }
+
+    public boolean removeAll()  {
+        return store.removeAll();
+    }
+}
+                            </pre>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="cookiemanager.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../end.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> CookieManager por Defecto<br />
+            <b>Página siguiente:</b> Final de la Lección
+        </div>
+    </body>
+</html> 

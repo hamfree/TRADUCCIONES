@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Usando Restricciones de Método en las Jerarquías de Tipos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="bean-validation-advanced003.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="partcdi.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="CIHGJBGI">
+      <h2 id="using-method-constraints-in-type-hierarchies">
+        Usando Restricciones de Método en las Jerarquías de Tipos
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Si agrega restricciones de validación a objetos en una jerarquía de herencia, tenga 
+            especial cuidado para evitar errores no deseados al usar subtipos.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Para un tipo dado, los subtipos deben poder sustituirse sin encontrar errores. Por 
+            ejemplo, si tiene una clase <code>Person</code> y una subclase <code>Employee</code> que 
+            amplía <code>Person</code>, debería poder usar instancias <code>Employee</code> donde 
+            quiera que pueda usar instancias <code>Person</code>. Si <code>Employee</code> anula un 
+            método en <code>Person</code> agregando restricciones de parámetros de método, el código 
+            que funciona correctamente con objetos <code>Person</code> puede generar excepciones de 
+            validación con objetos <code>Employee</code>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            El siguiente código muestra un uso incorrecto de las restricciones de parámetros de 
+            método dentro de una jerarquía de clases:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public class Person {
+...
+  public void setPhone(String phone) { ... }
+}
+public class Employee extends Person {
+...
+  @Override
+  public void setPhone(@Verified String phone) { ... }
+}
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Al agregar la restricción <code>@Verified</code> a <code>Employee.setPhone</code>, los 
+            parámetros que eran válidos con <code>Person.setPhone</code> no serán válidos con 
+            <code>Employee.setPhone</code>. Esto se llama fortalecer las condiciones previas (es 
+            decir, los parámetros del método) del método de un subtipo. No puede reforzar las 
+            condiciones previas de las llamadas a métodos de subtipos.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            De manera similar, los valores de retorno de las llamadas a métodos no deben debilitarse 
+            en los subtipos. El siguiente código muestra un uso incorrecto de las restricciones en 
+            los valores devueltos del método en una jerarquía de clases:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public class Person {
+...
+  @Verified
+  public USPhoneNumber getPhone() { ... }
+}
+public class Employee extends Person {
+...
+  @Override
+  public USPhoneNumber getPhone() { ... }
+}
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            En este ejemplo, el método <code>Employee.getPhone</code> elimina la restricción 
+            <code>@Verified</code> en el valor de retorno. Los valores devueltos que no pasarían la 
+            validación al llamar a <code>Person.getEmail</code> están permitidos al llamar a 
+            <code>Employee.getPhone</code>. Esto se denomina debilitar las condiciones posteriores 
+            (es decir, los valores devueltos) de un subtipo. No puede debilitar las condiciones 
+            posteriores de una llamada de método de subtipo.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Si su jerarquía de tipos fortalece las condiciones previas o debilita las condiciones 
+            posteriores de las llamadas a métodos de subtipos, el tiempo de ejecución de Validación 
+            de Beans generará una <code>javax.validation.ConstraintDeclarationException</code>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Las clases que implementan varias interfaces, cada una de las cuales tiene la misma 
+            firma de método, conocidas como tipos paralelos, deben conocer las restricciones que se 
+            aplican a las interfaces que implementan para evitar fortalecer las condiciones previas. 
+            Por ejemplo:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public interface PaymentService {
+  void processOrder(Order order, double amount);
+...
+}
+public interface CreditCardPaymentService {
+  void processOrder(@NotNull Order order, @NotNull double amount);
+...
+}
+public class MyPaymentService implements PaymentService,
+        CreditCardPaymentService {
+  @Override
+  public void processOrder(Order order, double amount) { ... }
+...
+}
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            En este caso, <code>MyPaymentService</code> tiene las restricciones del método 
+            <code>processOrder</code> en <code>CreditCardPaymentService</code>, pero el código del 
+            cliente llama a <code>PaymentService.processOrder</code > no espera estas restricciones. 
+            Este es otro ejemplo de cómo fortalecer las condiciones previas de un subtipo y dará 
+            como resultado una <code>ConstraintDeclarationException</code>.
+          </p>
+        </div>
+        <div class="sect2" id="sthref125">
+          <h3 id="rules-for-using-method-constraints-in-type-hierarchies">
+            Reglas para Usar Restricciones de Método en las Jerarquías de Tipos
+          </h3>
+          <div class="paragraph">
+            <p>
+              Las siguientes reglas definen cómo se deben usar las restricciones de validación de 
+              métodos en las jerarquías de tipos.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  No agregue restricciones de parámetros de método a métodos anulados o 
+                  implementados en un subtipo.
+                </p>
+              </li>
+              <li>
+                <p>
+                  No agregue restricciones de parámetros de método a métodos anulados o 
+                  implementados en un subtipo que se declaró originalmente en varios tipos 
+                  paralelos.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Puede agregar restricciones de valor devuelto a un método anulado o implementado 
+                  en un subtipo.
+                </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="bean-validation-advanced003.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="partcdi.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

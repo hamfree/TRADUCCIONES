@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Respuestas: Concurrencia en Swing (Los Tutoriales de Java&trade; &gt; Creando una IGU (Interfaz Gráfica
+            de Usuario) con JFC/Swing)
+        </title>
+        <meta name="description" content="Este tutorial de Swing Java describe el desarrollo de interfaces gráficas de usuario (GUI)
+              para aplicaciones y applets que utilizan componentes Swing" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java swing, java ui, java user interface,
+              swing components, swing events, swing layout  " />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+    </head>
+    <body>
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                            </div>
+                            <div class="PrintHeaders">
+                                <b>Recorrido:</b> Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="MainFlow_wide">
+            <span id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing</a>
+            </span>
+            <div class="NavBit">
+                <a href="../TOC.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a href="../TOC.html">TdC</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Respuestas: Concurrencia en Swing</h1>
+            </div>
+            <div id="PageContent">
+                <h2>Preguntas</h2>
+                <p>
+                    <b>Pregunta 1:</b> Para cada una de las siguientes tareas, especifique en qué hilo debería ser ejecutado y
+                    porqué.
+                    <br />
+                    <b>Respuesta 1:</b>
+                </p>
+                <ul>
+                    <li>
+                        Iniciar el IGU. El hilo despachador de eventos; la mayoría de las interacciones con el marco de trabajo del
+                        IGU deben ocurrir en este hilo.
+                    </li>
+                    <li>
+                        Cargar un gran fichero. Un hilo de trabajo. Ejecutar esta tarea en el hilo despachador de eventos prevendría
+                        a los eventos del IGU de ser procesados, &quot;congelando&quot; el IGU hasta que la tarea se acabe.
+                        Ejecutar esta tarea en un hilo inicial causaría un retraso en la creación del IGU.
+                    </li>
+                    <li>
+                        Invocar
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/swing/JComponent.html#setFont-java.awt.Font-">
+                            <code>javax.swing.JComponent.setFont</code></a> para cambiar la fuente de un componente. El hilo 
+                        despachador de eventos. Como con la mayoría de los métodos de Swing, no es seguro invocar 
+                        <code>setFont</code> desde cualquier otro hilo.
+                    </li>
+                    <li>
+                        Invocar
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/swing/text/JTextComponent.html#setText-java.lang.String-">
+                            <code>javax.swing.text.JTextComponent.setText</code></a> para cambiar el texto de un componente. Este
+                        método está documentado como seguro en multihilo, así que puede ser invocado desde cualquier hilo.
+                    </li>
+                </ul>
+                <p>
+                    <b>Pregunta 2:</b>  Un conjunto de hilos no es usado para ninguna de las tareas mencionadas en la pregunta 
+                    previa. Nombre este hilo y explique porqué sus aplicaciones son muy limitadas.
+                    <br />
+                    <b>Respuesta 2:</b> Los hilos iniciales lanzan la primera tarea del IGU  en el hilo despachador de eventos.
+                    Después de eso, un programa Swing se conduce primariamente por los eventos del IGU, los cuales disparan tareas
+                    en el hilo despachador de eventos y en el hilo de trabajo. Usualmente, los hilos iniciales quedan sin nada que
+                    hacer.
+                </p>
+                <p>
+                    <b>Pregunta 3:</b> <code>SwingWorker</code> tiene dos parámetros de tipos. Explique cómo estos parámetros de 
+                    tipos son usados, y porque a menudo no importa cuáles son.<br />
+                    <b>Respuesta 3:</b> Los parámetros tipo especifican el tipo del resultado final (también el tipo de vuelta del
+                    método <code>doInBackground</code>) y el tipo de los resultados provisionales (también los argumentos tipo para
+                    <code>publish</code> y <code>process</code>). Muchas tareas de fondo no suministran resultados provisionales o
+                    finales.
+                </p>
+                <h2>Ejercicios</h2>
+                <p>
+                    <b>Pregunta 1:</b> Modifique el ejemplo
+                    <a class="SourceLink" target="_blank"
+                       href="../examples/concurrency/FlipperProject/src/concurrency/Flipper.java"
+                       onclick="showCode('../../displayCode.html',
+                                       '../examples/concurrency/FlipperProject/src/concurrency/Flipper.java');
+                               return false;"><code>Flipper</code></a> de forma que haga una pausa de 5 segundos entre las
+                    &quot;tiradas de monedas.&quot; Si el usuario pulsa &quot;Cancelar&quot;, el bucle de lanzamiento de
+                    monedas termina inmediatamente.
+                    <br />
+                    <b>Respuesta 1:</b> Vea el código fuente para
+                    <a class="SourceLink" target="_blank" 
+                       href="../examples/QandE/Flipper2Project/src/QandE/Flipper2.java"
+                       onclick="showCode('../../displayCode.html',
+                                       '../examples/QandE/Flipper2Project/src/QandE/Flipper2.java');
+                               return false;"><code>Flipper2</code></a>. El programa modificado añade un retraso en el bucle
+                    central <code>doInBackground</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+protected Object doInBackground() {
+    long heads = 0;
+    long total = 0;
+    Random random = new Random();
+    while (!isCancelled()) {
+        <b>try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+        //¡Cancelado!
+        return null;
+        }</b>
+        total++;
+        if (random.nextBoolean()) {
+            heads++;
+        }
+        publish(new FlipPair(heads, total));
+    }
+    return null;
+}
+                    </pre>
+                </div>
+                <p>
+                    El <code>try ... catch</code> causa que <code>doInBackground</code> vuelva si una interrupción es recibida
+                    mientas el hilo está durmiendo. Invocar <code>cancel</code> con un argumento <code>true</code> asegura que una
+                    interrupción sea enviada cuando la tarea se cancela.
+                </p>
+            </div>
+        </div>
+        <div class="NavBit">
+            <a href="../TOC.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+            <a href="../TOC.html">TdC</a>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">
+                                avisos legales</a>.
+                        </p>
+                        <p class="footertext">Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.</p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página Anterior:</b> Preguntas y Ejercicios: Concurrencia en Swing
+        </div>
+    </body>
+</html>

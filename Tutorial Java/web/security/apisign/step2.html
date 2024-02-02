@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Generar las Claves Públicas y Privadas (Los Tutoriales de Java&trade; &gt; Características de Seguridad en Java SE &gt; 
+            Generando y Verificando Firmas)
+        </title>
+        <meta name="description" content="Este tutorial de seguridad de Java describe el uso de firmas digitales, claves y servicios 
+              de criptografía" />
+        <meta name="keywords" content="programación java, aprender java, código ejemplo java, seguridad java, criptografía, firma 
+              digital, verificación firma, código de firma" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Generando y Verificando Firmas</a></div>
+                <div class="linkAHEAD"><a href="gensig.html">Generando una Firma Digital</a></div>
+                <div class="linkBHEAD"><a href="step1.html">Preparar la Estructura Inicial del Programa</a></div>
+                <div class="nolinkBHEAD">Generar las Claves Públicas y Privadas</div>
+                <div class="linkBHEAD"><a href="step3.html">Firmando los Datos</a></div>
+                <div class="linkBHEAD"><a href="step4.html">Salvar la Firma y la Clave Pública en los Ficheros</a></div>
+                <div class="linkBHEAD"><a href="step5.html">Compilar y Ejecutar el Programa</a></div>
+                <div class="linkAHEAD"><a href="versig.html">Verificando una Signatura Digital</a></div>
+                <div class="linkBHEAD"><a href="vstep1.html">Preparar la Estructura Inicial del Programa</a></div>
+                <div class="linkBHEAD"><a href="vstep2.html">Introducir y Convertir los Bytes Codificados de la Clave Pública</a></div>
+                <div class="linkBHEAD"><a href="vstep3.html">Introducir los Bytes de la Firma</a></div>
+                <div class="linkBHEAD"><a href="vstep4.html">Verificar la Firma</a></div>
+                <div class="linkBHEAD"><a href="vstep5.html">Compilar y Ejecutar el Programa</a></div>
+                <div class="linkAHEAD"><a href="enhancements.html">Debilidades y Alternativas</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Características de Seguridad en Java SE<br />
+                <b>Lección:</b> Generando y Verificando Firmas<br />
+                <b>Sección:</b> Generando una Firma Digital
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Características de Seguridad en Java SE</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Generando y Verificando Firmas</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="step1.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="step3.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Generar las Claves Públicas y Privadas</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Para ser capaz de crear una firma digital, necesita una clave privada. (Su correspondiente clave pública se 
+                    necesitará para verificar la autenticidad de la firma).
+                </p>
+                <p>
+                    En algunos casos el <i>par de claves</i> (la clave privada y la clave pública correspondiente) ya están 
+                    disponibles en archivos. En ese caso el programa puede importar y usar la clave privada para el firmado, como 
+                    se muestra en 
+                    <a href="enhancements.html">Debilidades y Alternativas</a>.
+                </p>
+                <p>
+                    En otros casos el programa necesita generar el par de claves. Se genera un par de claves usando la clase 
+                    <code>KeyPairGenerator</code>.
+                </p>
+                <p>
+                    En este ejemplo generará un par de claves pública/privada para el Algoritmo de Firma Digital (DSA). Generará 
+                    claves con una longitud de 1024 bits.
+                </p>
+                <p>
+                    Generar un par de claves requiere de varios pasos:
+                </p>
+                <p style="font-weight: bold">
+                    Crear un Generador de Pares de Claves
+                </p>
+                <p>
+                    El primer paso es obtener el objeto generador de pares de clave para generar claves para el algoritmo de firmas 
+                    DSA.
+                </p>
+                <p>
+                    Como con todas las clases de tipo motor, la forma de obtener un objeto  <code>KeyPairGenerator</code> para un 
+                    tipo particular de algoritmo es llamar al método de factoría estático <code>getInstance</code> en la clase 
+                    <code>KeyPairGenerator</code>. El método tiene dos formas, ambas tiene un primer argumento 
+                    <code>String algorithm</code>; una forma también tiene un segundo argumento <code>String provider</code>.
+                </p>
+                <p>
+                    Un llamante puede así opcionalmente especificar el nombre de un proveedor, lo que garantizará que 
+                    la implementación del algoritmo solicitado sea del proveedor mencionado. El código de ejemplo de esta lección 
+                    siempre especifica al proveedor predeterminado SUN integrado en el KDJ.
+                </p>
+                <p>
+                    Coloque la siguiente sentencia despues de la línea 
+                </p>
+                <div class="codeblock">
+                    <pre>
+else try {
+                    </pre>
+                </div>
+                <p>
+                    en el archivo creado en el paso previo, 
+                    <a href="step1.html">Preparar la Estructura Inicial del Programa</a>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA", "SUN");
+                    </pre>
+                </div>
+                <p style="font-weight: bold">
+                    Inicializar el Generador de Par de Claves
+                </p>
+                <p>
+                    El siguiente paso es inicializar el generador de par de claves. Todos los generadores de par de claves 
+                    comparten los conceptos de un tamaño de clave y fuente de aleatoriedad. La clase <code>KeyPairGenerator</code> 
+                    tiene un método <code>initialize</code> que toma esos dos tipos de argumentos.
+                </p>
+                <p>
+                    El tamaño de clave para un generador de claves DSA es la longitud de clave (en bits), que fijará en 1024.
+                </p>
+                <p>
+                    La fuente de aleatoriedad debe ser una instancia de la clase <code>SecureRandom</code> que proporciona un 
+                    generador de números aleatorios (RNG) criptográficamente fuerte. Para más información sobre 
+                    <code>SecureRandom</code>, vea la 
+                    <a class="OutsideLink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/security/SecureRandom.html">
+                        Especificación de la IPA de SecureRandom IPA</a> y la 
+                    <a class="OutsideLink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/crypto/CryptoSpec.html#SecureRandom">
+                        Guía de Referencia de la Arquitectura de Criptografía de Java</a>.
+                </p>
+                <p>
+                    El ejemplo siguiente solicita una isntancia de <code>SecureRandom</code> que usa el algoritmo SHA1PRNG, como el 
+                    proporcionado por el proveedor SUN integrado. El ejemplo después pasa esta instancia <code>SecureRandom</code> 
+                    al método de inicialización del generador de par de claves.
+                </p>
+                <div class="codeblock">
+                    <pre>
+SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+keyGen.initialize(1024, random);
+                    </pre>
+                </div>
+                <p>
+                    Algunas situaciones requieren valores aleatorios fuertes, tales como cuando se crean secretos de alto valor y 
+                    vida larga como las claves privadas y públicas de RSA. Para ayudar a guiar a las aplicaciones a seleccionar una 
+                    implementación <code>SecureRandom</code> sólida y adecuada, desde las distribuciones de Java KDJ 8 se incluye 
+                    una lista de implementaciones fuertes <code>SecureRandom</code> conocidas  en la propiedad 
+                    <code>securerandom.strongAlgorithms</code> de la clase <code>java.security.Security</code>. Cuando está creando 
+                    tales datos, debe considerar usar <code>SecureRandom.getInstanceStrong()</code>, ya que obtiene una instancia 
+                    de los algoritmos fuertes conocidos.
+                </p>
+                <p style="font-weight: bold">
+                    Genere el Par de Claves
+                </p>
+                <p>
+                    El paso final es generar el par de claves y almacenar las claves en los objetos <code>PrivateKey</code> y 
+                    <code>PublicKey</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+KeyPair pair = keyGen.generateKeyPair();
+PrivateKey priv = pair.getPrivate();
+PublicKey pub = pair.getPublic();
+                    </pre>
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="step1.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="step3.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Preparar la Estructura Inicial del Programa<br />
+            <b>Página siguiente:</b> Firmando los Datos
+        </div>
+    </body>
+</html> 

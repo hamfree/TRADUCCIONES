@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Accediendo a los Enterprise Beans</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="ejb-intro003.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="ejb-intro005.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GIPJF">
+      <h2 id="accessing-enterprise-beans">Accediendo a los Enterprise Beans</h2>
+      <div class="sectionbody">
+        <table class="tableblock frame-all grid-all spread">
+          <colgroup>
+            <col style="width: 100%;">
+          </colgroup>
+          <tbody>
+            <tr>
+              <td class="tableblock halign-left valign-top">
+                <div>
+                  <div class="paragraph">
+                    <p>Nota:</p>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      El material de esta sección se aplica solo a los beans de sesión y no a los beans 
+                      controlados por mensajes. Debido a que tienen un modelo de programación diferente, los 
+                      beans controlados por mensajes no tienen interfaces o vistas sin interfaz que definan el 
+                      acceso del cliente.
+                    </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="paragraph">
+          <p>
+            Los clientes acceden a enterprise beans a través de una vista sin interfaz oa través de una 
+            interfaz comercial. Una vista sin interfaz de un bean empresarial expone los métodos públicos de 
+            la clase de implementación del enterprise bean a los clientes. Los clientes que utilizan la vista 
+            sin interfaz de un enterprise bean pueden invocar cualquier método público en la clase de 
+            implementación del enterprise bean o cualquier superclase de la clase de implementación. Una 
+            interfaz empresarial es una interfaz de lenguaje de programación Java estándar que contiene los 
+            métodos de negocio del enterprise bean.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Un cliente puede acceder a un bean de sesión solo a través de los métodos definidos en la 
+            interfaz empresarial del bean o a través de los métodos públicos de un enterprise bean que no 
+            tiene una vista de interfaz. La vista de interfaz empresarial o sin interfaz define la vista del 
+            cliente de un enterprise bean. Todos los demás aspectos del enterprise bean (implementaciones de 
+            métodos y configuraciones de implementación) están ocultos para el cliente.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Las interfaces bien diseñadas y las vistas sin interfaz simplifican el desarrollo y el 
+            mantenimiento de las aplicaciones Java EE. Las interfaces limpias y las vistas sin interfaz no 
+            solo protegen a los clientes de cualquier complejidad en el nivel EJB, sino que también permiten 
+            que los enterprise beans cambien internamente sin afectar a los clientes. Por ejemplo, si cambia 
+            la implementación de un método comercial de un bean de sesión, no tendrá que modificar el código 
+            del cliente. Pero si tuviera que cambiar las definiciones de métodos en las interfaces, es posible 
+            que también deba modificar el código del cliente. Por lo tanto, es importante que diseñe las 
+            interfaces y las vistas sin interfaz cuidadosamente para aislar a sus clientes de posibles cambios 
+            en los enterprise beans.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Los beans de sesión pueden tener más de una interfaz empresarial. Los beans de sesión deberían 
+            implementar su interfaz o interfaces comerciales, pero no están obligados a hacerlo.
+          </p>
+        </div>
+        <div class="sect2" id="GIRFL">
+          <h3 id="using-enterprise-beans-in-clients">Usando Enterprise Beans en Clientes</h3>
+          <div class="paragraph">
+            <p>
+              El cliente de un enterprise bean obtiene una referencia a una instancia de un enterprise bean a 
+              través de la inyección de dependencia, usando anotaciones del lenguaje de programación Java, o 
+              búsqueda JNDI, usando la sintaxis de interfaz de directorio y nombres de Java para encontrar la 
+              instancia del enterprise bean.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La inyección de dependencia es la forma más sencilla de obtener una referencia de enterprise 
+              bean. Los clientes que se ejecutan en un entorno administrado por un servidor Java EE, 
+              aplicaciones web JavaServer Faces, servicios web JAX-RS, otros enterprise beans o clientes de 
+              aplicaciones Java EE admiten la inyección de dependencia mediante la anotación 
+              <code>javax.ejb.EJB</code> .
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las aplicaciones que se ejecutan fuera de un entorno administrado por un servidor Java EE, como 
+              las aplicaciones Java SE, deben realizar una búsqueda explícita. JNDI admite una sintaxis global 
+              para identificar componentes Java EE para simplificar esta búsqueda explícita.
+            </p>
+          </div>
+          <div class="sect3" id="GIRGN">
+            <h4 id="portable-jndi-syntax">Sintaxis JNDI Portable</h4>
+            <div class="paragraph">
+              <p>
+                Se utilizan tres espacios de nombres JNDI para búsquedas JNDI portátiles: 
+                <code>java:global</code>, <code>java:module</code>, y <code>java:app</code>.
+              </p>
+            </div>
+            <div class="ulist">
+              <ul>
+                <li>
+                  <p>
+                    El espacio de nombres JNDI <code>java:global</code> es la forma portátil de encontrar 
+                    enterprise beans remotos mediante búsquedas JNDI. Las direcciones JNDI tienen el siguiente 
+                    formato:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+java:global[/application name]/module name /enterprise bean name[/interface name ]
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      El nombre de la aplicación y el nombre del módulo tienen como valor predeterminado el 
+                      nombre de la aplicación y el módulo menos la extensión del archivo. Los nombres de las 
+                      aplicaciones son obligatorios solo si la aplicación está empaquetada dentro de un EAR. 
+                      El nombre de la interfaz solo es necesario si el bean empresarial implementa más de una 
+                      interfaz empresarial.
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    El espacio de nombres <code>java:module</code> se utiliza para buscar enterprise beans 
+                    locales dentro del mismo módulo. Las direcciones JNDI que utilizan el espacio de nombres 
+                    <code>java:module</code> tienen el siguiente formato:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+java:module/enterprise bean name/[interface name]
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      El nombre de la interfaz solo es necesario si el bean empresarial implementa más de una 
+                      interfaz empresarial.
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    El espacio de nombres <code>java:app</code> se utiliza para buscar beans empresariales 
+                    locales empaquetados dentro de la misma aplicación. Es decir, el bean empresarial se 
+                    empaqueta dentro de un archivo EAR que contiene varios módulos Java EE. Las direcciones 
+                    JNDI que utilizan el espacio de nombres <code>java:app</code> tienen el siguiente formato:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+java:app[/module name]/enterprise bean name [/interface name]
+                      </code></pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      El nombre del módulo es opcional. El nombre de la interfaz solo es necesario si el 
+                      enterprise bean implementa más de una interfaz empresarial.
+                    </p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="paragraph">
+              <p>
+                Por ejemplo, si un enterprise bean, <code>MyBean</code>, se empaqueta dentro del archivo de la 
+                aplicación web <code>myApp.war</code>, el nombre del módulo es <code>myApp</code>. El nombre 
+                JNDI portátil es <code>java:module/MyBean</code>. Un nombre JNDI equivalente que utiliza el 
+                espacio de nombres <code>java:global</code> es <code>java:global/myApp/MyBean</code>.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GIPIZ">
+          <h3 id="deciding-on-remote-or-local-access">Decidir Sobre el Acceso Remoto o Local</h3>
+          <div class="paragraph">
+            <p>
+              Cuando diseña una aplicación Java EE, una de las primeras decisiones que toma es el tipo de 
+              acceso de cliente permitido por los beans empresariales: remoto, local o servicio web.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Permitir el acceso local o remoto depende de los siguientes factores.</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  Acoplamiento estrecho o suelto de beans relacionados: los beans estrechamente acoplados 
+                  dependen unos de otros. Por ejemplo, si un bean de sesión que procesa pedidos de ventas 
+                  llama a un bean de sesión que envía un mensaje de confirmación por correo electrónico al 
+                  cliente, estos beans están estrechamente acoplados. Los frijoles estrechamente acoplados son 
+                  buenos candidatos para el acceso local. Debido a que encajan como una unidad lógica, por lo 
+                  general se llaman entre sí con frecuencia y se beneficiarían del mayor rendimiento que es 
+                  posible con el acceso local.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Tipo de cliente: si los clientes de aplicaciones acceden a un bean empresarial, debe 
+                  permitir el acceso remoto. En un entorno de producción, estos clientes casi siempre se 
+                  ejecutan en máquinas distintas de aquellas en las que se ejecuta el Servidor GlassFish. Si 
+                  los clientes de un bean empresarial son componentes web u otros enterprise beans, el tipo 
+                  de acceso depende de cómo desee distribuir sus componentes.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Distribución de componentes: las aplicaciones Java EE son escalables porque sus componentes 
+                  del lado del servidor se pueden distribuir en varias máquinas. En una aplicación 
+                  distribuida, por ejemplo, el servidor en el que se ejecutan los componentes web puede no ser 
+                  el mismo en el que se implementan los beans empresariales a los que acceden. En este 
+                  escenario distribuido, los enterprise beans deberían permitir el acceso remoto.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Rendimiento: debido a factores como la latencia de la red, las llamadas remotas pueden ser 
+                  más lentas que las llamadas locales. Por otro lado, si distribuye componentes entre 
+                  diferentes servidores, puede mejorar el rendimiento general de la aplicación. Ambas 
+                  declaraciones son generalizaciones; el rendimiento puede variar en diferentes entornos 
+                  operativos. Sin embargo, debe tener en cuenta cómo el diseño de su aplicación puede afectar 
+                  el rendimiento.
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Si no está seguro de qué tipo de acceso debe tener un enterprise bean, elija el acceso remoto. 
+              Esta decisión le da más flexibilidad. En el futuro, puede distribuir sus componentes para 
+              adaptarse a las crecientes demandas de su aplicación.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Aunque es poco común, es posible que un enterprise bean permita el acceso local y remoto. Si 
+              este es el caso, la interfaz comercial del bean debe designarse explícitamente como una interfaz 
+              comercial decorándola con las anotaciones <code>@Remote</code> o <code>@Local</code>, o la clase 
+              bean debe designar explícitamente las interfaces comerciales mediante las anotaciones 
+              <code>@Remote</code> y <code>@Local</code>. La misma interfaz comercial no puede ser una 
+              interfaz comercial local y remota.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="GIPMZ">
+          <h3 id="local-clients">Clientes Locales</h3>
+          <div class="paragraph">
+            <p>Un cliente local tiene estas características.</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>Debe ejecutarse en la misma aplicación que el enterprise bean al que accede.</p>
+              </li>
+              <li>
+                <p>Puede ser un componente web u otro enterprise bean.</p>
+              </li>
+              <li>
+                <p>
+                  Para el cliente local, la ubicación del enterprise bean al que accede no es transparente.
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              La vista sin interfaz de un enterprise bean es una vista local. Los métodos públicos de la clase 
+              de implementación del enterprise bean están expuestos a los clientes locales que acceden a la 
+              vista sin interfaz del enterprise bean. Enterprise beans que utilizan la vista sin interfaz no 
+              implementan una interfaz empresarial.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La interfaz comercial local define los métodos comerciales y de ciclo de vida del bean. Si la 
+              interfaz comercial del bean no está decorada con <code>@Local</code> o <code>@Remote</code>, y 
+              si la clase de bean no especifica la interfaz usando <code>@Local</code> o <code>@Remote</code>, 
+              la interfaz empresarial es, de forma predeterminada, una interfaz local.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para crear un enterprise bean que solo permita el acceso local, puede, pero no es obligatorio, 
+              realizar una de las siguientes acciones.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  Cree una clase de implementación de enterprise bean que no implemente una interfaz 
+                  empresarial, lo que indica que el bean expone una vista sin interfaz a los clientes. Por 
+                  ejemplo:
+                </p>
+                <div class="listingblock">
+                  <div class="content">
+                    <pre class="prettyprint highlight">
+                      <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Session
+public class MyBean { ... }
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <p>
+                  Anote la interfaz comercial del bean empresarial como una interfaz <code>@Local</code>. Por 
+                  ejemplo:
+                </p>
+                <div class="listingblock">
+                  <div class="content">
+                    <pre class="prettyprint highlight">
+                      <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Local
+public interface InterfaceName { ... }
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <p>
+                  Especifique la interfaz decorando la clase de bean con <code>@Local</code> y especifique el 
+                  nombre de la interfaz. Por ejemplo:
+                </p>
+                <div class="listingblock">
+                  <div class="content">
+                    <pre class="prettyprint highlight">
+                      <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Local(InterfaceName.class)
+public class BeanName implements InterfaceName  { ... }
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="sect3" id="GIPSC">
+            <h4 id="accessing-local-enterprise-beans-using-the-no-interface-view">
+              Acceder a Enterprise Beans Locales Usando la Vista Sin Interfaz
+            </h4>
+            <div class="paragraph">
+              <p>
+                El acceso del cliente a un enterprise bean que expone una vista local sin interfaz se logra a 
+                través de la inyección de dependencia o la búsqueda JNDI.
+              </p>
+            </div>
+            <div class="ulist">
+              <ul>
+                <li>
+                  <p>
+                    Para obtener una referencia a la vista sin interfaz de un enterprise bean a través de la 
+                    inyección de dependencia, use la anotación <code>javax.ejb.EJB</code> y especifique la 
+                    clase de implementación del enterprise bean:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@EJB
+ExampleBean exampleBean;
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    Para obtener una referencia a la vista sin interfaz de un enterprise bean a través de la 
+                    búsqueda JNDI, utilice el método <code>lookup</code> de la interfaz 
+                    <code>javax.naming.InitialContext</code>:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+ExampleBean exampleBean = (ExampleBean)
+        InitialContext.lookup("java:module/ExampleBean");
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="paragraph">
+              <p>
+                Los clientes no utilizan el operador <code>new</code> para obtener una nueva instancia de un 
+                enterprise bean que utiliza una vista sin interfaz.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="GIPSE">
+            <h4 id="accessing-local-enterprise-beans-that-implement-business-interfaces">
+              Acceder a Enterprise Beans Locales Que Implementan Interfaces de Negocio
+            </h4>
+            <div class="paragraph">
+              <p>
+                El acceso del cliente a enterprise beans que implementan interfaces comerciales locales se 
+                logra a través de la inserción de dependencias o la búsqueda JNDI.
+              </p>
+            </div>
+            <div class="ulist">
+              <ul>
+                <li>
+                  <p>
+                    Para obtener una referencia a la interfaz empresarial local de un enterprise bean a través 
+                    de la inserción de dependencias, utilice la anotación <code>javax.ejb.EJB</code> y 
+                    especifique el nombre de la interfaz empresarial local del enterprise bean:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@EJB
+Example example;
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    Para obtener una referencia a una interfaz empresarial local de un enterprise bean a 
+                    través de la búsqueda JNDI, utilice el método <code>lookup</code> de la interfaz 
+                    <code>javax.naming.InitialContext</code>:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+ExampleLocal example = (ExampleLocal)
+         InitialContext.lookup("java:module/ExampleLocal");
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GIPIU">
+          <h3 id="remote-clients">Clientes Remotos</h3>
+          <div class="paragraph">
+            <p>Un cliente remoto de un enterprise bean tiene las siguientes características.</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  Puede ejecutarse en una máquina diferente y en una JVM diferente del enterprise bean al que 
+                  accede. (No es necesario que se ejecute en una JVM diferente).
+                </p>
+              </li>
+              <li>
+                <p>Puede ser un componente web, un cliente de aplicación u otro enterprise bean.</p>
+              </li>
+              <li>
+                <p>
+                  Para un cliente remoto, la ubicación del enterprise bean es transparente.
+                </p>
+              </li>
+              <li>
+                <p>
+                  El enterprise bean debe implementar una interfaz empresarial. Es decir, es posible que los 
+                  clientes remotos no accedan a un enterprise bean a través de una vista sin interfaz.
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>Para crear un enterprise bean que permita el acceso remoto, debe</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  Decore la interfaz empresarial del enterprise bean con la anotación <code>@Remote</code>:
+                </p>
+                <div class="listingblock">
+                  <div class="content">
+                    <pre class="prettyprint highlight">
+                      <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Remote
+public interface InterfaceName { ... }
+                    </code>
+                    </pre>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <p>
+                  O decore la clase de bean con <code>@Remote</code>, especificando la interfaz o interfaces 
+                  comerciales:
+                </p>
+                <div class="listingblock">
+                  <div class="content">
+                    <pre class="prettyprint highlight">
+                      <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Remote(InterfaceName.class)
+public class BeanName implements InterfaceName { ... }
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              La interfaz remota define los métodos comerciales y de ciclo de vida que son específicos del 
+              bean. Por ejemplo, la interfaz remota de un bean llamado <code>BankAccountBean</code> podría 
+              tener métodos comerciales llamados <code>deposit</code> y <code>credit</code>. La 
+              <a href="#GIPNO">Figura 35-1</a> muestra cómo la interfaz controla la vista del cliente de un 
+              enterprise bean.
+            </p>
+          </div>
+          <div id="GIPNO" class="paragraph">
+            <div class="title">
+              <strong>Figura 35-1 Interfaces para un Enterprise Bean con acceso remoto</strong>
+            </div>
+            <p>
+              <span class="image">
+                <img src="img/javaeett_dt_020.png" 
+                     alt="Diagrama que muestra un cliente remoto accediendo a los métodos de un enterprise 
+                     bean a través de su interfaz remota.">
+              </span>
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El acceso del cliente a un enterprise bean que implementa una interfaz comercial remota se logra 
+              a través de la inyección de dependencia o la búsqueda JNDI.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  Para obtener una referencia a la interfaz empresarial remota de un enterprise bean a través 
+                  de la inserción de dependencias, utilice la anotación <code>javax.ejb.EJB</code> y 
+                  especifique el nombre de la interfaz empresarial remota del enterprise bean:
+                </p>
+                <div class="listingblock">
+                  <div class="content">
+                    <pre class="prettyprint highlight">
+                      <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@EJB
+Example example;
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <p>
+                  Para obtener una referencia a una interfaz empresarial remota de un enterprise bean a través 
+                  de la búsqueda JNDI, utilice el método <code>lookup</code> de la interfaz 
+                  <code>javax.naming.InitialContext</code>:
+                </p>
+                <div class="listingblock">
+                  <div class="content">
+                    <pre class="prettyprint highlight">
+                      <code class="language-oac_no_warn" data-lang="oac_no_warn">
+ExampleRemote example = (ExampleRemote)
+        InitialContext.lookup("java:global/myApp/ExampleRemote");
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="sect2" id="GIPKD">
+          <h3 id="web-service-clients">Clientes de Servicios Web</h3>
+          <div class="paragraph">
+            <p>
+              Un cliente de servicio web puede acceder a una aplicación Java EE de dos formas. Primero, el 
+              cliente puede acceder a un servicio web creado con JAX-WS. (Para obtener más información sobre 
+              JAX-WS, consulte el <a href="jaxws.html#BNAYL">
+                Capítulo 31, "Construyendo Servicios Web con JAX-WS"</a>). En segundo lugar, un cliente de 
+              servicio web puede invocar el negocio métodos de un bean de sesión sin estado. Los clientes de 
+              servicios web no pueden acceder a los beans de mensaje.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Siempre que utilice los protocolos correctos (SOAP, HTTP, WSDL), cualquier cliente de servicio 
+              web puede acceder a un bean de sesión sin estado, ya sea que el cliente esté o no escrito en el 
+              lenguaje de programación Java. El cliente ni siquiera "sabe" qué tecnología implementa el 
+              servicio: bean de sesión sin estado, JAX-WS o alguna otra tecnología. Además, los beans 
+              empresariales y los componentes web pueden ser clientes de servicios web. Esta flexibilidad le 
+              permite integrar aplicaciones Java EE con servicios web.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Un cliente de servicio web accede a un bean de sesión sin estado a través de la clase de 
+              implementación del punto final del servicio web del bean. De forma predeterminada, todos los 
+              métodos públicos de la clase de bean son accesibles para los clientes del servicio web. La 
+              anotación <code>@WebMethod</code> se puede utilizar para personalizar el comportamiento de los 
+              métodos del servicio web. Si se usa la anotación <code>@WebMethod</code> para decorar los 
+              métodos de la clase bean, solo los métodos decorados con <code>@WebMethod</code> se exponen a 
+              los clientes del servicio web.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para obtener un ejemplo de código, consulte 
+              <a href="ejb-basicexamples004.html#BNBOR">Un Ejemplo de Servicio Web: helloservice</a>.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="GIPLY">
+          <h3 id="method-parameters-and-access">Parámetros y Accesos de Métodos</h3>
+          <div class="paragraph">
+            <p>
+              El tipo de acceso afecta a los parámetros de los métodos de bean que llaman los clientes. Las 
+              siguientes secciones se aplican no solo a los parámetros del método, sino también a los valores 
+              de retorno del método.
+            </p>
+          </div>
+          <div class="sect3" id="GIPLX">
+            <h4 id="isolation">Aislamiento</h4>
+            <div class="paragraph">
+              <p>
+                Los parámetros de las llamadas remotas están más aislados que los de las llamadas locales. Con 
+                llamadas remotas, el cliente y el bean operan en diferentes copias de un objeto de parámetro. 
+                Si el cliente cambia el valor del objeto, el valor de la copia en el bean no cambia. Esta capa 
+                de aislamiento puede ayudar a proteger el bean si el cliente modifica accidentalmente los 
+                datos.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                En una llamada local, tanto el cliente como el bean pueden modificar el mismo objeto de 
+                parámetro. En general, no debe confiar en este efecto secundario de las llamadas locales. 
+                Quizás algún día quieras distribuir tus componentes, reemplazando las llamadas locales por 
+                remotas.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Al igual que con los clientes remotos, los clientes de servicios web operan en diferentes 
+                copias de parámetros que el bean que implementa el servicio web.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="GIPKV">
+            <h4 id="granularity-of-accessed-data">Granularidad de los Datos a los Que se Accede</h4>
+            <div class="paragraph">
+              <p>
+                Debido a que es probable que las llamadas remotas sean más lentas que las llamadas locales, 
+                los parámetros en los métodos remotos deben ser de grano relativamente grueso. Un objeto de 
+                granularidad gruesa contiene más datos que uno de granularidad fina, por lo que se requieren 
+                menos llamadas de acceso. Por la misma razón, los parámetros de los métodos llamados por los 
+                clientes del servicio web también deben ser de granularidad gruesa.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="ejb-intro003.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="ejb-intro005.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

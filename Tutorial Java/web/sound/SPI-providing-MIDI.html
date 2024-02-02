@@ -1,0 +1,413 @@
+<html lang="es">                                                                                                                                                                
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Proporcionando Servicios MIDI (Los Tutoriales de Java&trade; &gt; Sonido)
+        </title>
+        <meta name="description" content="" />
+        <meta name="keywords" content="java programming, learn java, java sample code, " />
+        <link rel="stylesheet" href="../indice.css" type="text/css"/>
+        <script src="../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkAHEAD"><a href="sampled-overview.html">Descripción del Paquete Sampled</a></div>
+                <div class="linkAHEAD"><a href="accessing.html">Accediendo a los Recursos del Sistema de Audio</a></div>
+                <div class="linkAHEAD"><a href="playing.html">Reproducción de Audio</a></div>
+                <div class="linkAHEAD"><a href="capturing.html">Grabando Audio</a></div>
+                <div class="linkAHEAD"><a href="controls.html">Procesando Audio con Controles</a></div>
+                <div class="linkAHEAD"><a href="converters.html">Usando Ficheros y Convertidores de Formato</a></div>
+                <div class="linkAHEAD"><a href="overview-MIDI.html">Descripción del Paquete MIDI</a></div>
+                <div class="linkAHEAD"><a href="accessing-MIDI.html">Accediendo a los Recursos del Sistema MIDI</a></div>
+                <div class="linkAHEAD"><a href="MIDI-messages.html">Transmitiendo y Recibiendo Mensajes MIDI</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-intro.html">Introducción a los Secuenciadores</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-methods.html">Utilizando Métodos del Secuenciador</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-adv.html">Usando Características Avanzadas del Secuenciador</a></div>
+                <div class="linkAHEAD"><a href="MIDI-synth.html">Sintetizando Sonido</a></div>
+                <div class="linkAHEAD"><a href="SPI-intro.html">Introducción a los Interfaces de los Proveedores de Servicio</a></div>
+                <div class="linkAHEAD"><a href="SPI-providing-sampled.html">Proporcionando Servicios de Audio Sampleado</a></div>
+                <div class="nolinkAHEAD">Proporcionando Servicios MIDI</div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Sonido
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="./index.html" target="_top">Sonido</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="SPI-providing-sampled.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./end.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Proporcionando Servicios MIDI</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    <a class="TutorialLink" target="_top" href="SPI-intro.html">
+                        Introducción a los Interfaces de los Proveedores de Servicio</a> explicó que los paquetes 
+                    <code>javax.sound.sampled.spi</code> y <code>javax.sound.midi.spi</code> definen clases abstractas para ser 
+                    utilizadas por desarrolladores de servicios de sonido. Al implementar una subclase de una de estas clases 
+                    abstractas, un proveedor de servicios puede crear un nuevo servicio que amplíe la funcionalidad del sistema 
+                    en tiempo de ejecución. La sección anterior cubrió el uso del paquete <code>javax.sound.sampled.spi</code>. 
+                    Esta sección explica cómo usar el paquete <code>javax.sound.midi.spi</code> para proporcionar nuevos 
+                    servicios para manejar dispositivos y archivos MIDI.
+                </p>
+                <p>
+                    Hay cuatro clases abstractas en el paquete <code>javax.sound.midi.spi</code>, que representan cuatro tipos 
+                    diferentes de servicios que puede proporcionar al sistema MIDI:
+                </p>
+                <ul>
+                    <li>
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/sound/midi/spi/MidiFileWriter.html">
+                            <code>MidiFileWriter</code></a> proporciona servicios de escritura de archivos MIDI. Estos servicios 
+                        hacen posible que un programa de aplicación guarde, en un archivo MIDI, una <code>Sequence</code> MIDI 
+                        que ha generado o procesado.
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/sound/midi/spi/MidiFileReader.html">
+                            <code>MidiFileReader</code></a> proporciona servicios de lectura de archivos que devuelven una 
+                        <code>Sequence</code> MIDI desde un archivo MIDI para su uso en un programa de aplicación.
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/sound/midi/spi/MidiDeviceProvider.html">
+                            <code>MidiDeviceProvider</code></a> proporciona instancias de uno o más tipos específicos de dispositivo 
+                        MIDI, posiblemente incluidos los dispositivos de hardware.
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/sound/midi/spi/SoundbankReader.html">
+                            <code>SoundbankReader</code></a> suministra servicios de lectura de archivos de banco de sonido. 
+                        Subclases concretas de <code>SoundbankReader</code> analizan un archivo de banco de sonidos dado, 
+                        produciendo un objeto <code>Soundbank</code> que se puede cargar en un <code>Synthesizer</code>.
+                    </li>
+                </ul>
+                <p>
+                    Un programa de aplicación no creará directamente una instancia de un objeto de servicio, ya sea un objeto de 
+                    proveedor, como un <code>MidiDeviceProvider</code>, o un objeto, como un <code>Synthesizer</code>, que se 
+                    proporciona por el objeto proveedor. El programa tampoco se referirá directamente a las clases de SPI. En 
+                    cambio, el programa de aplicación realiza solicitudes al objeto <code>MidiSystem</code> en el paquete 
+                    <code>javax.sound.midi</code>, y <code>MidiSystem</code> a su vez usa subclases concretas de las clases de 
+                    <code>javax.sound.midi.spi</code> para procesar estas solicitudes.
+                </p>
+                <p></p>
+                <h2>
+                    Proporcionar Servicios de Escritura de Ficheros MIDI
+                </h2>
+                <p>
+                    Hay tres formatos de archivo MIDI estándar, todos los cuales puede admitir una implementación de la IPA de Java 
+                    de Sonido : Tipo 0, Tipo 1 y Tipo 2. Estos formatos de archivo difieren en su representación interna de los 
+                    datos de secuencia MIDI en el archivo, y son apropiado para diferentes tipos de secuencias. Si una 
+                    implementación no es compatible con los tres tipos, un proveedor de servicios puede proporcionar el soporte para 
+                    los no implementados. También existen variantes de los formatos de archivo MIDI estándar, algunos de ellos 
+                    propietarios, que de manera similar podrían ser compatibles con un proveedor externo.
+                </p>
+                <p>
+                    La capacidad de escribir archivos MIDI la proporcionan subclases concretas de <code>MidiFileWriter</code>. Esta 
+                    clase abstracta es directamente análoga a <code>javax.sampled.spi.AudioFileWriter</code>. Nuevamente, los 
+                    métodos se agrupan en métodos de consulta para aprender qué tipos de archivos se pueden escribir y métodos para 
+                    escribir realmente un archivo. Al igual que con <code>AudioFileWriter</code>, dos de los métodos de consulta son 
+                    concretos:
+                </p>
+                <div class="codeblock">
+                    <pre>
+boolean isFileTypeSupported(int fileType)
+boolean isFileTypeSupported(int fileType, Sequence sequence) 
+                    </pre>
+                </div>
+                <p>
+                    El primero de ellos proporciona información general sobre si el escritor de archivos puede escribir el tipo 
+                    especificado de tipo de archivo MIDI. El segundo método es más específico: pregunta si una secuencia particular 
+                    se puede escribir en el tipo especificado de archivo MIDI. Generalmente, no necesita anular ninguno de estos dos 
+                    métodos concretos. En la implementación predeterminada, cada uno invoca uno de los otros dos métodos de consulta 
+                    correspondientes e itera sobre los resultados devueltos. Al ser abstractos, estos otros dos métodos de consulta 
+                    deben implementarse en la subclase:
+                </p>
+                <div class="codeblock">
+                    <pre>
+abstract int[] getMidiFileTypes() 
+abstract int[] getMidiFileTypes(Sequence sequence) 
+                    </pre>
+                </div>
+                <p>
+                    El primero de estos devuelve una matriz de todos los tipos de archivos que se admiten en general. Una 
+                    implementación típica podría inicializar la matriz en el constructor del escritor de archivos y devolver la 
+                    matriz de este método. A partir de ese conjunto de tipos de archivos, el segundo método encuentra el subconjunto 
+                    en el que el escritor de archivos puede escribir la secuencia dada. De acuerdo con la especificación MIDI, no 
+                    todos los tipos de secuencias se pueden escribir en todos los tipos de archivos MIDI.
+                </p>
+                <p>
+                    Los métodos <code>write</code> de una subclase <code>MidiFileWriter</code> realizan la codificación de los datos 
+                    en una <code>Sequence</code> dada en el formato de datos correcto para el tipo de archivo MIDI solicitado, 
+                    escribiendo la secuencia codificada en un archivo o una secuencia de salida:
+                </p>
+                <div class="codeblock">
+                    <pre>
+abstract int write(Sequence in, int fileType, 
+                   java.io.File out) 
+abstract int write(Sequence in, int fileType, 
+                   java.io.OutputStream out) 
+                    </pre>
+                </div>
+                <p>
+                    Para hacer esto, el método <code>write</code> debe analizar la <code>Sequence</code> iterando sobre sus pistas, 
+                    construir un encabezado de archivo apropiado y escribir el encabezado y las pistas en la salida. El formato de 
+                    encabezado del archivo MIDI, por supuesto, está definido por la especificación MIDI. Incluye información como un 
+                    "número mágico" que lo identifica como un archivo MIDI, la longitud del encabezado, el número de pistas y la 
+                    información de tiempo de la secuencia (tipo de división y resolución). El resto del archivo MIDI consta de los 
+                    datos de la pista, en el formato definido por la especificación MIDI.
+                </p>
+                <p>
+                    Veamos brevemente cómo el programa de aplicación, el sistema MIDI y el proveedor de servicios cooperan para 
+                    escribir un archivo MIDI. En una situación típica, un programa de aplicación tiene una <code>Sequence</code> 
+                    MIDI particular para guardar en un archivo. El programa consulta el objeto <code>MidiSystem</code> para ver qué 
+                    formatos de archivo MIDI, si los hay, son compatibles con la <code>Sequence</code> en particular, antes de 
+                    intentar escribir el archivo. El método <code>MidiSystem.getMidiFileTypes(Sequence)</code> devuelve una matriz 
+                    de todos los tipos de archivos MIDI en los que el sistema puede escribir una secuencia en particular. Para ello, 
+                    invoca el método <code>getMidiFileTypes</code> correspondiente para cada uno de los servicios 
+                    <code>MidiFileWriter</code> instalados, y recopila y devuelve los resultados en una matriz de enteros que se 
+                    pueden considerar como una lista maestra de todos los tipos de archivos compatibles con la 
+                    <code>Sequence</code> dada. Cuando se trata de escribir la <code>Sequence</code> en un archivo, a la llamada a 
+                    <code>MidiSystem.write</code> se le pasa un número entero que representa un tipo de archivo, junto con la 
+                    <code>Sequence</code> por escribir y el archivo de salida; <code>MidiSystem</code> utiliza el tipo proporcionado 
+                    para decidir qué <code>MidiFileWriter</code> instalado debe manejar la solicitud de escritura, y envía un 
+                    <code>write</code> correspondiente al <code>MidiFileWriter</code>.
+                </p>
+                <p></p>
+                <h2>
+                    Proporcionar Servicios de Lectura de Ficheros MIDI
+                </h2>
+                <p>
+                    La clase abstracta <code>MidiFileReader</code> es directamente análoga a la clase 
+                    <code>javax.sampled.spi.AudioFileReader</code>. Ambos consisten en dos métodos sobrecargados, cada uno de los 
+                    cuales puede tomar un argumento <code>File</code>, <code>URL</code> o <code>InputStream</code>. El primero de 
+                    los métodos sobrecargados devuelve el formato de archivo de un archivo especificado. En el caso de 
+                    <code>MidiFileReader</code>, el IPA es:
+                </p>
+                <div class="codeblock">
+                    <pre>
+abstract MidiFileFormat getMidiFileFormat(java.io.File file) 
+abstract MidiFileFormat getMidiFileFormat(
+    java.io.InputStream stream) 
+abstract MidiFileFormat getMidiFileFormat(java.net.URL url) 
+                    </pre>
+                </div>
+                <p>
+                    Las subclases concretas deben implementar estos métodos para devolver un objeto <code>MidiFileFormat</code> 
+                    completo que describa el formato del archivo MIDI especificado (o flujo o URL), asumiendo que el archivo es de 
+                    un tipo admitido por el lector de archivos y que contiene información de encabezado válida. De lo contrario, 
+                    debería lanzarse una <code>InvalidMidiDataException</code>.
+                </p>
+                <p>
+                    El otro método sobrecargado devuelve una <code>Sequence</code> MIDI de un archivo, flujo o URL determinados:
+                </p>
+                <div class="codeblock">
+                    <pre>
+abstract Sequence getSequence(java.io.File file) 
+abstract Sequence getSequence(java.io.InputStream stream) 
+abstract Sequence getSequence(java.net.URL url) 
+                    </pre>
+                </div>
+                <p>
+                    El método <code>getSequence</code> realiza el trabajo real de analizar los bytes en el archivo de entrada MIDI y 
+                    construir un objeto <code>Sequence</code> correspondiente. Este es esencialmente el proceso inverso al utilizado 
+                    por <code>MidiFileWriter.write</code>. Debido a que existe una correspondencia uno a uno entre el contenido de 
+                    un archivo MIDI según lo definido por la especificación MIDI y un objeto <code>Sequence</code> definido por la 
+                    IPA de Sonido de Java, los detalles del análisis son sencillos. Si el archivo pasado a <code>getSequence</code> 
+                    contiene datos que el lector de archivos no puede analizar (por ejemplo, porque el archivo está dañado o no 
+                    cumple con la especificación MIDI), una <code>InvalidMidiDataException</code> debería lanzarse.
+                </p>
+                <h2>
+                    Proporcionar Dispositivos MIDI Particulares
+                </h2>
+                <p>
+                    Un <code>MidiDeviceProvider</code> puede considerarse una fábrica que suministra uno o más tipos particulares de 
+                    dispositivos MIDI. La clase consta de un método que devuelve una instancia de un dispositivo MIDI, así como 
+                    métodos de consulta para saber qué tipos de dispositivos puede suministrar este proveedor.
+                </p>
+                <p>
+                    Al igual que con los otros servicios de <code>javax.sound.midi.spi</code>, los desarrolladores de aplicaciones 
+                    obtienen acceso indirecto a un servicio <code>MidiDeviceProvider</code> a través de una llamada a los métodos 
+                    de <code>MidiSystem</code>, en este caso <code>MidiSystem.getMidiDevice</code> y 
+                    <code>MidiSystem.getMidiDeviceInfo</code>. El propósito de subclasificar <code>MidiDeviceProvider</code> es 
+                    proporcionar un nuevo tipo de dispositivo, por lo que el desarrollador del servicio también debe crear una clase 
+                    de acompañamiento para el dispositivo que se devuelve, tal como vimos con <code>MixerProvider</code> en el 
+                    paquete <code>javax.sound.sampled.spi</code>. Allí, la clase del dispositivo devuelto implementó la interfaz 
+                    <code>javax.sound.sampled.Mixer</code>; aquí implementa la interfaz <code>javax.sound.midi.MidiDevice</code>. 
+                    También podría implementar una subinterfaz de <code>MidiDevice</code>, como <code>Synthesizer</code> o 
+                    <code>Sequencer</code>.
+                </p>
+                <p>
+                    Debido a que una sola subclase de <code>MidiDeviceProvider</code> puede proporcionar más de un tipo de 
+                    <code>MidiDevice</code>, el método <code>getDeviceInfo</code> de la clase devuelve una matriz de objetos 
+                    <code>MidiDevice.Info</code> que enumeran los diferentes <code>MidiDevices</code> disponibles:
+                </p>
+                <div class="codeblock">
+                    <pre>
+abstract MidiDevice.Info[] getDeviceInfo() 
+                    </pre>
+                </div>
+                <p>
+                    La matriz devuelta puede contener un solo elemento, por supuesto. Una implementación típica del proveedor podría 
+                    inicializar una matriz en su constructor y devolverla aquí. Esto permite que <code>MidiSystem</code> itere sobre 
+                    todos los <code>MidiDeviceProviders</code> instalados para construir una lista de todos los dispositivos 
+                    instalados. <code>MidiSystem</code> puede devolver esta lista (matriz <code>MidiDevice.Info[]</code>) a un 
+                    programa de aplicación.
+                </p>
+                <p>
+                    <code>MidiDeviceProvider</code> también incluye un método de consulta concreto:
+                </p>
+                <div class="codeblock">
+                    <pre>
+boolean isDeviceSupported(MidiDevice.Info info) 
+                a    </pre>
+                </div>
+                <p>
+                    Este método permite al sistema consultar al proveedor sobre un tipo específico de dispositivo. Generalmente, no 
+                    es necesario anular este método de conveniencia. La implementación predeterminada itera sobre la matriz devuelta 
+                    por getDeviceInfo y compara el argumento con cada elemento.
+                </p>
+                <p>
+                    El tercer y último método <code>MidiDeviceProvider</code> devuelve el dispositivo solicitado:
+                </p>
+                <div class="codeblock">
+                    <pre>
+abstract MidiDevice getDevice(MidiDevice.Info info) 
+                    </pre>
+                </div>
+                <p>
+                    Este método primero debe probar el argumento para asegurarse de que describe un dispositivo que este proveedor 
+                    puede suministrar. Si no es así, debería lanzar una <code>IllegalArgumentException</code>. De lo contrario, 
+                    devuelve el dispositivo.
+                </p>
+                <h2>
+                    Proporcionar Servicios de Lectura de Ficheros de Bancos de Sonido
+                </h2>
+                <p>
+                    Un <code>SoundBank</code> es un conjunto de <code>Instruments</code> que se pueden cargar en un 
+                    <code>Synthesizer</code>. Un <code>Instrument</code> es una implementación de un algoritmo de síntesis de sonido 
+                    que produce un tipo particular de sonido e incluye cadenas de nombre e información que lo acompañan. Un 
+                    <code>SoundBank</code> corresponde aproximadamente a un banco en la especificación MIDI, pero es una colección 
+                    más extensa y direccionable; Quizás sea mejor pensar en él como una colección de bancos MIDI.
+                </p>
+                <p>
+                    <code>SoundbankReader</code> consta de un único método sobrecargado, que el sistema invoca para leer un objeto 
+                    <code>Soundbank</code> de un archivo de banco de sonidos:
+                </p>
+                <div class="codeblock">
+                    <pre>
+abstract Soundbank getSoundbank(java.io.File file) 
+abstract Soundbank getSoundbank(java.io.InputStream stream) 
+abstract Soundbank getSoundbank(java.net.URL url) 
+                    </pre>
+                </div>
+                <p>
+                    Las subclases concretas de <code>SoundbankReader</code> funcionarán en conjunto con implementaciones 
+                    particulares definidas por el proveedor de <code>SoundBank</code>, <code>Instrument</code> y 
+                    <code>Synthesizer</code> para permitir que el sistema cargue un <code>SoundBank</code> desde un archivo en una 
+                    instancia de una clase particular de <code>Synthesizer</code>. Las técnicas de síntesis pueden diferir 
+                    enormemente de un <code>Synthesizer</code> a otro y, como consecuencia, los datos almacenados en un 
+                    <code>Instrument</code> o <code>SoundBank</code> proporcionan control o especificación. Los datos para el 
+                    proceso de síntesis de un <code>Synthesizer</code> pueden tomar una variedad de formas. Una técnica de síntesis 
+                    puede requerir sólo unos pocos bytes de datos de parámetros; otro puede basarse en amplias muestras de sonido. 
+                    Los recursos presentes en un <code>SoundBank</code> dependerán de la naturaleza del <code>Synthesizer</code> en 
+                    el que se cargan y, por lo tanto, de la implementación del método <code>getSoundbank</code> de una subclase de 
+                    <code>SoundbankReader</code> tiene acceso al conocimiento de un tipo particular de <code>SoundBank</code>. 
+                    Además, una subclase particular de <code>SoundbankReader</code> comprende un formato de archivo particular para 
+                    almacenar los datos de <code>SoundBank</code>. Ese formato de archivo puede ser propietario y específico del 
+                    proveedor.
+                </p>
+                <p>
+                    <code>SoundBank</code> es solo una interfaz, con solo restricciones débiles en el contenido de un objeto 
+                    <code>SoundBank</code>. Los métodos que un objeto debe admitir para implementar esta interfaz 
+                    (<code>getResources</code>, <code>getInstruments</code>, <code>getVendor</code>, <code>getName</code>, etc.) 
+                    impone requisitos laxos sobre los datos que contiene el objeto. Por ejemplo, <code>getResources</code> y 
+                    <code>getInstruments</code> pueden devolver matrices vacías. El contenido real de un objeto 
+                    <code>SoundBank</code> subclasificado, en particular sus instrumentos y sus recursos que no son instrumentos, 
+                    son definidos por el proveedor de servicios. Por lo tanto, el mecanismo de análisis de un archivo de banco de 
+                    sonidos depende completamente de la especificación de ese tipo particular de archivo de banco de sonidos.
+                </p>
+                <p>
+                    Los archivos de banco de sonidos se crean fuera de la IPA de Sonido de Java, generalmente por el proveedor del 
+                    sintetizador que puede cargar ese tipo de banco de sonidos. Algunos proveedores pueden proporcionar herramientas 
+                    para el usuario final para crear dichos archivos.
+                </p>
+                <p>&nbsp;</p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="SPI-providing-sampled.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./end.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            "Los Tutoriales de Java" está sujeto a estos <a href="../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Proporcionando Servicios de Audio Sampleado<br />
+            <b>Página siguiente:</b> Final de la Lección
+        </div>
+    </body>
+</html> 

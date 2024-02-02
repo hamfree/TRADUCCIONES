@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Personalizando la Carga de un Resource Bundle (Los Tutoriales de Java&trade; &gt; Internacionalización &gt; 
+            Aislando Datos de una Localización Específica)
+        </title>
+        <meta name="description" content="Este tutorial de internacionalización de Java describe la configuración regional, 
+              aislando datos específicos de la configuración regional, formateando datos, nombre de dominio internacionalizado e 
+              identificador de recursos" />
+        <meta name="keywords" content="java programming, learn java, java sample code, i18n, internationalization, locale, text
+              formatting" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Aislando Datos de una Localización Específica</a></div>
+                <div class="linkAHEAD"><a href="concept.html">Sobre la Clase ResourceBundle</a></div>
+                <div class="linkAHEAD"><a href="prepare.html">Preparándose para Utilizar un ResourceBundle</a></div>
+                <div class="linkAHEAD"><a href="propfile.html">Respaldando un ResourceBundle con Ficheros de Propiedades</a></div>
+                <div class="linkAHEAD"><a href="list.html">Usando un ListResourceBundle</a></div>
+                <div class="nolinkAHEAD">Personalizando la Carga de un Resource Bundle</div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Internacionalización<br />
+                <b>Lección:</b> Aislando Datos de una Localización Específica
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Internacionalización</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Aislando Datos de una Localización Específica</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="list.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../format/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Personalizando la Carga de un Resource Bundle</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Más temprano en esta lección ha aprendido cómo crear y acceder objetos de la clase <code>ResourceBundle</code>. 
+                    Esta sección amplía sus conocimientos y explica cómo aprovechar las ventajas de las capacidades de la clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/ResourceBundle.Control.html">
+                        <code>ResourceBundle.Control</code></a>.
+                </p>
+                <p>
+                    La clase <code>ResourceBundle.Control</code> fue creada para especificar cómo ubicar e instanciar paquetes de 
+                    recursos. Define un conjunto de métodos de retrollamada que son invocados por los métodos de factoría de 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/ResourceBundle.html#getBundle-java.lang.String-java.util.Locale-java.util.ResourceBundle.Control-">
+                        <code>ResourceBundle.getBundle</code></a> durante el proceso de carga del paquete.
+                </p>
+                <p>
+                    A diferencia del método 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/ResourceBundle.html#getBundle-java.lang.String-java.util.Locale-">
+                        <code>ResourceBundle.getBundle</code></a> descrito anteriormente, este método 
+                    <code>ResourceBundle.getBundle</code> define un paquete de recursos usando el nombre base especificado, la 
+                    configuración regional predeterminada y el control especificado.
+                </p>
+                <div class="codeblock">
+                    <pre>
+public static final ResourceBundle getBundle(
+    String baseName,
+    ResourceBundle.Control cont
+    // ...
+                    </pre>
+                </div>
+                <p>
+                    El control especificado proporciona información para el proceso de carga del paquete de recursos.
+                </p>
+                <p>
+                    El programa de ejemplo siguiente llamado 
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/RBControl.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/RBControl.java'); return false;">
+                        <code>RBControl.java</code></a> ilustra cómo definir sus propias rutas de búsqueda para las configuraciones 
+                        regionales del chino.
+                </p>
+                <h2>
+                    1. Crear los Ficheros de <code>properties</code>.
+                </h2>
+                <p>
+                    Como se describió antes puede cargar sus recursos desde clases o desde ficheros de <code>properties</code>. 
+                    Estos ficheros contienen descripciones para las configuraciones regionales siguientes:
+                </p>
+                <ul>
+                    <li>
+                        <code>
+                            <a class="SourceLink" target="_blank" href="examples/RBControl.properties" 
+                               onclick="showCode('../../displayCode.html', 'examples/RBControl.properties'); return false;">
+                                <code>RBControl.properties</code></a></code> &ndash; Global
+                    </li>
+                    <li>
+                        <code>
+                            <a class="SourceLink" target="_blank" href="examples/RBControl_zh.properties" 
+                               onclick="showCode('../../displayCode.html', 'examples/RBControl_zh.properties'); return false;">
+                                <code>RBControl_zh.properties</code></a></code> &mdash; Sólo idioma: Chino Simplificado
+                    </li>
+                    <li>
+                        <code>
+                            <a class="SourceLink" target="_blank" href="examples/RBControl_zh_CN.properties" 
+                               onclick="showCode('../../displayCode.html', 'examples/RBControl_zh_CN.properties'); return false;">
+                                <code>RBControl_zh_cn.properties</code></a></code> &ndash; Sólo región: China
+                    </li>
+                    <li>
+                        <code>
+                            <a class="SourceLink" target="_blank" href="examples/RBControl_zh_HK.properties" 
+                               onclick="showCode('../../displayCode.html', 'examples/RBControl_zh_HK.properties'); return false;">
+                                <code>RBControl_zh_hk.properties</code></a></code> &ndash; Sólo región: Hong Kong
+                    </li>
+                    <li>
+                        <code>
+                            <a class="SourceLink" target="_blank" href="examples/RBControl_zh_TW.properties" 
+                               onclick="showCode('../../displayCode.html', 'examples/RBControl_zh_TW.properties'); return false;">
+                                <code>RBControl_zh_tw.properties</code></a></code> &ndash; Taiwán
+                    </li>
+                </ul>
+                <p>
+                    En este ejemplo una aplicación crea una nueva configuración regional para la región de Hong Kong.
+                </p>
+                <h2>
+                    2. Crear una instancia de <code>ResourceBundle</code>.
+                </h2>
+                <p>
+                    Como en el ejemplo de la sección previa, esta aplicación crea una instancia de <code>ResourceBundle</code> 
+                    invocando el método <code>getBundle</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+private static void test(Locale locale) {
+    ResourceBundle rb = ResourceBundle.getBundle(
+                            "RBControl",
+                            locale,
+                            new ResourceBundle.Control() {
+                                    // ...
+                            }
+                        );
+                    </pre>
+                </div>
+                <p>
+                    El método <code>getBundle</code> busca ficheros de <code>properties</code> con el prefijo RBControl. Sin 
+                    embargo, este método contiene un parámetro <code>Control</code>, el cual dirige el proceso de búsqueda de las 
+                    configuraciones regionales del idioma chino.
+                </p>
+                <h2>
+                    3. Invocar el método <code>getCandidateLocales</code>
+                </h2>
+                <p>
+                    El método <code>getCandidateLocales</code> devuelve una lista de los objetos <code>Locales</code> como 
+                    configuraciones regionales candidatas para el nombre base y configuración regional.
+                </p>
+                <div class="codeblock">
+                    <pre>
+new ResourceBundle.Control() {
+    @Override
+    public List&lt;Locale&gt; getCandidateLocales(
+                            String baseName,
+                            Locale locale) {
+                // ...                                        
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    La implementación predeterminada devuelve una lista de objetos <code>Locale</code> como sigue: Locale(language, 
+                    country).
+                </p>
+                <p>
+                    Sin embargo, este método es sobreescrito para implementar el siguiente comportamiento específico:
+                </p>
+                <div class="codeblock">
+                    <pre>
+if (baseName == null)
+    throw new NullPointerException();
+
+if (locale.equals(new Locale("zh", "HK"))) {
+    return Arrays.asList(
+               locale,
+               Locale.TAIWAN,
+               // no Locale.CHINESE here
+               Locale.ROOT);
+} else if (locale.equals(Locale.TAIWAN)) {
+    return Arrays.asList(
+               locale,
+               // no Locale.CHINESE here
+               Locale.ROOT);
+}
+                    </pre>
+                </div>
+                <p>
+                    Tenga en cuenta que el último elemento de la secuencia de entornos locales candidatos debe ser un entorno local 
+                    raíz.
+                </p>
+                <h2>
+                    4. Llamar la clase <code>test</code>
+                </h2>
+                <p>
+                    Llame a la clase <code>test</code> para las siguientes cuatro configuraciones regionales diferentes:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public static void main(String[] args) {
+    test(Locale.CHINA);
+    test(new Locale("zh", "HK"));
+    test(Locale.TAIWAN);
+    test(Locale.CANADA);
+}
+                    </pre>
+                </div>
+                <h2>
+                    5. Ejecutar el Programa de Ejemplo
+                </h2>
+                <p>
+                    Verá la salida del programa como sigue:
+                </p>
+                <div class="codeblock">
+                    <pre>
+locale: zh_CN
+        region: China
+        language: Simplified Chinese
+locale: zh_HK
+        region: Hong Kong
+        language: Traditional Chinese
+locale: zh_TW
+        region: Taiwan
+        language: Traditional Chinese
+locale: en_CA
+        region: global
+        language: English
+                    </pre>
+                </div>
+                <p>
+                    Tenga en cuenta que al recién creado se le asignó la región de Hong Kong, porque se especificó en un archivo de 
+                    <code>properties</code> apropiado. El chino tradicional se asignó como el idioma para la configuración 
+                    regional de Taiwán.
+                </p>
+                <p>
+                    Otros dos métodos interesantes de la clase <code>ResourceBundle.Control</code> no se usaron en el ejemplo 
+                    <code>RBControl</code>, pero merecen ser mencionados. El método <code>getTimeToLive</code> se usa para 
+                    determinar cuánto tiempo puede existir el paquete de recursos en la caché. Si el tiempo límite para un paquete 
+                    de recursos en la caché ha expirado, el método <code>needsReload</code> se invoca para determinar si el paquete 
+                    de recursos necesita ser recargado.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="list.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../format/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Usando un ListResourceBundle<br />
+            <b>Página siguiente:</b> Formatting
+        </div>
+    </body>
+</html> 

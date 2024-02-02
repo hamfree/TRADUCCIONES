@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Subrecursos y Resolución de Recursos en Tiempo de Ejecución</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jaxrs-advanced002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jaxrs-advanced004.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GKNAV">
+      <h2 id="subresources-and-runtime-resource-resolution">
+        Subrecursos y Resolución de Recursos en Tiempo de Ejecución
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Puede usar una clase de recurso para procesar solo una parte de la solicitud de URI. Luego, un 
+            recurso raíz puede implementar subrecursos que pueden procesar el resto de la ruta URI.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Un método de clase de recurso que está anotado con <code>@Path</code> es un método de subrecurso o 
+            un localizador de subrecurso.
+          </p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>
+                Un método de subrecurso se usa para manejar solicitudes en un subrecurso del recurso 
+                correspondiente.
+              </p>
+            </li>
+            <li>
+              <p>
+                Se utiliza un localizador de subrecursos para localizar los subrecursos del recurso 
+                correspondiente.
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p><a href="#GKLAG">Métodos de Subrecurso</a></p>
+            </li>
+            <li>
+              <p><a href="#GKRHR">Localizadores de Subrecursos</a></p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="GKLAG">
+          <h3 id="subresource-methods">Métodos de Subrecurso</h3>
+          <div class="paragraph">
+            <p>
+              Un método de subrecurso maneja una solicitud HTTP directamente. El método se debe anotar con un 
+              designador de método de solicitud, como <code>@GET</code> o <code>@POST</code>, además de 
+              <code>@Path</code>. El método se invoca para los URI de solicitud que coinciden con una 
+              plantilla de URI creada mediante la concatenación de la plantilla de URI de la clase de recurso 
+              con la plantilla de URI del método.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El siguiente fragmento de código muestra cómo se puede usar un método de subrecurso para extraer 
+              el apellido de un empleado cuando se proporciona la dirección de correo electrónico del 
+              empleado:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Path("/employeeinfo")
+public class EmployeeInfo {
+    public employeeinfo() {}
+    @GET
+    @Path("/employees/{firstname}.{lastname}@{domain}.com")
+    @Produces("text/xml")
+    public String getEmployeeLastName(@PathParam("lastname") String lastName) {
+       ...
+    }
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El método <code>getEmployeeLastName</code> devuelve <code>doe</code> para la siguiente solicitud 
+              <code>GET</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+GET /employeeinfo/employees/john.doe@example.com
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GKRHR">
+          <h3 id="subresource-locators">Localizadores de Subrecursos</h3>
+          <div class="paragraph">
+            <p>
+              Un localizador de subrecursos devuelve un objeto que manejará una solicitud HTTP. El método no 
+              se debe anotar con un designador de método de solicitud. Debe declarar un localizador de 
+              subrecursos dentro de una clase de subrecursos, y solo los localizadores de subrecursos se 
+              utilizan para la resolución de recursos en tiempo de ejecución.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>El siguiente fragmento de código muestra un localizador de subrecursos:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+// Clase de recurso raíz
+@Path("/employeeinfo")
+public class EmployeeInfo {
+    // Localizador de subrecursos: obtiene el subrecurso Employee
+    // del camino /employeeinfo/employees/{empid}
+    @Path("/employees/{empid}")
+    public Employee getEmployee(@PathParam("empid") String id) {
+        // Encuentra el Employee según el parámetro de ruta de identificación
+        Employee emp = ...;
+        ...
+        return emp;
+    }
+}
+// Clase de subrecurso
+public class Employee {
+    // Método subrecurso: devuelve el apellido del employee
+    @GET
+    @Path("/lastname")
+    public String getEmployeeLastName() {
+        ...
+        return lastName;
+    }
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              En este fragmento de código, el método <code>getEmployee</code> es el localizador de subrecursos 
+              que proporciona el objeto <code>Employee</code>, que atiende las solicitudes de 
+              <code>lastname</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Si su solicitud HTTP es <code>GET /employeeinfo/employees/as209/</code>, el método 
+              <code>getEmployee</code> devuelve un objeto <code>Employee</code> cuya identificación es 
+              <code>as209</code>. En tiempo de ejecución, JAX-RS envía una solicitud 
+              <code>GET /employeeinfo/employees/as209/lastname</code> al método 
+              <code>getEmployeeLastName</code>. El método <code>getEmployeeLastName</code> recupera y devuelve 
+              el apellido del empleado cuya identificación es <code>as209</code>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jaxrs-advanced002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jaxrs-advanced004.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

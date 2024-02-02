@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Cómo las Operaciones LDAP se Mapean a las IPAs de JNDI (Los Tutoriales de Java&trade; &gt; Nombrado en Java e Interfaz
+            de Directorio &gt; Temas Avanzados para los Usuarios LDAP)
+        </title>
+        <meta name="description" content="Este tutorial de Java JNDI describe la tecnología de Nombrado en Java e Interfaz de 
+              Directorio (JNDI), operaciones de nombre y directorio, y LDAP" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jndi, ldap, jndi service provider" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Temas Avanzados para los Usuarios LDAP</a></div>
+                <div class="linkAHEAD"><a href="ldap.html">LDAP v3</a></div>
+                <div class="linkAHEAD"><a href="jndi.html">JNDI como una IPA de LDAP</a></div>
+                <div class="nolinkBHEAD">Cómo las Operaciones LDAP se Mapean a las IPAs de JNDI</div>
+                <div class="linkBHEAD"><a href="exceptions.html">Cómo los Códigos de Error LDAP se Mapean a las Excepciones de JNDI</a></div>
+                <div class="linkAHEAD"><a href="security.html">Seguridad</a></div>
+                <div class="linkBHEAD"><a href="authentication.html">Modos de Autenticación en LDAP</a></div>
+                <div class="linkBHEAD"><a href="auth_mechs.html">Mecanismos de Autenticación</a></div>
+                <div class="linkBHEAD"><a href="anonymous.html">Anónimo</a></div>
+                <div class="linkBHEAD"><a href="simple.html">Simple</a></div>
+                <div class="linkBHEAD"><a href="sasl.html">SASL</a></div>
+                <div class="linkBHEAD"><a href="digest.html">Digest-MD5</a></div>
+                <div class="linkBHEAD"><a href="ssl.html">SSL y Sockets Personalizados</a></div>
+                <div class="linkAHEAD"><a href="rename.html">Más Operaciones LDAP</a></div>
+                <div class="linkBHEAD"><a href="compare.html">Comparación LDAP</a></div>
+                <div class="linkBHEAD"><a href="result.html">Resultados de la Búsqueda</a></div>
+                <div class="linkBHEAD"><a href="unsol.html"> Notificaciones no Solicitadas de LDAP</a></div>
+                <div class="linkAHEAD"><a href="connect.html">Gestión de Conexiones</a></div>
+                <div class="linkBHEAD"><a href="create.html">Creación</a></div>
+                <div class="linkBHEAD"><a href="close.html"> Cierre</a></div>
+                <div class="linkBHEAD"><a href="pool.html">Agrupación (Pooling)</a></div>
+                <div class="linkBHEAD"><a href="config.html">Configuración</a></div>
+                <div class="linkAHEAD"><a href="faq.html">Preguntas Frecuentes</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Nombrado en Java e Interfaz de Directorio<br />
+                <b>Lección:</b> Temas Avanzados para los Usuarios LDAP<br />
+                <b>Sección:</b> JNDI como una IPA de LDAP
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Nombrado en Java e Interfaz de Directorio</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Temas Avanzados para los Usuarios LDAP</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="jndi.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="exceptions.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Cómo las Operaciones LDAP se Mapean a las IPAs de JNDI</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    LDAP define un conjunto de operaciones o peticiones (vea 
+                    <a class="OutsideLink" target="_blank"
+                       href="http://www.ietf.org/rfc/rfc2251.txt">RFC 2251</a>). En JNDI, estas se corresponden con operaciones 
+                       sobre las interfaces 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/directory/DirContext.html">
+                        <code>DirContext</code></a> y 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/ldap/LdapContext.html">
+                        <code>LdapContext</code></a> (las cuales son subinterfaces de 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html"><code>Context</code></a>). Por 
+                    ejemplo, cuando un llamante invoca a un método <code>DirContext</code>, el proveedor de servicio LDAP 
+                    implementa el método enviando peticiones LDAP al servidor LDAP.
+                </p>
+                <p>
+                    La tabla siguiente muestra cómo se corresponden las operaciones en LDAP con los métodos de JNDI.
+                </p>
+                <table class="celda" style="width:80%">
+                    <caption>Métodos de JNDI que se corresponden con operaciones LDAP</caption>
+                    <tr>
+                        <th id="h1" class="celda" style="padding: 3px;">Operación LDAP</th>
+                        <th id="h2" class="celda" style="padding: 3px;">Métodos JNDI Correspondientes</th>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="padding: 3px;">vincular</td>
+                        <td headers="h2" class="celda" style="padding: 3px;">
+                            La forma correspondiente de crear una conexión inicial al servidor LDAP en JNDI es la creación de un 
+                            <a class="APILink" target="_blank"
+                               href="https://docs.oracle.com/javase/8/docs/api/javax/naming/directory/InitialDirContext.html">
+                                <code>InitialDirContext</code></a>. Cuando la aplicación crea un contexto inicial, proporciona 
+                            información de autenticación del cliente a través de las propiedades de entorno. Para cambiar esa
+                            información de autenticación para un contexto existente, use 
+                            <a class="APILink" target="_blank"
+                               href="https://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html#addToEnvironment-java.lang.String-java.lang.Object-">
+                                <code>Context.addToEnvironment()</code></a> y
+                            <a class="APILink" target="_blank"
+                               href="https://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html#removeFromEnvironment-java.lang.String-">
+                                <code>Context.removeFromEnvironment()</code></a>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="padding: 3px;">desvincular</td>
+                        <td headers="h2" class="celda" style="padding: 3px;">
+                            <a class="APILink" target="_blank"
+                               href="https://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html#close">
+                                <code>Context.close()</code></a> se usa para liberar los recursos utilizados por un contexto. 
+                            Difiere de la operación &quot;desvincular&quot; de LDAP en que dada la implementación de un proveedor 
+                            de servicio, los recursos pueden ser compartidos entre contextos, de forma que cerrar un contexto 
+                            no liberará todos los recursos si esos recursos están siendo compartidos con otro contexto. 
+                            Asegúrese de cerrar todos los contextos si intenta liberar todos los recursos.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="padding: 3px;">buscar</td>
+                        <td headers="h2" class="celda" style="padding: 3px;">
+                            El método correspondiente en JNDI es la sobrecarga de 
+                            <a class="APILink" target="_blank" 
+                               href="https://docs.oracle.com/javase/8/docs/api/javax/naming/directory/DirContext.html#search-java.lang.String-java.lang.String-javax.naming.directory.SearchControls-">
+                                <code>DirContext.search()</code></a> que acepta un filtro de búsqueda (
+                            <a class="OutsideLink" target="_blank"
+                               href="http://www.ietf.org/rfc/rfc2254.txt">RFC 2254</a>). Vea el ejemplo del 
+                            <a class="TutorialLink" target="_top" href="../ops/filter.html">filtro</a>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="padding: 3px;">modificar</td>
+                        <td headers="h2" class="celda" style="padding: 3px;">
+                            El método correspondiente en JNDI es la sobrecarga de 
+                            <a class="APILink" target="_blank" 
+                               href="https://docs.oracle.com/javase/8/docs/api/javax/naming/directory/DirContext.html#modifyAttributes-java.lang.String-javax.naming.directory.ModificationItem:A-">
+                                <code>DirContext.modifyAttributes()</code></a> que acepta una matriz de 
+                            <a class="APILink" target="_blank" 
+                               href="https://docs.oracle.com/javase/8/docs/api/javax/naming/directory/ModificationItem.html">
+                                <code>DirContext.ModificationItem</code>s</a>. Vea la sección 
+                            <a class="TutorialLink" target="_top" href="../ops/modattrs.html">Modificar Atributos</a> para un 
+                            ejemplo.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="padding: 3px;">agregar</td>
+                        <td headers="h2" class="celda" style="padding: 3px;">
+                            Los métodos correspondientes en JNDI son 
+                            <a class="APILink" target="_blank" 
+                               href="https://docs.oracle.com/javase/8/docs/api/javax/naming/directory/DirContext.html#bind-java.lang.String-java.lang.Object-javax.naming.directory.Attributes-">
+                                <code>DirContext.bind()</code></a> y
+                            <a class="APILink" target="_blank" 
+                               href="https://docs.oracle.com/javase/8/docs/api/javax/naming/directory/DirContext.html#createSubcontext-java.lang.String-javax.naming.directory.Attributes-">
+                                <code>DirContext.createSubcontext()</code></a>. Puede usar uno de ellos para agregar una entrada 
+                            LDAP nueva. Usando <code>bind()</code>, puede especificar no sólo un conjunto de atributos para la 
+                            nueva entrada sino también un objeto Java que se agregará junto con los atributos. Vea la sección 
+                            <a class="TutorialLink" target="_top" href="../ops/bindattr.html">Añadir y Reemplazar Vínculos con 
+                                Atributos</a> para un ejemplo.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="padding: 3px;">eliminar</td>
+                        <td headers="h2" class="celda" style="padding: 3px;">
+                            Los métodos correspondientes en JNDI son 
+                            <a class="APILink" target="_blank" 
+                               href="https://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html#unbind-java.lang.String-">
+                                <code>Context.unbind()</code></a> y 
+                            <a class="APILink" target="_blank"
+                               href="https://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html#destroySubcontext-java.lang.String-">
+                                <code>Context.destroySubcontext()</code></a>. Puede usar cualquiera de ellos para eliminar una 
+                            entrada LDAP.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="padding: 3px;">modificar DN/RDN</td>
+                        <td headers="h2" class="celda" style="padding: 3px;">
+                            El método correspondiente en JNDI es 
+                            <a class="APILink" target="_blank" 
+                               href="https://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html#rename-java.lang.String-java.lang.String-">
+                                <code>Context.rename()</code></a>. Vea la sección 
+                            <a class="TutorialLink" target="_top" 
+                               href="../ldap/rename.html">Renombrar Objetos</a> para más detalles.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="padding: 3px;">comparar</td>
+                        <td headers="h2" class="celda" style="padding: 3px;">
+                            La operación corresponidente en JNDI es una restricción adecuada de 
+                            <a class="APILink" target="_blank" 
+                               href="https://docs.oracle.com/javase/8/docs/api/javax/naming/directory/DirContext.html#search-java.lang.String-javax.naming.directory.Attributes-java.lang.String:A-">
+                                <code>DirContext.search()</code></a>. Vea la sección 
+                            <a class="TutorialLink" target="_top" 
+                               href="../ldap/compare.html">Comparación LDAP</a> para un ejemplo.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="padding: 3px;">abandonar</td>
+                        <td headers="h2" class="celda" style="padding: 3px;">
+                            Cuando cierra un contexto, todas sus solicitudes pendientes se abandonan. De forma similar, cuando 
+                            cierra una 
+                            <a class="APILink" target="_blank"
+                               href="https://docs.oracle.com/javase/8/docs/api/javax/naming/NamingEnumeration.html">
+                                <code>NamingEnumeration</code></a>, la petición correspondiente de LDAP &quot;buscar&quot; se 
+                            abandona.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="padding: 3px;">operación extendida</td>
+                        <td headers="h2" class="celda" style="padding: 3px;">
+                            El método correspondiente en JNDI es 
+                            <a class="APILink" target="_blank" 
+                               href="https://docs.oracle.com/javase/8/docs/api/javax/naming/ldap/LdapContext.html#extendedOperation-javax.naming.ldap.ExtendedRequest-">
+                                <code>LdapContext.extendedOperation()</code></a>. Vea el 
+                            <a class="OutsideLink" target="_blank"
+                               href="https://docs.oracle.com/javase/jndi/tutorial/ldap/ext/index.html">Tutorial JNDI</a> para más 
+                            detalles.
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="jndi.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="exceptions.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> JNDI como una IPA de LDAP<br />
+            <b>Página siguiente:</b> Cómo los Códigos de Error LDAP se Mapean a las Excepciones de JNDI
+        </div>
+    </body>
+</html> 

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Configuración de la Seguridad Mediante Descriptores de Implementación</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="security-advanced006.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="security-advanced008.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GKHRL">
+      <h2 id="configuring-security-using-deployment-descriptors">
+        Configuración de la Seguridad Mediante Descriptores de Implementación
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            La forma recomendada de configurar la seguridad en la plataforma Java EE 8 es con anotaciones. Si 
+            desea anular la configuración de seguridad en el momento de la implementación, puede usar 
+            elementos de seguridad en el descriptor de implementación <code>web.xml</code> para hacerlo. Esta 
+            sección describe cómo usar el descriptor de implementación para especificar la autenticación 
+            básica y anular la asignación predeterminada de principal a rol.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>
+                <a href="#BNCCM">
+                  Especificación de Seguridad para la Autenticación Básica en el Descriptor de Implementación
+                </a>
+              </p>
+            </li>
+            <li>
+              <p>
+                <a href="#GKAFQ">
+                  Especificación de la Asignación no Predeterminada de la Asociación Principal-to-Role en el 
+                  Descriptor de Implementación
+                </a>
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="BNCCM">
+          <h3 id="specifying-security-for-basic-authentication-in-the-deployment-descriptor">
+            Especificación de Seguridad para la Autenticación Básica en el Descriptor de Implementación
+          </h3>
+          <div class="paragraph">
+            <p>
+              Los elementos del descriptor de implementación que agregan autenticación básica a un ejemplo le 
+              indican al servidor o navegador que realice las siguientes tareas.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  Enviar un cuadro de diálogo de inicio de sesión estándar para recopilar datos de nombre de 
+                  usuario y contraseña.
+                </p>
+              </li>
+              <li>
+                <p>Verificar que el usuario esté autorizado para acceder a la aplicación.</p>
+              </li>
+              <li>
+                <p>Si está autorizado, muestra el servlet al usuario.</p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              El siguiente código de muestra muestra los elementos de seguridad para un descriptor de 
+              implementación que podría usarse en el ejemplo de autenticación básica que se encuentra en el 
+              directorio tut-install`/examples/security/hello2_basicauth/`:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+    &lt;security-constraint&gt;
+        &lt;display-name&gt;SecurityConstraint&lt;/display-name&gt;
+        &lt;web-resource-collection&gt;
+             &lt;web-resource-name&gt;WRCollection&lt;/web-resource-name&gt;
+            &lt;url-pattern&gt;/greeting&lt;/url-pattern&gt;
+        &lt;/web-resource-collection&gt;
+        &lt;auth-constraint&gt;
+            &lt;role-name&gt;TutorialUser&lt;/role-name&gt;
+        &lt;/auth-constraint&gt;
+        &lt;user-data-constraint&gt;
+             &lt;transport-guarantee&gt;CONFIDENTIAL&lt;/transport-guarantee&gt;
+        &lt;/user-data-constraint&gt;
+    &lt;/security-constraint&gt;
+    &lt;login-config&gt;
+        &lt;auth-method&gt;BASIC&lt;/auth-method&gt;
+        &lt;realm-name&gt;file&lt;/realm-name&gt;
+    &lt;/login-config&gt;
+    &lt;security-role&gt;
+        &lt;role-name&gt;TutorialUser&lt;/role-name&gt;
+    &lt;/security-role&gt;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Este descriptor de implementación especifica que solo los usuarios que hayan ingresado sus 
+              nombres de usuario y contraseñas y que hayan sido autorizados para acceder a esta URL porque se 
+              verificó que tienen el rol <code>TutorialUsuario</code>. Los datos de usuario y contraseña serán 
+              enviados por transporte protegido para evitar su lectura en tránsito.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="GKAFQ">
+          <h3 id="specifying-non-default-principal-to-role-mapping-in-the-deployment-descriptor">
+            Especificación de la Asignación no Predeterminada de la Asociación Principal-to-Role en el 
+            Descriptor de Implementación
+          </h3>
+          <div class="paragraph">
+            <p>
+              Para asignar un nombre de rol permitido por la aplicación o módulo a principales (usuarios) y 
+              grupos definidos en el servidor, use el elemento <code>security-role-mapping</code> en el 
+              archivo descriptor de implementación en tiempo de ejecución 
+              (<code>glassfish- application.xml</code>, <code>glassfish-web.xml</code> o 
+              <code>glassfish-ejb-jar.xml</code>). La entrada debe declarar una asignación entre un rol de 
+              seguridad utilizado en la aplicación y uno o más grupos o principales definidos para el dominio 
+              aplicable del servidor GlassFish. A continuación se muestra un ejemplo del archivo 
+              <code>glassfish-web.xml</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;glassfish-web-app&gt;
+    &lt;security-role-mapping&gt;
+        &lt;role-name&gt;DIRECTOR&lt;/role-name&gt;
+        &lt;principal-name&gt;schwartz&lt;/principal-name&gt;
+    &lt;/security-role-mapping&gt;
+    &lt;security-role-mapping&gt;
+        &lt;role-name&gt;DEPT-ADMIN&lt;/role-name&gt;
+        &lt;group-name&gt;dept-admins&lt;/group-name&gt;
+    &lt;/security-role-mapping&gt;
+&lt;/glassfish-web-app&gt;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El nombre del rol se puede asignar a un principal (usuario) específico, a un grupo o a ambos. 
+              Los nombres principales o de grupo a los que se hace referencia deben ser principales o grupos 
+              válidos en el dominio predeterminado actual del servidor GlassFish. El <code>role-name</code> en 
+              este ejemplo debe coincidir exactamente con el <code>role-name</code> en el elemento 
+              <code>security-role</code> del <code>web.xml</code> correspondiente o el nombre del rol 
+              definido en las anotaciones <code>@DeclareRoles</code> y/o <code>@RolesAllowed</code>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="security-advanced006.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="security-advanced008.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

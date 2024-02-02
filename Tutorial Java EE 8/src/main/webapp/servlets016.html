@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>La Aplicación de Ejemplo fileupload</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="servlets015.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="servlets017.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BABDGFJJ">
+      <h2 id="the-fileupload-example-application">La Aplicación de Ejemplo fileupload</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            El ejemplo de <code>fileupload</code>, ubicado en el directorio 
+            tut-install`/examples/web/servlet/fileupload/`, ilustra cómo implementar y utilizar la función de 
+            carga de archivos.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            El caso de estudio Duke's Forest proporciona un ejemplo más complejo que carga un archivo de 
+            imagen y almacena su contenido en una base de datos.
+          </p>
+        </div>
+        <table class="tableblock frame-all grid-all spread">
+          <colgroup>
+            <col style="width: 100%;">
+          </colgroup>
+          <tbody>
+            <tr>
+              <td class="tableblock halign-left valign-top">
+                <div>
+                  <div class="paragraph">
+                    <p><strong>Nota</strong>:</p>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      Salvo que se indique expresamente lo contrario, el sitio y todo el contenido 
+                      proporcionado en el sitio o a través del mismo se proporcionan "tal cual" y 
+                      "según disponibilidad". Oracle renuncia expresamente a todas las garantías de cualquier 
+                      tipo, ya sean expresas o implícitas, incluidas, entre otras, las garantías implícitas de 
+                      comerciabilidad, idoneidad para un propósito particular y no infracción con respecto al 
+                      sitio y todo el contenido proporcionado en el sitio o a través de este. Oracle no 
+                      garantiza que: (a) el sitio o el contenido cumplan con sus requisitos; (b) el sitio 
+                      estará disponible de manera ininterrumpida, oportuna, segura o sin errores; (c) los 
+                      resultados que puedan obtenerse del uso del sitio o cualquier contenido provisto en/o a 
+                      través del sitio serán precisos o confiables; o (d) la calidad de cualquier contenido 
+                      comprado u obtenido por usted en/o a través del sitio satisfará sus expectativas.
+                    </p>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      Cualquier contenido al que se acceda, descargue u obtenga de otro modo en o a través del 
+                      uso del sitio se utiliza bajo su propia discreción y riesgo. Oracle no será responsable 
+                      de ningún daño a su sistema informático o pérdida de datos que resulte de la descarga o 
+                      el uso del contenido.
+                    </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p><a href="#CHDFGBGI">Arquitectura de la Aplicación de Ejemplo fileupload</a></p>
+            </li>
+            <li>
+              <p><a href="#CHDIHJCI">Ejecutando el Ejemplo fileupload</a></p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="CHDFGBGI">
+          <h3 id="architecture-of-the-fileupload-example-application">
+            Arquitectura de la Aplicación de Ejemplo fileupload
+          </h3>
+          <div class="paragraph">
+            <p>
+              La aplicación de ejemplo <code>fileupload</code> consta de un solo servlet y un formulario HTML 
+              que realiza una solicitud de carga de archivos al servlet.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Este ejemplo incluye un formulario HTML muy simple con dos campos, Archivo y Destino. El tipo de 
+              entrada, <code>file</code>, permite al usuario explorar el sistema de archivos local para 
+              seleccionar el archivo. Cuando se selecciona el archivo, se envía al servidor como parte de una 
+              solicitud POST. Durante este proceso, se aplican dos restricciones obligatorias al formulario 
+              con tipo de entrada <code>file</code>.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  El atributo <code>enctype</code> debe establecerse en un valor de 
+                  <code>multipart/form-data</code>.
+                </p>
+              </li>
+              <li>
+                <p>Su método debe ser POST.</p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Cuando el formulario se especifica de esta manera, la solicitud completa se envía al servidor en 
+              forma codificada. Luego, el servlet usa sus propios medios para manejar la solicitud para 
+              procesar los datos del archivo entrante y extraer un archivo de la secuencia. El destino es la 
+              ruta a la ubicación donde se guardará el archivo en su computadora. Al presionar el botón Cargar 
+              en la parte inferior del formulario, se envían los datos al servlet, que guarda el archivo en el 
+              destino especificado.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>El formulario HTML en <code>index.html</code> es el siguiente:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+    &lt;head&gt;
+        &lt;title&gt;Subir Archivo&lt;/title&gt;
+        &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;form method="POST" action="upload" enctype="multipart/form-data" &gt;
+            Archivo:
+            &lt;input type="file" name="file" id="file" /&gt; &lt;br/&gt;
+            Destino:
+            &lt;input type="text" value="/tmp" name="destination"/&gt;
+            &lt;/br&gt;
+            &lt;input type="submit" value="Upload" name="cargar" id="upload" /&gt;
+        &lt;/form&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Se utiliza un método de solicitud POST cuando el cliente necesita enviar datos al servidor como 
+              parte de la solicitud, como cuando carga un archivo o envía un formulario completo. Por el 
+              contrario, un método de solicitud GET envía una URL y encabezados solo al servidor, mientras que 
+              las solicitudes POST también incluyen un cuerpo de mensaje. Esto permite que se envíen al 
+              servidor datos de longitud arbitraria de cualquier tipo. Un campo de encabezado en la solicitud 
+              POST generalmente indica el tipo de medio de Internet del cuerpo del mensaje.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Al enviar un formulario, el navegador transmite el contenido, combinando todas las partes, y 
+              cada parte representa un campo de un formulario. Las partes reciben el nombre de los elementos 
+              <code>input</code> y están separadas entre sí con delimitadores de cadena llamados 
+              <code>boundary</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Así es como se ven los datos enviados desde el formulario <code>fileupload</code>, después de 
+              seleccionar <code>sample.txt</code> como el archivo que se cargará en el directorio 
+              <code>tmp</code> el el sistema de archivos local:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+POST /fileupload/upload HTTP/1.1
+Host: localhost:8080
+Content-Type: multipart/form-data;
+boundary=---------------------------263081694432439 Content-Length: 441
+-----------------------------263081694432439
+Content-Disposition: form-data; name="file"; filename="sample.txt"
+Content-Type: text/plain
+ Data from sample file
+-----------------------------263081694432439
+Content-Disposition: form-data; name="destination"
+ /tmp
+-----------------------------263081694432439
+Content-Disposition: form-data; name="cargar"
+ Upload
+-----------------------------263081694432439--
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>El servlet <code>FileUploadServlet.java</code> comienza de la siguiente manera:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@WebServlet(name = "FileUploadServlet", urlPatterns = {"/upload"})
+@MultipartConfig
+public class FileUploadServlet extends HttpServlet {
+    private final static Logger LOGGER =
+            Logger.getLogger(FileUploadServlet.class.getCanonicalName());
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              La anotación <code>@WebServlet</code> utiliza la propiedad <code>urlPatterns</code> para definir 
+              asignaciones de servlet.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La anotación <code>@MultipartConfig</code> indica que el servlet espera que las solicitudes se 
+              realicen utilizando el tipo MIME <code>multipart/form-data</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El método <code>processRequest</code> recupera el destino y la parte del archivo de la 
+              solicitud, luego llama al método <code>getFileName</code> para recuperar el nombre del archivo 
+              de la parte del archivo. Luego, el método crea un <code>FileOutputStream</code> y copia el 
+              archivo en el destino especificado. La sección de manejo de errores del método captura y maneja 
+              algunas de las razones más comunes por las que no se encuentra un archivo. Los métodos 
+              <code>processRequest</code> y <code>getFileName</code> se ven así:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+protected void processRequest(HttpServletRequest request,
+        HttpServletResponse response)
+        throws ServletException, IOException {
+    response.setContentType("text/html;charset=UTF-8");
+    // Crea los componentes de ruta para guardar el archivo
+    final String path = request.getParameter("destination");
+    final Part filePart = request.getPart("file");
+    final String fileName = getFileName(filePart);
+    OutputStream out = null;
+    InputStream filecontent = null;
+    final PrintWriter writer = response.getWriter();
+    try {
+        out = new FileOutputStream(new File(path + File.separator
+                + fileName));
+        filecontent = filePart.getInputStream();
+        int read = 0;
+        final byte[] bytes = new byte[1024];
+        while ((read = filecontent.read(bytes)) != -1) {
+            out.write(bytes, 0, read);
+        }
+        writer.println("Nuevo archivo " + fileName + " creado en " + path);
+        LOGGER.log(Level.INFO, "El Archivo{0}esta siendo cargado en {1}",
+                new Object[]{fileName, path});
+    } catch (FileNotFoundException fne) {
+        writer.println("O no especificó un archivo para cargar o está "
+                 + "intentando subir un archivo a una ubicación protegida "
+                 + "o inexistente".);
+        writer.println("&lt;br/&gt; ERROR: " + fne.getMessage());
+        LOGGER.log(Level.SEVERE, "Problemas durante la carga del archivo. Error: {0}",
+                new Object[]{fne.getMessage()});
+    } finally {
+        if (out != null) {
+            out.close();
+        }
+        if (filecontent != null) {
+            filecontent.close();
+        }
+        if (writer != null) {
+            writer.close();
+        }
+    }
+}
+private String getFileName(final Part part) {
+    final String partHeader = part.getHeader("content-disposition");
+    LOGGER.log(Level.INFO, "Part Header = {0}", partHeader);
+    for (String content : part.getHeader("content-disposition").split(";")) {
+        if (content.trim().startsWith("filename")) {
+            return content.substring(
+                    content.indexOf('=') + 1).trim().replace("\"", "");
+        }
+    }
+    return null;
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="CHDIHJCI">
+          <h3 id="running-the-fileupload-example">Ejecutando el Ejemplo fileupload</h3>
+          <div class="paragraph">
+            <p>
+              Puede usar el EID de NetBeans o Maven para compilar, empaquetar, implementar y ejecutar el 
+              ejemplo de <code>fileupload</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Aquí se tratan los siguientes temas:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  <a href="#CHDGDJCI">
+                    Para Construir, Empaquetar, y Desplegar el Ejemplo fileupload Usando el EID NetBeans
+                  </a>
+                </p>
+              </li>
+              <li>
+                <p>
+                  <a href="#CHDCFADG">
+                    Para Construir, Empaquetar, y Desplegar el Ejemplo fileupload Usando Maven
+                  </a>
+                </p>
+              </li>
+              <li>
+                <p><a href="#CHDDDAAJ">Para Ejecutar el Ejemplo fileupload</a></p>
+              </li>
+            </ul>
+          </div>
+          <div class="sect3" id="CHDGDJCI">
+            <h4 id="to-build-package-and-deploy-the-fileupload-example-using-netbeans-ide">
+              Para Construir, Empaquetar, y Desplegar el Ejemplo fileupload Usando el EID NetBeans</h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Asegúrese de que el Servidor GlassFish se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                  </p>
+                </li>
+                <li>
+                  <p>En el menú Archivo, elija Abrir proyecto.</p>
+                </li>
+                <li>
+                  <p>En el cuadro de diálogo Abrir proyecto, vaya a:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/web/servlet
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Seleccione la carpeta <code>fileupload</code>.</p>
+                </li>
+                <li>
+                  <p>Haga clic en Abrir proyecto.</p>
+                </li>
+                <li>
+                  <p>
+                    En la pestaña Proyectos, haga clic con el botón derecho en el proyecto 
+                    <code>fileupload</code> y seleccione Build.
+                  </p>
+                </li>
+              </ol>
+            </div>
+          </div>
+          <div class="sect3" id="CHDCFADG">
+            <h4 id="to-build-package-and-deploy-the-fileupload-example-using-maven">
+              Para Construir, Empaquetar, y Desplegar el Ejemplo fileupload Usando Maven
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Asegúrese de que el Servidor GlassFish se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                  </p>
+                </li>
+                <li>
+                  <p>En una ventana de terminal, vaya a:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/web/servlet/fileupload/
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Ingrese el siguiente comando para implementar la aplicación:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+mvn install
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+          <div class="sect3" id="CHDDDAAJ">
+            <h4 id="to-run-the-fileupload-example">Para Ejecutar el Ejemplo fileupload</h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>En un navegador web, ingrese la siguiente URL:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+http://localhost:8080/fileupload/
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    En la página Carga de Archivos, haga clic en Elegir Archivo para mostrar una ventana del 
+                    explorador de archivos.
+                  </p>
+                </li>
+                <li>
+                  <p>Seleccione un archivo para cargar y haga clic en Abrir.</p>
+                  <div class="paragraph">
+                    <p>
+                      El nombre del archivo que seleccionó se muestra en el campo Archivo. Si no selecciona un 
+                      archivo, se lanzará una excepción.
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <p>En el campo Destino, escriba un nombre de directorio.</p>
+                  <div class="paragraph">
+                    <p>
+                      El directorio ya debe haber sido creado y también debe ser escribible. Si no ingresa un 
+                      nombre de directorio o si ingresa el nombre de un directorio inexistente o protegido, se 
+                      generará una excepción.
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    Haga clic en Cargar para cargar el archivo que seleccionó en el directorio que especificó 
+                    en el campo Destino.
+                  </p>
+                  <div class="paragraph">
+                    <p>Un mensaje informa que el archivo se creó en el directorio que especificó.</p>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    Vaya al directorio que especificó en el campo Destino y verifique que el archivo cargado 
+                    esté presente.
+                  </p>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="servlets015.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="servlets017.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

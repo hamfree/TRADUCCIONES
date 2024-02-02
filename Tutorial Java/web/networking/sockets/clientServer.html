@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Escribiendo el Lado del Servidor de un Socket (Los Tutoriales de Java&trade; &gt; Personalizando la Red &gt; 
+            Todo Sobre Sockets)
+        </title>
+        <meta name="description" content="Este tutorial de Java sobre redes describe las capacidades de red de la plataforma Java, 
+              trabajando con URL, sockets, datagramas y cookies." />
+        <meta name="keywords" content="java programming, learn java, java sample code, java networking, java url, java socket,
+              datagram, java cookie" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Todo Sobre Sockets</a></div>
+                <div class="linkAHEAD"><a href="definition.html">¿Qué es un Socket?</a></div>
+                <div class="linkAHEAD"><a href="readingWriting.html">Leyendo de y Escribiendo a un Socket</a></div>
+                <div class="nolinkAHEAD">Escribiendo el Lado del Servidor de un Socket</div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Personalizando la Red<br />
+                <b>Lección:</b> Todo Sobre Sockets
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Personalizando la Red</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Todo Sobre Sockets</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="readingWriting.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../datagrams/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Escribiendo el Lado del Servidor de un Socket</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Esta sección le muestra cómo escribir un servidor y el cliente que va con el. El servidor en el par 
+                    cliente/servidor sirve chistes Toc Toc. Los niños prefieren las bromas Toc Toc y, por lo general, son 
+                    vehículos para los malos juegos de palabras. Ellos van así:
+                </p>
+                <p>
+                    <strong>Server</strong>: &quot;¡Toc Toc!&quot;<br/>
+                    <strong>Client</strong>: &quot;¿Quién está ahí?&quot;<br/>
+                    <strong>Server</strong>: &quot;Andrés.&quot;<br/>
+                    <strong>Client</strong>: &quot;Andrés ¿quién?&quot;<br/>
+                    <strong>Server</strong>: &quot;El que viene cada mes. ¡Abre y paga el alquiler!&quot;<br/>
+                    <strong>Client</strong>: &quot;(Gemido).&quot;
+                </p>
+                <p>
+                    El ejemplo consiste en dos programas de Java ejecutándose independientemente: el programa cliente y el programa 
+                    servidor. El programa cliente está implementado por una única clase, 
+                    <a class="SourceLink" target="_blank" href="examples/KnockKnockClient.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/KnockKnockClient.java'); return false;">
+                        <code>KnockKnockClient</code></a>, y es muy similar al ejemplo 
+                    <a class="SourceLink" target="_blank" href="examples/EchoClient.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/EchoClient.java'); return false;">
+                        <code>EchoClient</code></a> de la sección previa. El programa servidor está implementado por dos clases:
+                    <a class="SourceLink" target="_blank" href="examples/KnockKnockServer.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/KnockKnockServer.java'); return false;">
+                        <code>KnockKnockServer</code></a> y 
+                    <a class="SourceLink" target="_blank" href="examples/KnockKnockProtocol.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/KnockKnockProtocol.java'); return false;">
+                        <code>KnockKnockProtocol</code></a>. <code>KnockKnockServer</code>, el cual es similar a 
+                    <a class="SourceLink" target="_blank" href="examples/EchoServer.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/EchoServer.java'); return false;">
+                        <code>EchoServer</code></a>, contiene el método <code>main</code>para el programa servidor y realiza el 
+                        trabajo de escuchar en el puerto, establecer las conexiones, y leer y escribir al socket. La clase 
+                    <a class="SourceLink" target="_blank" href="examples/KnockKnockProtocol.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/KnockKnockProtocol.java'); return false;">
+                        <code>KnockKnockProtocol</code></a> sirve los chistes. Lleva la pista del chiste actual, el estado actual 
+                        (toc toc enviado, pista enviada, etcetera), y devuelve las piezas de texto varias del chiste dependiendo 
+                        del estado actual. Este objeto implemente el protocolo &mdash; el lenguaje que el cliente y el servidor 
+                        han aceptado usar para comunicar.
+                </p>
+                <p>
+                    La sección siguiente mira en detalle cada clase tanto en el cliente como en el servidor y entonces le muestra 
+                    cómo ejecutarlos.
+                </p>
+                <h2>
+                    El Servidor Toc Toc
+                </h2>
+                <p>
+                    Esta sección describe el código que implementa el programa de servidor Toc Toc, 
+                    <a class="SourceLink" target="_blank" href="examples/KnockKnockServer.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/KnockKnockServer.java'); return false;">
+                        <code>KnockKnockServer</code></a>.
+                </p>
+                <p>
+                    El programa servidor empieza creando un nuevo objeto 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/net/ServerSocket.html"><code>ServerSocket</code></a> 
+                    para que escuche en un puerto específico (vea la sentencia en negrita en el siguiente segmento de código). 
+                    Cuando ejecuta este servidor, elija un puerto que no esté ya dedicado a algún otro servicio. Por ejemplo, este 
+                    comando inicia el programa servidor <code>KnockKnockServer</code> para que escuche en el puerto 4444:
+                </p>
+                <div class="codeblock">
+                    <pre>
+java KnockKnockServer 4444
+                    </pre>
+                </div>
+                <p>
+                    El programa servidor crae el objeto <code>ServerSocket</code> en una sentencia <code>try</code>-with-resources:
+                </p>
+                <div class="codeblock">
+                    <pre>
+int portNumber = Integer.parseInt(args[0]);
+
+try ( 
+    <strong>ServerSocket serverSocket = new ServerSocket(portNumber);</strong>
+    Socket clientSocket = serverSocket.accept();
+    PrintWriter out =
+        new PrintWriter(clientSocket.getOutputStream(), true);
+    BufferedReader in = new BufferedReader(
+        new InputStreamReader(clientSocket.getInputStream()));
+) {
+                    </pre>
+                </div>
+                <p>
+                    <code>ServerSocket</code> es una clase de 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/net/package-frame.html"><code>java.net</code></a> que 
+                       proporciona una implementación independiente del sistema del lado servidor de una conexión de socket de 
+                       cliente/servidor. El constructor para <code>ServerSocket</code> lanza una excepción si no puede escuchar en 
+                       el puerto especificado (por ejemplo, el puerto está ya siendo usado). En este caso, 
+                       <code>KnockKnockServer</code> no tiene más remedio que salir.
+                </p>
+                <p>
+                    Si el servidor se vincula con éxito a su puerto, entonces se crea con éxito el objeto <code>ServerSocket</code> 
+                    y el servidor continúa con el siguiente paso &mdash; aceptar una conexión desde un cliente (la siguiente 
+                    sentencia en la sentencia <code>try</code>-with-resources):
+                </p>
+                <div class="codeblock">
+                    <pre>
+clientSocket = serverSocket.accept();
+                    </pre>
+                </div>
+                <p>
+                    El método 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/net/ServerSocket.html#accept--"><code>accept</code></a> 
+                    espera hasta que un cliente inicia y pide una conexión en la máquina y puerto de este servidor. (Asumamos que 
+                    usted ejecutó el programa servidor <code>KnockKnockServer</code> en la computadora de nombre 
+                    <code>knockknockserver.example.com</code>.) En este ejemplo, el servidor está ejecutando en el número de puerto 
+                    especificado por el primer argumento de línea de comandos. Cuando se solicita una conexión y se establece con 
+                    éxito, el método accept devuelve un nuevo objeto 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/net/Socket.html"><code>Socket</code></a> el cual está 
+                       vinculado al mismo puerto local y tiene su dirección remota y puerto remoto configurados como los del 
+                       cliente. El servidor puede comunicar con el cliente a través de este nuevo <code>Socket</code> y continúa 
+                       escuchando las peticiones de conexión del cliente en el <code>ServerSocket</code> original. Esta versión 
+                       particular del programa no escucha más solicitudes de conexión de clientes. Sin embargo, una versión 
+                       modificada del programa se proporciona en <a href="#later">Soportando Clientes Múltiples</a>.
+                </p>
+                <p>
+                    Después de que el servidor establece con éxito una conexión con un cliente, comunica con el cliente usando este 
+                    código:
+                </p>
+                <div class="codeblock">
+                    <pre>
+try (
+    // ...
+    PrintWriter out =
+        new PrintWriter(clientSocket.getOutputStream(), true);
+    BufferedReader in = new BufferedReader(
+        new InputStreamReader(clientSocket.getInputStream()));
+) {
+    String inputLine, outputLine;
+            
+    <strong>// Initiate conversation with client
+    KnockKnockProtocol kkp = new KnockKnockProtocol();
+    outputLine = kkp.processInput(null);
+    out.println(outputLine);</strong>
+
+    while ((inputLine = in.readLine()) != null) {
+        outputLine = kkp.processInput(inputLine);
+        out.println(outputLine);
+        if (outputLine.equals("Bye."))
+            break;
+    }
+                    </pre>
+                </div>
+                <p>
+                    Este código hace lo siguiente:
+                </p>
+                <ol>
+                    <li>
+                        Obtiene los flujos de entrada y salida del socket y abre readers y writers en ellos.
+                    </li>
+                    <li>
+                        Inicia la comunicación con el cliente escribiendo al socket (mostrado en negrita).
+                    </li>
+                    <li>
+                        Comunica con el cliente leyendo y escribiendo en el socket (el bucle <code>while</code>).
+                    </li>
+                </ol>
+                <p>
+                    El paso 1 es ya familiar. El paso 2 se muestra en negrita y se merece unos pocos comentarios. Las sentencias en 
+                    negraita en el segmento de código de arriba inician la conversación con el cliente. El código crea un objeto 
+                    <code>KnockKnockProtocol</code> &mdash; el objeto que lleva la pista del chiste actual, el estado actual dentro 
+                    del chiste, etcetera.
+                </p>
+                <p>
+                    Después de que se crea <code>KnockKnockProtocol</code>, el código llama al método <code>processInput</code> de 
+                    <code>KnockKnockProtocol</code> para obtener el primer mensaje que el servidor envía al cliente. Para este 
+                    ejemplo, la primera cosa que dice el servidor es &quot;¡Toc! ¡Toc!&quot; A continuación, el servidor escribe 
+                    la información al 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/io/PrintWriter.html"><code>PrintWriter</code></a> 
+                    conectado al socket del cliente, enviando así el mensaje al cliente.
+                </p>
+                <p>
+                    El paso 3 está codificado en el bucle <code>while</code>. Mientras el cliente y el servidor tengan aún algo que 
+                    decirse el uno al otro, el servidor lee y escribe al socket, enviando mensajes de ida y vuelta entre el cliente 
+                    y el servidor.
+                </p>
+                <p>
+                    El servidor inició la conversación con un &quot;¡Toc! ¡Toc!&quot; así que después el servidor debe esperar 
+                    para que el cliente diga &quot;¿Quién está ahí?&quot; Como resultado, el bucle <code>while</code> itera en la 
+                    lectura del flujo de entrada. El método <code>readLine</code> espera hasta que el cliente responde escribiendo 
+                    algo a su flujo de salida (el flujo de entrada del servidor). Cuando el cliente responde, el servidor pasa la 
+                    respuesta del cliente al objeto <code>KnockKnockProtocol</code> para una respuesta apropiada. El servidor envía 
+                    inmediatamente la respuesta al cliente a través del flujo de salida conectado al socket, usando una llamada a 
+                    println. Si la respuesta generada del servidor desde el objeto <code>KnockKnockServer</code> es 
+                    &quot;Bye.&quot; esto indica que el cliente no quiere más chistes y el bucle termina.
+                </p>
+                <p>
+                    El entorno de ejecución de Java automáticamente cierra los flujos de entrada y salida, el socket del cliente, y 
+                    el socket del servidor porque han sido creados en una sentencia <code>try</code>-with-resources.
+                </p>
+                <h2>
+                    El Protoco Toc Toc
+                </h2>
+                <p>
+                    La clase 
+                    <a class="SourceLink" target="_blank" href="examples/KnockKnockProtocol.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/KnockKnockProtocol.java'); return false;">
+                        <code>KnockKnockProtocol</code></a> implementa el protocolo que el cliente y servidor usan para comunicar. 
+                        Esta clase mantiene la pista de dónde están el cliente y el servidor en su conversación y sirve la 
+                        respuesta del servidor a las sentencias del cliente. El objeto <code>KnockKnockProtocol</code> contiene el 
+                        texto de todos los chistes y se asegura de que el cliente da la respuesta apropiada a las sentencias del 
+                        servidor. No estaría bien que el cliente dijera "¿Andrés quién?" cuando el servidor dice "¡Toc! ¡Toc!".
+                </p>
+                <p>
+                    Todos los pares cliente/servidor deben tener algún protocolo por el cual puedan hablarse entre sí; de otra 
+                    forma, los datos que se transmiten de un lado a otro no tendrían sentido. El protocolo que sus propios clientes 
+                    y servidores usan dependen enteramente de la comunicación requerida por ellos para realizar la tarea.
+                </p>
+                <h2>
+                    El Cliente Toc Toc
+                </h2>
+                <p>
+                    La clase 
+                    <a class="SourceLink" target="_blank" href="examples/KnockKnockClient.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/KnockKnockClient.java'); return false;">
+                        <code>KnockKnockClient</code></a> implementa el programa cliente que habla a 
+                    <code>KnockKnockServer</code>. <code>KnockKnockClient</code> está basado en el programa <code>EchoClient</code>
+                    de la sección anterior,
+                    <a class="TutorialLink" target="_top" href="readingWriting.html">Leyendo de y Escribiendo a un Socket</a> y 
+                    debería ser algo familiar para usted. Pero repasaremos el programa de todos modos y veremos lo que está 
+                    sucediendo en el cliente en el contexto de lo que está sucediendo en el servidor.
+                </p>
+                <p>
+                    Cuando inicia el programa cliente, el servidor debería estar ya ejecutándose y escuchando en el puerto, 
+                    esperando para que un cliente solicite una conexión. Así, la primera cosa que hace el programa cliente es abrir 
+                    un socket que se conecta al servidor que se está ejecutando en la máquina con el nombre y puerto especificados:
+                </p>
+                <div class="codeblock">
+                    <pre>
+String hostName = args[0];
+int portNumber = Integer.parseInt(args[1]);
+
+try (
+    <strong>Socket kkSocket = new Socket(hostName, portNumber);</strong>
+    PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
+    BufferedReader in = new BufferedReader(
+        new InputStreamReader(kkSocket.getInputStream()));
+)
+                    </pre>
+                </div>
+                <p>
+                    Cuando crea su socket, el ejemplo <code>KnockKnockClient</code> usa el nombre de la máquina del primer 
+                    argumento de la línea de comandos, el nombre de la computadora en su red que está ejecutando el programa 
+                    servidor <code>KnockKnockServer</code>.
+                </p>
+                <p>
+                    El ejemplo <code>KnockKnockClient</code> usa el segundo argumento de la línea de comandos como el número de 
+                    puerto cuando crea su socket. Este es un <em>número de puerto remoto</em> &mdash; el número de un puerto en la 
+                    computadora del servidor &mdash; y es el puerto en el cual <code>KnockKnockServer</code> está escuchando. Por 
+                    ejemplo, el siguiente comando ejecuta el ejemplo <code>KnockKnockClient</code> con 
+                    <code>knockknockserver.example.com</code> como nombre de la computadora donde se está ejecutando el programa 
+                    servidor <code>KnockKnockServer</code> y 4444 como el número de puerto remoto:
+                </p>
+                <div class="codeblock">
+                    <pre>
+java KnockKnockClient knockknockserver.example.com 4444
+                    </pre>
+                </div>
+                <p>
+                    El socket del cliente se vincula a cualquier <em>puerto local</em> disponible &mdash; un puerto en el 
+                    computador cliente. Recuerde que el servidor obtiene un nuevo socket también. Si usted ejecuta el ejemplo 
+                    <code>KnockKnockClient</code> con los argumentos de línea de comando del ejemplo previo, entonces este socket 
+                    se vincula al número de puerto local 4444 en la computadora desde la cual ejecutó el ejemplo 
+                    <code>KnockKnockClient</code>. El socket del servidor y el socket del cliente se conectan.
+                    
+                </p>
+                <p>
+                    A continuación viene el bucle <code>while</code> que implementa la comunicación entre el cliente y el servidor. 
+                    El servidor habla primero, así que el cliente debe escuchar primero. El cliente hace esto leyendo el 
+                    flujo de entrada enlazado al socket. Si el servidor habla, dice &quot;Adios&quot; y el cliente sale del bucle.
+                    De otra forma, el cliente visualiza el texto a la salida estandar y entonces lee la respuesta del usuario, el 
+                    cual teclea en la entrada estándar. Después de que el usuario teclea un retorno de carro, el cliente envía el 
+                    texto al servidor a través del flujo de salida enlazado al socket.
+                </p>
+                <div class="codeblock">
+                    <pre>
+while ((fromServer = in.readLine()) != null) {
+    System.out.println("Server: " + fromServer);
+    if (fromServer.equals("Bye."))
+        break;
+
+    fromUser = stdIn.readLine();
+    if (fromUser != null) {
+        System.out.println("Client: " + fromUser);
+        out.println(fromUser);
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    La comunicación termina cuando el servidor pregunta si el cliente desea oir otro chiste, el cliente dice no, y 
+                    el servidor dice &quot;Adios&quot;.
+                </p>
+                <p>
+                    El clietne cierra automáticamente sus flujos de entrada y salida y el socket porque fueron creeado en una 
+                    sentencia <code>try</code>-with-resources.
+                </p>
+                <h2>
+                    Ejecutando los Programas
+                </h2>
+                <p>
+                    Debe iniciar el programa servidor primero. Para hacer esto, ejecute el programa servidor usando el intérprete 
+                    de Java, tal como lo haría con cualquier otra aplicación de Java. Especifique como argumento de línea de 
+                    comandos el número de puerto en el cual el programa servidor escucha:
+                </p>
+                <div class="codeblock">
+                    <pre>
+java KnockKnockServer 4444
+                    </pre>
+                </div>
+                <p>
+                    An continuación, ejecute el programa cliente. Note que puede ejecutar el cliente en cualquier computadora 
+                    dentro de su red; no tiene que ejecutarlo en la misma computadora que el servidor. Especifique como argumentos 
+                    de línea de comandos el nombre de la máquina y el número de puerto de la computadora que ejecuta el programa 
+                    servidor <code>KnockKnockServer</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+java KnockKnockClient knockknockserver.example.com 4444
+                    </pre>
+                </div>
+                <p>
+                    Si es demasiado rápido, podría iniciar el cliente antes de que el servidor tenga una oportunidad de 
+                    inicializarse a sí mismo y empezar a escuchar en el puerto. Si esto ocurre, verá un volcado de pila del 
+                    cliente. Si esto ocurre, simplemente reinicie el cliente.
+                </p>
+                <p>
+                    Si intenta iniciar un segundo cliente mientras el primer cliente está conectado al servidor, el segundo cliente 
+                    simplemente se colgará. La sección siguiente, <a href="#later">Soportando Múltiples Clientes</a>, habla sobre 
+                    el soporte de múltiples clientes.
+                </p>
+                <p>
+                    Cuando ha establecido una conexión con éxito entre el cliente y el servidor, verá el siguiente texto 
+                    visualizado en su pantalla:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Server: Knock! Knock!
+                    </pre>
+                </div>
+                <p>
+                    Ahora, debe responder con:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<strong>Who's there?</strong>
+                    </pre>
+                </div>
+                <p>
+                    El cliente muestra lo que usted teclea y envía el texto al servidor. El servidor responde con la primera línea 
+                    de los muchso chistes Toc Toc en su repertorio. Ahora su pantalla debería contener esto (el texto que usted 
+                    tecleó está en negrita):
+                </p>
+                <div class="codeblock">
+                    <pre>
+Server: Knock! Knock!
+<strong>Who's there?</strong>
+Client: Who's there?
+Server: Turnip
+                    </pre>
+                </div>
+                <p>
+                    Ahora, usted responde con:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Turnip who?
+                    </pre>
+                </div>
+                <p>
+                    De nuevo, el cliente refleja lo que usted escribe y envía el texto al servidor. El servidor responde con la 
+                    línea de broma. Ahora su pantalla debería contener esto:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Server: Knock! Knock!
+<strong>Who's there?</strong>
+Client: Who's there?
+Server: Turnip
+<strong>Turnip who?</strong>
+Client: Turnip who?
+Server: Turnip the heat, it's cold in here! Want another? (y/n)   
+                    </pre>
+                </div>
+                <p>
+                    Si quiere oir otro chistes, teclee <strong>y</strong>; si no, teclee <strong>n</strong>. Si uste teclea 
+                    <strong>y</strong>, el servidor empieza de nuevo con &quot;Knock! Knock!&quot; Si usted teclea 
+                    <strong>n</strong>, el server dice &quot;Bye.&quot; causando así que tanto el cliente como el servidor 
+                    terminen.
+                </p>
+                <p>
+                    Si en cualquier punto usted comete un error mecanográfico, el objeto <code>KnockKnockServer</code> lo captura y 
+                    el servidor responde con un mensaje similar a este:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Server: You're supposed to say "Who's there?"!
+                    </pre>
+                </div>
+                <p>
+                    El servidor vuelve a empezar el chiste:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Server: Try again. Knock! Knock!
+                    </pre>
+                </div>
+                <p>
+                    Note que el objeto <code>KnockKnockProtocol</code> es particualr sobre la ortografía y la puntuación pero no 
+                    sobre las mayúsculas.
+                </p>
+                <h2>
+                    <a id="later">Soportando Múltiples Clientes</a>
+                </h2>
+                <p>
+                    Para mantener el ejemplo <code>KnockKnockServer</code> simple, lo diseñamos para que escuchara y manejara una 
+                    única petición de conexión. Sin embargo, pueden venir múltiples peticiones de cliente en el mismo puerto y, 
+                    consecuentemente, al mismo <code>ServerSocket</code>. Las peticiones de conexión de los clientes son encoladas 
+                    en el puerto, de forma que el servidor debe aceptar las conexiones secuencialmente. Sin embargo, el servidor 
+                    puede servirlas simultáneamente a través del uso de hilos &mdash; un hilo por cada conexión de cliente.
+                </p>
+                <p>
+                    El flujo básico de la lógica en un servidor como ese es esta:
+                </p>
+                <div class="codeblock">
+                    <pre>
+while (true) {
+    acepta una conexión;
+    crea un hilo para tratar con el cliente;
+}
+                    </pre>
+                </div>
+                <p>
+                    El hilo lee y escribe en la conexión del cliente según sea necesario.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Intente esto:</strong>&nbsp;
+                    <p>
+                        Modifique <code>KnockKnockServer</code> de forma que pueda servir a múltiples clientes al mismo tiempo. Dos 
+                        clases componen nuestra solución:
+                        <a class="SourceLink" target="_blank" href="examples/KKMultiServer.java" 
+                           onclick="showCode('../../displayCode.html', 'examples/KKMultiServer.java'); return false;">
+                            <code>KKMultiServer</code></a> y
+                        <a class="SourceLink" target="_blank" href="examples/KKMultiServerThread.java"
+                           onclick="showCode('../../displayCode.html', 'examples/KKMultiServerThread.java'); return false;">
+                            <code>KKMultiServerThread</code></a>. <code>KKMultiServer</code> hace bucles para siempre, escuchando las 
+                            peticiones de conexión de los clientes en un <code>ServerSocket</code>. Cuando entra una solicitud, 
+                            <code>KKMultiServer</code> acepta la conexión, crea un nuevo objeto <code>KKMultiServerThread</code> 
+                            para procesarla, le entrega el socket devuelto dede accept, e inicia el hilo. Entonces el servidor 
+                            vuelve a escuchar las peticiones de conexión. El objeto <code>KKMultiServerThread</code> comunica con 
+                            el cliente leyendo y escribiendo en el socket. Ejecute en nuevo servidor Toc Toc 
+                            <code>KKMultiServer</code> y después ejecute varios clientes en sucesión.
+                    </p>
+                    <hr />
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="readingWriting.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../datagrams/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Leyendo de y Escribiendo a un Socket<br />
+            <b>Página siguiente:</b> All About Datagrams
+        </div>
+    </body>
+</html> 

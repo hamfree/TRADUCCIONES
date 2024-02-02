@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Reproducción de Audio (Los Tutoriales de Java&trade; &gt; Sonido)
+        </title>
+        <meta name="description" content="" />
+        <meta name="keywords" content="java programming, learn java, java sample code, " />
+        <link rel="stylesheet" href="../indice.css" type="text/css"/>
+        <script src="../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkAHEAD"><a href="sampled-overview.html">Descripción del Paquete Sampled</a></div>
+                <div class="linkAHEAD"><a href="accessing.html">Accediendo a los Recursos del Sistema de Audio</a></div>
+                <div class="nolinkAHEAD">Reproducción de Audio</div>
+                <div class="linkAHEAD"><a href="capturing.html">Grabando Audio</a></div>
+                <div class="linkAHEAD"><a href="controls.html">Procesando Audio con Controles</a></div>
+                <div class="linkAHEAD"><a href="converters.html">Usando Ficheros y Convertidores de Formato</a></div>
+                <div class="linkAHEAD"><a href="overview-MIDI.html">Descripción del Paquete MIDI</a></div>
+                <div class="linkAHEAD"><a href="accessing-MIDI.html">Accediendo a los Recursos del Sistema MIDI</a></div>
+                <div class="linkAHEAD"><a href="MIDI-messages.html">Transmitiendo y Recibiendo Mensajes MIDI</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-intro.html">Introducción a los Secuenciadores</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-methods.html">Utilizando Métodos del Secuenciador</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-adv.html">Usando Características Avanzadas del Secuenciador</a></div>
+                <div class="linkAHEAD"><a href="MIDI-synth.html">Sintetizando Sonido</a></div>
+                <div class="linkAHEAD"><a href="SPI-intro.html">Introducción a los Interfaces de los Proveedores de Servicio</a></div>
+                <div class="linkAHEAD"><a href="SPI-providing-sampled.html">Proporcionando Servicios de Audio Sampleado</a></div>
+                <div class="linkAHEAD"><a href="SPI-providing-MIDI.html">Proporcionando Servicios MIDI</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Sonido
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="./index.html" target="_top">Sonido</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="accessing.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="capturing.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Reproducción de Audio</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    En ocasiones, La reproducción se denomina <em>presentación</em> o <em>renderización</em>. Estos son términos 
+                    generales que son aplicables a otras clases de medios además del sonido. La característica esencial es que una 
+                    secuencia de datos se envía a alguna parte para la percepción eventual por un usuario. Si los datos están 
+                    basados en el tiempo, como el sonido lo es, deben ser enviados en la velocidad correcta. Con el sonido incluso 
+                    más que con el vídeo, es importante que la velocidad del flujo de datos se mantenga, porque las interrupciones 
+                    en la reproducción de sonido a menudo produce clics fuertes o distorsiones irritantes. La IPA de Sonido de Java 
+                    está diseñada para ayudar a los programas de aplicación a reproducir sonidos de manera fluída y continua, 
+                    incluso sonidos muy largos.
+                </p>
+                <p>
+                    Anteriormente vio cómo obtener una línea del sistema de audio o de un mezclador. Aquí aprenderá a reproducir 
+                    sonido a través de una línea.
+                </p>
+                <p>
+                    Como sabe, hay dos clases de línea que puede usar para reproducir sonido: un 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/Clip.html"><code>Clip</code></a> y una 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/SourceDataLine.html">
+                        <code>SourceDataLine</code></a>. La diferencia primaria entre las dos es que con <code>Clip</code> 
+                        especifica todos los datos de sonido de una vez, antes de la reproducción, mientras que con un 
+                        <code>SourceDataLine</code> sigue escribiendo nuevos búferes de datos continuamente durante la 
+                        reproducción. Aunque hay muchas situaciones en las cuales podría usar un <code>Clip</code> o un 
+                        <code>SourceDataLine</code>, el criterio siguietne ayuda a identificar qué clase de línea se ajusta mejor 
+                        para una situación particular:
+                </p>
+                <ul>
+                    <li>
+                        Use un <code>Clip</code> cuando tiene datos de sonido no en tiempo real que pueden ser precargados en 
+                        memoria.
+                        <p>
+                            Por ejemplo, podría leer un archivo corto de sonido en un clip. Si quiere que el sonido se reproduzca 
+                            más de una vez, un <code>Clip</code> es más conveniente que una <code>SourceDataLine</code>, 
+                            especialmente si quiere la reproducción en bucle (recorrer repetidamente todo o parte del sonido). Si 
+                            necesita iniciar la reproducción en una posición arbitraria en el sonido, la interfaz <code>Clip</code> 
+                            proporciona un método para hacer eso fçacilmente. Finalmente, reproducir desde un <code>Clip</code> 
+                            generalmente tiene menos latencia que la reproducción con búfer desde una <code>SourceDataLine</code>. 
+                            En otras palabras, porque se precarga el sonido dentro de un clip, la reproducción puede iniciarse 
+                            inmediatamente en vez de tener que esperar a que el búfer se llene.
+                        </p>
+                    </li>
+                    <li>
+                        Use una <code>SourceDataLine</code> para transmitir datos, tals como un archivo de sonido largo que no 
+                        entre en memoria de una vez, o un sonido cuyos datos no se pueden conocer antes de la reproducción.
+                        <p>
+                            Como un ejemplo de este último caso, suponga que está monitorizando la entrada de usaurio &mdash; es 
+                            decir, reproducir el sonido a medida que se captura. Si no tiene un mezclador que pueda enviar audio de 
+                            entrada de vuelta a un puerto de salida, su programa de aplicación tendrá que tomar los datos 
+                            capturados y enviarlos a un mezclador de salida de audio. En este caso, una <code>SourceDataLine</code> 
+                            es más apropiada que un <code>Clip</code>. Otro ejemplo de sonido que no puede ser conocido antes 
+                            ocurre cuando sintetiza o manipula los datos de sonido interactivamente en respuesta a la entrada del 
+                            usuario. Por ejemplo, imagine un juego que proporcione retroalimentación auditiva mediante la 
+                            &quot;transformación&quot; de un sonido a otro a medida que el usuario mueve el ratón. La naturaleza 
+                            dinámica de la transformación de sonido requiere que el programa de aplicación actualize los datos de 
+                            sonido continuamente durante la reproducción, en lugar de suministrarlo todo antes de que comienze la 
+                            reproducción.
+                        </p>
+                    </li>
+                </ul>
+                <p></p>
+                <h2>
+                    Usar un Clip
+                </h2>
+                <p>
+                    Obtiene un <code>Clip</code> como se describió anteriormente bajo 
+                    <a class="TutorialLink" target="_top" href="accessing.html#113154">Obtener una Linea de un Tipo Deseado</a>; 
+                    Construye un objeto <code>DataLine.Info</code> con <code>Clip.class</code> para el primer argumento, y pasa este 
+                    <code>DataLine.Info</code> como un argumento al método <code>getLine</code> de <code>AudioSystem</code> o 
+                    <code>Mixer</code>.
+                </p>
+                <p>
+                    Obtener una línea simplemente significa que ha obtenido una forma de referise a ella; <code>getLine</code> 
+                    no reserva en realidad la línea para usted. Ya que un mezclador podría tener un número limitado de líneas del 
+                    tipo deseado disponibles, puede ocurrir que después de que invoque <code>getLine</code> para obtener el clip, 
+                    otro programa de aplicación intervenga y captura el clip antes de que esté listo para la reproducción. Para 
+                    utilizar realmente el clip, debe reservarlo para el uso exclusivo de su programa invocando uno de los siguientes 
+                    métodos de <code>Clip</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+void open(AudioInputStream stream)
+void open(AudioFormat format, byte[] data, int offset, int bufferSize)
+                    </pre>
+                </div>
+                <p>
+                    A pesar del argumento <code>bufferSize</code> en el segundo método <code>open</code> anterior, <code>Clip</code>
+                    (a diferencia de <code>SourceDataLine</code>) no incluye métodos para escribir nuevos datos al búfer. El 
+                    argumento <code>bufferSize</code> aquí simplemente especifica cuánto cargar de la matriz de bytes en el clip. 
+                    No es un búfer en el cual usted puede después cargar más datos, como puede con un búfer de 
+                    <code>SourceDataLine&#39;s</code>.
+                </p>
+                <p>
+                    Después de abrir el clip, puede especificar en qué punto en los datos debe empezar la reproducción, usando los 
+                    métodos <code>setFramePosition</code> o <code>setMicroSecondPosition</code> de <code>Clip</code>. De otra forma, 
+                    empezará en el principio. Puede también configurar la reproducción paa que se repita repetidamente, usando el 
+                    método <code>setLoopPoints</code>.
+                </p>
+                <p>
+                    Cuando está listo para empezar la reproducción, invoque simplemente el método <code>start</code>. Para parar o 
+                    pausar el clip, invoque el método <code>stop</code>, y para reanudar la reproducción, invoque 
+                    <code>start</code> de nuevo. El clip recuerda la posición del medio donde se paró la reproducción, por lo que no 
+                    es necesario utilizar métodos explícitos de pausa y reanudación. Si no quiere reanudarlo donde lo dejó, puede 
+                    &quot;rebobinar&quot; el clip al principio (o a cualquier otra posición, para el caso) usando los métodos 
+                    de posicionamiento de cuadro o microsegundo mencionados arriba.
+                </p>
+                <p>
+                    A <code>Clip&#39;s</code> volume level and activity status (active versus inactive) can be monitored by invoking 
+                    the <code>DataLine</code> methods <code>getLevel</code> and <code>isActive</code>, respectively. An active 
+                    <code>Clip</code> is one that is currently playing sound.
+                </p>
+                <p></p>
+                <h2>
+                    Usar una SourceDataLine
+                </h2>
+                <p>
+                    Obtener una <code>SourceDataLine</code> es similar para obtener un <code>Clip</code>. Abrir la 
+                    <code>SourceDataLine</code> es también similar a abrir un <code>Clip</code>, en eso el propósito es una vez de 
+                    nuevo reservar la línea. Sin embargo, usa un método diferente, heredado de <code>DataLine</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+void open(AudioFormat format)
+                    </pre>
+                </div>
+                <p>
+                    Tenga en cuenta que cuando abre una <code>SourceDataLine</code>, no asocia ningún dato de sonido con la línea 
+                    aún, a menos que abra un <code>Clip</code>. En su lugar, solo especifica el formato de los datos de audio que 
+                    desea reproducir. El sistema elige una longitud prdeterminada del búfer.
+                </p>
+                <p>
+                    Pued también estipular una cierta longitud en bytes del búfer, usando esta variante:
+                </p>
+                <p></p>
+                <div class="codeblock">
+                    <pre>
+void open(AudioFormat format, int bufferSize)
+                    </pre>
+                </div>
+                <p>
+                    Por consistencia con métodos similares, el argumento <code>bufferSize</code> se expresa en bytes, pero debe 
+                    corresponder a un número integral de cuadros/tramas.
+                </p>
+                <p>
+                    En vez de usar el método opean descrito arriba, es también posible abrir una <code>SourceDataLine</code> usando 
+                    el método <code>open()</code> de <code>Line</code>, sin argumentos. En este caso, la línea se abre con el 
+                    formato de audio y tamaño de búfer predeterminado. Sin embargo, no puede cambiar esto más tarde. Si quiere 
+                    saber el formato de audio y el tamaño de búfer predeterminado de la línea, puede invocar los métodos 
+                    <code>getFormat</code> y <code>getBufferSize</code> de <code>DataLine</code>, incluso antes de que se haya 
+                    abierto la línea.
+                </p>
+                <p>
+                    Una vez la <code>SourceDataLine</code> está abierta, puede empezar a reproducir el sonido. Puede hacer esto 
+                    invocando el método start de <code>DataLine</code>, y después escribir datos repetidamente al búfer de 
+                    reproducción de la línea.
+                </p>
+                <p>
+                    El método start permite que la línea empieze a reproducir sonido tan pronto como hay cualquier dato en su búfer. 
+                    Usted coloca datos en el búfer con el método siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+int write(byte[] b, int offset, int length)
+                    </pre>
+                </div>
+                <p>
+                    El desplazamiento en la matriz se expresa en bytes, al igual que la longitud de la matriz.
+                </p>
+                <p>
+                    La línea empieza a enviar datos tan pronto como sea posible a su mezclador. Cuando el propio mezclador envía 
+                    los datos a su deestino, la <code>SourceDataLine</code> genera un evento <code>START</code>. (En una 
+                    implementación típica de la IPA de Sonido de Java, el retardo entre el momento en el que la línea de origen 
+                    envía los datos al mezclador y el momento en el que el mezclador envía los datos a su destino es despreciable, 
+                    es decir, mucho meos que el tiempo de un muestreo). Este evento <code>START</code> se obtiene enviandolo a los 
+                    listeners de la línea, como se explica abajo en 
+                    <a href="#113711">Monitorizando el Estado de una Linea</a>. La línea se considera ahora activa, así que el 
+                    método <code>isActive</code> de <code>DataLine</code> devolverá <code>true</code>. Tenga en cuenta que todo esto 
+                    ocurre solo una vez el búfer contiene datos en reproducir, no necesariamente justo en el momento en el que se 
+                    invoca el método start. Si invoca <code>start</code> en una nueva <code>SourceDataLine</code> pero nunca 
+                    escribió datos al búfer, la línea nunca se activaría y el evento <code>START</code> nunca sería enviado. (Sin 
+                    embargo, en este caso, el método <code>isRunning</code> de <code>DataLine</code> devolvería <code>true</code>).
+                </p>
+                <p>
+                    Entonces, ¿cómo sabe cuántos datos escribir en el búfer y cuándo enviar el segundo lote de datos? 
+                    Afortunadamente, ¡no necesita cronometrar la segunda invocación de escritura para sincronizar con el final del 
+                    primer búfer! En su lugar, puede aprovechar el comportamiento de bloqueo del método <code>write</code>:
+                </p>
+                <ul>
+                    <li>
+                        El método vuelve tan pronto como los datos han sido escritos al búer. No espera hasta que todos los datos 
+                        en el búfer ha terminado de reproducir. (Si lo hiciera, no tendría tiempo de escribir el siguiente búfer 
+                        sin crear una discontinuidad en el audio).
+                    </li>
+                    <li>
+                        Está bien intentar escribir más datos de los que puede contener el búfer. En este caso, el método bloquea 
+                        (no vuelve) hasta que todos los datos que solicitó se hayan colocado realmente en el búfer. En otras 
+                        palabras, el valor de un búfer de sus datos a la vez se escribirá en el búfer y se reproducirá, hasta que 
+                        todos los datos restantes quepan en el búfer, momento en el que el método regresa. Ya sea que el método se 
+                        bloquee o no, regresa tan pronto como se pueda escribir el valor del último búfer de datos de esta 
+                        invocación. Una vez más, esto significa que es muy probable que su código recupere el control antes de que 
+                        finalice la reproducción de los datos del último búfer.
+                    </li>
+                    <li>
+                        Mientras en muchos contextos es adecuado escribir más datos de los que el búfer mantendrá, si quiere 
+                        asegurarse de que la siguiente escritura emitida no se bloquee, puede limitar el número de bytes que 
+                        escribe al número que el método <code>available</code> de <code>DataLine</code> retorna.
+                    </li>
+                </ul>
+                <p>
+                    A continuación, se muestra un ejemplo de iteración a través de fragmentos de datos que se leen desde una 
+                    secuencia, escribiendo un fragmento a la vez en <code>SourceDataLine</code> para su reproducción:
+                </p>
+                <div class="codeblock">
+                    <pre>
+// lee fragmentos de un flujo y los escribe en una línea de fuente de datos
+line.start();
+while (total &lt; totalToRead &amp;&amp; !stopped)}
+    numBytesRead = stream.read(myData, 0, numBytesToRead);
+    if (numBytesRead == -1) break;
+    total += numBytesRead; 
+    line.write(myData, 0, numBytesRead);
+
+}
+                    </pre>
+                </div>
+                <p>
+                    Si no quiere que el método <code>write</code> se bloquee, puede primero invocar el método <code>available</code>
+                    (dentro del bucle) para encontrar cuántos bytes se pueden escribir sin bloquear, y después limitar la variable 
+                    <code>numBytesToRead</code> a este número, antes de leerlos del flujo. Sin embargo, en el ejemplo dado, el 
+                    bloqueo no importará mucho, ya que el método de escritura se invoca dentro de un bucle que no se completará 
+                    hasta que se escriba el último búfer en la iteración final del bucle. Ya sea que use la técnica de bloqueo o 
+                    no, probablemente querrá invocar este bucle de reproducción en un subproceso separado del resto del programa de 
+                    aplicación, para que su programa no parezca congelarse al reproducir un sonido largo. En cada iteración del 
+                    bucle, puede comproba si el usuario ha solicitado que se pare la reproducción. Dicha solicitud debe establecer 
+                    el booleano <code>stopped</code>, utilizado en el código anterior, en <code>true</code>.
+                </p>
+                <p>
+                    Ya que <code>write</code> vuelve antes de que todos los datos hayan terminado de reproducirse, ¿Cómo se sabe 
+                    cuándo se ha completado realmente la reproducción? Una forma es invocar al método <code>drain</code> de 
+                    <code>DataLine</code> después de escribir los datos del último búfer. Este método bloquea hasata que todos los 
+                    datos han sido reproducidos. Cuando el control vuelve a su programa, puede liberar la línea, si se desea, sin 
+                    miedo a cortar prematuramente la reproducción de cualquier muestreo de audio:
+                </p>
+                <div class="codeblock">
+                    <pre>
+line.write(b, offset, numBytesToWrite); 
+//esta es la invocación final de write
+line.drain();
+line.stop();
+line.close();
+line = null;
+                    </pre>
+                </div>
+                <p>
+                    Puede intencionalmente parar la reproducción prematuramente, por supuesto. Por ejemplo, el programa de 
+                    aplicación podría proporcionar al usuario un botón de Parar. Invoque el método <code>stop</code> de 
+                    <code>DataLine</code> para parar la reproducción inmediatamente, incluso en la mitad de un búfer. Esto deja 
+                    cualquier dato sin reproducir en el búfer, de forma que si posteriormente invoca <code>start</code>, la 
+                    reproducción se reanuda donde se dejó. Si es no es que lo quiere que pase, puede descartar los datos que quedan 
+                    en el búfer invocando <code>flush</code>.
+                </p>
+                <p>
+                    Una <code>SourceDataLine</code> genera un evento <code>STOP</code> siempreq que el flujo de datos haya sido 
+                    parado, ya sea que esta parada fuese iniciada con el método drain, el método stop, o el método flush, o porque 
+                    el final de un búfer de reproducción se alcanzó antes de que el programa de aplicación invocase 
+                    <code>write</code> de nuevo para proporcionar nuevos datos. Un evento <code>STOP</code> no significa 
+                    necesariamente que el método <code>stop</code> fuese invocado, y no significa necesariamente que una invocación 
+                    posterior de <code>isRunning</code> devolverá <code>false</code>. Sin embargo, significa que 
+                    <code>isActive</code> devolverá <code>false</code>. (Cuando el método <code>start</code> ha sido invocado, el 
+                    método <code>isRunning</code> devolverá <code>true</code>, incluso si se genera un evento <code>STOP</code>, y 
+                    emepezará a devolver <code>false</code> solo una vez se invoque el método <code>stop</code>). Es importante 
+                    darse cuenta de que los eventos <code>START</code> y <code>STOP</code> corresponde a <code>isActive</code>, no 
+                    a <code>isRunning</code>.
+                </p>
+                <p></p>
+                <h2>
+                    Monitorizar el Estado de una Línea
+                </h2>
+                <p>
+                    Una vez ha iniciado la reproducción de un sonido, ¿cómo sabe cuando ha finalizado? Vimos una solución antes, 
+                    invocando el método <code>drain</code> después de escribir el último búfer de datos, pero ese enfoque es 
+                    aplicable solo a <code>SourceDataLine</code>. Otro enfoque, que funciona para <code>SourceDataLines</code> y 
+                    <code>Clips</code>, es registrarse para recibir notificaciones de la línea cada vez que la línea cambia de 
+                    estado. Estas notificaciones se generan en la forma de objetos <code>LineEvent</code>, de los cuales hay cuatro 
+                    tipos: <code>OPEN</code>, <code>CLOSE</code>, <code>START</code>, y <code>STOP</code>.
+                </p>
+                <p>
+                    Cualquier objeto en su programa que implemente la interfaz <code>LineListener</code> puede registrarse para 
+                    recibir tales notificaciones. Para implementar la interfaz <code>LineListener</code>, el objeto simplemente 
+                    necesita un método update que tome un argumento <code>LineEvent</code>. Para registrar este objeto como uno de 
+                    los listeners de la línea, invoque el siguiente método de <code>Line</code>:
+                </p>
+                <p></p>
+                <div class="codeblock">
+                    <pre>
+public void addLineListener(LineListener listener)
+                    </pre>
+                </div>
+                <p>
+                    Cada vez que la línea abre, cierra, se inica, o para, envía un mensaje <code>update</code> a todos sus 
+                    listeners. Su objeto puede consultar el <code>LineEvent</code> que recibe. Primero podría invocar 
+                    <code>LineEvent.getLine</code> para asegurarse que la líinea que paró es la que le importa. En el caso que 
+                    estamos describiendo aquí, quiere saber si se ha terminado el sonido, asi que mira si el <code>LineEvent</code> 
+                    es del tipo <code>STOP</code>. Si lo es, podría comprobar la posición actual del sonido, que también se 
+                    almacena en el objeto <code>LineEvent</code>, y compararla a la longitud del sonido (si se sabe) para ver si 
+                    se alcanzó el final y no se paró por otros motivos (tales como la pulsación del botón Parar por el usuario, 
+                    aunque probablemente sería capaz de determinar esa causa en alguna otra parte de su código).
+                </p>
+                <p>
+                    En la misma línea, si necesita saber cuándo se abre, se cierra o se inicia la línea, se utiliza el mismo 
+                    mecanismo. Los <code>LineEvents</code> son generados por diferentes clases de líneas, no simplemente 
+                    <code>Clips</code> y <code>SourceDataLines</code>. Sin embargo, en el caso de un <code>Port</code> no puede 
+                    contar con obtener un evento para conocer el estado de una línea abierta o cerrada. Por ejemplo, un 
+                    <code>Port</code> podría ser inicializado abierto cuando se crea, así que no invoca el método <code>open</code> 
+                    y el <code>Port</code> nunca genera un evento <code>OPEN</code>. (Vea la descripción previa de 
+                    <a class="TutorialLink" target="_top" href="accessing.html#113216">Seleccionar Puertos de Entrada y Salida</a>).
+                </p>
+                <p></p>
+                <h2>
+                    Sincronizar la Reproducción en Múltiples Líneas
+                </h2>
+                <p>
+                    Si está reproduciendo varias pistas de audio simultáneamente, probablemente quiera que todas ellas empiecen y 
+                    acaben exactamente a la vez. Algunos mezcladores facilitan este comportamiento con su método 
+                    <code>synchronize</code>, que le permite aplicar operacones tales como <code>open</code>, <code>close</code>, 
+                    <code>start</code>, y <code>stop</code> a un grupo de líneas de datos usndo un comando único, en vez de tener 
+                    que controlar cada línea individualmente. Además, el grado de precisión con que se aplican las operaciones a las 
+                    líneas es controlable.
+                </p>
+                <p>
+                    Para encontrar si un mezclador particular ofrece esta característica para un grupo específico de líneas de 
+                    datos, invoque el método <code>isSynchronizationSupported</code> de la interfaz <code>Mixer</code>:
+                </p>
+                <p></p>
+                <div class="codeblock">
+                    <pre>
+boolean isSynchronizationSupported(Line[] lines, boolean  maintainSync)
+                    </pre>
+                </div>
+                <p>
+                    El primer parámetro especifica un grupo de líneas de datos específicos, y el segundo parámetro indica la 
+                    precisión con la cual la sincronización debe ser mantenida. Si el segundo parámetro es <code>true</code>, la 
+                    consulta está preguntando si el mezclador es capaz de mantener la precisión de la muestra al controlar 
+                    las líneas especificadas <em>en todo momento</em>; de lo contrario, se requiere una sincronización precisa solo 
+                    durante las operaciones de inicio y parada, no durante la reproducción.
+                </p>
+                <p></p>
+                <h2>
+                    Procesar el Audio de Salida
+                </h2>
+                <p>
+                    Algunos líneas de fuentes de datos tienen controles de proceso de señales, tales como ganancia, balance, 
+                    reverberación y controles de frecuencia de muestreo.  Controles similares, especialmente controles de ganancia, 
+                    podrían estar presentes en los puertos de salida también. Para más información sobre como determinar si una 
+                    línea tiene tales controles, y cómo usarlos si lo hace, vea 
+                    <a class="TutorialLink" target="_top" href="controls.html">Procesando Audio con Controles</a>.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="accessing.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="capturing.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Accediendo a los Recursos del Sistema de Audio<br />
+            <b>Página siguiente:</b> Grabando Audio
+        </div>
+    </body>
+</html> 

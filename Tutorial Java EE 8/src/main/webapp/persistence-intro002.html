@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Entidades</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="persistence-intro001.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="persistence-intro003.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BNBQA">
+      <h2 id="entities">Entidades</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Una entidad es un objeto de dominio de persistencia ligero. Normalmente, una entidad representa 
+            una tabla en una base de datos relacional y cada instancia de entidad corresponde a una fila en 
+            esa tabla. El artefacto de programación principal de una entidad es la clase de entidad, aunque 
+            las entidades pueden usar clases auxiliares.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            El estado persistente de una entidad se representa mediante campos persistentes o propiedades 
+            persistentes. Estos campos o propiedades usan anotaciones de asignación relacional/objeto para 
+            asignar las entidades y las relaciones de entidad a los datos relacionales en el almacén de datos 
+            subyacente.
+          </p>
+        </div>
+        <div class="sect2" id="BNBQB">
+          <h3 id="requirements-for-entity-classes">Requisitos para Clases de Entidad</h3>
+          <div class="paragraph">
+            <p>Una clase de entidad debe seguir estos requisitos.</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>La clase se debe anotar con la anotación <code>javax.persistence.Entity</code>.</p>
+              </li>
+              <li>
+                <p>
+                  La clase debe tener un constructor público o protegido sin argumentos. La clase puede tener 
+                  otros constructores.
+                </p>
+              </li>
+              <li>
+                <p>
+                  La clase no debe declararse <code>final</code>. Ningún método o variable de instancia 
+                  persistente debe declararse <code>final</code>.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Si una instancia de entidad se pasa por valor como un objeto separado, como a través de la 
+                  interfaz de negocios remota de un bean de sesión, la clase debe implementar la interfaz 
+                  <code>Serializable</code>.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Las entidades pueden extender tanto las clases de entidad como las de no entidad, y las 
+                  clases de no entidad pueden extender las clases de entidad.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Las variables de instancia persistentes deben declararse private, protected o 
+                  package-private y solo se puede acceder a ellas directamente mediante los métodos de la 
+                  clase de entidad. Los clientes deben acceder al estado de la entidad a través de métodos 
+                  de negocio o de acceso.
+                </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="sect2" id="BNBQC">
+          <h3 id="persistent-fields-and-properties-in-entity-classes">
+            Campos y Propiedades Persistentes en Clases de Entidad
+          </h3>
+          <div class="paragraph">
+            <p>
+              Se puede acceder al estado persistente de una entidad a través de las variables de instancia o 
+              las propiedades de la entidad. Los campos o propiedades deben ser de los siguientes tipos de 
+              lenguaje Java:
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>Tipos primitivos de Java</p>
+              </li>
+              <li>
+                <p><code>java.lang.String</code></p>
+              </li>
+              <li>
+                <p>Otros tipos serializables, que incluyen:</p>
+                <div class="ulist">
+                  <ul>
+                    <li>
+                      <p>Contenedores de tipos primitivos de Java</p>
+                    </li>
+                    <li>
+                      <p><code>java.math.BigInteger</code></p>
+                    </li>
+                    <li>
+                      <p><code>java.math.BigDecimal</code></p>
+                    </li>
+                    <li>
+                      <p><code>java.util.Date</code></p>
+                    </li>
+                    <li>
+                      <p><code>java.util.Calendar</code></p>
+                    </li>
+                    <li>
+                      <p><code>java.sql.Date</code></p>
+                    </li>
+                    <li>
+                      <p><code>java.sql.Time</code></p>
+                    </li>
+                    <li>
+                      <p><code>java.sql.TimeStamp</code></p>
+                    </li>
+                    <li>
+                      <p>Tipos serializables definidos por el usuario</p>
+                    </li>
+                    <li>
+                      <p><code>byte[]</code></p>
+                    </li>
+                    <li>
+                      <p><code>Byte[]</code></p>
+                    </li>
+                    <li>
+                      <p><code>char[]</code></p>
+                    </li>
+                    <li>
+                      <p><code>Character[]</code></p>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <p>Tipos enumerados</p>
+              </li>
+              <li>
+                <p>Otras entidades y/o colecciones de entidades</p>
+              </li>
+              <li>
+                <p>Clases integrables</p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las entidades pueden usar campos persistentes, propiedades persistentes o una combinación de 
+              ambos. Si las anotaciones de asignación se aplican a las variables de instancia de la entidad, 
+              la entidad utiliza campos persistentes. Si las anotaciones de mapeo se aplican a los métodos 
+              getter de la entidad para las propiedades de estilo JavaBeans, la entidad usa propiedades 
+              persistentes.
+            </p>
+          </div>
+          <div class="sect3" id="BNBQD">
+            <h4 id="persistent-fields">Campos Persistentes</h4>
+            <div class="paragraph">
+              <p>
+                Si la clase de entidad usa campos persistentes, el tiempo de ejecución de persistencia accede 
+                directamente a las variables de instancia de clase de entidad. Todos los campos no anotados 
+                como <code>javax.persistence.Transient</code> o no marcados como Java 
+                <code>transient</code> se conservarán en el almacén de datos. Las anotaciones de mapeo 
+                objeto/relacional deben aplicarse a las variables de instancia.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="BNBQE">
+            <h4 id="persistent-properties">Propiedades Persistentes</h4>
+            <div class="paragraph">
+              <p>
+                Si la entidad usa propiedades persistentes, la entidad debe seguir las convenciones de métodos 
+                de los componentes JavaBeans. Las propiedades de estilo JavaBeans utilizan métodos getter y 
+                setter que normalmente reciben el nombre de los nombres de las variables de instancia de la 
+                clase de entidad. Para cada propiedad de propiedad persistente de tipo Type de la entidad, hay 
+                un método getter <code>get`Property y un método setter `set`Property. Si la propiedad es un 
+                  valor booleano, puede usar `is`Property en lugar de `get`Property. Por ejemplo, si una 
+                  entidad `Customer</code> usa propiedades persistentes y tiene una variable de instancia 
+                privada llamada <code>firstName</code>, la clase define un <code>getFirstName</code> y 
+                <code>setFirstName</code> para recuperar y establecer el estado de la variable de instancia 
+                <code>firstName</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>Las firmas de métodos para propiedades persistentes de un solo valor son las siguientes:</p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+Type getProperty()
+void setProperty(Type type)
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                Las anotaciones de mapeo de objeto/relacional para propiedades persistentes deben aplicarse a 
+                los métodos getter. Las anotaciones de asignación no se pueden aplicar a campos o propiedades 
+                anotadas como <code>@Transient</code> o marcadas como <code>transient</code>.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="GIQVN">
+            <h4 id="using-collections-in-entity-fields-and-properties">
+              Uso de Colecciones en Propiedades y Campos de Entidad
+            </h4>
+            <div class="paragraph">
+              <p>
+                Los campos y propiedades persistentes con valor de colección deben usar las interfaces de 
+                colección de Java admitidas, independientemente de si la entidad usa campos o propiedades 
+                persistentes. Se pueden utilizar las siguientes interfaces de recopilación:
+              </p>
+            </div>
+            <div class="ulist">
+              <ul>
+                <li>
+                  <p><code>java.util.Collection</code></p>
+                </li>
+                <li>
+                  <p><code>java.util.Set</code></p>
+                </li>
+                <li>
+                  <p><code>java.util.List</code></p>
+                </li>
+                <li>
+                  <p><code>java.util.Map</code></p>
+                </li>
+              </ul>
+            </div>
+            <div class="paragraph">
+              <p>
+                Si la clase de entidad usa campos persistentes, el tipo de las firmas de método anteriores 
+                debe ser uno de estos tipos de colección. También se pueden utilizar variantes genéricas de 
+                estos tipos de colecciones. Por ejemplo, si tiene una propiedad persistente que contiene un 
+                conjunto de números de teléfono, la entidad <code>Customer</code> tendría los siguientes 
+                métodos:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+Set&lt;PhoneNumber&gt; getPhoneNumbers() { ... }
+void setPhoneNumbers(Set&lt;PhoneNumber&gt;) { ... }
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                Si un campo o una propiedad de una entidad consta de una colección de tipos básicos o clases 
+                integrables, use la anotación <code>javax.persistence.ElementCollection</code> en el campo o 
+                la propiedad.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Los dos atributos de <code>@ElementCollection</code> son <code>targetClass</code> y 
+                <code>fetch</code>. El atributo <code>targetClass</code> especifica el nombre de clase de la 
+                clase básica o incrustable y es opcional si el campo o la propiedad se define utilizando los 
+                genéricos del lenguaje de programación Java. El atributo opcional <code>fetch</code> se usa 
+                para especificar si la colección debe recuperarse de forma perezosa o anticipada, usando las 
+                constantes <code>javax.persistence.FetchType</code> de <code>LAZY</code> o 
+                <code>EAGER</code>, respectivamente. De forma predeterminada, la colección se obtendrá de 
+                forma diferida (perezosa).
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                La siguiente entidad, <code>Person</code>, tiene un campo persistente, <code>nicknames</code>, 
+                que es una colección de clases <code>String</code> que se buscarán con anticipación. El 
+                elemento <code>targetClass</code> no es obligatorio porque utiliza genéricos para definir el 
+                campo:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Entity
+public class Person {
+    ...
+    @ElementCollection(fetch=EAGER)
+    protected Set&lt;String&gt; nickname = new HashSet();
+    ...
+}
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                Las colecciones de elementos de entidad y relaciones pueden representarse mediante colecciones 
+                <code>java.util.Map</code>. Un <code>Map</code> consta de una clave y un valor.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>Al usar elementos o relaciones <code>Map</code>, se aplican las siguientes reglas.</p>
+            </div>
+            <div class="ulist">
+              <ul>
+                <li>
+                  <p>
+                    La clave o valor <code>Map</code> puede ser un tipo de lenguaje de programación Java 
+                    básico, una clase integrable o una entidad.
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Cuando el valor <code>Map</code> es una clase integrable o un tipo básico, use la 
+                    anotación <code>@ElementCollection</code>.
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Cuando el valor <code>Map</code> es una entidad, utilice la anotación 
+                    <code>@OneToMany</code> o <code>@ManyToMany</code>.
+                  </p>
+                </li>
+                <li>
+                  <p>Utilice el tipo <code>Map</code> en un solo lado de una relación bidireccional.</p>
+                </li>
+              </ul>
+            </div>
+            <div class="paragraph">
+              <p>
+                Si el tipo de clave de un <code>Map</code> es un tipo básico del lenguaje de programación 
+                Java, use la anotación <code>javax.persistence.MapKeyColumn</code> para establecer la 
+                asignación de columnas para la clave. De forma predeterminada, el atributo <code>name</code> 
+                de <code>@MapKeyColumn</code> tiene el formato RELATIONSHIP-FIELD/PROPERTY-NAME`_KEY`. Por 
+                ejemplo, si el nombre del campo de la relación de referencia es <code>image</code>, el 
+                atributo <code>name</code> predeterminado es <code>IMAGE_KEY</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Si el tipo de clave de un <code>Map</code> es una entidad, utilice la anotación 
+                <code>javax.persistence.MapKeyJoinColumn</code>. Si se necesitan varias columnas para 
+                establecer la asignación, utilice la anotación 
+                <code>javax.persistence.MapKeyJoinColumns</code> para incluir varias anotaciones 
+                <code>@MapKeyJoinColumn</code>. Si no está presente <code>@MapKeyJoinColumn</code>, el nombre 
+                de la columna de asignación se establece de forma predeterminada en 
+                RELATIONSHIP-FIELD/PROPERTY-NAME`_KEY`. Por ejemplo, si el nombre del campo de la relación es 
+                <code>employee</code>, el atributo <code>name</code> predeterminado es 
+                <code>EMPLOYEE_KEY</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Si los tipos genéricos del lenguaje de programación Java no se utilizan en el campo de 
+                relación o la propiedad, la clase de clave debe establecerse explícitamente mediante la 
+                anotación <code>javax.persistence.MapKeyClass</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Si la clave <code>Map</code> es la clave principal o un campo o propiedad persistente de la 
+                entidad que es el valor de <code>Map</code>, utilice la anotación 
+                <code>javax.persistence.MapKey</code> . Las anotaciones <code>@MapKeyClass</code> y 
+                <code>@MapKey</code> no se pueden usar en el mismo campo o propiedad.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Si el valor de <code>Map</code> es un tipo básico del lenguaje de programación Java o una 
+                clase integrable, se asignará como una tabla de recopilación en la base de datos subyacente. 
+                Si no se utilizan tipos genéricos, el atributo <code>targetClass</code> de la anotación 
+                <code>@ElementCollection</code> debe establecerse en el tipo del valor <code>Map</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Si el valor de <code>Map</code> es una entidad y forma parte de una relación unidireccional de 
+                muchos a muchos o de uno a muchos, se asignará como una tabla de combinación en la base de 
+                datos subyacente. Una relación unidireccional de uno a muchos que usa un <code>Map</code> 
+                también se puede mapear usando la anotación <code>@JoinColumn</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Si la entidad es parte de una relación bidireccional de uno a muchos/muchos a uno, se mapeará 
+                en la tabla de la entidad que representa el valor del <code>Map</code>. Si no se utilizan 
+                tipos genéricos, el atributo <code>targetEntity</code> de las anotaciones 
+                <code>@OneToMany</code> y <code>@ManyToMany</code> debe establecerse en el tipo de valor 
+                <code>Map</code>.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="GKAHQ">
+            <h4 id="validating-persistent-fields-and-properties">
+              Validación de Propiedades y Campos Persistentes
+            </h4>
+            <div class="paragraph">
+              <p>
+                La IPA de Java para JavaBeans Validation (Validación de Beans) proporciona un mecanismo para 
+                validar los datos de la aplicación. Validación de Beans está integrada en los contenedores 
+                Java EE, lo que permite utilizar la misma lógica de validación en cualquiera de los niveles de 
+                una aplicación empresarial.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Las restricciones de Validación de Beans se pueden aplicar a clases de entidad persistentes, 
+                clases integrables y superclases mapeadas. De forma predeterminada, el proveedor de 
+                persistencia realizará automáticamente la validación en entidades con campos persistentes o 
+                propiedades anotadas con restricciones de Validación de Beans inmediatamente después de los 
+                eventos <code>PrePersist</code>, <code>PreUpdate</code> y <code>PreRemove</code> del ciclo de 
+                vida.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Las restricciones de Validación de Beans son anotaciones aplicadas a los campos o propiedades 
+                de las clases del lenguaje de programación Java. Validación de Beans proporciona un conjunto 
+                de restricciones, así como una IPA para definir restricciones personalizadas. Las 
+                restricciones personalizadas pueden ser combinaciones específicas de las restricciones 
+                predeterminadas o restricciones nuevas que no utilizan las restricciones predeterminadas. Cada 
+                restricción está asociada con al menos una clase de validador que valida el valor del campo o 
+                la propiedad restringidos. Los desarrolladores de restricciones personalizadas también deben 
+                proporcionar una clase de validación para la restricción.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Las restricciones de Validación de Beans se aplican a los campos persistentes o propiedades de 
+                clases persistentes. Al agregar restricciones de Validación de Beans, use la misma estrategia 
+                de acceso que la clase persistente. Es decir, si la clase persistente usa acceso a campos, 
+                aplique las anotaciones de restricciones de Validación de Beans en los campos de la clase. Si 
+                la clase usa el acceso a la propiedad, aplique las restricciones en los métodos getter.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                La <a href="bean-validation002.html#GKAGK">Tabla 22-1</a> enumera las restricciones integradas 
+                de Validación de Beans, definidas en el paquete <code>javax.validation.constraints</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Todas las restricciones integradas enumeradas en la 
+                <a href="bean-validation002.html#GKAGK">Tabla 22-1</a> tienen una anotación correspondiente, 
+                ConstraintName`.List`, para agrupar varias restricciones del mismo tipo en el mismo campo o 
+                propiedad. Por ejemplo, el siguiente campo persistente tiene dos restricciones 
+                <code>@Pattern</code>:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Pattern.List({
+    @Pattern(regexp="..."),
+    @Pattern(regexp="...")
+})
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                La siguiente clase de entidad, <code>Contact</code>, tiene restricciones de Validación de 
+                Beans aplicadas a sus campos persistentes:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Entity
+public class Contact implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    @NotNull
+    protected String firstName;
+    @NotNull
+    protected String lastName;
+    @Pattern(regexp = "[a-z0-9!#$%&amp;'*+/=?^_`{|}~-]+(?:\\."
+            + "[a-z0-9!#$%&amp;'*+/=?^_`{|}~-]+)*@"
+            + "(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9]"
+            + "(?:[a-z0-9-]*[a-z0-9])?",
+            message = "{invalid.email}")
+    protected String email;
+    @Pattern(regexp = "^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$",
+            message = "{invalid.phonenumber}")
+    protected String mobilePhone;
+    @Pattern(regexp = "^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$",
+            message = "{invalid.phonenumber}")
+    protected String homePhone;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    @Past
+    protected Date birthday;
+    ...
+}
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                La anotación <code>@NotNull</code> en los campos <code>firstName</code> y 
+                <code>lastName</code> especifica que esos campos ahora son obligatorios. Si se crea una nueva 
+                instancia de <code>Contact</code> donde <code>firstName</code> o <code>lastName</code> no se 
+                han inicializado, Validación de Beans arrojará un error de validación. De manera similar, si 
+                una instancia de <code>Contact</code> creada anteriormente se ha modificado para que 
+                <code>firstName</code> o <code>lastName</code> sean nulos, se generará un error de validación.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                El campo <code>email</code> tiene aplicada una restricción <code>@Pattern</code>, con una 
+                expresión regular complicada que coincide con la mayoría de las direcciones de correo 
+                electrónico válidas. Si el valor de <code>email</code> no coincide con esta expresión regular, 
+                se generará un error de validación.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Los campos <code>homePhone</code> y <code>mobilePhone</code> tienen las mismas restricciones 
+                <code>@Pattern</code>. La expresión regular coincide con números de teléfono de 10 dígitos en 
+                los Estados Unidos y Canadá con la forma <code>(`xxx</code>)` xxx`-`xxxx.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                El campo <code>birthday</code> se anota con la restricción <code>@Past</code>, que garantiza 
+                que el valor de <code>birthday</code> debe estar en el pasado.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="BNBQF">
+          <h3 id="primary-keys-in-entities">Claves Primarias en las Entidades</h3>
+          <div class="paragraph">
+            <p>
+              Cada entidad tiene un identificador de objeto único. Una entidad de cliente, por ejemplo, podría 
+              identificarse mediante un número de cliente. El identificador único, o clave principal, permite 
+              a los clientes ubicar una instancia de entidad particular. Cada entidad debe tener una clave 
+              primaria. Una entidad puede tener una clave primaria simple o compuesta.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las claves principales simples utilizan la anotación <code>javax.persistence.Id</code> para 
+              indicar la propiedad o el campo de la clave principal.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las claves primarias compuestas se utilizan cuando una clave principal consta de más de un 
+              atributo, que corresponde a un conjunto de propiedades o campos persistentes individuales. Las 
+              claves primarias compuestas deben definirse en una clase de clave principal. Las claves 
+              primarias compuestas se indican mediante las anotaciones 
+              <code>javax.persistence.EmbeddedId</code> y <code>javax.persistence.IdClass</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La clave principal, o la propiedad o el campo de una clave principal compuesta, debe ser uno de 
+              los siguientes tipos de lenguaje Java:
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>Tipos primitivos de Java</p>
+              </li>
+              <li>
+                <p>Tipos de contenedores primitivos de Java</p>
+              </li>
+              <li>
+                <p><code>java.lang.String</code></p>
+              </li>
+              <li>
+                <p><code>java.util.Date</code> (el tipo temporal debe ser <code>DATE</code>)</p>
+              </li>
+              <li>
+                <p><code>java.sql.Date</code></p>
+              </li>
+              <li>
+                <p><code>java.math.BigDecimal</code></p>
+              </li>
+              <li>
+                <p><code>java.math.BigInteger</code></p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los tipos de punto flotante nunca deben usarse en claves primarias. Si usa una clave primaria 
+              generada, solo los tipos integrales serán portables.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Una clase de clave principal debe cumplir estos requisitos.</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>El modificador de control de acceso de la clase debe ser <code>public</code>.</p>
+              </li>
+              <li>
+                <p>
+                  Las propiedades de la clase de clave principal deben ser <code>public</code> o 
+                  <code>protected</code> si se utiliza el acceso basado en propiedades.
+                </p>
+              </li>
+              <li>
+                <p>La clase debe tener un constructor predeterminado público.</p>
+              </li>
+              <li>
+                <p>
+                  La clase debe implementar los métodos <code>hashCode()</code> y 
+                  <code>equals(Object other)</code>.
+                </p>
+              </li>
+              <li>
+                <p>La clase debe ser serializable.</p>
+              </li>
+              <li>
+                <p>
+                  Una clave principal compuesta debe representarse y asignarse a varios campos o propiedades 
+                  de la clase de entidad o debe representarse y asignarse como una clase integrable.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Si la clase se asigna a varios campos o propiedades de la clase de entidad, los nombres y 
+                  tipos de los campos o propiedades de clave principal en la clase de clave principal deben 
+                  coincidir con los de la clase de entidad.
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              La siguiente clase de clave principal es una clave compuesta, y los campos 
+              <code>customerOrder</code> y <code>itemId</code> juntos identifican de forma única una entidad:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public final class LineItemKey implements Serializable {
+    private Integer customerOrder;
+    private int itemId;
+    public LineItemKey() {}
+    public LineItemKey(Integer order, int itemId) {
+        this.setCustomerOrder(order);
+        this.setItemId(itemId);
+    }
+    @Override
+    public int hashCode() {
+        return ((this.getCustomerOrder() == null
+                ? 0 : this.getCustomerOrder().hashCode())
+                ^ ((int) this.getItemId()));
+    }
+    @Override
+    public boolean equals(Object otherOb) {
+        if (this == otherOb) {
+            return true;
+        }
+        if (!(otherOb instanceof LineItemKey)) {
+            return false;
+        }
+        LineItemKey other = (LineItemKey) otherOb;
+        return ((this.getCustomerOrder() == null
+                ? other.getCustomerOrder() == null : this.getCustomerOrder()
+                .equals(other.getCustomerOrder()))
+                &amp;&amp; (this.getItemId() == other.getItemId()));
+    }
+    @Override
+    public String toString() {
+        return "" + getCustomerOrder() + "-" + getItemId();
+    }
+    /* Getters y setters */
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="BNBQH">
+          <h3 id="multiplicity-in-entity-relationships">
+            Multiplicidad en las Relaciones Entre Entidades
+          </h3>
+          <div class="paragraph">
+            <p>Las multiplicidades son de los siguientes tipos.</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  Uno a uno: cada instancia de entidad está relacionada con una sola instancia de otra 
+                  entidad. Por ejemplo, para modelar un almacén físico en el que cada contenedor de 
+                  almacenamiento contiene un solo widget, <code>StorageBin</code> y <code>Widget</code> 
+                  tendrían una relación de uno a uno. Las relaciones uno a uno usan la anotación 
+                  <code>javax.persistence.OneToOne</code> en la propiedad o campo persistente correspondiente.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Uno a muchos: una instancia de entidad se puede relacionar con varias instancias de las 
+                  otras entidades. Un pedido de ventas, por ejemplo, puede tener varios elementos de línea. 
+                  En la aplicación de pedidos, <code>CustomerOrder</code> tendría una relación de uno a muchos 
+                  con <code>LineItem</code>. Las relaciones de uno a muchos usan la anotación 
+                  <code>javax.persistence.OneToMany</code> en la propiedad o campo persistente 
+                  correspondiente.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Muchos a uno: varias instancias de una entidad se pueden relacionar con una sola instancia 
+                  de la otra entidad. Esta multiplicidad es lo opuesto a una relación de uno a muchos. En el 
+                  ejemplo recién mencionado, la relación con <code>CustomerOrder</code> desde la perspectiva 
+                  de <code>LineItem</code> es de muchos a uno. Las relaciones de muchos a uno usan la 
+                  anotación <code>javax.persistence.ManyToOne</code> en la propiedad o campo persistente 
+                  correspondiente.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Muchos a muchos: las instancias de la entidad se pueden relacionar con múltiples instancias 
+                  entre sí. Por ejemplo, cada curso universitario tiene muchos estudiantes y cada estudiante 
+                  puede tomar varios cursos. Por lo tanto, en una solicitud de inscripción, 
+                  <code>Course</code> y <code>Student</code> tendrían una relación de muchos a muchos. Las 
+                  relaciones de muchos a muchos usan la anotación <code>javax.persistence.ManyToMany</code> en 
+                  la propiedad o campo persistente correspondiente.
+                </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="sect2" id="BNBQI">
+          <h3 id="direction-in-entity-relationships">Dirección en las Relaciones Entre Entidades</h3>
+          <div class="paragraph">
+            <p>
+              La dirección de una relación puede ser bidireccional o unidireccional. Una relación 
+              bidireccional tiene tanto un lado propietario como un lado inverso. Una relación unidireccional 
+              tiene sólo un lado propietario. El lado propietario de una relación determina cómo el tiempo de 
+              ejecución de persistencia actualiza la relación en la base de datos.
+            </p>
+          </div>
+          <div class="sect3" id="BNBQJ">
+            <h4 id="bidirectional-relationships">Relaciones bidireccionales</h4>
+            <div class="paragraph">
+              <p>
+                En una relación bidireccional, cada entidad tiene un campo de relación o propiedad que hace 
+                referencia a la otra entidad. A través del campo o propiedad de relación, el código de una 
+                clase de entidad puede acceder a su objeto relacionado. Si una entidad tiene un campo 
+                relacionado, se dice que la entidad "conoce" su objeto relacionado. Por ejemplo, si 
+                <code>CustomerOrder</code> sabe qué instancias de <code>LineItem</code> tiene y si 
+                <code>LineItem</code> sabe a qué <code>CustomerOrder</code> pertenece, estas tienen una 
+                relación bidireccional.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>Las relaciones bidireccionales deben seguir estas reglas.</p>
+            </div>
+            <div class="ulist">
+              <ul>
+                <li>
+                  <p>
+                    El lado inverso de una relación bidireccional debe hacer referencia a su lado propietario 
+                    mediante el uso del elemento <code>mappedBy</code> de <code>@OneToOne</code>, 
+                    <code>@OneToMany</code> o <code >@ManyToMany</code> anotación. El elemento 
+                    <code>mappedBy</code> designa la propiedad o campo en la entidad que es propietaria de la 
+                    relación.
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    El lado muchos de las relaciones bidireccionales de muchos a uno no debe definir el 
+                    elemento <code>mappedBy</code>. El lado de muchos es siempre el lado propietario de la 
+                    relación.
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Para las relaciones bidireccionales uno a uno, el lado propietario corresponde al lado que 
+                    contiene la clave foránea correspondiente.
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Para relaciones bidireccionales de muchos a muchos, cualquiera de los lados puede ser el 
+                    lado propietario.
+                  </p>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="sect3" id="BNBQK">
+            <h4 id="unidirectional-relationships">Relaciones Unidireccionales</h4>
+            <div class="paragraph">
+              <p>
+                En una relación unidireccional, solo una entidad tiene un campo de relación o una propiedad 
+                que hace referencia a la otra. Por ejemplo, <code>LineItem</code> tendría un campo de relación 
+                que identifica <code>Product</code>, pero <code>Product</code> no tendría un campo de relación 
+                o propiedad para <code>LineItem</code>. En otras palabras, <code>LineItem</code> conoce 
+                <code>Product</code>, pero <code>Product</code> no sabe qué instancias de 
+                <code>LineItem</code> se refieren a él.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="BNBQL">
+            <h4 id="queries-and-relationship-direction">Consultas y Dirección de Relaciones</h4>
+            <div class="paragraph">
+              <p>
+                Las consultas del lenguaje de consulta de persistencia de Java y la API de Criterios a menudo 
+                navegan a través de las relaciones. La dirección de una relación determina si una consulta 
+                puede navegar de una entidad a otra. Por ejemplo, una consulta puede navegar desde 
+                <code>LineItem</code> a <code>Product</code> pero no puede navegar en la dirección opuesta. 
+                Para <code>CustomerOrder</code> y <code>LineItem</code>, una consulta podría navegar en ambas 
+                direcciones porque estas dos entidades tienen una relación bidireccional.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="BNBQM">
+            <h4 id="cascade-operations-and-relationships">Relaciones y Operaciones en Cascada</h4>
+            <div class="paragraph">
+              <p>
+                Las entidades que utilizan relaciones suelen depender de la existencia de la otra entidad en 
+                la relación. Por ejemplo, una línea de pedido es parte de un pedido; si se elimina el pedido, 
+                también se debe eliminar la línea de pedido. Esto se denomina relación de eliminación en 
+                cascada.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                El tipo enumerado <code>javax.persistence.CascadeType</code> define las operaciones en cascada 
+                que se aplican en el elemento <code>cascade</code> de las anotaciones de relación. La 
+                <a href="#GJJNJ">Tabla 40-1</a> enumera las operaciones en cascada para las entidades.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p><a id="sthref159"></a><a id="GJJNJ"></a></p>
+            </div>
+            <div class="paragraph">
+              <p><strong>Tabla 40-1 Operaciones en cascada para entidades</strong></p>
+            </div>
+            <table class="tableblock frame-all grid-all" style="width: 75%;">
+              <colgroup>
+                <col style="width: 20%;">
+                <col style="width: 80%;">
+              </colgroup>
+              <tbody>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><strong>Operación en cascada</strong></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><strong>Descripción</strong></p></td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>ALL</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">
+                      Todas las operaciones en cascada se aplicarán a la entidad relacionada de la entidad 
+                      matriz. <code>All</code> es equivalente a especificar 
+                      <code>cascade={DETACH, MERGE, PERSIST, REFRESH, REMOVE}</code>
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>DETACH</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">
+                      Si la entidad principal se separa del contexto de persistencia, la entidad relacionada 
+                      también se separará.
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>MERGE</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">
+                      Si la entidad principal se fusiona con el contexto de persistencia, la entidad 
+                      relacionada también se fusionará.
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>PERSIST</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">
+                      Si la entidad principal persiste en el contexto de persistencia, la entidad relacionada 
+                      también persistirá.
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>REFRESH</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">
+                      Si la entidad principal se actualiza en el contexto de persistencia actual, la entidad 
+                      relacionada también se actualizará.
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock"><code>REMOVE</code></p></td>
+                  <td class="tableblock halign-left valign-top">
+                    <p class="tableblock">
+                      Si la entidad principal se elimina del contexto de persistencia actual, la entidad 
+                      relacionada también se eliminará.
+                    </p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="paragraph">
+              <p>
+                Las relaciones de eliminación en cascada se especifican mediante la especificación del 
+                elemento <code>cascade=REMOVE</code> para las relaciones <code>@OneToOne</code> y 
+                <code>@OneToMany</code>. Por ejemplo:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@OneToMany(cascade=REMOVE, mappedBy="customer")
+public Set&lt;CustomerOrder&gt; getOrders() { return orders; }
+                  </code>
+                </pre>
+              </div>
+            </div>
+          </div>
+          <div class="sect3" id="GIQXY">
+            <h4 id="orphan-removal-in-relationships">Eliminación de Huérfanos en las Relaciones</h4>
+            <div class="paragraph">
+              <p>
+                Cuando una entidad de destino en una relación de uno a uno o de uno a varios se elimina de la 
+                relación, a menudo es deseable aplicar en cascada la operación de eliminación a la entidad de 
+                destino. Estas entidades de destino se consideran "huérfanas" y el atributo 
+                <code>orphanRemoval</code> se puede usar para especificar que las entidades huérfanas deben 
+                eliminarse. Por ejemplo, si un pedido tiene muchas líneas de pedido y una de ellas se elimina 
+                del pedido, la línea de pedido eliminada se considera huérfana. Si <code>orphanRemoval</code> 
+                se establece en <code>true</code>, la entidad de la línea de pedido se eliminará cuando la 
+                línea de pedido se elimine del pedido.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                El atributo <code>orphanRemoval</code> en <code>@OneToMany</code> y <code>@oneToOne</code> 
+                toma un valor booleano y es falso de manera predeterminada.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                El siguiente ejemplo conectará en cascada la operación de eliminación a la entidad huérfana 
+                <code>order</code> cuando se elimine la entidad <code>customer</code>:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@OneToMany(mappedBy="customer", orphanRemoval="true")
+public List&lt;CustomerOrder&gt; getOrders() { ... }
+                  </code>
+                </pre>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GJIWZ">
+          <h3 id="embeddable-classes-in-entities">Clases Integrables en Entidades</h3>
+          <div class="paragraph">
+            <p>
+              Las clases integrables se usan para representar el estado de una entidad, pero no tienen una 
+              identidad persistente propia, a diferencia de las clases de entidad. Las instancias de una clase 
+              integrable comparten la identidad de la entidad propietaria. Las clases incrustables existen 
+              solo como el estado de otra entidad. Una entidad puede tener atributos de clase integrables de 
+              valor único o valor de colección.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las clases integrables tienen las mismas reglas que las clases de entidad, pero se anotan con la 
+              anotación <code>javax.persistence.Embeddable</code> en lugar de <code>@Entity</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La siguiente clase integrable, <code>ZipCode</code>, tiene los campos <code>zip</code> y 
+              <code>plusFour</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Embeddable
+public class ZipCode {
+    String zip;
+    String plusFour;
+    ...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>Esta clase incrustable es utilizada por la entidad <code>Address</code>:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Entity
+public class Address {
+    @Id
+    protected long id
+    String street1;
+    String street2;
+    String city;
+    String province;
+    @Embedded
+    ZipCode zipCode;
+    String country;
+    ...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las entidades que poseen clases integrables como parte de su estado persistente pueden anotar el 
+              campo o la propiedad con la anotación <code>javax.persistence.Embedded</code> pero no están 
+              obligadas a hacerlo.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las clases integrables pueden usar otras clases integrables para representar su estado. También 
+              pueden contener colecciones de tipos básicos de lenguaje de programación Java u otras clases 
+              integrables. Las clases integrables también pueden contener relaciones con otras entidades o 
+              colecciones de entidades. Si la clase integrable tiene tal relación, la relación es de la 
+              entidad de destino o colección de entidades a la entidad propietaria de la clase integrable.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="persistence-intro001.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="persistence-intro003.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

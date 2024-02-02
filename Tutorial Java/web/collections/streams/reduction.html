@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />        
+        <title>Reducción (Los Tutoriales de Java&trade; &gt; Colecciones &gt; Operaciones de Agregación)</title>
+        <meta name="description" content="Este tutorial de Java sobre colecciones describe los interfaces, implementaciones, y
+              algoritmos en el marco de trabajo de Colecciones de Java" />
+        <meta name="keywords" content="programacion java , aprender java, codigo de ejemplo de java, colecciones de java,
+              set, list, queue, map, array, arraylist" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Operaciones de Agregación</a></div>
+                <div class="nolinkAHEAD">Reducción</div>
+                <div class="linkAHEAD"><a href="parallelism.html">Paralelismo</a></div>
+                <div class="linkQUESTIONS"><a href="QandE/questions.html">Preguntas y Ejercicios</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Colecciones<br />
+                <b>Lección:</b> Operaciones de Agregación
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;
+                <a href="../index.html" target="_top">Colecciones</a>&nbsp;&gt;
+                <a href="index.html" target="_top">Operaciones de Agregación</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="parallelism.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Reducción</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    La sección
+                    <a class="TutorialLink" target="_top" href="../../collections/streams/index.html">Operaciones de Agregación</a>
+                    describe la siguiente tubería de operaciones, la cual calcula la edad media de todos los miembros masculinos en
+                    la colección <code>roster</code>:
+                </p>
+                <pre class="codeblock">
+double average = roster
+    .stream()
+    .filter(p -&gt; p.getGender() == Person.Sex.MALE)
+    .mapToInt(Person::getAge)
+    .average()
+    .getAsDouble();
+                </pre>
+                <p>
+                    El KDJ contiene muchas operaciones terminales (tales como
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/IntStream.html#average--java/lang/reflect/Executable.html">
+                        <code>average</code></a>,
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/IntStream.html#sum--">
+                        <code>sum</code></a>,
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html#min-java.util.Comparator-">
+                        <code>min</code></a>,
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html#max-java.util.Comparator-">
+                        <code>max</code></a>, y
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html#count--">
+                        <code>count</code></a>) que devuelven un valor combinando los contenidos de un flujo. Estas operaciones se 
+                    llaman <em>operaciones de reducción</em>. El KDJ también contiene operaciones de reduccion que devuelve una
+                    colección en vez de un valor único. Muchas operaciones de reducción realizan una tarea específica, tal como
+                    encontrar la media de los valores o agrupar elementos en categorías. Sin embargo, el KDJ le suministra
+                    operaciones de reducción de propósito general
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html#reduce-T-java.util.function.BinaryOperator-">
+                        <code>reduce</code></a> y
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html#collect-java.util.function.Supplier-java.util.function.BiConsumer-java.util.function.BiConsumer-">
+                        <code>collect</code></a>, el cual esta sección describe en detalle.
+                </p>
+                <p>
+                    Esta sección cubre los tópicos siguietes:
+                </p>
+                <ul>
+                    <li>
+                        <a href="#reduce">El Método Stream.reduce</a>
+                    </li>
+                    <li>
+                        <a href="#collect">El Método Stream.collect</a>
+                    </li>
+                </ul>
+                <p>
+                    Puede encontrar los extractos del código descritos en esta sección en el ejemplo
+                    <a class="SourceLink" target="_blank" href="examples/ReductionExamples.java"
+                       onclick="showCode('../../displayCode.html', 'examples/ReductionExamples.java'); return false;">
+                        <code>ReductionExamples</code></a>.
+                </p>
+                <h2>
+                    <a id="reduce">El Método Stream.reduce</a>
+                </h2>
+                <p>
+                    El método
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html#reduce-T-java.util.function.BinaryOperator-">
+                        <code>Stream.reduce</code>
+                    </a> es una operación de reducción de propósito general. Considera la siguiente tubería, la cual calcula la 
+                    suma de las edades de los miembros masculinos en la colección <code>roster</code>. Usa la operación de
+                    reducción
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/IntStream.html#sum--">
+                        <code>Stream.sum</code>
+                    </a>:
+                </p>
+                <pre class="codeblock">
+Integer totalAge = roster
+    .stream()
+    .mapToInt(Person::getAge)
+    .sum();
+                </pre>
+                <p>
+                    Compare esto con la siguiente tubería, la cual usa la operación <code>Stream.reduce</code> para calcular el
+                    mismo valor:
+                </p>
+                <pre class="codeblock">
+Integer totalAgeReduce = roster
+   .stream()
+   .map(Person::getAge)
+   .reduce(
+       0,
+       (a, b) -&gt; a + b);
+                </pre>
+                <p>
+                    La operación <code>reduce</code> en este ejemplo toma dos argumentos:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>identity</code>: El elemento identity es a la vez el valor inicial de la reducción y el resultado
+                            por defecto si no hay elementos en el flujo. En este ejemplo, el elemento identity es <code>0</code>;
+                            esto es el valor inicial de la suma de edades y el valor por defecto si no existen miembros en la
+                            colección <code>roster</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>accumulator</code>: La función accumulator toma dos parámetros: un resultado parcial de la
+                            reducción (en este ejemplo, la suma de todos los enteros procesados hasta ahora) y el elemento siguiente 
+                            del flujo (en este ejemplo, un entero). Devuelve un nuevo resultado parcial. En este ejemplo, la 
+                            función accumulator es una expresión lambda que agrega dos valores <code>Integer</code> y devuelve un
+                            valor <code>Integer</code>:
+                        </p>
+                        <pre class="codeblock">
+(a, b) -&gt; a + b
+                        </pre>
+                    </li>
+                </ul>
+                <p>
+                    La operación <code>reduce</code> siempre devuelve un valor nuevo. Sin embargo, la función accumulator también
+                    devuelve un valor nuevo cada vez que procesa un elemento de un flujo. Suponga que quiere reducir los elementos 
+                    de un flujo a un objeto más complejo, tal como una colección. Esto podría obstaculizar el rendimiento de su 
+                    aplicación. Si su operación <code>reduce</code> implica agregar elementos a una colección, entonces cada vez
+                    que su función accumulator procesa un elemento, crea una nueva colección que incluye el elemento, lo cual es
+                    ineficiente. Sería más eficiente para usted actualizar una colección existente en su lugar. Puede hacer esto
+                    con el método
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html#collect-java.util.function.Supplier-java.util.function.BiConsumer-java.util.function.BiConsumer-">
+                        <code>Stream.collect</code>
+                    </a>, lo cual describe la siguiente sección.
+                </p>
+                <h2>
+                    <a id="collect">El Método Stream.collect</a>
+                </h2>
+                <p>
+                    A diferencia del método <code>reduce</code>, el cual siempre crea un valor nuevo cuando procesa un elemento, el
+                    método
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html#collect-java.util.function.Supplier-java.util.function.BiConsumer-java.util.function.BiConsumer-">
+                        <code>collect</code>
+                    </a> modifica, o muta, un valor existente.
+                </p>
+                <p>
+                    Considere cómo encontrar la media de los valores en un flujo. Usted necesita dos piezas de datos: el número
+                    total de valores y la suma de esos valores. Sin embargo, al igual que el método <code>reduce</code> y los otros
+                    métodos de reducción, el método <code>collect</code> devuelve sólo un valor. Puede crear un tipo de dato nuevo
+                    que contiene variables miembro que siguen la pista del número total de valores y la suma de esos valores, tales
+                    como la siguiente clase, 
+                    <a class="SourceLink" target="_blank" href="examples/Averager.java"
+                       onclick="showCode('../../displayCode.html', 'examples/Averager.java'); return false;">
+                        <code>Averager</code></a>:
+                </p>
+                <pre class="codeblock">
+class Averager implements IntConsumer
+{
+    private int total = 0;
+    private int count = 0;
+        
+    public double average() {
+        return count > 0 ? ((double) total)/count : 0;
+    }
+        
+    public void accept(int i) { total += i; count++; }
+    public void combine(Averager other) {
+        total += other.total;
+        count += other.count;
+    }
+}
+                </pre>
+                <p>
+                    La tubería siguiente usa la clase <code>Averager</code> y el método <code>collect</code> para calcular la
+                    edad media de todos los mienbros másculinos:
+                </p>
+                <pre class="codeblock">
+Averager averageCollect = roster.stream()
+    .filter(p -&gt; p.getGender() == Person.Sex.MALE)
+    .map(Person::getAge)
+    .collect(Averager::new, Averager::accept, Averager::combine);
+                   
+System.out.println("Edad media de los miembros masculinos: " +
+    averageCollect.average());
+                </pre>
+                <p>
+                    La operación <code>collect</code> en este ejemplo toma tres argumentos:
+                </p>
+                <ul>
+                    <li>
+                        <code>supplier</code>: La supplier es una función factoría; construye nuevas instancias. Para la operación
+                        <code>collect</code>, crea instancias del contenedor resultante. En este ejemplo, es una nueva instancia de
+                        la clase <code>Averager</code>.
+                    </li>
+                    <li>
+                        <code>accumulator</code>: La función accumulator incorpora un elemento de flujo en un contenedor resultante.
+                        En este ejemplo, modifica el contenedor resultante de <code>Averager</code> incrementado la variable
+                        <code>count</code> en uno y añadiéndolo a la variable miembro <code>total</code> el valor del elemento
+                        fluno, el cual es un entero representando la edad de un miembro masculino.
+                    </li>
+                    <li>
+                        <code>combiner</code>: La función combiner toma dos contenedores de resultados y mezcla sus contenidos. En
+                        este ejemplo, modifica un contenedor resultado <code>Averager</code> al incrementar la variable
+                        <code>count</code> por la variable miembro <code>count</code> de la otra instancia <code>Averager</code>
+                        y agregar a la variable miembro <code>total</code> el valor de la variable miembro <code>total</code>
+                        de la otra instancia <code>Averager</code>.
+                    </li>
+                </ul>
+                <p>
+                    Tenga en cuenta lo siguiente:
+                </p>
+                <ul>
+                    <li>
+                        El proveedor es una expresión lambda (o una referencia de método) a diferencia de un valor como el elemento
+                        de identidad en la operación <code>reduce</code>.
+                    </li>
+                    <li>
+                        Las funciones accumulator y combiner no devuelven un valor.
+                    </li>
+                    <li>
+                        Puede usar las operaciones <code>collect</code> con los flujos paralelos; vea la sección
+                        <a class="TutorialLink" target="_top" href="../../collections/streams/parallelism.html">Paralelismo</a>
+                        para más información. (Si ejecuta el método <code>collect</code> con un flujo paralelo, entonces el KDJ
+                        crea un nuevo hilo cada vez que la función del combinador crea un nuevo objeto, tal como un objeto
+                        <code>Averager</code> en este ejemplo. Consecuentemente, no tiene que preocuparse sobre la sincronización).
+                    </li>
+                </ul>
+                <p>
+                    Aunque el KDJ le proporciona la operación <code>average</code> para calcular el valor medio de los elementos en
+                    un flujo, pude usar la operación <code>collect</code> y una clase personalizada si necesita calcular varios
+                    valores desde los elementos de un flujo.
+                </p>
+                <p>
+                    La operación <code>collect</code> está mejor ajustada para las colecciones. El ejemplo siguiente coloca los
+                    nombres de los miembros masculinos en una colección con la operación <code>collect</code>:
+                </p>
+                <pre class="codeblock">
+List&lt;String&gt; namesOfMaleMembersCollect = roster
+    .stream()
+    .filter(p -> p.getGender() == Person.Sex.MALE)
+    .map(p -> p.getName())
+    .collect(Collectors.toList());
+                </pre>
+                <p>
+                    Esta versión de la operación <code>collect</code> toma un parámetro de tipo
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collector.html">
+                        <code>Collector</code>
+                    </a>. Esta clase encapsula las funciones usadas como argumentos en la operación <code>collect</code> que
+                    requiere tres argumentos (las funciones supplier, accumulator, y combiner).
+                </p>
+                <p>
+                    La clase
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collectors.html">
+                        <code>Collectors</code>
+                    </a> contiene muchas operaciones de reducción útiles, tales como la acumulación de elementos en colecciones y 
+                    el resumen de elementos según diversos criterios. Estas operaciones de reducción devuelven instancias de la 
+                    clase <code>Collector</code>, para que pueda usarlos como un parámetro para la operación <code>collect</code>.
+                </p>
+                <p>
+                    Este ejemplo usa la operación
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collectors.html#toList--">
+                        <code>Collectors.toList</code>
+                    </a>, la cual acumula los elementos de flujo en una nueva instancia de <code>List</code>. Como con la mayoría
+                    de las operaciones en la clase <code>Collectors</code>, el operador <code>toList</code> devuelve una instancia
+                    de <code>Collector</code>, no una colección.
+                </p>
+                <p>
+                    El ejemplo siguiente agrupa los miembros de la colección <code>roster</code> por género:
+                </p>
+                <pre class="codeblock">
+Map&lt;Person.Sex, List&lt;Person&gt;&gt; byGender =
+    roster
+        .stream()
+        .collect(
+            Collectors.groupingBy(Person::getGender));
+                </pre>
+                <p>
+                    La operación
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collectors.html#groupingBy-java.util.function.Function-">
+                        <code>groupingBy</code>
+                    </a> devuelve un mapa cuyas claves son los valores que resultan de aplicar la expresión lambda especificada 
+                    como su parámetro (la cual es llamada una <em>función de clasificación</em>). En este ejemplo, el mapa devuelto
+                    contiene dos claves, <code>Person.Sex.MALE</code> y <code>Person.Sex.FEMALE</code>. Los valores
+                    correspondientes de las claves son instancias de <code>List</code> que contienen los elementos de flujo que, 
+                    cuando se procesan la función de clasificación, correspondiente a la clave valor. Por ejemplo, el valor que 
+                    corresponde a la clave <code>Person.Sex.MALE</code> es una instancia de <code>List</code> que contiene todos los
+                    miembros masculinos.
+                </p>
+                <p>
+                    El ejemplo siugiente recupera los nombres de cada miembro en la colección <code>roster</code> y los agrupa por
+                    género:
+                </p>
+                <pre class="codeblock">
+Map&lt;Person.Sex, List&lt;String&gt;&gt; namesByGender =
+    roster
+        .stream()
+        .collect(
+            Collectors.groupingBy(
+                Person::getGender,                      
+                Collectors.mapping(
+                    Person::getName,
+                    Collectors.toList())));
+                </pre>
+                <p>
+                    La operación
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collectors.html#groupingBy-java.util.function.Function-java.util.stream.Collector-">
+                        <code>groupingBy</code>
+                    </a> en este ejemplo toma dos parámetros, una función de clasificación y una instancia de 
+                    <code>Collector</code>. El parámetro <code>Collector</code> se llama <em>downstream collector</em>. Este es un
+                    collector que el tiempo de ejecución de Java se aplica a los resultado de otro collector. Consecuentemente, esta
+                    operación <code>groupingBy</code> le habilita a aplicar un método <code>collect</code> a los valores de la
+                    <code>List</code> creada por el operador <code>groupingBy</code>. Este ejemplo aplica el collector
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collectors.html#mapping-java.util.function.Function-java.util.stream.Collector-java.util.stream.Collector-">
+                        <code>mapping</code>
+                    </a>, el cual aplica la función mapping <code>Person::getName</code> a cada elemento del flujo.
+                    Consecuentemente, el flujo resultante consiste sólo en los nombres de los miembros. Una tubería que contiene 
+                    una o más downstream collectors, como este ejemplo, se llama una <em>reducción multinivel</em>.
+                </p>
+                <p>
+                    El ejemplo siguiente recupera la edad total de los miembros de cada género:
+                </p>
+                <pre class="codeblock">Map&lt;Person.Sex, Integer&gt; totalAgeByGender =
+    roster
+        .stream()
+        .collect(
+            Collectors.groupingBy(
+                Person::getGender,                      
+                Collectors.reducing(
+                    0,
+                    Person::getAge,
+                    Integer::sum)));
+                </pre>
+                <p>La operación
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collectors.html#reducing-U-java.util.function.Function-java.util.function.BinaryOperator-">
+                        <code>reducing</code>
+                    </a> toma tres parámetros:
+                </p>
+                <ul>
+                    <li>
+                        <code>identity</code>: Como la operación <code>Stream.reduce</code>, el elemento identity es a la vez el
+                        valor incial de la reducción y el resultado por defecto si no hay elementos en el flujo. En este ejemplo,
+                        el elemento identity es <code>0</code>; este es el valor inicial de la suma de edades y el valor por
+                        defecto si no existen miembros.
+                    </li>
+                    <li>
+                        <code>mapper</code>: La operación <code>reducing</code> se aplica a esta función mapeadora para todos los
+                        elementos de flujo. En este ejemplo, el mapeador recupera la edad de cada miembro.
+                    </li>
+                    <li>
+                        <code>operation</code>: La función operation es usada para reducir los valores mapeados. En este ejemplo, la
+                        función operation agrega valores <code>Integer</code>.
+                    </li>
+                </ul>
+                <p>
+                    El ejemplo siguiente recupera la edad media de miembros de cada género:
+                </p>
+                <pre class="codeblock">
+Map&lt;Person.Sex, Double&gt; averageAgeByGender = roster
+    .stream()
+    .collect(
+        Collectors.groupingBy(
+            Person::getGender,                      
+            Collectors.averagingInt(Person::getAge)));
+                </pre>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="parallelism.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos
+                            <a href="../../information/cpyr.html">avisos legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Operaciones de Agregación<br />
+            <b>Página siguiente:</b> Paralelismo
+        </div>
+    </body>
+</html> 

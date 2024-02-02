@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Cuantificadores (Los Tutoriales de Java&trade; &gt; Clases Esenciales &gt; Expresiones Regulares)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe las excepciones, la entrada/salida básica, concurrencia,
+              expresiones regulares, y el entorno de la plataforma" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java exception, java input output, java
+              threads, java regex, regular expressions, path, classpath, environment variable" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper  clearfix">       
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div> 
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Expresiones Regulares</a></div>
+                <div class="linkAHEAD"><a href="intro.html">Introducción</a></div>
+                <div class="linkAHEAD"><a href="test_harness.html">Clase Para Pruebas</a></div>
+                <div class="linkAHEAD"><a href="literals.html">Literales de Cadena</a></div>
+                <div class="linkAHEAD"><a href="char_classes.html">Clases Carácter</a></div>
+                <div class="linkAHEAD"><a href="pre_char_classes.html">Clases Carácter Predefinidas</a></div>
+                <div class="nolinkAHEAD">Cuantificadores</div>
+                <div class="linkAHEAD"><a href="groups.html">Grupos de Captura</a></div>
+                <div class="linkAHEAD"><a href="bounds.html">Comparadores Límite</a></div>
+                <div class="linkAHEAD"><a href="pattern.html">Métodos de la Clase Pattern</a></div>
+                <div class="linkAHEAD"><a href="matcher.html">Métodos de la Clase Matcher</a></div>
+                <div class="linkAHEAD"><a href="pse.html">Métodos de la Clase PatternSyntaxException</a></div>
+                <div class="linkAHEAD"><a href="unicode.html">Soporte de Unicode</a></div>
+                <div class="linkAHEAD"><a href="resources.html">Recursos Adicionales</a></div>
+                <div class="linkQUESTIONS"><a href="QandE/questions.html">Preguntas y Ejercicios</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Clases Esenciales<br />
+                <b>Lección:</b> Expresiones Regulares
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Clases Esenciales</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Expresiones Regulares</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="pre_char_classes.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="groups.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Cuantificadores</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Los <i>cuantificadores</i> le permiten especificar el número de ocurrencias contra las que corresponder. Por
+                    convenencia, las tres secciones de la especificación del IPA de Pattern que describen los cuantificadores 
+                    codiciosos, reluctantes y posesivos se presentan a continuación. A primera vista puede parecer que los 
+                    cuantificadores <code>X?</code>, <code>X??</code> y <code>X?+</code> hacen exactamenten la misma cosa, ya
+                    que todos ellos prometen corresponder &quot;<code>X</code>, una vez o ninguna&quot;. Hay sutiles diferencias de
+                    implementación las cuales serán explicadas cerca del final de esta sección.
+                </p>
+                <table class="celda">
+                    <caption>
+                        Tabla de los cuantificadores codiciosos, reluctantes, y posesivos
+                    </caption>
+                    <tr>
+                        <th id="h1" class="celda">Codicioso</th>
+                        <th id="h2" class="celda">Reluctante</th>
+                        <th id="h3" class="celda">Posesivo</th>
+                        <th id="h4" class="celda">Significado</th>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda"><code>X?</code></td>
+                        <td headers="h2" class="celda"><code>X??</code></td>
+                        <td headers="h3" class="celda"><code>X?+</code></td>
+                        <td headers="h4" class="celda"><code style="font-style: italic">X</code>, una vez o ninguna</td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda"><code>X*</code></td>
+                        <td headers="h2" class="celda"><code>X*?</code></td>
+                        <td headers="h3" class="celda"><code>X*+</code></td>
+                        <td headers="h4" class="celda"><code style="font-style: italic">X</code>, cero o más veces</td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda"><code>X+</code></td>
+                        <td headers="h2" class="celda"><code>X+?</code></td>
+                        <td headers="h3" class="celda"><code>X++</code></td>
+                        <td headers="h4" class="celda"><code style="font-style: italic">X</code>, una o más veces</td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda"><code>X{n}</code></td>
+                        <td headers="h2" class="celda"><code>X{n}?</code></td>
+                        <td headers="h3" class="celda"><code>X{n}+</code></td>
+                        <td headers="h4" class="celda">
+                            <code style="font-style: italic">X</code>, exactamente <i><code>n</code></i> veces
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda"><code>X{n,}</code></td>
+                        <td headers="h2" class="celda"><code>X{n,}?</code></td>
+                        <td headers="h3" class="celda"><code>X{n,}+</code></td>
+                        <td headers="h4" class="celda">
+                            <code style="font-style: italic">X</code>, al menos <i><code>n</code></i> veces
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda"><code>X{n,m}</code></td>
+                        <td headers="h2" class="celda"><code>X{n,m}?</code></td>
+                        <td headers="h3" class="celda"><code>X{n,m}+</code></td>
+                        <td headers="h4" class="celda">
+                            <code style="font-style: italic">X</code>, al menos <i><code>n</code></i> pero no más que
+                            <i><code>m</code></i> veces
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    Empezamos nuestra mirada a los cuantificadores codiciosos creando tres expresiones regulares diferentes: la
+                    letra &quot;a&quot; seguida por o <code>?</code>, <code>*</code>, o <code>+</code>. Veamos qué pasa cuando estas
+                    expresiones son comprobadas contra una cadena de entrada vacía <code>&quot;&quot;</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Introduzca su expresión regular: a?
+Introduzca la cadena de entrada donde buscar:
+He encontrado el texto "" empezando en el índice 0 y terminando en el índice 0.
+
+Introduzca su expresión regular: a*
+Introduzca la cadena de entrada donde buscar:
+He encontrado el texto "" empezando en el índice 0 y terminando en el índice 0.
+
+Introduzca su expresión regular: a+
+Introduzca la cadena de entrada donde buscar:
+No se encontraron coincidencias.
+                    </pre>
+                </div>
+                <h2>Coincidencias de Longitud-Cero</h2>
+                <p>
+                    En el ejemplo anterior, la correspondencia es satisfactoria en los dos primeros casos porque las expresiones 
+                    <code>a?</code> y <code>a*</code> ambas permiten las cero ocurrencias de la letra <code>a</code>. Notará
+                    también que los índices de inicio y final son ambos cero, lo que es diferente a cualquiera de los ejemplos que
+                    hemos visto. La cadena de entrada vacía <code>&quot;&quot;</code> no tiene longitud, por lo que la prueba
+                    simplemente no coincide con el índice 0. Las coincidencias de esta clase son conocidas como una 
+                    <i>coincidencia de longitud-cero</i>. Una coincidencia de longitud-cero puede ocurrir en varias ocasiones: en
+                    una cadena de entrada vacía, al principio de una cadena de entrada, después del último carácter de una cadena de
+                    entrada, o entre dos caracteres cualquiera de una cadena de entrada. Las coincidencias de longitud-cero son
+                    fácilmente identificables porque siempre empiezan y termina en la misma posición de índice.
+                </p>
+                <p>
+                    Exploremos las coincidencias de longitud-cero con unos pocos ejemplos más. Cambiamos la cadena de entrada a una
+                    única letra &quot;a&quot; y notará algo interesante:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Introduzca su expresión regular: a?
+Introduzca la cadena de entrada donde buscar: a
+He encontrado el texto "a" empezando en el índice 0 y terminando en el índice 1.
+He encontrado el texto "" empezando en el índice 1 y terminando en el índice 1.
+
+Introduzca su expresión regular: a*
+Introduzca la cadena de entrada donde buscar: a
+He encontrado el texto "a" empezando en el índice 0 y terminando en el índice 1.
+He encontrado el texto "" empezando en el índice 1 y terminando en el índice 1.
+
+Introduzca su expresión regular: a+
+Introduzca la cadena de entrada donde buscar: a
+He encontrado el texto "a" empezando en el índice 0 y terminando en el índice 1.
+                    </pre>
+                </div>
+                <p>
+                    Los tres cuantificadores encontraron la letra &quot;a&quot;, pero los dos primeros también encontraron una
+                    coincidencia de longitud-cero en el índice 1; esto es, después del último carácter de la cadena de entrada.
+                    Recuerde, el matcher ve el carácter &quot;a&quot; como si estuviera situando en la celda entre el índice 0 y el
+                    índice 1, y nuestra prueba se repite hasta que no puede encontrar ninguna coincidencia más. Dependiendo del 
+                    cuantificador usado, la presencia de &quot;nada&quot; en el índice después del último carácter puede disparar
+                    o no una coincidencia.
+                </p>
+                <p>
+                    Ahora cambie la cadena de entrada a la letra &quot;a&quot; cinco veces en una fila y obtendrá lo siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Introduzca su expresión regular: a?
+Introduzca la cadena de entrada donde buscar: aaaaa
+He encontrado el texto "a" empezando en el índice 0 y terminando en el índice 1.
+He encontrado el texto "a" empezando en el índice 1 y terminando en el índice 2.
+He encontrado el texto "a" empezando en el índice 2 y terminando en el índice 3.
+He encontrado el texto "a" empezando en el índice 3 y terminando en el índice 4.
+He encontrado el texto "a" empezando en el índice 4 y terminando en el índice 5.
+He encontrado el texto "" empezando en el índice 5 y terminando en el índice 5.
+
+Introduzca su expresión regular: a*
+Introduzca la cadena de entrada donde buscar: aaaaa
+He encontrado el texto "aaaaa" empezando en el índice 0 y terminando en el índice 5.
+He encontrado el texto "" empezando en el índice 5 y terminando en el índice 5.
+
+Introduzca su expresión regular: a+
+Introduzca la cadena de entrada donde buscar: aaaaa
+He encontrado el texto "aaaaa" empezando en el índice 0 y terminando en el índice 5.
+                    </pre>
+                </div>
+                <p>
+                    La expresión <code>a?</code> encuentra una coincidencia individual para cada carácter, ya que coincide cuando
+                    &quot;a&quot; aparece cero o una vez. La expresión <code>a*</code> encuentra dos coincidencias separadas: una
+                    con todas las letras &quot;a&quot;&#39; en la primera coincidencia, y después la coincidencia de longitud-cero
+                    después del último carácter en el indice 5. Y finalmente, <code>a+</code> coincide con todas las ocurrencias de
+                    la letra &quot;a&quot;, ignorando la presencia de &quot;nada&quot; en el último índice.
+                </p>
+                <p>
+                    En este punto, podría estarse preguntando cuales serían los resultados si los dos primeros cuantificadores 
+                    encontraran una letra distinta a &quot;a&quot;. Por ejemplo, ¿qué ocurre si encuentran la letra &quot;b&quot;,
+                    como en &quot;ababaaaab&quot;?
+                </p>
+                <p>
+                    Vamos a averiguarlo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Introduzca su expresión regular: a?
+Introduzca la cadena de entrada donde buscar: ababaaaab
+He encontrado el texto "a" empezando en el índice 0 y terminando en el índice 1.
+He encontrado el texto "" empezando en el índice 1 y terminando en el índice 1.
+He encontrado el texto "a" empezando en el índice 2 y terminando en el índice 3.
+He encontrado el texto "" empezando en el índice 3 y terminando en el índice 3.
+He encontrado el texto "a" empezando en el índice 4 y terminando en el índice 5.
+He encontrado el texto "a" empezando en el índice 5 y terminando en el índice 6.
+He encontrado el texto "a" empezando en el índice 6 y terminando en el índice 7.
+He encontrado el texto "a" empezando en el índice 7 y terminando en el índice 8.
+He encontrado el texto "" empezando en el índice 8 y terminando en el índice 8.
+He encontrado el texto "" empezando en el índice 9 y terminando en el índice 9.
+
+Introduzca su expresión regular: a*
+Introduzca la cadena de entrada donde buscar: ababaaaab
+He encontrado el texto "a" empezando en el índice 0 y terminando en el índice 1.
+He encontrado el texto "" empezando en el índice 1 y terminando en el índice 1.
+He encontrado el texto "a" empezando en el índice 2 y terminando en el índice 3.
+He encontrado el texto "" empezando en el índice 3 y terminando en el índice 3.
+He encontrado el texto "aaaa" empezando en el índice 4 y terminando en el índice 8.
+He encontrado el texto "" empezando en el índice 8 y terminando en el índice 8.
+He encontrado el texto "" empezando en el índice 9 y terminando en el índice 9.
+
+Introduzca su expresión regular: a+
+Introduzca la cadena de entrada donde buscar: ababaaaab
+He encontrado el texto "a" empezando en el índice 0 y terminando en el índice 1.
+He encontrado el texto "a" empezando en el índice 2 y terminando en el índice 3.
+He encontrado el texto "aaaa" empezando en el índice 4 y terminando en el índice 8.
+                    </pre>
+                </div>
+                <p>
+                    Aunque la letra &quot;b&quot; aparece en las celdas 1, 3, y 8, la salida reporta una coincidencia de
+                    longitud-cero en esas ubicaciones. La expresión regular <code>a?</code> no está específicamente buscando la
+                    letra &quot;b&quot;; está meramente buscando la presencia (o la falta de ella) de la letra &quot;a&quot;. Si el
+                    cuantificador permite la coincidencia de &quot;a&quot; cero veces, cualquier cosa en la cadena de entrada que
+                    no sea una &quot;a&quot; se mostrará como una coincidencia de longitud-cero. Las aes restantes son
+                    correspondidas de acuerdo a las reglas descritas en los ejemplos previos.
+                </p>
+                <p>
+                    Para corresponder un patrón exactamente <i>n</i> número de veces, simplemente especifique el número dentro de un
+                    conjunto de llaves:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Introduzca su expresión regular: a{3}
+Introduzca la cadena de entrada donde buscar: aa
+No se encontraron coincidencias.
+
+Introduzca su expresión regular: a{3}
+Introduzca la cadena de entrada donde buscar: aaa
+He encontrado el texto "aaa" empezando en el índice 0 y terminando en el índice 3.
+
+Introduzca su expresión regular: a{3}
+Introduzca la cadena de entrada donde buscar: aaaa
+He encontrado el texto "aaa" empezando en el índice 0 y terminando en el índice 3.
+                    </pre>
+                </div>
+                <p>
+                    Aquí, la expresión regular <code>a{3}</code> está buscando por tres ocurrencias de la letra &quot;a&quot; en una
+                    fila. La primera prueba falla porque la cadena de entrada no tiene bastantes aes para coincidir con el patrón.
+                    La segunda prueba contiene exactamente 3 aes en la cadena de entrada, lo cual dispara una coincidencia. La
+                    tercera prueba también dispara una coincidencia porque hay exactamente 4 aes al principio de la cadena de
+                    entrada. Cualquier cosa que siga es irrelevante para la primera coincidencia. Si el patrón apareciera de nuevo
+                    después de ese punto, dispararía coincidencias posteriores:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Introduzca su expresión regular: a{3}
+Introduzca la cadena de entrada donde buscar: aaaaaaaaa
+He encontrado el texto "aaa" empezando en el índice 0 y terminando en el índice 3.
+He encontrado el texto "aaa" empezando en el índice 3 y terminando en el índice 6.
+He encontrado el texto "aaa" empezando en el índice 6 y terminando en el índice 9.
+                    </pre>
+                </div>
+                <p>
+                    Para pedir que un patrón aparezca al menos <i>n</i> veces, añada una coma después del número:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Introduzca su expresión regular: a{3,}
+Introduzca la cadena de entrada donde buscar: aaaaaaaaa
+He encontrado el texto "aaaaaaaaa" empezando en el índice 0 y terminando en el índice 9.
+                    </pre>
+                </div>
+                <p>
+                    Con la misma cadena de entrada, este test encuentra sólo una coincidencia, porque las 9 aes en una fila
+                    satisfacen la necesidad de &quot;por lo menos&quot; 3 aes.
+
+                </p>
+                <p>
+                    Finalmente, para especificar un límite superior en el número de ocurrencias, añada un segundo número dentro de
+                    las llaves:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Introduzca su expresión regular: a{3,6} // encuentra por lo menos 3 (pero no más de 6) aes en una fila.
+Introduzca la cadena de entrada donde buscar: aaaaaaaaa
+He encontrado el texto "aaaaaa" empezando en el índice 0 y terminando en el índice 6.
+He encontrado el texto "aaa" empezando en el índice 6 y terminando en el índice 9.
+                    </pre>
+                </div>
+                <p>
+                    Aquí la primera coincidencia está forzada a parar en el límite superior de 6 caracteres. La segunda coincidencia 
+                    incluye lo que quede, que sucede que son tres aes &mdash; el número mínimo de caracteres permitidos para esta
+                    correspondencia. Si la cadena de entrada fuera un carácter más corta, no habría una segunda coincidencia ya que
+                    sólo dos aes permanecerían.
+                </p>
+                <h2>Capturar Grupos y Clases de Caracteres con Cuantificadores</h2>
+                <p>
+                    Hasta ahora, sólo probamos cuantificadores en cadenas de entrada conteniendo un carácter. En realidad, los
+                    cuantificadores pueden sólo adjuntar un carácter a la vez, de forma que la expresión regular &quot;abc+&quot;
+                    significaría &quot;a, seguido por b, seguido por c una o más veces&quot;. No significaría &quot;abc&quot; una o
+                    más veces. Sin embargo, los cuantificadores pueden también adjuntar
+                    <a class="TutorialLink" target="_top" href="char_classes.html">Clases de Caracteres</a> y
+                    <a class="TutorialLink" target="_top"
+                       href="groups.html">Grupos de Captura</a>, tales como <code>[abc]+</code> (a o b o c, una o más veces) o
+                    <code>(abc)+</code> (el grupo &quot;abc&quot;, uno o más veces).
+                </p>
+                <p>
+                    Vamos a ilustrarlo especificando el grupo <code>(perro)</code>, tres veces en una fila.
+                </p>
+                <div class="codeblock">
+                    <pre>
+Introduzca su expresión regular: (perro){3}
+Introduzca la cadena de entrada donde buscar: perroperroperroperroperroperro
+He encontrado el texto "perroperroperro" empezando en el índice 0 y terminando en el índice 15.
+He encontrado el texto "perroperroperro" empezando en el índice 15 y terminando en el índice 30.
+
+Introduzca su expresión regular: perro{3}
+Introduzca la cadena de entrada donde buscar: perroperroperroperroperroperro
+No se encontraron coincidencias.
+                    </pre>
+                </div>
+                <p>
+                    Aquí el primer ejemplo encuentra tres coincidencias, ya que el cuantificador se aplica al grupo de captura
+                    entero. Borrar los paréntesis, sin embargo, hace que la coincidencia falle porque el cuantificador <code>{3}</code>
+                    ahora se aplica sólo a la letra &quot;o&quot;.
+                </p>
+                <p>
+                    Del mismo modo, podemos aplicar un cuantificador a toda una clase de caracteres:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Introduzca su expresión regular: [abc]{3}
+Introduzca la cadena de entrada donde buscar: abccabaaaccbbbc
+He encontrado el texto "abc" empezando en el índice 0 y terminando en el índice 3.
+He encontrado el texto "cab" empezando en el índice 3 y terminando en el índice 6.
+He encontrado el texto "aaa" empezando en el índice 6 y terminando en el índice 9.
+He encontrado el texto "ccb" empezando en el índice 9 y terminando en el índice 12.
+He encontrado el texto "bbc" empezando en el índice 12 y terminando en el índice 15.
+
+Introduzca su expresión regular: abc{3}
+Introduzca la cadena de entrada donde buscar: abccabaaaccbbbc
+No se encontraron coincidencias.
+                    </pre>
+                </div>
+                <p>
+                    Aquí el cuantificador <code>{3}</code> se aplica a la clase de caracteres entera en el primer ejemplo, pero sólo
+                    a la letra &quot;c&quot; en el segundo. <a id="difs"></a>
+                </p>
+                <h2>Diferencias Entre los Cuantificadores Codiciosos, Renuentes y Posesivos</h2>
+                <p>
+                    Hay sutiles diferencias entre cuantificadores codiciosos, reluctantes y posesivos.
+                </p>
+                <p>
+                    Los cuantificadores codiciosos son considerados &quot;codiciosos&quot; porque fuerzan al matcher a leer, o
+                    <i>consumir</i>, la cadena de entrada entera antes de intentar la primera coincidencia. Si el primer intento de
+                    coincidencia (la cadena de entrada entera) falla, el matcher retrocede la cadena de caracteres por un carácter
+                    y lo intenta de nuevo, repitiendo el proceso hasta que se encuentre una coincidencia o no haya más caracteres
+                    a la izquierda a los que retroceder. Dependiendo del cuantificador usado en la expresión, la última cosa que
+                    intentará hacer coincidir es 1 o 0 caracteres.
+                </p>
+                <p>
+                    Los cuantificadores reluctantes, sin embargo, toman el enfoque opuesto: Ellos empiezan al principio de la cadena
+                    de entrada, entonces reluctantemente consumen un carácter a la vez buscando una coincidencia. La última cosa
+                    que intentan es la cadena de entrada entera.
+                </p>
+                <p>
+                    Finalmente, los cuantificadores posesivos siempre consumen la cadena de entrada entera, intentándolo una vez (y
+                    sólo una vez) por una coincidencia. A diferencia de los cuantificadores codiciosos, los cuantificadores
+                    posesivos nunca retroceden, incluso si haciéndlo les permitiese hacer que la coincidencia general tuviera éxito.
+
+                </p>
+                <p>
+                    Para ilustrarlo, considera la cadena de entrada <code>xfooxxxxxxfoo</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+Introduzca su expresión regular: .*foo // cuantificador codicioso
+Introduzca la cadena de entrada donde buscar: xfooxxxxxxfoo
+He encontrado el texto "xfooxxxxxxfoo" empezando en el índice 0 y terminando en el índice 13.
+
+Introduzca su expresión regular: .*?foo // cuantificador reluctante
+Introduzca la cadena de entrada donde buscar: xfooxxxxxxfoo
+He encontrado el texto "xfoo" empezando en el índice 0 y terminando en el índice 4.
+He encontrado el texto "xxxxxxfoo" empezando en el índice 4 y terminando en el índice 13.
+
+Introduzca su expresión regular: .*+foo  // cuantificador posesivo
+Introduzca la cadena de entrada donde buscar: xfooxxxxxxfoo
+No se encontraron coincidencias.
+
+                    </pre>
+                </div>
+                <p>
+                    El primer ejemplo usa el cuantificador codicioso <code>.*</code> para buscar &quot;cualquier cosa&quot;, cero o
+                    más veces, seguido por las letras <code>&quot;f&quot; &quot;o&quot; &quot;o&quot;</code>. Debido a que el
+                    cuantificador es codicioso, la porción de <code>.*</code> de la expresión primero consume la cadena de entrada
+                    entera. En este punto, la expresión global no puede tener éxito, porque las tres últimas letras
+                    (<code>&quot;f&quot; &quot;o&quot; &quot;o&quot;</code>) han sido ya consumidas. Así que el matcher lentamente
+                    retrocede una letra cada vez hasta que la ocurrencia más a la derecha de &quot;foo&quot; ha sido regurgitada, en
+                    ese punto la coincidencia tiene éxito y la búsqueda termina.
+                </p>
+                <p>
+                    El segundo ejemplo, sin embargo, es reluctante, así que empieza primero consumiendo &quot;nada&quot;. Ya que
+                    &quot;foo&quot; no aparece al principio de la cadena, es forzado a tragarse la primera letra (una &quot;x&quot;),
+                    la cual dispara la primera coincidencia en 0 y 4. Nuestra prueba continúa el proceso hasta que la cadena de
+                    entrada es agotada. Encuentra otra coincidencia en 4 y 13.
+                </p>
+                <p>
+                    El tercer ejemplo falla en encontrar una coincidencia porque el cuantificador es posesivo. En este caso, la
+                    cadena de entrada entere es consumida por <code>.*+</code>, no dejando nada después para satisfacer el
+                    &quot;foo&quot; al final de la expresión. Use los cuantificadores posesivos para situaciones donde quiera
+                    aprovechar todo sin retroceder; superará al cuantificador codicioso equivalente en los casos en que la 
+                    coincidencia no se encuentre inmediatamente.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="pre_char_classes.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="groups.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">
+                                Su uso de ésta
+                            </a>
+                            página y todo el material en las páginas bajo el anuncio &quot;Los Tutoriales de Java&quot; está sujeto
+                            a estos
+                            <a href="../../information/cpyr.html">
+                                avisos legales
+                            </a>
+                            .
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs
+                            </a>
+                            .
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión
+                            </a>
+                            .
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página Anterior:</b> Clases Carácter Predefinidas<br />
+            <b>Página Siguiente:</b> Grupos de Captura
+        </div>
+    </body>
+</html>

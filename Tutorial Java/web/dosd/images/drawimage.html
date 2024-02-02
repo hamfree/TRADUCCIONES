@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dibujando una Imagen (Los Tutoriales de Java&trade; &gt; Gráficos 2D &gt; Trabajando con Imágenes)</title>
+        <meta name="description" content="Este tutorial de Java 2D describe gráficos 2D, geometría, IPA de texto, imágenes, 
+              impresión, temas 2D avanzados." />
+        <meta name="keywords" content="java programming, learn java, java sample code, java 2d" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Trabajando con Imágenes</a></div>
+                <div class="linkAHEAD"><a href="loadimage.html">Leyendo/Cargando una Imagen</a></div>
+                <div class="nolinkAHEAD">Dibujando una Imagen</div>
+                <div class="linkAHEAD"><a href="drawonimage.html">Creando y Dibujando en una Imagen</a></div>
+                <div class="linkAHEAD"><a href="saveimage.html">Escribiendo/Salvando una Imagen</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Gráficos 2D<br />
+                <b>Lección:</b> Trabajando con Imágenes
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Gráficos 2D</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Trabajando con Imágenes</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="loadimage.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="drawonimage.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Dibujando una Imagen</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Como ya ha aprendido, el método <code>Graphics.drawImage</code> dibuja una imagen en una ubicación específica:
+                </p>
+                <div class="codeblock">
+                    <pre>
+boolean Graphics.drawImage(Image img,
+                   int x, int y,
+                   ImageObserver observer);
+                    </pre>
+                </div>
+                <p>
+                    La ubicación <code>x,y</code> especifica la posición de la parte superior izquierda de la imagen. El parámetro 
+                    <code>observer</code> notifica a la aplicación de las actualizaciones a la imagen que se carga asincrónicamente. 
+                    El parámetro <code>observer</code> no se usa frecuentemente de forma directa y no se necesita para la clase 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/image/BufferedImage.html">
+                        <code>BufferedImage</code></a> por lo que generalmente es nulo.
+                </p>
+                <p>
+                    El método descrito aborda solo el caso en el que se va a dibujar la imagen completa, asignando píxeles de la 
+                    imagen a las coordenadas del espacio del usuario 1: 1. A veces, las aplicaciones requieren dibujar una parte de 
+                    la imagen (una subimagen) o escalar la imagen para cubrir un área particular de la superficie de dibujo, o 
+                    transformar o filtrar la imagen antes de dibujar.
+                </p>
+                <p>
+                    Las sobrecargas del método <code>drawImage()</code> realizan estas operaciones. Por ejemplo, la siguiente 
+                    sobrecarga del método <code>drawImage()</code> le permite dibujar la mayor parte de un área especificada de la 
+                    imagen especificada que esté disponible actualmente, escalando para que quepa dentro del área especificada del 
+                    elemento de diseño de destino superficie:
+                </p>
+                <div class="codeblock">
+                    <pre>
+boolean Graphics.drawImage(Image img,
+       int dstx1, int dsty1, int dstx2, int dsty2,
+       int srcx1, int srcy1, int srcx2, int srcy2,
+       ImageObserver observer);
+                    </pre>
+                </div>
+                <p>
+                    Los parámetros <code>src</code> representan el área de la imagen para copiar y dibujar. Los parámetros 
+                    <code>dst</code> muestran el área del destino que debe cubrir el área de origen. Las coordenadas 
+                    <code>dstx1, dsty1</code> definen la ubicación para dibujar la imagen. Las dimensiones de ancho y alto en el 
+                    área de destino se calculan mediante las siguientes expresiones: <code>(dstx2-dstx1), (dsty2-dsty1)</code>. Si 
+                    las dimensiones de las áreas de origen y destino son diferentes, Java 2D IPA se ampliará o reducirá, según sea 
+                    necesario.
+                </p>
+                <p>
+                    El siguiente ejemplo de código divide una imagen en cuatro cuadrantes y dibuja aleatoriamente cada cuadrante de 
+                    la imagen de origen en un cuadrante diferente del destino.
+                </p>
+                <p style="text-align: center">
+                <applet code="JumbledImageApplet" archive="examples/lib/JumbledImageApplet.jar" width="400" height="250" >
+                    <param name="permissions" value="sandbox" />
+                </applet>
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Nota:</strong> &nbsp; si no ve el applet ejecutándose, debe instalar al menos la versión 7 del 
+                    <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                        kit de desarrollo de Java SE (KDJ)</a>.
+                    <hr />
+                </div>
+                <p>
+                    El código completo para este applet está en 
+                    <a class="SourceLink" target="_blank"
+                       href="examples/JumbledImageApplet.java"
+                       onclick="showCode('../../displayCode.html', 'examples/JumbledImageApplet.java'); return false;">
+                        <code>JumbledImageApplet.java</code></a>.
+                </p>
+                <p>
+                    Este ejemplo usa el siguiente código para pintar la imagen <code>duke_skateboard.jpg</code> desordenada. Repite las 
+                    cuatro subimágenes de la fuente, dibujando cada una a su vez en un cuadrante de destino seleccionado al azar.
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+/* divida la imagen 'bi' en cuatro áreas 
+ * rectangulares y dibuje cada una de estas áreas en una 
+ * parte diferente de la imagen, para mezclar 
+ * la imagen. 'celdas' es una matriz que se ha llenado 
+ * con valores que redirigen 
+ * el dibujo de una subárea a otra subárea.
+ */
+int cellWidth = bi.getWidth(null)/2;
+int cellHeight = bi.getHeight(null)/2;
+for (int x=0; x&lt;2; x++) {
+    int sx = x*cellWidth;
+    for (int y=0; y&lt;2; y++) {
+        int sy = y*cellHeight;
+        int cell = cells[x*2+y];
+        int dx = (cell / 2) * cellWidth;
+        int dy = (cell % 2) * cellHeight;
+        g.drawImage(bi,
+                    dx, dy, 
+                    x+cellWidth, dy+cellHeight,
+                    sx, sy,
+                    sx+cellWidth, sy+cellHeight,
+                    null);
+    }
+}
+                    </pre>
+                </div>
+                <h2>Filtrar Imágenes</h2>
+                <p>
+                    Además de copiar y escalar imágenes, Java 2D IPA también filtra una imagen. <em>Filtrar</em> es dibujar o 
+                    producir una nueva imagen aplicando un algoritmo a los píxeles de la imagen de origen. Los filtros de imagen se 
+                    pueden aplicar mediante el siguiente método:
+                </p>
+                <div class="codeblock">
+                    <pre>
+void Graphics2D.drawImage(BufferedImage img,
+                          BufferedImageOp op,
+                          int x, int y)
+                    </pre>
+                </div>
+                <p>
+                    El parámetro <code>BufferedImageOp</code> implementa el filtro. El siguiente applet representa una imagen 
+                    dibujada sobre el texto. Arrastre el control deslizante para mostrar más o menos texto a través de la imagen y 
+                    hacer que la imagen sea más o menos transparente.
+                </p>
+                <p style="text-align: center">
+                <applet code="SeeThroughImageApplet" archive="examples/lib/SeeThroughImageApplet.jar" width="400" height="250">
+                    <param name="permissions" value="sandbox" />
+                </applet>
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Nota:</strong> &nbsp; si no ve el applet ejecutándose, debe instalar al menos la versión 7 del 
+                    <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                        kit de desarrollo de Java SE (KDJ)</a>.
+                    <hr />
+                </div>
+                <p>
+                    El siguiente código muestra cómo se realiza la acción de filtro al operar en un objeto 
+                    <code>BufferedImage</code> con un canal <em>alpha</em> y cambia la escala de ese canal alfa usando el objeto 
+                    <code>RescaleOp</code>. El canal alfa determina la translucidez de cada píxel. También especifica el grado en 
+                    que se sobrescribe esta imagen.
+                </p>
+                <div class="codeblock">
+                    <pre>
+/* Crea una BufferedImage ARGB */
+BufferedImage img = ImageIO.read(imageSrc);
+int w = img.getWidth(null);
+int h = img.getHeight(null);
+BufferedImage bi = new
+    BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+Graphics g = bi.getGraphics();
+g.drawImage(img, 0, 0, null);
+
+/*
+ * Cree una operación de filtro de reescala que haga que la imagen 
+ * sea 50% opaca.
+ */
+float[] scales = { 1f, 1f, 1f, 0.5f };
+float[] offsets = new float[4];
+RescaleOp rop = new RescaleOp(scales, offsets, null);
+
+/* Dibuja la imagen aplicando el filtro */
+g2d.drawImage(bi, rop, 0, 0);
+                    </pre>
+                </div>
+                <p>
+                    El ejemplo completo representado en 
+                    <a class="SourceLink" target="_blank" href="examples/SeeThroughImageApplet.java"
+                       onclick="showCode('../../displayCode.html', 'examples/SeeThroughImageApplet.java'); return false;">
+                        <code>SeeThroughImageApplet.java</code></a> incluye el código que usa el control deslizante para ajustar la 
+                    transparencia desde el 50% inicial. Este ejemplo también requiere la imagen 
+                    <a href="examples/duke_skateboard.jpg">duke_skateboard.jpg</a>.
+                </p>
+                <p>
+                    El objeto <code>RescaleOp</code> es solo uno de los muchos filtros que se pueden crear. Java 2D IPA tiene varios 
+                    filtros integrados, incluidos los siguientes:
+                </p>
+                <ul>
+                    <li>
+                        <code>ConvolveOp</code>. Cada píxel de salida se calcula a partir de los píxeles circundantes en la 
+                        imagen de origen. Puede usarse para desenfocar o enfocar imágenes.
+                    </li>
+                    <li>
+                        <code>AffineTransformOp</code>. Este filtro asigna píxeles en el origen a una posición diferente en el 
+                        destino aplicando una transformación en la ubicación del píxel.
+                    </li>
+                    <li>
+                        <code>LookupOp</code>. Este filtro utiliza una tabla de búsqueda proporcionada por la aplicación para 
+                        reasignar los colores de los píxeles.
+                    </li>
+                    <li>
+                        <code>RescaleOp</code>. Este filtro multiplica los colores por algún factor. Se puede utilizar para aclarar 
+                        u oscurecer la imagen, aumentar o reducir su opacidad, etc.
+                    </li>
+                </ul>
+                <p>
+                    El siguiente ejemplo utiliza cada uno de los filtros descritos, así como el escalado:
+                </p>
+                <p style="text-align: center">
+                <applet code="ImageDrawingApplet" archive="examples/lib/ImageDrawingApplet.jar" width="400" height="250">
+                    <param name="permissions" value="sandbox" />
+                </applet>
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Nota:</strong> &nbsp; si no ve el applet ejecutándose, debe instalar al menos la versión 7 del 
+                    <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                        kit de desarrollo de Java SE (KDJ)</a>.
+                    <hr />
+                </div>
+                <p>
+                    El código completo para este applet está en 
+                    <a class="SourceLink" target="_blank" href="examples/ImageDrawingApplet.java"
+                       onclick="showCode('../../displayCode.html', 'examples/ImageDrawingApplet.java'); return false;">
+                        <code>ImageDrawingApplet.java</code></a> y este applet requiere la imagen 
+                    <a href="examples/bld.jpg">bld.jpg</a>.
+                </p>
+                <p>
+                    Utilice el menú desplegable para seleccionar una operación de filtrado o escalado de imágenes.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="loadimage.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="drawonimage.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Leyendo/Cargando una Imagen<br />
+            <b>Página siguiente:</b> Creando y Dibujando en una Imagen
+        </div>
+    </body>
+</html> 

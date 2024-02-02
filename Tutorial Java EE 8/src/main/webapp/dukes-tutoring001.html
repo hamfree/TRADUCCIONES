@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Diseño y Arquitectura de la Tutoría de Duke</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="dukes-tutoring.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="dukes-tutoring002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GKAEI">
+      <h2 id="design-and-architecture-of-dukes-tutoring">Diseño y Arquitectura de la Tutoría de Duke</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            La tutoría de Duke es una aplicación web que incorpora varias tecnologías Java EE. Expone una 
+            interfaz principal (para estudiantes, tutores y personal del centro de tutoría) y una interfaz de 
+            administración (para que el personal mantenga el sistema). Los Enterprise Beans proporciona la 
+            lógica de negocio para ambas interfaces. Los enterprise beans utilizan la IPA de Persistencia de 
+            Java para crear y almacenar los datos de la aplicación en la base de datos. La 
+            <a href="#CHDDJDCH">Figura 61-1</a> ilustra la arquitectura de la aplicación.
+          </p>
+        </div>
+        <div id="CHDDJDCH" class="paragraph">
+          <div class="title">
+            <strong>Figura 61-1 Arquitectura de la Aplicación de Ejemplo Tutoría de Duke</strong>
+          </div>
+          <p>
+            <span class="image">
+              <img src="img/javaeett_dt_061.png" 
+                   alt="Diagrama de arquitectura de la aplicación de ejemplo Tutoría de Duke. Dos clientes 
+                   acceden a la interfaz principal y la interfaz de administración implementada en el 
+                   contenedor web. Estas interfaces se comunican con enterprise beans desplegados en el 
+                   contenedor EJB. Los enterprise beans se comunican con la base de datos.">
+            </span>
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            La aplicación Tutoría de Duke se organiza en dos proyectos principales: la biblioteca 
+            <code>dukes-tutoring-common</code> y la aplicación web <code>dukes-tutoring-war</code>. El 
+            proyecto de biblioteca <code>dukes-tutoring-common</code> contiene las clases de entidad y las 
+            clases auxiliares utilizadas por la aplicación web <code>dukes-tutoring-war</code> y 
+            <code>dukes-tutoring-common</code> se empaqueta y se implementa con 
+            <code>dukes-tutoring-war</code>. El archivo JAR de la biblioteca es útil para permitir que otras 
+            aplicaciones, como una aplicación de cliente JavaFX, reutilicen las clases de entidad y las clases 
+            auxiliares.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Tutoría de Duke utiliza las siguientes características de la plataforma Java EE:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>Entidades de persistencia IPA de Java</p>
+              <div class="ulist">
+                <ul>
+                  <li>
+                    <p>
+                      Una anotación personalizada de Validación de Beans, <code>@Email</code>, para validar 
+                      direcciones de correo electrónico
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      Una definición estándar de <code>jta-data-source</code> que creará el recurso JDBC en la 
+                      implementación
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      Una propiedad estándar en el descriptor de implementación <code>persistence.xml</code> 
+                      para crear y eliminar de forma automática y portable las tablas en 
+                      <code>jta-data-source</code>
+                    </p>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li>
+              <p>
+                Enterprise beans
+              </p>
+              <div class="ulist">
+                <ul>
+                  <li>
+                    <p>Beans singleton y sesión de vista local sin interfaz</p>
+                  </li>
+                  <li>
+                    <p>Recursos JAX-RS en un bean de sesión</p>
+                  </li>
+                  <li>
+                    <p>
+                      Restricciones de seguridad de Java EE en los métodos de negocio de la interfaz 
+                      administrativa
+                    </p>
+                  </li>
+                  <li>
+                    <p>Todos los enterprise beans empaquetados dentro del WAR</p>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li>
+              <p>WebSocket</p>
+              <div class="ulist">
+                <ul>
+                  <li>
+                    <p>
+                      Un punto de conexión del servidor WebSocket que publica automáticamente el estado de los 
+                      estudiantes en los puntos de conexión del cliente
+                    </p>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li>
+              <p>Contextos e Inyección de Dependencia</p>
+              <div class="ulist">
+                <ul>
+                  <li>
+                    <p>Un evento CDI que se activa cuando cambia el estado de un estudiante</p>
+                  </li>
+                  <li>
+                    <p>
+                      Métodos de controlador para actualizar la aplicación una vez que se activa el evento de 
+                      estado
+                    </p>
+                  </li>
+                  <li>
+                    <p>Beans gestionados por CDI para páginas Facelets</p>
+                  </li>
+                  <li>
+                    <p>Anotaciones de Validación de Beans en los beans gestionados por CDI</p>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li>
+              <p>Tecnología JavaServer Faces, usando Facelets para el front-end web</p>
+              <div class="ulist">
+                <ul>
+                  <li>
+                    <p>Plantillas</p>
+                  </li>
+                  <li>
+                    <p>Componentes compuestos</p>
+                  </li>
+                  <li>
+                    <p>Un formateador personalizado, <code>PhoneNumberFormatter</code></p>
+                  </li>
+                  <li>
+                    <p>Restricciones de seguridad en la interfaz administrativa</p>
+                  </li>
+                  <li>
+                    <p>Componentes Facelets habilitados para Ajax</p>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="paragraph">
+          <p>
+            La aplicación Tutoría de Duke tiene dos interfaces de usuario principales, ambas empaquetadas en 
+            un solo archivo WAR:
+          </p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>La interfaz principal, para estudiantes, tutores y personal.</p>
+            </li>
+            <li>
+              <p>
+                La interfaz administrativa utilizada por el personal para administrar a los estudiantes y 
+                tutores, y para generar informes de asistencia.
+              </p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="dukes-tutoring.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="dukes-tutoring002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

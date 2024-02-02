@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />        
+        <title>Implementaciones de Convenencia (Los Tutoriales de Java&trade; &gt; Colecciones)</title>
+        <meta name="description" content="Este tutorial de Java sobre colecciones describe los interfaces, implementaciones, y
+              algoritmos en el marco de trabajo de Colecciones de Java" />
+        <meta name="keywords" content="programacion java , aprender java, codigo de ejemplo de java, colecciones de java,
+              set, list, queue, map, array, arraylist" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Implementaciones</a></div>
+                <div class="linkAHEAD"><a href="set.html">Implementaciones de Set</a></div>
+                <div class="linkAHEAD"><a href="list.html">Implementaciones de List</a></div>
+                <div class="linkAHEAD"><a href="map.html">Implementaciones de Map</a></div>
+                <div class="linkAHEAD"><a href="queue.html">Implementaciones de Queue</a></div>
+                <div class="linkAHEAD"><a href="deque.html">Implementaciones de Deque</a></div>
+                <div class="linkAHEAD"><a href="wrapper.html">Implementaciones de Wrapper</a></div>
+                <div class="nolinkAHEAD">Implementaciones de Convenencia</div>
+                <div class="linkAHEAD"><a href="summary.html">Sumario de Implementaciones</a></div>
+                <div class="linkQUESTIONS"><a href="QandE/questions.html">Preguntas y Ejercicios: Implementaciones</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Colecciones<br />
+                <b>Lección:</b> Implementaciones
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;
+                <a href="../index.html" target="_top">Colecciones</a>&nbsp;&gt;
+                <a href="index.html" target="_top">Implementaciones</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="wrapper.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="summary.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Implementaciones de Convenencia</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Esta sección describe varias mini-implementaciones que pueden ser más convenientes y más eficientes que las 
+                    implemetanciones de propósito general cuando no necesita todo su poder. Todas las implementaciones en esta 
+                    sección están disponibles vía métodos estáticos de factoría en vez de clases <code>public</code>.
+                </p>
+                <h2>Vista de Lista de una Matriz</h2>
+                <p>
+                    El método <a class="APILink" target="_blank"
+                                 href="https://docs.oracle.com/javase/8/docs/api/java/util/Arrays.html#asList-T...-">
+                        <code>Arrays.asList</code>
+                    </a> devuelve una vista de <code>List</code> de su argumento matriz. Los cambios a la <code>List</code> se
+                    escriben en la matriz y viceversa. El tamaño de la colección es el de la matriz y no puede ser cambiado. Si se
+                    llama a los métodos <code>add</code> o <code>remove</code> en la <code>List</code>, se producirá una
+                    <code>UnsupportedOperationException</code>.
+                </p>
+                <p>
+                    El uso normal de esta implementación es como un puente entre las IPAs basadas en colecciones y las basadas en 
+                    matrices. Le permite pasar una matriz a un método esperando una <code>Collection</code> o una <code>List</code>.
+                    Sin embargo, esta implementación tiene también otro uso. Si necesita una <code>List</code> de tamaño fijo, es
+                    más eficiente que cualquier implementación de <code>List</code> de propósito general. Esta es la expresión
+                    idiomática.
+                </p>
+                <div class="codeblock">
+                    <pre>
+List&lt;String&gt; list = Arrays.asList(new String[size]);
+                    </pre>
+                </div>
+                <p>
+                    Tenga en cuenta que no se conserva una referencia a la matriz de respaldo.
+                </p>
+                <h2>Lista de copias múltiples inmutables</h2>
+                <p>
+                    Ocasionalmente necesitará una <code>List</code> inmutable que consista de copias múltiples del mismo elemento.
+                    El método <a class="APILink" target="_blank"
+                                 href="https://docs.oracle.com/javase/8/docs/api/java/util/Collections.html#nCopies-int-T-">
+                        <code>Collections.nCopies</code>
+                    </a> devuelve tal lista. Esta implementación tiene dos usos principales. El primero es inicializar una
+                    <code>List</code> recién creada; por ejemplo, suponga que quiere un <code>ArrayList</code> que inicialmente
+                    consiste de 1000 elementos <code>null</code>. El siguiente encantamiento realiza el truco.
+                </p>
+                <div class="codeblock">
+                    <pre>
+List&lt;Type&gt; list = new ArrayList&lt;Type&gt;(Collections.nCopies(1000, (Type)null);
+                    </pre>
+                </div>
+                <p>
+                    Por supuesto, el valor inicial de cada elemento no necesita ser <code>null</code>. El segundo principal uso
+                    es hacer crecer una <code>List</code> existente. Por ejemplo, suponga que quiere añadir 69 copias de la cadena
+                    <code>&quot;murciélago de la fruta&quot;</code> al final de  una <code>List&lt;String&gt;</code>. No está claro
+                    por qué querría hacer tal cosa, pero supongamos que lo hizo. Lo siguiente es cómo lo haría.
+                </p>
+                <div class="codeblock">
+                    <pre>
+    mascotasAdorables.addAll(Collections.nCopies(69, "murciélago de la fruta"));
+                    </pre>
+                </div>
+                <p>
+                    Al usar la forma de <code>addAll</code> que toma tanto un índice como una <code>Collection</code>, puede
+                    añadir los nuevos elementos en la mitada de una <code>List</code> en vez de al final de ella.
+                </p>
+                <h2>Set Inmutable y Singleton</h2>
+                <p>
+                    Algunas veces necesitará un <code>Set</code> inmutable y <i>singleton</i>, el cual consite de un elemento único
+                    y especificado. El método
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Collections.html#singleton-T-">
+                        <code>Collections.singleton</code>
+                    </a> devuelve tal <code>Set</code>. Un uso de esta implementación es eliminar todas ls ocurrencias de un
+                    elemento especificado de una <code>Collection</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+c.removeAll(Collections.singleton(e));
+                    </pre>
+                </div>
+                <p>
+                    Un modismo relacionado elimina todos los elementos que se asignan a un valor especificado de un
+                    <code>Map</code>. Por ejemplo, suponga que tiene un <code>Map</code> &mdash; <code>job</code> &mdash; que
+                    asigna personas a su línea de trabajo y supong que quiere eliminar todos los abogados. La siguiente sentencia
+                    realizará este trabajo.
+                </p>
+                <div class="codeblock">
+                    <pre>
+job.values().removeAll(Collections.singleton(LAWYER));
+                    </pre>
+                </div>
+                <p>
+                    Un uso más de esta implementación es suministrar un valor de entrada único a un método que está escrito para
+                    aceptar una colección de valores.
+                </p>
+                <h2>El Set y la List vacíos, y las Constantes de Map</h2>
+                <p>
+                    La clase <a class="APILink" target="_blank"
+                                href="https://docs.oracle.com/javase/8/docs/api/java/util/Collections.html">
+                        <code>Collections</code>
+                    </a> suministra métodos para devolver el <code>Set</code>, <code>List</code>, y el <code>Map</code> vacíos
+                    &mdash;
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Collections.html#emptySet--">
+                        <code>emptySet</code></a>,
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Collections.html#emptyList--">
+                        <code>emptyList</code></a>, y
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Collections.html#emptyMap--">
+                        <code>emptyMap</code></a>. El uso principal de estas constantes es como entrada a métodos que toman una
+                    <code>Collection</code> de valores cuando usted no quiere suministrar ningún valor en absoluto, como en este
+                    ejemplo.
+                </p>
+                <div class="codeblock">
+                    <pre>
+tourist.declarePurchases(Collections.emptySet());
+                    </pre>
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="wrapper.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;
+                <a target="_top" href="summary.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos
+                            <a href="../../information/cpyr.html">avisos legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Implementaciones de Wrapper<br />
+            <b>Página siguiente:</b> Sumario de Implementaciones
+        </div>
+    </body>
+</html> 

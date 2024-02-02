@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Ámbitos de WebSocket y Usuarios</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jsf-ws003.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-ws005.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1">
+      <h2 id="websocket-scopes-and-users">Ámbitos de WebSocket y Usuarios</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            De forma predeterminada, el WebSocket tiene un ámbito de aplicación. Por ejemplo, cualquier vista 
+            o sesión en toda la aplicación web que tenga el mismo canal WebSocket abierto recibirá el mismo 
+            mensaje push. El mensaje push puede ser enviado por todos los usuarios y la aplicación. Para 
+            restringir los mensajes push a todas las vistas solo en la sesión de usuario actual, establezca el 
+            atributo de ámbito opcional en <code>session</code> . En este caso, el mensaje push solo puede ser 
+            enviado por el usuario y no por la aplicación.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p><code>&lt;f:websocket channel="someChannel" scope="session" &#8230;&#8203; /&gt;</code></p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Para restringir los mensajes push solo a la vista actual, puede establecer el atributo de alcance 
+            en <code>view</code>. El mensaje push no aparecerá en otras vistas en la misma sesión, incluso si 
+            tiene la misma URL. Este mensaje push solo puede ser enviado por el usuario y no por la 
+            aplicación.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p><code>&lt;f:websocket channel="someChannel" scope="view" &#8230;&#8203; /&gt;</code></p>
+        </div>
+        <div class="paragraph">
+          <p>El atributo de ámbito puede no ser una expresión EL.</p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Además, puede establecer el atributo opcional <code>user</code> en el identificador único del 
+            usuario que inició sesión, normalmente el nombre de inicio de sesión o el ID de usuario. Como tal, 
+            el mensaje push puede dirigirse a un usuario específico y también puede ser enviado por otros 
+            usuarios y la aplicación. El valor del atributo <code>user</code> debe implementar 
+            <code>Serializable</code> y tener una huella de memoria baja, por lo que no se recomienda una 
+            entidad de usuario completa.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Por ejemplo, cuando utiliza autenticación administrada por contenedor o un marco o biblioteca 
+            relacionada:
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            <code>&lt;f:websocket channel="someChannel"user="#{request.remoteUser}" &#8230;&#8203; /&gt;</code>
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            O bien, cuando tiene una entidad de usuario personalizada accesible a través de EL, como 
+            <code>#{someLoggedInUser}</code> que tiene una propiedad <code>id</code> que representa su 
+            identificador:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;f:websocket channel="someChannel"
+user="#{someLoggedInUser.id}" ... /&gt;
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Cuando se especifica el atributo <code>user</code>, el alcance predeterminado es 
+            <code>session</code> y no se puede establecer en <code>application</code>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            En el lado del servidor, el mensaje push se puede dirigir al usuario especificado en el atributo 
+            <code>user</code> usando <code>PushContext.send(Object, Serializable)</code>. El mensaje push 
+            puede ser enviado por todos los usuarios y la aplicación.
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Inject @Push
+private PushContext someChannel;
+public void sendMessage(Object message, User recipientUser) { Long recipientUserId = recipientUser.getId(); someChannel.send(message, recipientUserId);
+}
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Se pueden orientar varios usuarios pasando una <code>Collection</code> que contiene 
+            identificadores de usuario a <code>PushContext.send(Object, Collection)</code>.
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public void sendMessage(Object message, Group recipientGroup) {
+Collection&lt;Long&gt; recipientUserIds = recipientGroup.getUserIds();
+someChannel.send(message, recipientUserIds);
+}
+              </code>
+            </pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jsf-ws003.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-ws005.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Respuestas a Preguntas y Ejercicios: (Los Tutoriales de Java&trade; &gt; Colecciones &gt; Implementaciones)</title>
+        <meta name="description" content="Este tutorial de Java sobre colecciones describe los interfaces, implementaciones, y
+              algoritmos en el marco de trabajo de Colecciones de Java" />
+        <meta name="keywords" content="programacion java , aprender java, codigo de ejemplo de java, colecciones de java,
+              set, list, queue, map, array, arraylist" />
+        <link rel="stylesheet" href="../../../indice.css" type="text/css"/>
+    </head>
+    <body>
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="MainFlow_wide">
+            <span id="BreadCrumbs">
+                <a href="../../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;
+                <a href="../../index.html" target="_top">Colecciones</a>&nbsp;&gt;
+                <a href="../index.html" target="_top">Implementaciones</a>
+            </span>
+            <div class="NavBit">
+                <a href="../QandE/questions.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a href="../../TOC.html">TdC</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Respuestas a Preguntas y Ejercicios:</h1>
+            </div>
+            <div id="PageContent">
+                <h2>Preguntas</h2>
+                <ol>
+                    <li>
+                        Pregunta: Usted planea escribir un programa que usa varias interfaces básicas de colección:
+                        <code>Set</code>, <code>List</code>, <code>Queue</code>, y <code>Map</code>.
+                        No está seguro de qué implementaciones trabajarán mejor, así que decide usar las implementaciones de
+                        uso general hasta que tenga una mejor idea de cómo su programa funcionará en el mundo real. ¿Qué
+                        implementaciones son estas?
+                        Respuesta:<br />
+                        <code>Set</code>: <code>HashSet</code><br />
+                        <code>List</code>: <code>ArrayList</code><br />
+                        <code>Queue</code>: <code>LinkedList</code><br />
+                        <code>Map</code>: <code>HashMap</code>
+                    </li>
+                    <li>
+                        Pregunta: Si necesita una implementación <code>Set</code> que suministre una iteración ordenada-por-valor
+                        ¿qué clase usaría? <br />
+                        Respuesta: <br />
+                        <code>TreeSet</code> garantiza que el conjunto ordenado esté en orden ascendiente de elementos, ordenados
+                        de acuerdo al orden natural de los elementos o suministrado por el <code>Comparator</code>.
+                    </li>
+                    <li>
+                        Pregunta: ¿Qué clase usa para acceder a las implementaciones de envoltura? <br />
+                        Respuesta: <br />
+                        Usted usa la clase <code>Collections</code>, la cual suministra métodos estáticos que operan o devuelven
+                        colecciones.
+                    </li>
+                </ol>
+                <h2>Ejercicios</h2>
+                <ol>
+                    <li>
+                        Ejericicio: Escriba un programa que lea un fichero de texto, especificado por el primer argumento de la
+                        línea de  comandos, en una <code>List</code>. El programa imprimirá después líneas aleatorias del fichero,
+                        el número de líneas impresas estará especificado por el segundo argumento de la línea de comandos. Escriba
+                        el programa de forma que se asigne una colección de tamaño correcto, de una vez, en vez de ser gradualmente
+                        expandida mientras se lee el fichero. Consejo: Para determinar el número de líneas en el fichero, use
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/io/File.html#length--">
+                            <code>java.io.File.length</code>
+                        </a> para obtener el tamaño del fichero, y después divida por el tamaño supuesto de una línea promedio.
+                        <br />
+                        Respuesta: <br />
+                        Ya que estamos accediendo a la <code>List</code> aleatoriamente, usaremos una <code>ArrayList</code>.
+                        Estimamos el número de línea tomando el tamaño del fihcero y dividiendo por 50. Luego duplicamos esa cifra,
+                        ya que es más eficiente sobreestimar que subestimar.
+                        <div class="codeblock">
+                            <pre>
+
+    import java.util.*;
+    import java.io.*;
+
+    public class FileList {
+        public static void main(String[] args) {
+            final int assumedLineLength = 50;
+            File file = new File(args[0]);
+            List&lt;String&gt; fileList =
+                new ArrayList&lt;String&gt;((int)(file.length() / assumedLineLength) * 2);
+            BufferedReader reader = null;
+            int lineCount = 0;
+            try {
+                reader = new BufferedReader(new FileReader(file));
+                for (String line = reader.readLine(); line != null;
+                        line = reader.readLine()) {
+                    fileList.add(line);
+                    lineCount++;
+                }
+            } catch (IOException e) {
+                System.err.format(&quot;Could not read %s: %s%n&quot;, file, e);
+                System.exit(1);
+            } finally {
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {}
+                }
+            }
+            int repeats = Integer.parseInt(args[1]);
+            Random random = new Random();
+            for (int i = 0; i &lt; repeats; i++) {
+                System.out.format(&quot;%d: %s%n&quot;, i,
+                        fileList.get(random.nextInt(lineCount - 1)));
+            }
+        }
+    }
+                            </pre>
+                        </div>
+                        Este programa en realidad gasta la mayoría de su tiempo leyenedo en el fichero, así que preasignar el
+                        <code>ArrayList</code> tiene poco efecto en su rendimiento. Especificar una capacidad inicial por
+                        adelantado es más probable que sea útil cuando su programa repetidamente crea grandes objetos
+                        <code>ArrayList</code> sin intervención de E/S.
+                    </li>
+                </ol>
+            </div>
+        </div>
+        <div class="NavBit">
+            <a href="../QandE/questions.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+            <a href="../../TOC.html">TdC</a>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos
+                            <a href="../../information/cpyr.html">avisos legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Preguntas y Ejercicios: Implementaciones
+        </div>
+    </body>
+</html> 

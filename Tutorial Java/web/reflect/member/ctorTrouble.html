@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Solución de Problemas (Los Tutoriales de Java&trade; &gt; La IPA de Reflexión &gt; Miembros)
+        </title>
+        <meta name="description" content="Este tutorial de reflexión de Java describe el uso de la reflexión para acceder y 
+              manipular clases, campos, métodos y constructores" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java reflection" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Miembros</a></div>
+                <div class="linkAHEAD"><a href="field.html">Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldTypes.html">Obteniendo los Tipos de los Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldModifiers.html">Recuperando y Analizando Modificadores de los Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldValues.html">Obteniendo y Estableciendo los Valores de los Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldTrouble.html">Solución de Problemas</a></div>
+                <div class="linkAHEAD"><a href="method.html">Métodos</a></div>
+                <div class="linkBHEAD"><a href="methodType.html">Obteniendo Información del Tipo del Método</a></div>
+                <div class="linkBHEAD"><a href="methodparameterreflection.html">Obteniendo los Nombre de los Parámetros del Método</a></div>
+                <div class="linkBHEAD"><a href="methodModifiers.html">Recuperando y Analizando Modificadores del Método</a></div>
+                <div class="linkBHEAD"><a href="methodInvocation.html">Invocando Métodos</a></div>
+                <div class="linkBHEAD"><a href="methodTrouble.html">Solución de Problemas</a></div>
+                <div class="linkAHEAD"><a href="ctor.html">Constructores</a></div>
+                <div class="linkBHEAD"><a href="ctorLocation.html">Encontrando Constructores</a></div>
+                <div class="linkBHEAD"><a href="ctorModifiers.html">Recuperando y Analizando Modificadores del Constructor</a></div>
+                <div class="linkBHEAD"><a href="ctorInstance.html">Creando Nuevas Instancias de Clase</a></div>
+                <div class="nolinkBHEAD">Solución de Problemas</div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> La IPA de Reflexión<br />
+                <b>Lección:</b> Miembros<br />
+                <b>Sección:</b> Constructores
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">La IPA de Reflexión</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Miembros</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="ctorInstance.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../special/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Solución de Problemas</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Los siguientes problemas son encontrados algunas veces por los desarrolladores cuando intentan invocar 
+                    constructores a través de reflexión.
+                </p>
+                <h2>
+                    InstantiationException Debido a que Falta el Constructor de Cero Argumentos
+                </h2>
+                <p>
+                    El ejemplo 
+                    <a class="SourceLink" target="_blank" href="example/ConstructorTrouble.java" 
+                       onclick="showCode('../../displayCode.html', 'example/ConstructorTrouble.java'); return false;">
+                        <code>ConstructorTrouble</code></a> ilustra qué ocurre cuando el código intenta crear una nueva instancia 
+                    de una clase usando 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#newInstance--">
+                        <code>Class.newInstance()</code></a> y no hay constructor sin argumentos accesible:
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+public class ConstructorTrouble {
+    private ConstructorTrouble(int i) {}
+
+    public static void main(String... args){
+	try {
+	    Class&lt;?&gt; c = Class.forName(&quot;ConstructorTrouble&quot;);
+	    Object o = c.newInstance();  // InstantiationException
+
+        // production code should handle these exceptions more gracefully
+	} catch (ClassNotFoundException x) {
+	    x.printStackTrace();
+	} catch (InstantiationException x) {
+	    x.printStackTrace();
+	} catch (IllegalAccessException x) {
+	    x.printStackTrace();
+	}
+    }
+}
+                    </pre>
+                </div>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java ConstructorTrouble</em>
+java.lang.InstantiationException: ConstructorTrouble
+        at java.lang.Class.newInstance0(Class.java:340)
+        at java.lang.Class.newInstance(Class.java:308)
+        at ConstructorTrouble.main(ConstructorTrouble.java:7)
+                    </pre>
+                </div>
+                <div class="note">
+                    <hr />
+                    <strong>Consejo:</strong>&nbsp;Hay una variedad de razones diferentes por las que una 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/InstantiationException.html">
+                        <code>InstantiationException</code></a> puede ocurrir. En este caso, el problema es que la presencia del 
+                    constructor con un argumento <code>int</code> previene al compilador de generar el constructor por defecto 
+                    (o sin argumentos) y no hay constructor sin argumentos explícito en el código. Recuerde que 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#newInstance--">
+                        <code>Class.newInstance()</code></a> se comporta de forma muy parecida a la palabra clave <code>new</code> 
+                    y fallará cuando <code>new</code> falle.
+                    <hr />
+                </div>
+                <h2>
+                    Class.newInstance () Lanza una Excepción Inesperada
+                </h2>
+                <p>
+                    El ejemplo 
+                    <a class="SourceLink" target="_blank" href="example/ConstructorTroubleToo.java" 
+                       onclick="showCode('../../displayCode.html', 'example/ConstructorTroubleToo.java'); return false;">
+                        <code>ConstructorTroubleToo</code></a> muestra un problema irresoluble en 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#newInstance--">
+                        <code>Class.newInstance()</code></a>. Es decir, propaga cualquier excepción &mdash; comprobada o no 
+                    comprobada &mdash; lanzada por el constructor.
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+import java.lang.reflect.InvocationTargetException;
+import static java.lang.System.err;
+
+public class ConstructorTroubleToo {
+    public ConstructorTroubleToo() {
+        throw new RuntimeException(&quot;exception in constructor&quot;);
+    }
+
+    public static void main(String... args) {
+        try {
+            Class&lt;?&gt; c = Class.forName(&quot;ConstructorTroubleToo&quot;);
+            // Method propagetes any exception thrown by the constructor
+            // (including checked exceptions).
+            if (args.length &gt; 0 &amp;&amp; args[0].equals(&quot;class&quot;)) {
+                Object o = c.newInstance();
+            } else {
+                Object o = c.getConstructor().newInstance();
+            }
+
+            // production code should handle these exceptions more gracefully
+        } catch (ClassNotFoundException x) {
+            x.printStackTrace();
+        } catch (InstantiationException x) {
+            x.printStackTrace();
+        } catch (IllegalAccessException x) {
+            x.printStackTrace();
+        } catch (NoSuchMethodException x) {
+            x.printStackTrace();
+        } catch (InvocationTargetException x) {
+            x.printStackTrace();
+            err.format(&quot;%n%nCaught exception: %s%n&quot;, x.getCause());
+        }
+    }
+}
+                    </pre>
+                </div>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java ConstructorTroubleToo class</em>
+Exception in thread "main" java.lang.RuntimeException: exception in constructor
+        at ConstructorTroubleToo.&lt;init&gt;(ConstructorTroubleToo.java:6)
+        at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+        at sun.reflect.NativeConstructorAccessorImpl.newInstance
+          (NativeConstructorAccessorImpl.java:39)
+        at sun.reflect.DelegatingConstructorAccessorImpl.newInstance
+          (DelegatingConstructorAccessorImpl.java:27)
+        at java.lang.reflect.Constructor.newInstance(Constructor.java:513)
+        at java.lang.Class.newInstance0(Class.java:355)
+        at java.lang.Class.newInstance(Class.java:308)
+        at ConstructorTroubleToo.main(ConstructorTroubleToo.java:15)
+                    </pre>
+                </div>
+                <p>
+                    Esta situación es única en reflexión. Normalmente, es imposible escribir código que ignore una excepción 
+                    comprobada porque no compilaría. Es posible envolver cualquier excepción lanzada por un constructor usando 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Constructor.html#newInstance-java.lang.Object...-">
+                        <code>Constructor.newInstance()</code></a> en vez de 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#newInstance--">
+                        <code>Class.newInstance()</code></a>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java ConstructorTroubleToo</em>
+java.lang.reflect.InvocationTargetException
+        at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+        at sun.reflect.NativeConstructorAccessorImpl.newInstance
+          (NativeConstructorAccessorImpl.java:39)
+        at sun.reflect.DelegatingConstructorAccessorImpl.newInstance
+          (DelegatingConstructorAccessorImpl.java:27)
+        at java.lang.reflect.Constructor.newInstance(Constructor.java:513)
+        at ConstructorTroubleToo.main(ConstructorTroubleToo.java:17)
+Caused by: java.lang.RuntimeException: exception in constructor
+        at ConstructorTroubleToo.&lt;init&gt;(ConstructorTroubleToo.java:6)
+        ... 5 more
+
+
+Caught exception: java.lang.RuntimeException: exception in constructor
+                    </pre>
+                </div>
+                <p>
+                    Si se lanza una 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/InvocationTargetException.html">
+                        <code>InvocationTargetException</code></a>, el método fue invocado. La diagnosis del problema debe ser el 
+                    mismo que si se llamó el constructor directamente y lanzó la excepción que se recupera mediante 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/InvocationTargetException.html#getCause--">
+                        <code>InvocationTargetException.getCause()</code></a>. Esta excepción no indica un problema con el paquete 
+                    de reflexión o su uso.
+                </p>
+                <div class="note">
+                    <hr /><strong>Consejo:</strong>&nbsp;Es preferible usar 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Constructor.html#newInstance-java.lang.Object...-">
+                        <code>Constructor.newInstance()</code></a> en vez de 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#newInstance--">
+                        <code>Class.newInstance()</code></a> porque la primera IPA permite el escrutinio y manejo de excepciones 
+                    arbitrarias lanzadas por los constructores.
+                    <hr />
+                </div>
+                <h2>
+                    Problemas para Localizar o Invocar el Constructor Correcto
+                </h2>
+                <p>
+                    La clase 
+                    <a class="SourceLink" target="_blank" href="example/ConstructorTroubleAgain.java" 
+                       onclick="showCode('../../displayCode.html', 'example/ConstructorTroubleAgain.java'); return false;">
+                        <code>ConstructorTroubleAgain</code></a> ilustra varias formas en la que el código incorrecto puede fallar 
+                    en localizar o invocar el constructor esperado.
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+import java.lang.reflect.InvocationTargetException;
+import static java.lang.System.out;
+
+public class ConstructorTroubleAgain {
+    public ConstructorTroubleAgain() {}
+
+    public ConstructorTroubleAgain(Integer i) {}
+
+    public ConstructorTroubleAgain(Object o) {
+	out.format(&quot;Constructor passed Object%n&quot;);
+    }
+
+    public ConstructorTroubleAgain(String s) {
+	out.format(&quot;Constructor passed String%n&quot;);
+    }
+
+    public static void main(String... args){
+	String argType = (args.length == 0 ? &quot;&quot; : args[0]);
+	try {
+	    Class&lt;?&gt; c = Class.forName(&quot;ConstructorTroubleAgain&quot;);
+	    if (&quot;&quot;.equals(argType)) {
+		// IllegalArgumentException: wrong number of arguments
+		Object o = c.getConstructor().newInstance(&quot;foo&quot;);
+	    } else if (&quot;int&quot;.equals(argType)) {
+		// NoSuchMethodException - looking for int, have Integer
+		Object o = c.getConstructor(int.class);
+	    } else if (&quot;Object&quot;.equals(argType)) {
+		// newInstance() does not perform method resolution
+		Object o = c.getConstructor(Object.class).newInstance(&quot;foo&quot;);
+	    } else {
+		assert false;
+	    }
+
+        // production code should handle these exceptions more gracefully
+	} catch (ClassNotFoundException x) {
+	    x.printStackTrace();
+	} catch (NoSuchMethodException x) {
+	    x.printStackTrace();
+	} catch (InvocationTargetException x) {
+	    x.printStackTrace();
+	} catch (InstantiationException x) {
+	    x.printStackTrace();
+	} catch (IllegalAccessException x) {
+	    x.printStackTrace();
+	}
+    }
+}
+                    </pre>
+                </div>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java ConstructorTroubleAgain</em>
+Exception in thread "main" java.lang.IllegalArgumentException: wrong number of
+  arguments
+        at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+        at sun.reflect.NativeConstructorAccessorImpl.newInstance
+          (NativeConstructorAccessorImpl.java:39)
+        at sun.reflect.DelegatingConstructorAccessorImpl.newInstance
+          (DelegatingConstructorAccessorImpl.java:27)
+        at java.lang.reflect.Constructor.newInstance(Constructor.java:513)
+        at ConstructorTroubleAgain.main(ConstructorTroubleAgain.java:23)
+                    </pre>
+                </div>
+                <p>
+                    Se lanza una 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/IllegalArgumentException.html">
+                        <code>IllegalArgumentException</code></a> porque se solicitó el constructor sin argumentos y se hizo un 
+                    intento de pasar un argumento. La misma excepción sería lanzada si se pasase un argumento al constructor 
+                    del tipo equivocado.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java ConstructorTroubleAgain int</em>
+java.lang.NoSuchMethodException: ConstructorTroubleAgain.&lt;init&gt;(int)
+        at java.lang.Class.getConstructor0(Class.java:2706)
+        at java.lang.Class.getConstructor(Class.java:1657)
+        at ConstructorTroubleAgain.main(ConstructorTroubleAgain.java:26)
+                    </pre>
+                </div>
+                <p>
+                    Esta excepción puede ocurrir si el desarrollador erróneamente cree que reflexión convertirá en ambos sentidos 
+                    los tipos. La operación de boxing (conversión de un tipo primitivo en un tipo de referencia) ocurre solo 
+                    durante la compilación. No hay oportunidad para que ocurra esta operación en reflexión, así que el tipo 
+                    específico debe ser usado cuando localize un constructor.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java ConstructorTroubleAgain Object</em>
+Constructor passed Object
+                    </pre>
+                </div>
+                <p>
+                    Aquí, se podría esperar que el constructor que toma un argumento 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html"><code>String</code></a> sería 
+                    invocado  ya que <code>newInstance()</code> fue invocada con el tipo más específico <code>String</code>. Sin 
+                    embargo, ¡es demasiado tarde! El constructor que se encontró ya es el constructor con un argumento 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html">
+                        <code>Object</code></a>. <code>newInstance()</code> no intenta resolver el método; simplemente opera sobre 
+                    el objeto constructor existente.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Consejo:</strong>&nbsp;Una diferencia importante entre <code>new</code> y 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Constructor.html#newInstance-java.lang.Object...-">
+                        <code>Constructor.newInstance()</code></a> es que <code>new</code> realiza la comprobación del tipo de 
+                    argumento del método, la conversión de tipo primitivo a tipo de referencia, y resolución de método. Nada de 
+                    esto ocurre en reflexión, donde se deben tomar decisiones explícitas.
+                    <hr />
+                </div>
+                <h2>
+                    IllegalAccessException al Intentar Invocar un Constructor Inaccesible
+                </h2>
+                <p>
+                    Una 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/IllegalAccessException.html">
+                        <code>IllegalAccessException</code></a> puede ser lanzada si se hace un intento de invocar un constructor 
+                    privadao o inaccesible. El ejemplo 
+                    <a class="SourceLink" target="_blank" href="example/ConstructorTroubleAccess.java" 
+                       onclick="showCode('../../displayCode.html', 'example/ConstructorTroubleAccess.java'); return false;">
+                        <code>ConstructorTroubleAccess</code></a> ilustra el seguimiento de pila resultante.
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
+class Deny {
+    private Deny() {
+	System.out.format(&quot;Deny constructor%n&quot;);
+    }
+}
+
+public class ConstructorTroubleAccess {
+    public static void main(String... args) {
+        try {
+            Constructor c = Deny.class.getDeclaredConstructor();
+            // c.setAccessible(true);   // solution
+            c.newInstance();
+
+            // production code should handle these exceptions more gracefully
+        } catch (InvocationTargetException x) {
+            x.printStackTrace();
+        } catch (NoSuchMethodException x) {
+            x.printStackTrace();
+        } catch (InstantiationException x) {
+            x.printStackTrace();
+        } catch (IllegalAccessException x) {
+            x.printStackTrace();
+        }
+    }
+}
+                    </pre>
+                </div>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java ConstructorTroubleAccess</em>
+java.lang.IllegalAccessException: Class ConstructorTroubleAccess can not access
+  a member of class Deny with modifiers "private"
+        at sun.reflect.Reflection.ensureMemberAccess(Reflection.java:65)
+        at java.lang.reflect.Constructor.newInstance(Constructor.java:505)
+        at ConstructorTroubleAccess.main(ConstructorTroubleAccess.java:15)
+                    </pre>
+                </div>
+                <div class="note">
+                    <hr />
+                    <strong>Consejo:</strong>&nbsp;Existe una restricción de acceso que previene la invocación reflexiva de 
+                    constructores que normalmente no deberían ser accesibles mediante invocación directa. (Esto incluye, pero no 
+                    está limitado a, constructores privados en una clase separada y constructores públicos en una clase privada 
+                    separada). Sin embargo, <code>Constructor</code> se declara para extender 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/AccessibleObject.html">
+                        <code>AccessibleObject</code></a> el cual proporciona la habilidad de suprimir esta comprobación a través 
+                    de <a class="APILink" target="_blank" 
+                          href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/AccessibleObject.html#setAccessible-boolean-">
+                        <code>AccessibleObject.setAccessible()</code></a>.
+                    <hr />
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="ctorInstance.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../special/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Creando Nuevas Instancias de Clase<br />
+            <b>Página siguiente:</b> Arrays and Enumerated Types
+        </div>
+    </body>
+</html> 

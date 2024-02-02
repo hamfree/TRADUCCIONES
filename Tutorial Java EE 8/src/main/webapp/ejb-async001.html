@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Invocación de Método Asíncrono</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="ejb-async.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="ejb-async002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GKKQG">
+      <h2 id="asynchronous-method-invocation">Invocación de Método Asíncrono</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Los beans de sesión pueden implementar métodos asíncronos, métodos de negocio en los que 
+            el contenedor de enpterprise bean devuelve el control al cliente antes de que se invoque 
+            el método en la instancia del bean de sesión. Luego, los clientes pueden usar la API de 
+            concurrencia de Java SE para recuperar el resultado, cancelar la invocación y buscar 
+            excepciones. Los métodos asincrónicos se usan normalmente para operaciones de ejecución 
+            prolongada, para tareas que hacen un uso intensivo del procesador, para tareas en 
+            segundo plano, para aumentar el rendimiento de la aplicación o para mejorar el tiempo de 
+            respuesta de la aplicación si el resultado de la invocación del método no se requiere de 
+            inmediato.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Cuando un cliente de bean de sesión invoca un método de negocio no asíncrono típico, el 
+            control no se devuelve al cliente hasta que el método se haya completado. Sin embargo, a 
+            los clientes que llaman a métodos asincrónicos, el contenedor de enterprise bean les 
+            devuelve inmediatamente el control. Esto permite que el cliente realice otras tareas 
+            mientras se completa la invocación del método. Si el método devuelve un resultado, el 
+            resultado es una implementación de la interfaz 
+            <code>java.util.concurrent.Future&lt;V&gt;</code>, donde "V" es el tipo de valor del 
+            resultado. La interfaz <code>Future&lt;V&gt;</code> define métodos que el cliente puede 
+            usar para verificar si el cálculo se completó, esperar a que se complete la invocación, 
+            recuperar el resultado final y cancelar la invocación.
+          </p>
+        </div>
+        <div class="sect2" id="GKIFJ">
+          <h3 id="creating-an-asynchronous-business-method">
+            Creando un Método de Negocio Asíncrono
+          </h3>
+          <div class="paragraph">
+            <p>
+              Anote un método de negocio con <code>javax.ejb.Asynchronous</code> para marcar ese 
+              método como un método asíncrono, o aplique <code>@Asynchronous</code> a nivel de clase 
+              para marcar todos los métodos comerciales de la sesión bean como métodos asincrónicos. Los métodos de beans de sesión que exponen servicios web no pueden ser asíncronos.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los métodos asincrónicos deben devolver <code>void</code> o una implementación de la 
+              interfaz <code>Future&lt;V&gt;</code>. Los métodos asincrónicos que devuelven 
+              <code>void</code> no pueden declarar excepciones de aplicación, pero si devuelven 
+              <code>Future&lt;V&gt;</code>, pueden declarar excepciones de aplicación. Por ejemplo:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Asynchronous
+public Future&lt;String&gt; processPayment(Order order) throws PaymentException { ... }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Este método intentará procesar el pago de un pedido y devolverá el estado como 
+              <code>String</code>. Incluso si el procesador de pagos tarda mucho tiempo, el cliente 
+              puede continuar trabajando y mostrar el resultado cuando finalmente se completa el 
+              procesamiento.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La clase <code>javax.ejb.AsyncResult&lt;V&gt;</code> es una implementación concreta de 
+              la interfaz <code>Future&lt;V&gt;</code> proporcionada como clase auxiliar para 
+              devolver resultados asincrónicos. <code>AsyncResult</code> tiene un constructor con el 
+              resultado como parámetro, lo que facilita la creación de implementaciones 
+              <code>Future&lt;V&gt;</code>. Por ejemplo, el método <code>processPayment</code> 
+              usaría <code>AsyncResult</code> para devolver el estado como una <code>String</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Asynchronous
+public Future&lt;String&gt; processPayment(Order order) throws PaymentException {
+    ...
+    String status = ...;
+    return new AsyncResult&lt;String&gt;(status);
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El resultado se devuelve al contenedor de enterprise beans, no directamente al 
+              cliente, y el contenedor de enterprise beans pone el resultado a disposición del 
+              cliente. El bean de sesión puede verificar si el cliente solicitó que se cancelara la 
+              invocación llamando al método <code>javax.ejb.SessionContext.wasCancelled</code>. Por 
+              ejemplo:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Asynchronous
+public Future&lt;String&gt; processPayment(Order order) throws PaymentException {
+    ...
+    if (SessionContext.wasCancelled()) {
+        // limpiar
+    } else {
+        // procesar el pago
+    }
+    ...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GKIEM">
+          <h3 id="calling-asynchronous-methods-from-enterprise-bean-clients">
+            Llamando a Métodos Asíncronos desde Clientes de Enterprise Beans
+          </h3>
+          <div class="paragraph">
+            <p>
+              Los clientes de beans de sesión llaman a métodos asincrónicos como métodos comerciales 
+              no asincrónicos. Si el método asíncrono devuelve un resultado, el cliente recibe una 
+              instancia de <code>Future&lt;V&gt;</code> tan pronto como se invoca el método. Esta 
+              instancia se puede utilizar para recuperar el resultado final, cancelar la invocación, 
+              verificar si la invocación se completó, verificar si se generaron excepciones durante 
+              el procesamiento y verificar si la invocación se canceló.
+            </p>
+          </div>
+          <div class="sect3" id="GKICM">
+            <h4 id="retrieving-the-final-result-from-an-asynchronous-method-invocation">
+              Recuperar el Resultado Final de una Invocación de Método Asincróno
+            </h4>
+            <div class="paragraph">
+              <p>
+                El cliente puede recuperar el resultado utilizando uno de los métodos 
+                <code>Future&lt;V&gt;.get</code>. Si el bean de sesión que maneja la invocación no 
+                ha completado el procesamiento, llamar a uno de los métodos <code>get</code> hará 
+                que el cliente detenga la ejecución hasta que se complete la invocación. Utilice el 
+                método <code>Future&lt;V&gt;.isDone</code> para determinar si el procesamiento se ha 
+                completado antes de llamar a uno de los métodos <code>get</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                El método <code>get()</code> devuelve el resultado como el tipo especificado en el 
+                valor de tipo de la instancia <code>Future&lt;V&gt;</code>. Por ejemplo, llamar a 
+                <code>Future&lt;String&gt;.get()</code> devolverá un objeto <code>String</code>. Si 
+                se canceló la invocación del método, las llamadas a <code>get()</code> generan una 
+                <code>java.util.concurrent.CancellationException</code>. Si la invocación resultó en 
+                una excepción durante el procesamiento por parte del bean de sesión, las llamadas a 
+                <code>get()</code> generarán una 
+                <code>java.util.concurrent.ExecutionException</code>. La causa de 
+                <code>ExecutionException</code> se puede recuperar llamando al método 
+                <code>ExecutionException.getCause</code>. 
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                El método <code>get(long timeout, java.util.concurrent.TimeUnit unit)</code> es 
+                similar al método <code>get()</code>, pero permite al cliente establecer un valor de 
+                tiempo de espera. Si se supera el valor de tiempo de espera, se genera una 
+                <code>java.util.concurrent.TimeoutException</code>. Consulte el Javadoc para la 
+                clase <code>TimeUnit</code> para conocer las unidades de tiempo disponibles para 
+                especificar el valor de tiempo de espera.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="GKIDB">
+            <h4 id="cancelling-an-asynchronous-method-invocation">
+              Cancelando una Invocación a un Método Asíncrono
+            </h4>
+            <div class="paragraph">
+              <p>
+                Llame al método <code>cancel(boolean mayInterruptIfRunning)</code> en la instancia 
+                <code>Future&lt;V&gt;</code> para intentar cancelar la invocación del método. El 
+                método <code>cancel</code> devuelve <code>true</code> si la cancelación fue exitosa 
+                y <code>false</code> si la invocación del método no se puede cancelar.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Cuando no se puede cancelar la invocación, se utiliza el parámetro 
+                <code>mayInterruptIfRunning</code> para alertar a la instancia del bean de sesión en 
+                la que se ejecuta la invocación del método de que el cliente intentó cancelar la 
+                invocación. Si <code>mayInterruptIfRunning</code> se establece en <code>true</code>, 
+                las llamadas a <code>SessionContext.wasCancelled</code> por parte de la instancia 
+                del bean de sesión devolverán <code>true</code>. Si 
+                <code>mayInterruptIfRunning</code> establece <code>false</code>, las llamadas a 
+                <code>SessionContext.wasCancelled</code> por parte de la instancia del bean de 
+                sesión devolverán <code>false</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                El método <code>Future&lt;V&gt;.isCancelled</code> se utiliza para comprobar si la 
+                invocación del método se canceló antes de que se completara la invocación del método 
+                asíncrono llamando a <code>Future&lt;V&gt;.cancel</code>. El método 
+                <code>isCancelled</code> devuelve <code>true</code> si se canceló la invocación.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="GKIEV">
+            <h4 id="checking-the-status-of-an-asynchronous-method-invocation">
+              Comprobar el Estado de la Invocación a un Método Asíncrono
+            </h4>
+            <div class="paragraph">
+              <p>
+                El método <code>Future&lt;V&gt;.isDone</code> devuelve <code>true</code> si la 
+                instancia del bean de sesión completó el procesamiento de la invocación del método. 
+                El método <code>isDone</code> devuelve <code>true</code> si la invocación del método 
+                asincrónico se completó normalmente, se canceló o resultó en una excepción. Es 
+                decir, <code>isDone</code> indica solo si el bean de sesión ha completado el 
+                procesamiento de la invocación.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="ejb-async.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="ejb-async002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

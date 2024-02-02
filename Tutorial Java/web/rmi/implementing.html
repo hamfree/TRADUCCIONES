@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Implementando un Intefaz Remoto (Los Tutoriales de Java&trade; &gt; RMI)
+        </title>
+        <meta name="description" content="Este tutorial del RMI de Java describe el sistema RMI de Java. Recorre un ejemplo completo
+              de cliente/servidor" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java rmi, java client server" />
+        <link rel="stylesheet" href="../indice.css" type="text/css"/>
+        <script src="../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkAHEAD"><a href="overview.html">Una descripción de las Aplicaciones RMI (Remote Method Interface)</a></div>
+                <div class="linkAHEAD"><a href="server.html">Escribiendo un Servidor RMI</a></div>
+                <div class="linkBHEAD"><a href="designing.html">Diseñando un Interfaz Remoto</a></div>
+                <div class="nolinkBHEAD">Implementando un Intefaz Remoto</div>
+                <div class="linkAHEAD"><a href="client.html">Creando un Programa Cliente</a></div>
+                <div class="linkAHEAD"><a href="example.html">Compilando y Ejecutando el Ejemplo</a></div>
+                <div class="linkBHEAD"><a href="compiling.html">Compilando los Programas de Ejemplo</a></div>
+                <div class="linkBHEAD"><a href="running.html">Ejecutando los Programas de Ejemplo</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> RMI<br />
+                <b>Sección:</b> Escribiendo un Servidor RMI
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="./index.html" target="_top">RMI</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="designing.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="client.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Implementando un Intefaz Remoto</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Esta sección describe la tarea de implementar una clase para el motor de cálculo. En general, una clase que 
+                    implementa una interfaz remota debería al menos hacer lo siguiente:
+                </p>
+                <ul>
+                    <li>
+                        Declarar las interfaces remotas que se están implementando
+                    </li>
+                    <li>
+                        Definir el constructor para cada objeto remoto
+                    </li>
+                    <li>
+                        Proporcionar una implementación para cada método remoto en las interfaces remotas
+                    </li>
+                </ul>
+                <p>
+                    Un programa servidor de RMI necesita crear los objetos remotos iniciales y <i>exportarlos</i> al tiempo de 
+                    ejecución de RMI, lo que los hace disponibles para recibir invocaciones remotas entrantes. Este procedimiento 
+                    de configuración puede ser encapsulado en un método de la propia clase de implementación del objeto remoto 
+                    o incluirse en otra clase por completo. El procedimiento de configuración debe hacer lo siguiente:
+                </p>
+                <ul>
+                    <li>
+                        Crear e instalar un gestor de seguridad
+                    </li>
+                    <li>
+                        Crear y exportar uno o más objetos remotos.
+                    </li>
+                    <li>
+                        Registrar al menos un objeto remoto con el registro RMI (o con otro servicio de nombres, tal como un 
+                        servicio accesible a través de la Interfaz de Nombres y Directorio de Java) para fines de arranque.
+                    </li>
+                </ul>
+                <p>
+                    La implementación completa del motor de cálculo es de la siguiente manera. La clase 
+                    <a class="SourceLink" target="_blank" href="examples/engine/ComputeEngine.java" 
+                       onclick="showCode('../displayCode.html', 'examples/engine/ComputeEngine.java'); return false;">
+                        <code>engine.ComputeEngine</code></a> implementa la interfaz remota <code>Compute</code> y también incluye 
+                    el método <code>main</code> para configurar el motor de cálculo. Aquí está el código fuente para la clase 
+                    <code>ComputeEngine</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+package engine;
+
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+import compute.Compute;
+import compute.Task;
+
+public class ComputeEngine implements Compute {
+
+    public ComputeEngine() {
+        super();
+    }
+
+    public &lt;T&gt; T executeTask(Task&lt;T&gt; t) {
+        return t.execute();
+    }
+
+    public static void main(String[] args) {
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new SecurityManager());
+        }
+        try {
+            String name = "Compute";
+            Compute engine = new ComputeEngine();
+            Compute stub =
+                (Compute) UnicastRemoteObject.exportObject(engine, 0);
+            Registry registry = LocateRegistry.getRegistry();
+            registry.rebind(name, stub);
+            System.out.println("ComputeEngine bound");
+        } catch (Exception e) {
+            System.err.println("ComputeEngine exception:");
+            e.printStackTrace();
+        }
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Las secciones siguientes describen cada componente de la implementación del motor de cálculo.
+                </p>
+                <h2>
+                    Declarar las Interfaces Remotas que se Están Implementando
+                </h2>
+                <p>
+                    La clase de implementación para el motor de cálculo se declara de la siguiente manera:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public class ComputeEngine implements Compute
+                    </pre>
+                </div>
+                <p>
+                    Esta declaración establece que la clase implementa el método remoto <code>Compute</code> y por lo tanto puede 
+                    usarse para un objeto remoto.
+                </p>
+                <p>
+                    La clase <code>ComputeEngine</code> define una clase de implementación de objeto remoto que implementa una 
+                    única interfaz remota y ninguna otra interfaz. La clase <code>ComputeEngine</code> también contiene dos 
+                    elementos de programa ejecutables que sólo pueden ser invocados localmente. El primero de estos elementos es un 
+                    constructor para las instancias <code>ComputeEngine</code>. El segundo de estos elementos es un método 
+                    <code>main</code> que se usa para crear una instancia <code>ComputeEngine</code> y ponerla a disposición de los 
+                    clientes. 
+                </p>
+                <h2>
+                    Definir el Constructor para el Objeto Remoto
+                </h2>
+                <p>
+                    La clase <code>ComputeEngine</code> tiene un único constructor que no toma argumentos. El código para el 
+                    constructor es de la siguiente manera:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public ComputeEngine() {
+    super();
+}
+                    </pre>
+                </div>
+                <p>
+                    Este constructor simplemente invoca al constructor de la superclase, que es el constructor sin argumentos de la 
+                    clase <code>Object</code>. Aunque el constructor de la superclase se invoca incluso si se omite del constructor 
+                    <code>ComputeEngine</code>, se incluye para mayor claridad.
+                </p>
+                <h2>
+                    Proporcionar Implementaciones para Cada Método Remoto
+                </h2>
+                <p>
+                    La clase para un objeto remoto proporciona implementaciones para cada método remoto especificado en las 
+                    interfaces remotas. La interfaz <code>Compute</code> contiene un único método rémoto, <code>executeTask</code>, 
+                    que se implementa de la siguiente manera:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public &lt;T&gt; T executeTask(Task&lt;T&gt; t) {
+    return t.execute();
+}
+                    </pre>
+                </div>
+                <p>
+                    Este método implementa el protocolo entre el objeto remoto <code>ComputeEngine</code> y sus clientes. Cada 
+                    cliente proporciona el <code>ComputeEngine</code> con un objeto <code>Task</code> que tiene una implementación 
+                    particular del método <code>execute</code> de la interfaz <code>Task</code>. El <code>ComputeEngine</code> 
+                    ejecuta cada tarea de cliente y devuelve el resultado del método <code>execute</code> de la tarea directamente 
+                    al cliente.
+                </p>
+                <h2>
+                    Pasar Objetos en RMI
+                </h2>
+                <p>
+                    Los argumentos a o los valores devueltos desde los métodos remotos pueden ser de cualquier tipo, incluyendo 
+                    objetos locales, objetos remotos, y tipos de datos prinitivos. Más precisamente, cualquier entidad de 
+                    cualquier tipo se puede pasar a o desde un método remoto siempre que la entidad sea una instancia de un tipo 
+                    que es un tipo de dato primitivo, un objeto remoto, o un objeto <i>serializable</i>, lo que significa que 
+                    implementa la interfaz <code>java.io.Serializable.</code>.
+                </p>
+                <p>
+                    Algunos tipos de objetos no coinciden con ninguno de estos criterios y así no se pueden pasar o devolver desde 
+                    un método remoto. La mayoría de estos objetos, tales como hilos o descriptores de fichero, encapsulan 
+                    información que tiene sentido sólo dentro de un espacio de direcciones único. Muchas de las clases principales, 
+                    incluyendo las clases en los paquetes <code>java.lang</code> y <code>java.util</code>, implementan la interfaz 
+                    <code>Serializable</code>.
+                </p>
+                <p>
+                    Las reglas que gobiernan cómo se pasan los argumentos y valores devueltos son las siguientes:
+                </p>
+                <ul>
+                    <li>
+                        Los objetos remotos son pasados esencialmente por referencia. Una <i>referencia de objeto remoto</i> es 
+                        un esbozo, el cual es un apoderado del lado del cliente que implementa el conjunto completo de las 
+                        interfaces remotas que el objeto remoto implementa.
+                    </li>
+                    <li>
+                        Los objetos locales se pasan por copia, usando la serialización de objetos. De forma predeterminada, todos 
+                        los campos son copiados excepto los campos que están marcados <code>static</code> o <code>transient</code>. 
+                        El comportamiento de serialización predeterminado se puede anular clase por clase.
+                    </li>
+                </ul>
+                <p>
+                    Pasar un objeto remoto por referencia significa que cualquier cambio hecho al estado del objeto por las 
+                    invocaciones del método remoto son reflejadas en el objeto remoto original. Cuando se pasa un objeto remoto, 
+                    sólo aquellas interfaces que son interfaces remotas están disponibles al receptor. Cualquier método definido en 
+                    la clase de implementación o definido en interfaces no remotas implementadas por la clase no están disponibles 
+                    para ese receptor.
+                </p>
+                <p>
+                    Por ejemplo, si tuviera que pasar una referencia a una instancia de la clase <code>ComputeEngine</code>, el 
+                    receptor solo tendría acceso al método <code>executeTask</code> del motor de cálculo. Ese receptor no vería el 
+                    constructor <code>ComputeEngine</code>, su método <code>main</code>, o su implementación de cualquier método de 
+                    <code>java.lang.Object</code>.
+                </p>
+                <p>
+                    En los parámetros y valores de retorno de las invocaciones del método remoto, los objetos que no son objetos 
+                    remotos son pasados por valor. Por lo tanto, se crea una copia del objeto en la máquina virtual Java receptora. 
+                    Cualquier cambio al estado del objeto por el receptor se refleja sólo en la copia del receptor, no en la 
+                    instancia original del remitente. Cualquier cambio al estado del objeto por el remitente se refleja sólo en la 
+                    instancia original del remitente, no en la copia del receptor.
+                </p>
+                <h2>
+                    Implementar el Método del Servidor <code>main</code>
+                </h2>
+                <p>
+                    El método más complejo de la implementación <code>ComputeEngine</code> es el método <code>main</code>. El 
+                    método <code>main</code> se usa para iniciar <code>ComputeEngine</code> y por lo tanto debe realizar la 
+                    inicialización y el mantenimiento necesarios para preparar al servidor para aceptar llamadas de los clientes. 
+                    Este método no es un método remoto, lo que significa que no puede ser invocado desde una máquina virtual de 
+                    Java diferente. Debido a que el método <code>main</code> se declara <code>static</code>, el método no está 
+                    asociado con un objeto en absoluto, sino con la clase <code>ComputeEngine</code>.
+                </p>
+                <h2>
+                    Crear e Instalar un Gestor de Seguridad
+                </h2>
+                <p>
+                    La primera tarea del método <code>main</code> es crear e instalar un gestor de seguridad, que proteja el acceso 
+                    a los recursos del sistema desde código no confiable descargado dentro de la máquina virtual de Java. Un gestor 
+                    de seguridad determina si el código descargado tiene acceso al sistema de ficheros local o puede realizar 
+                    cualquier otra operación privilegiada.
+                </p>
+                <p>
+                    Si un programa RMI no instala un gestor de seguridad, RMI no descargará clases (que no sean de la ruta de 
+                    clases locales) para objetos recibidos como argumentos o valores de retorno de invocaciones de métodos remotos.
+                    Esta restricción asegura que las operaciones realizadas por el código descargado están sujetas a una política 
+                    de seguridad.
+                </p>
+                <p>
+                    Aquí está el código que crea e instala un gestor de seguridad:
+                </p>
+                <div class="codeblock">
+                    <pre>
+if (System.getSecurityManager() == null) {
+    System.setSecurityManager(new SecurityManager());
+}
+                    </pre>
+                </div>
+                <h2>
+                    Hacer que el Objeto Remoto Esté Disponible para los Clientes
+                </h2>
+                <p>
+                    A continuación, el método <code>main</code> crea una instancia de <code>ComputeEngine</code> y la exporta al 
+                    tiempo de ejecución de RMI con las siguientes sentencias:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Compute engine = new ComputeEngine();
+Compute stub =
+    (Compute) UnicastRemoteObject.exportObject(engine, 0);
+                    </pre>
+                </div>
+                <p>
+                    El método estático <code>UnicastRemoteObject.exportObject</code> exporta el objeto remoto proporcionado para 
+                    que pueda recibir invocaciones de sus métodos remotos desde clientes remotos. El segundo argumento, un 
+                    <code>int</code>, usa el valor cero, lo que especifica el uso de un puerto anónimo. El puerto real será después 
+                    elegido en tiempo de ejecución por RMI o el sistema operativo subyacente. Sin embargo, se puede usar un valor 
+                    no cero para especificar un puerto específico a usar para la escucha. Una vez la invocación 
+                    <code>exportObject</code> ha vuelto de forma satisfactoria, el objeto remoto <code>ComputeEngine</code> está 
+                    listo para procesar las invocaciones remotas entrantes.
+                </p>
+                <p>
+                    El método <code>exportObject</code> devuelve un esbozo para el objeto remoto exportado. Tenga en cuenta que el 
+                    tipo de la variable <code>stub</code> debe ser <code>Compute</code>, no <code>ComputeEngine</code>, porque el 
+                    esbozo para un objeto remoto solo implementa las interfaces remotas que el objeto remoto exportado implementa.
+                </p>
+                <p>
+                    El método <code>exportObject</code> declara que puede lanzar una <code>RemoteException</code>, que es una 
+                    excepción de tipo comprobada. El método <code>main</code> maneja esta excepción con su bloque 
+                    <code>try</code>/<code>catch</code>. Si no fuera manejada la excepción de esta forma, tendría que declararse 
+                    <code>RemoteException</code> en la cláusula <code>throws</code> del método <code>main</code>. Un intento de 
+                    exportar un objeto remoto puede lanzar una <code>RemoteException</code> si los recursos de comunicación 
+                    necesarios no están disponibles, como si el puerto solicitado está destinado a algún otro proposito.
+                </p>
+                <p>
+                    Antes de que un cliente pueda invocar un método en un objeto remoto, debe primero obtener una referencia al 
+                    objeto remoto. La obtención de una referencia puede hacerse de la misma forma que se obtiene cualquier otra 
+                    referencia de objeto en un programa, como al obtener la referencia como parte del valor de retorno de un método 
+                    o como parte de una estructura de datos que contiene dicha referencia.
+                </p>
+                <p>
+                    El sistema proporciona un tipo particular de objeto remoto, el registro RMI, para encontrar referencias a otros 
+                    objetos remotos. El registro RMI es un servicio de nombres simple de objetos remotos que permite a los clientes 
+                    obtener una referencia a un objeto remoto por nombre. El registro es habitualmente solo utilizado para 
+                    localizar el primer objeto remoto que un cliente RMI necesita usar. Este primer objeto remoto podría después 
+                    proporcionar soporte para encontrar otros objetos.
+                </p>
+                <p>
+                    La interfaz remota <code>java.rmi.registry.Registry</code> es la IPA para vincular (o registrar) y buscar 
+                    objetos remotos en el registro. La clase <code>java.rmi.registry.LocateRegistry</code> proporciona métodos 
+                    estáticos para sintetizar una referencia remota a un registro en una dirección de red particular (máquina y 
+                    puerto). Estos métodos crean el objeto de referencia remota que contiene la dirección de red especificada sin 
+                    realizar ninguna comunicación remota. <code>LocateRegistry</code> también proporciona métodos estáticos para 
+                    crear un nuevo registro en la máquina virtual de Java actual, aunque este ejemplo no usa esos métodos. Una vez 
+                    se registra un objeto remoto en un registro RMI en la máquina local, los clientes en cualquier máquina pueden 
+                    buscar el objeto remoto por nombre, obtener su referencia, y después invocar los métodos remotos del objeto. El 
+                    registro puede ser compartido por todos los servidores que se ejecutan en una máquina, o un proceso individual 
+                    de servidor puede crear y usar su propio registro.
+                </p>
+                <p>
+                    La clase <code>ComputeEngine</code> crea un nombre para el objeto con la sentencia siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+String name = &quot;Compute&quot;;
+                    </pre>
+                </div>
+                <p>
+                    El código después agrega el nombre al registro RMI que se ejecuta en el servidor. Este paso se hace más tarde 
+                    con las sentencias siguientes:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Registry registry = LocateRegistry.getRegistry();
+registry.rebind(name, stub);
+                    </pre>
+                </div>
+                <p>
+                    La invocación <code>rebind</code> hace una llamada remota al registro RMI en la máquina local. Como cualquier 
+                    llamada remota, esta llamada puede resultar en el lanzamiento de una <code>RemoteException</code>, que es 
+                    manejada por el bloque <code>catch</code> al final del método <code>main</code>.
+                </p>
+                <p>
+                    Tenga en cuenta lo siguiente sobre la invocación <code>Registry.rebind</code>:
+                </p>
+                <ul>
+                    <li>
+                        La anulación sin argumentos de <code>LocateRegistry.getRegistry</code> sintetiza una referencia a un 
+                        registro en la máquina local y el puerto de registro predeterminado, 1099. Debe usar una anulación que 
+                        tenga un parámetro <code>int</code> si se creó el registro en un puerto distinto de 1099.
+                    </li>
+                    <li>
+                        Cuando se hace una invocación remota al registro, se pasa un esbozo del objeto remoto en vez de una copia 
+                        del objeto remoto en sí mismo. La implementación de objetos remotos, tales como instancias de 
+                        <code>ComputeEngine</code>, nunca salen de la máquina virtual de Java en las que fueron creados. Por lo 
+                        tanto, cuando un cliente realiza una búsqueda en un registro de servidor de objetos remotos, se devuelve 
+                        una copia del esbozo. Los objetos remotos en tales casos se pasan de manera efectiva por referencia (remota) 
+                        en lugar de por valor.
+                    </li>
+                    <li>
+                        Por razones de seguridad, una aplicación puede sólo <code>vincular</code> 
+                        (<b>Nota del Traductor:</b> <code>bind</code> en inglés), <code>desvincular</code> 
+                        (<b>Nota del Traductor:</b> <code>unbind</code> en inglés), o <code>volver a vincular</code> 
+                        (<b>Nota del Traductor:</b> <code>rebind</code> en inglés), referencias de objetos remotos con un registro 
+                        que se ejecute en la misma máquina. Esta restricción evita que un cliente remoto elimine o sobreescriba 
+                        cualquiera de las entradas en un registro de servidor. Una <code>búsqueda</code> 
+                        (<b>Nota del Traductor:</b> <code>lookup</code> en inglés), sin embargo, puede solicitarse desde cualquier 
+                        máquina, local o remota.
+                    </li>
+                </ul>
+                <p>
+                    Una vez que el servidor se ha registrado en el registro RMI local, imprime un mensaje que indica que está listo 
+                    para comenzar a manejar llamadas. Después, el método <code>main</code> termina. No es necesario tener un hilo 
+                    en espera para mantener vivo el servidor. Mientras haya una referencia al objeto <code>ComputeEngine</code> en 
+                    otra máquina virtual de Java, local o remota, el objeto <code>ComputeEngine</code> no se cerrará ni será 
+                    recolectado por el recolector de basura. Debido a que el programa vincula una referencia al 
+                    <code>ComputeEngine</code> en el registro, es accesible desde un cliente remoto, el registro mismo. El sistema 
+                    RMI mantiene el proceso de <code>ComputeEngine</code> ejecutándose. El <code>ComputeEngine</code> está disponible 
+                    para aceptar llamadas y no será reclamado hasta que su vinculación sea eliminada desde el registro <i>y</i> 
+                    no haya clientes remotos que mantengan una referencia remota al objeto <code>ComputeEngine</code>.
+                </p>
+                <p>
+                    La pieza final de código en el método <code>ComputeEngine.main</code> maneja cualquier excepción que pudiera 
+                    surgir. El único tipo de excepción comprobada que podría ser lanzada en el código es 
+                    <code>RemoteException</code>, por la invocación a <code>UnicastRemoteObject.exportObject</code> o por la 
+                    invocación del registro <code>rebind</code>. En cualquier caso, el programa no puede hacer mucho más que salir 
+                    después de imprimir un mensaje de error. En algunas aplicaciones distribuidas, es posible recuperarse de la 
+                    falla al realizar una invocación remota. Por ejemplo, la aplicación podría intentar repetir la operación o 
+                    elegir otro servidor para continuar la operación.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="designing.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="client.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Diseñando un Interfaz Remoto<br />
+            <b>Página siguiente:</b> Creando un Programa Cliente
+        </div>
+    </body>
+</html> 

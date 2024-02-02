@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Objetos Serializables (Los Tutoriales de Java&trade; &gt; Nombrado en Java e Interfaz de Directorio &gt; Objetos de
+            Java en el Directorio)
+        </title>
+        <meta name="description" content="Este tutorial de Java JNDI describe la tecnología de Nombrado en Java e Interfaz de 
+              Directorio (JNDI), operaciones de nombre y directorio, y LDAP" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jndi, ldap, jndi service provider" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Objetos de Java en el Directorio</a></div>
+                <div class="linkAHEAD"><a href="store.html">Almacenando y Leyendo Objetos</a></div>
+                <div class="nolinkAHEAD">Objetos Serializables</div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Nombrado en Java e Interfaz de Directorio
+                <br /><b>Lección:</b> Objetos de Java en el Directorio
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Nombrado en Java e Interfaz de Directorio</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Objetos de Java en el Directorio</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="store.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../newstuff/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Objetos Serializables</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    <em>Serializar</em> un objeto significa convertir su estado a un flujo de bytes de forma que el flujo de bytes 
+                    puede ser revertido de vuelta en una copia del objeto. Un objeto de Java es <em>serializable</em> si su clase 
+                    o cualquiera de sus superclases implementa la interfaz <code>java.io.Serializable</code> o su subinterfaz, 
+                    <code>java.io.Externalizable</code>. La <em>Deserialización</em> es el proceso de convertir la forma 
+                    serializada de un objeto de vuelta a una copia del objeto.
+                </p>
+                <p>
+                    Por ejemplo, la clase <code>java.awt.Button</code> implementa la interfaz <code>Serializable</code>, de forma 
+                    que puede serializar un objeto <code>java.awt.Button</code> y almacenar ese estado serializado en un fichero. 
+                    Posteriormente, puede leer de vuelta el estado serializado y deserializarlo en un objeto 
+                    <code>java.awt.Button</code>.
+                </p>
+                <p>
+                    La plataforma Java especifica un forma predeterminada por la cual los objetos serializables son serializados. 
+                    Una clase (Java) puede sobreescribir esta serialización predeterminada y definir su propia forma de serializar 
+                    objetos de esa clase. La 
+                    <a class="OutsideLink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/technotes/guides/serialization/index.html">
+                        Especificación de Serialización de Objetos</a> describe la serialización de objetos en detalle.
+                </p>
+                <p>
+                    Cuando un objeto se serializa, la información que identifica su clase se graba en el flujo serializado. Sin 
+                    embargo, la definición de clase (&quot;el fichero class&quot;) en sí misma no se graba. Es responsabilidad del 
+                    sistema que está deserializando el objeto determinar cómo ubicar y cargar los archivos de clase necesarios. Por 
+                    ejemplo, una aplicación Java podría incluir en su ruta de clases un fichero JAR que contiene los ficheros de 
+                    clases de los objetos serializados o cargar las definiciones de clase usando información almacenada en el 
+                    directorio, como se explicó más tarde en esta lección.  <a id="EXAMPLE"></a>
+                </p>
+                <h2>
+                    Vincular un Objeto Serializable
+                </h2>
+                <p>
+                    Puede almacenar un objeto serializable en el directorio si el proveedor de servicio subyacente soporta esa 
+                    acción, como hace el proveedor de servicio LDAP de Oracle.
+                </p>
+                <p>
+                    El ejemplo siguiente invoca 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html#bind-javax.naming.Name-java.lang.Object-">
+                        <code>Context.bind</code>
+                    </a> para vincular un botón AWT al nombre <code>&quot;cn=Button&quot;</code>. Para asociar los atributos con 
+                    el nuevo vínculo, puede usar 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/directory/DirContext.html#bind-javax.naming.Name-java.lang.Object-javax.naming.directory.Attributes-">
+                        <code>DirContext.bind</code>
+                    </a>. Para sobreescribir un vínculo existente, use 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html#rebind-javax.naming.Name-java.lang.Object-">
+                        <code>Context.rebind</code>
+                    </a> y
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/directory/DirContext.html#rebind-javax.naming.Name-java.lang.Object-javax.naming.directory.Attributes-">
+                        <code>DirContext.rebind</code></a>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+// Create the object to be bound
+Button b = new Button("Push me");
+
+// Perform the bind
+ctx.bind("cn=Button", b);
+                    </pre>
+                </div>
+                <p>
+                    Puede entonces leer el objeto de vuelta usando 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html#lookup-javax.naming.Name-">
+                        <code>Context.lookup</code></a>, como sigue.
+                </p>
+                <div class="codeblock">
+                    <pre>
+// Check that it is bound
+Button b2 = (Button)ctx.lookup("cn=Button");
+System.out.println(b2);
+                    </pre>
+                </div>
+                <p>
+                    Ejecutar 
+                    <a class="SourceLink" target="_blank" href="examples/SerObj.java"
+                       onclick="showCode('../../displayCode.html', 'examples/SerObj.java'); return false;">
+                        <code>este ejemplo</code></a> produce la siguiente salida.
+                </p>
+                <div class="codeblock">
+                    <pre>
+# java SerObj
+java.awt.Button[button0,0,0,0x0,invalid,label=Push me]
+                    </pre>
+                </div>
+                <p>
+                    <a id="CODEBASE"></a>
+                </p>
+                <h2>
+                    Especificar una Base de Código
+                </h2>
+                <hr />
+                <p>
+                    <strong>Nota:</strong> Los procedimientos descritos aquí son para vincular un objeto serializable en un 
+                    servicio de directorio que sigue el esquema definido en 
+                    <a class="OutsideLink" target="_blank" href="http://www.ietf.org/rfc/rfc2713.txt">RFC 2713</a>. Estos 
+                    procedimientos podrían no ser generalmente aplicables a otros servicios de directorio y nombrado que soporta 
+                    vincular un objeto serializable con una Base de Código especificada.
+                </p>
+                <hr />
+                <p>
+                    Cuando un objeto serializado se vincula en el directorio como se muestra en el ejemplo previo, las aplicaciones 
+                    que leen el objeto serializado desde el directorio deben tener acceso a las definiciones de clase necesarios 
+                    para deserializar el objeto.
+                </p>
+                <p>
+                    Alternativamente, puede grabar una <em>base de código</em> con el objeto serializado en el directorio, o 
+                    cuando usted vincula el objeto o posteriormente agregando un atributo usando 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/directory/DirContext.html#modifyAttributes-javax.naming.Name-int-javax.naming.directory.Attributes-">
+                        <code>DirContext.modifyAttributes</code>
+                    </a>. Puede usar cualquier atributo para registrar esta base de código y hacer que su aplicación lea ese 
+                    atributo del directorio y lo use de manera apropiada. O puede usar el atributo 
+                    <code>&quot;javaCodebase&quot;</code> especificado dentro. En el último caso, el proveedor de servicio de LDAP 
+                    de Oracle automáticamente usará el atributo para cargar las definiciones de clases según sea necesario. 
+                    <code>&quot;javaCodebase&quot;</code> debe contener la URL de un directorio base de código de un fichero JAR. 
+                    Si la base de código contiene más de una URL, entonces cada URL debe estar separada por un carácter espacio.
+                </p>
+                <p>
+                    El ejemplo siguiente se parece al de vincular un <code>java.awt.Button</code>. Se diferencia en que utiliza una 
+                    clase <code>Serializable</code> definida por el usuario, 
+                    <a class="SourceLink" target="_blank" href="examples/Flower.java"
+                       onclick="showCode('../../displayCode.html', 'examples/Flower.java'); return false;">
+                        <code>Flower</code>
+                    </a>, y proporciona un atributo <code>&quot;javaCodebase&quot;</code> que contiene la ubicación de la 
+                    definición de clase <code>Flower</code>.  Aquí está el código que hace la vinculación.
+                </p>
+                <div class="codeblock">
+                    <pre>
+String codebase = ...;
+
+// Create the object to be bound
+Flower f = new Flower("rose", "pink");
+
+// Perform the bind and specify the codebase
+ctx.bind("cn=Flower", f, new BasicAttributes("javaCodebase", codebase));
+                    </pre>
+                </div>
+                <p>
+                    Cuando ejecuta 
+                    <a class="SourceLink" target="_blank" href="examples/SerObjWithCodebase.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/SerObjWithCodebase.java'); return false;">
+                        <code>este ejemplo</code></a>, debe proporcionar la URL de la ubicación en la cual se instaló el fichero 
+                    de clase <code>Flower.class</code>. Por ejemplo, si <code>Flower.class</code> fue instalada en el servidor 
+                    web <code>web1</code>, en el directorio <code>example/classes</code>, entonces ejecutaría este ejemplo de 
+                    la siguiente manera.
+                </p>
+                <div class="codeblock">
+                    <pre>
+# java SerObjWithCodebase http://web1/example/classes/
+pink rose
+                    </pre>
+                </div>
+                <p>
+                    Después, puede eliminar <code>Flower.class</code> desde su ruta de clase y ejecutar cualquier programa que 
+                    busca o lista este objeto sin directamente referenciar la clase <code>Flower</code>. Si su programa referencia 
+                    <code>Flower</code> directamente, luego debe hacer que su archivo de clase esté disponible para su compilación 
+                    y ejecución.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="store.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../newstuff/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Almacenando y Leyendo Objetos<br />
+            <b>Página siguiente:</b> New features in KDJ 5.0 and KDJ 6
+        </div>
+    </body>
+</html> 

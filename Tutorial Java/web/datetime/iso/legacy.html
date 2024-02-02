@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />        
+        <title>
+            Código Date-Time Heredado (Los Tutoriales de Java&trade; &gt; Fecha y Hora &gt; Calendario Estándar)
+        </title>
+        <meta name="description" content="Este tutorial de Java de fecha y tiempo describe cómo usar las IPAs java.time
+              introducidas en el KDJ 8 para escribir código de fechas y tiempo. El núcleo del paquete usa el calendario estándar
+              como está definido en el sistema de calendario ISO." />
+        <meta name="keywords" content="java programming, learn java, java sample code, datetime, date time, JSR 310, date-time,
+              date, time, java.time, jdk8, ISO" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Calendario Estándar</a></div>
+                <div class="linkAHEAD"><a href="overview.html">Información General</a></div>
+                <div class="linkAHEAD"><a href="enum.html">DayOfWeek y Enumeraciones de Month</a></div>
+                <div class="linkAHEAD"><a href="date.html">Clase Date</a></div>
+                <div class="linkAHEAD"><a href="datetime.html">Clases Date y Time</a></div>
+                <div class="linkAHEAD"><a href="timezones.html">Zonas horarias y Clases de Compensación</a></div>
+                <div class="linkAHEAD"><a href="instant.html">Clase Instant</a></div>
+                <div class="linkAHEAD"><a href="format.html">Parseado y Formateado</a></div>
+                <div class="linkAHEAD"><a href="temporal.html">El Paquete Temporal</a></div>
+                <div class="linkBHEAD"><a href="adjusters.html">Temporal Adjuster</a></div>
+                <div class="linkBHEAD"><a href="queries.html">Temporal Query</a></div>
+                <div class="linkAHEAD"><a href="period.html">Period y Duration</a></div>
+                <div class="linkAHEAD"><a href="clock.html">Clock</a></div>
+                <div class="linkAHEAD"><a href="nonIso.html">Conversión de Fechas No-ISO</a></div>
+                <div class="nolinkAHEAD">Código Date-Time Heredado</div>
+                <div class="linkAHEAD"><a href="summary.html">Sumario</a></div>
+                <div class="linkQUESTIONS"><a href="QandE/questions.html">Preguntas y Ejercicios</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Fecha y Hora<br />
+                <b>Lección:</b> Calendario Estándar
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Fecha y Hora</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Calendario Estándar</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="nonIso.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="summary.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Código Date-Time Heredado</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Antes de la versión de Java SE 8, el mecanismo de fecha y hora de Java era proporcionado por las clases
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Date.html"><code>java.util.Date</code></a>,
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Calendar.html"><code>java.util.Calendar</code></a>,
+                       y
+                       <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/TimeZone.html"><code>java.util.TimeZone</code></a>
+                    , así como sus subclases, tales como
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/GregorianCalendar.html">
+                        <code>java.util.GregorianCalendar</code></a>. Estas clases tenían varios inconvenientes, incluyendo:
+                </p>
+                <ul>
+                    <li>La clase <code>Calendar</code> no era segura en cuanto a tipos.</li>
+                    <li>Debido a que las clases eran mutables, no se podían usar en aplicaciones multihilo.</li>
+                    <li>
+                        Los errores en el código de la aplicación eran comunes debido a la inusual numeración de los meses y la
+                        falta de seguridad de tipos.
+                    </li>
+                </ul>
+                <h2>
+                    Interoperabilidad con el código legado
+                </h2>
+                <p>
+                    Quizás tenga código legado que usa las clases de fecha y tiempo de <code>java.util</code> y le gustaría
+                    aprovechar la funcionalidad de <code>java.time</code> con cambios mínimos en su código.
+                </p>
+                <p>
+                    A la versión KDJ 8 se agregan varios métodos que permiten la conversión entre los objetos de
+                    <code>java.util</code> y <code>java.time</code>:
+                </p>
+                <ul>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/Calendar.html#toInstant--">
+                            <code>Calendar.toInstant()</code></a> convierte el objeto <code>Calendar</code> a un
+                        <code>Instant</code>.
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/GregorianCalendar.html#toZonedDateTime--">
+                            <code>GregorianCalendar.toZonedDateTime()</code></a> convierte una instancia 
+                        <code>GregorianCalendar</code> a una <code>ZonedDateTime</code>.
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/GregorianCalendar.html#from-java.time.ZonedDateTime-">
+                            <code>GregorianCalendar.from(ZonedDateTime)</code></a> crea un objeto <code>GregorianCalendar</code>
+                        usando el locale por defecto desde una instancia <code>ZonedDateTime</code>.
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/Date.html#from-java.time.Instant-">
+                            <code>Date.from(Instant)</code></a> crea un objeto <code>Date</code> desde un <code>Instant</code>.
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/Date.html#toInstant--">
+                            <code>Date.toInstant()</code></a> convierte un objeto <code>Date</code> en un <code>Instant</code>.
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/TimeZone.html#toZoneId--">
+                            <code>TimeZone.toZoneId()</code></a> convierte un objeto <code>TimeZone</code> en un <code>ZoneId</code>.
+                    </li>
+                </ul>
+                <p>
+                    El ejempo siguiente convierte una instancia <code>Calendar</code> en una instancia <code>ZonedDateTime</code>.
+                    Tenga en cuenta que se debe proporcionar una zona horaria para convertir de un <code>Instant</code> a un
+                    <code>ZonedDateTime</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Calendar now = Calendar.getInstance();
+ZonedDateTime zdt = ZonedDateTime.ofInstant(now.toInstant(), ZoneId.systemDefault()));
+                    </pre>
+                </div>
+                <p>
+                    El ejemplo siguiente muestra la conversión entre una <code>Date</code> y un <code>Instant</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Instant inst = date.toInstant();
+
+Date newDate = Date.from(inst);
+                    </pre>
+                </div>
+                <p>
+                    El ejemplo siguiente convierte de un <code>GregorianCalendar</code> a un <code>ZonedDateTime</code>, y despues
+                    de un <code>ZonedDateTime</code> a un <code>GregorianCalendar</code>. Otras clases basadas en el tiempo son
+                    creadas usando la instancia <code>ZonedDateTime</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+GregorianCalendar cal = ...;
+
+TimeZone tz = cal.getTimeZone();
+int tzoffset = cal.get(Calendar.ZONE_OFFSET);
+
+ZonedDateTime zdt = cal.toZonedDateTime();
+
+GregorianCalendar newCal = GregorianCalendar.from(zdt);
+
+LocalDateTime ldt = zdt.toLocalDateTime();
+LocalDate date = zdt.toLocalDate();
+LocalTime time = zdt.toLocalTime();
+                    </pre>
+                </div>
+                <h2>
+                    Asignar la Funcionalidad de Fecha y Tiempo de java.util a java.time
+                </h2>
+                <p>
+                    Debido a que la implementación de fecha y hora de Java se ha rediseñado completamente en la versión de Java SE
+                    8, no puede intercambiar un método por otro. Si quiere usar la funcionalidad rica ofrecida por el paquete
+                    <code>java.time</code>, su solución más fácil es usar los métodos <code>toInstant</code> o
+                    <code>toZonedDateTime</code> listados en la sección previa. Sin embargo, si no desea utilizar ese enfoque o no
+                    es suficiente para sus necesidades, debe volver a escribir su código de fecha y hora.
+                </p>
+                <p>
+                    La tabla introducida en la página 
+                    <a class="TutorialLink" target="_top" href="overview.html">Información General</a> es un buen lugar para
+                    comenzar a evaluar qué clases de <code>java.time</code> satisfacen sus necesidades.
+                </p>
+                <p>
+                    No hay una correspondencia de mapeo uno a uno entre las dos IPAs, pero la tabla siguiente le da una idea
+                    general de qué funcionalidad en las clases de fecha y hora de <code>java.util</code> se asignan en las IPAs
+                    de <code>java.time</code>.
+                </p>
+                <table class="celda">
+                    <tr>
+                        <th id="h1" class="celda">Funcionalidad java.util</th>
+                        <th id="h2" class="celda">Funcionalidad java.time</th>
+                        <th id="h3" class="celda">Comentarios</th>
+                    </tr>
+
+                    <tr>
+                        <td headers="h1" class="celda"><code>java.util.Date</code></td>
+                        <td headers="h2" class="celda"><code>java.time.Instant</code></td>
+                        <td headers="h3" class="celda">
+                            Las clases <code>Instant</code> y <code>Date</code> son similares. Cada clase:<br />
+                            - Representa un punto del tiempo instantáneo en la línea de tiempo (UTC)<br />
+                            - Mantiene una hora independiente de una zona horaria<br />
+                            - Se representa como epoch-segundos (desde 1970-01-01T00:00:00Z) más nanosegundos<br />
+                            Los métodos <code>Date.from(Instant)</code> y <code>Date.toInstant()</code> permiten la conversión
+                            entre estas clases.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda"><code>java.util.GregorianCalendar</code></td>
+                        <td headers="h2" class="celda"><code>java.time.ZonedDateTime</code></td>
+                        <td headers="h3" class="celda">
+                            La clase <code>ZonedDateTime</code> es el reemplazo para <code>GregorianCalendar</code>. Suministra la
+                            funcionalidad similar siguiente.<br />
+                            La representación humana del tiempo es como sigue:<br />
+                            &nbsp;&nbsp;<code>LocalDate</code>: año, mes, día<br />
+                            &nbsp;&nbsp;<code>LocalTime</code>: horas, minutos, segundos, nanosegundos<br />
+                            &nbsp;&nbsp;<code>ZoneId</code>: zona horaria<br />
+                            &nbsp;&nbsp;<code>ZoneOffset</code>: compensación actual de GMT<br />
+                            Los métodos <code>GregorianCalendar.from(ZonedDateTime)</code> y
+                            <code>GregorianCalendar.to(ZonedDateTime)</code> facilitan las conversiones entre estas clases.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda"><code>java.util.TimeZone</code></td>
+                        <td headers="h2" class="celda"><code>java.time.ZoneId</code> o <code>java.time.ZoneOffset</code></td>
+                        <td headers="h3" class="celda">
+                            La clase <code>ZoneId</code> especifica un identificador de zona horaria y tiene acceso a las reglas
+                            usadas en cada zona horaria. La clase <code>ZoneOffset</code> especifica sólo un desplazamiento desde
+                            Greenwich/UTC. Para más información, vea
+                            <a class="TutorialLink" target="_top" href="timezones.html">Zonas horarias y Clases de Compensación</a>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda">
+                            <code>GregorianCalendar</code> con la fecha establecida en <code>1970-01-01</code>
+                        </td>
+                        <td headers="h2" class="celda"><code>java.time.LocalTime</code></td>
+                        <td headers="h3" class="celda">
+                            El código que establece la fecha a 1970-01-01 en una instancia <code>GregorianCalendar</code> para
+                            utilizar los componentes de tiempo se pueden reemplazar por una instancia de <code>LocalTime</code>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda"><code>GregorianCalendar</code> con el tiempo fijado en <code>00:00.</code></td>
+                        <td headers="h2" class="celda"><code>java.time.LocalDate</code></td>
+                        <td headers="h3" class="celda">
+                            El código que establece el tiempo a 00:00 en una instancia <code>GregorianCalendar</code> para utilizar
+                            los componentes de fecha se puede reemplazar con una instancia de <code>LocalDate</code>. (Este
+                            enfoque de <code>GregorianCalendar</code> fue defectuoso, ya que la medianoche no ocurre en algunos
+                            países una vez al año debido a la transición al horario de verano).
+                        </td>
+                    </tr>
+                </table>
+                <h2>
+                    Formato de Fecha y Hora
+                </h2>
+                <p>
+                    Aunque la clase <code>java.time.format.DateTimeFormatter</code> suministra un mecanismo poderoso para dar
+                    format a los valores de fecha y hora, puede también usar directamente las clases basadas en el tiempo de
+                    <code>java.time</code> con <code>java.util.Formatter</code> y <code>String.format</code>, usando el mismo
+                    formateo basado en patrones que usted usa con las clases de fecha y hora de <code>java.util</code>.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="nonIso.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="summary.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Non-ISO Date Conversion<br />
+            <b>Página siguiente:</b> Summary
+        </div>
+    </body>
+</html> 

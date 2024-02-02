@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Dibujando Primitivas Geométricas (Los Tutoriales de Java&trade; &gt; Gráficos 2D &gt; Trabajando con la Geometría)
+        </title>
+        <meta name="description" content="Este tutorial de Java 2D describe gráficos 2D, geometría, IPA de texto, imágenes, 
+              impresión, temas 2D avanzados." />
+        <meta name="keywords" content="java programming, learn java, java sample code, java 2d, 2d geometry" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Trabajando con la Geometría</a></div>
+                <div class="nolinkAHEAD">Dibujando Primitivas Geométricas</div>
+                <div class="linkAHEAD"><a href="arbitrary.html">Dibujando Formas Arbitrarias</a></div>
+                <div class="linkAHEAD"><a href="strokeandfill.html">Trazado y Rellenado de Primitivas Graficas</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Gráficos 2D<br />
+                <b>Lección:</b> Trabajando con la Geometría
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Gráficos 2D</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Trabajando con la Geometría</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="arbitrary.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Dibujando Primitivas Geométricas</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    La IPA 2D de Java proporciona varias clases que definen objetos geométricos comunes tales como puntos, líneas, 
+                    curvas, y rectángulos. Estas clases de geometría son parte del paquete 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/geom/package-frame.html">
+                        <code>java.awt.geom</code></a>.<br />
+                    La interfaz 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/geom/PathIterator.html">
+                        <code>PathIterator</code></a> define métodos para recuperar elementos de una ruta.<br />
+                    La interfaz 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/Shape.html"><code>Shape</code></a> proporciona un 
+                    conjunto de métodos para describir e inspeccionar objetos de trayectoria geométrica. Esta interfaz está 
+                    implementada por las clase 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/geom/GeneralPath.html"><code>GeneralPath</code></a>
+                    y otras clases de geometría.
+                </p>
+                <p>
+                    Todos los ejemplos representados en esta sección crean geometrías usando el paquete <code>java.awt.geom</code> 
+                    y después las presenta usando la clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/Graphics2D.html"><code>Graphics2D</code></a>. Para 
+                    empezar obtenga un objeto <code>Graphics2D</code>, por ejemplo conviertiendo el parámetro 
+                    <code>Graphics</code> del método <code>paint()</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+public void paint (Graphics g) {
+    Graphics2D g2 = (Graphics2D) g;
+    ...
+}
+                    </pre>
+                </div>
+                <h2>Punto</h2>
+                <p>
+                    La clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/Point.html"><code>Point</code></a> crea un punto 
+                    representando una ubicación en (x,y) del 
+                    <a class="TutorialLink" target="_top" href="../overview/coordinate.html">espacio de coordenadas</a>. Las 
+                    subclases <code>Point2D.Float</code> y <code>Point2D.Double</code> proporcionan correspondientemente flotante y 
+                    doble precisión para almacenar las coordenadas del punto.
+                </p>
+                <div class="codeblock">
+                    <pre>
+//Crea un Point2D.Double
+Point2D.Double point = new Point2D.Double(x, y);
+                    </pre>
+                </div>
+                <p>
+                    Para crear un punto con las coordenadas 0,0 use el constructor predeterminado, <code>Point2D.Double()</code>.
+                    <br />
+                    Puede usar el método <code>setLocation</code> para establecer la posición del punto como sigue:
+                </p>
+                <ul>
+                    <li>
+                        <code>setLocation(double x, double y)</code> &ndash; Para establecer la ubicación del punto - definiendo 
+                        las coordenadas como valores double.
+                    </li>
+                    <li>
+                        <code>setLocation(Point2D p)</code> &ndash; Para establecer la ubicación del punto usando las coordenadas 
+                        de otro punto.
+                    </li>
+                </ul>
+                <p>
+                    Además, la clase <code>Point2D</code> tiene métodos para calcular la distancia entre el punto actual y un punto 
+                    con coordenadas dadas, o la distancia entre dos puntos.
+                </p>
+                <h2>Línea</h2>
+                <p>
+                    La clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/geom/Line2D.html"><code>Line2D</code></a> representa 
+                    un segmento de línea en (x, y) del espacio de coordenadas. Las subclases <code>Line2D. Float</code> y 
+                    <code>Line2D.Double</code> especifican líneas en coma flotante y precisión doble. Por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+// dibuja Line2D.Double
+g2.draw(new Line2D.Double(x1, y1, x2, y2));
+                    </pre>
+                </div>
+                <p>
+                    <img src="../../figures/2d/2D-16.gif" width="134" height="49" alt="Línea" />
+                </p>
+                <p>
+                    Esta clase incluye varios métodos <code>setLine()</code> para definir los puntos finales de la línea.<br />
+                    Alternativiamente, los puntos finales de la línea podrían ser especificados usando el constructor para la clase 
+                    <code>Line2D.Float</code> como sigue:
+                </p>
+                <ul>
+                    <li>
+                        <code>Line2D.Float(float X1, float Y1, float X2, float Y2)</code>
+                    </li>
+                    <li>
+                        <code>Line2D.Float(Point2D p1, Point2D p2)</code>
+                    </li>
+                </ul>
+                <p>
+                    Use el objeto 
+                    <a class="TutorialLink" target="_top" href="strokeandfill.html">Stroke</a> en la clase 
+                    <code>Graphics2D</code> para definir el trazo de la ruta de la línea.
+                </p>
+                <h2>Curvas</h2>
+                <p>
+                    El paquete <code>java.awt.geom</code> le permite crear un segmento de curva cuadrática o cúbica.
+                </p>
+                <h3>Segmento de Curva Cuadrática</h3>
+                <p>
+                    La clase 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/geom/QuadCurve2D.html">
+                        <code>QuadCurve2D</code></a> implementa la interfaz <code>Shape</code>. Esta clase representa un segmento 
+                    de curva paramétrica cuadrática en (x,) del espacio de coordenadas. Las subclases 
+                    <code>QuadCurve2D.Float</code> y <code>QuadCurve2D.Double</code> especifican una curva cuadrática en coma 
+                    flotante y doble precisión.
+                </p>
+                <p>
+                    Varios métodos <code>setCurve</code> se usan para especificar dos puntos finales y un punto de control de la 
+                    curva, cuyas coordenadas pueden ser definidas directamente, por las coordenadas de otros puntos y usando una 
+                    matriz determinada. <br />
+                    Un método muy útil, <code>setCurve(QuadCurve2D)</code>, establece la curva cuadrática con los mismos puntos 
+                    finales y el punto de control de una curva suministrada. Por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+// crea un nuevo QuadCurve2D.Float
+QuadCurve2D q = new QuadCurve2D.Float();
+// dibuja draw QuadCurve2D.Float con las coordenadas establecidas
+q.setCurve(x1, y1, ctrlx, ctrly, x2, y2);
+g2.draw(q);
+                    </pre>
+                </div>
+                <p>
+                    <img src="../../figures/2d/quadCurve.gif" width="134" height="80" 
+                         alt="Segmento de curva paramétrica cuadrática" />
+                </p>
+                <h3>Segmento de Curva Cúbica</h3>
+                <p>
+                    La clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/geom/CubicCurve2D.html">
+                        <code>CubicCurve2D</code></a> también implementa la interfaz 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/Shape.html"><code>Shape</code></a>. Esta clase 
+                    representa un segmento de una curva paramétrica cúbica en (x,y) del espacio de coordenadas. Las subclases 
+                    <code>CubicCurve2D.Float</code> y <code>CubicCurve2D.Double</code> especifica una curva cúbica en coma 
+                    flotante y doble precisión.
+                </p>
+                <p>
+                    La clase <code>CubicCurve2D</code> tiene métodos similares para establecer la curva a los de la clase 
+                    <code>QuadraticCurve2D</code>, pero con un segundo punto de control. por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+// crea un nuevo CubicCurve2D.Double
+CubicCurve2D c = new CubicCurve2D.Double();
+// dibuja CubicCurve2D.Double con las coordenadas establecidas
+c.setCurve(x1, y1, ctrlx1,
+           ctrly1, ctrlx2, ctrly2, x2, y2);
+g2.draw(c);
+                    </pre>
+                </div>
+                <img src="../../figures/2d/cubicCurve.gif" width="134" height="80" alt="Segmento de curva cúbica" />
+                <h2>Rectángulo</h2>
+                <p>
+                    Las clases que especifican primitivas representadas en el siguiente ejemplo extienden la clase 
+                    <code>RectangularShape</code>, que implementa la interfaz <code>Shape</code> y agrega unos cuantos métodos 
+                    propios.
+                </p>
+                <p>
+                    Estos métodos le permiten obtener información sobre la ubicación de una forma y su tamaño, para examinar el 
+                    punto central de un rectángulo, y para establecer los límites de la forma.
+                </p>
+                <p>
+                    La clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/geom/Rectangle2D.html"><code>Rectangle2D</code></a>
+                    representa un rectángulo definido por una ubicación (x, y) y una dimensión (w x h). Las subclases 
+                    <code>Rectangle2D.Float</code> y <code>Rectangle2D.Double</code> especifican un rectángulo en coma flotante y 
+                    doble precisión. Por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+// dibuja un Rectangle2D.Double
+g2.draw(new Rectangle2D.Double(x, y,
+                               rectwidth,
+                               rectheight));
+                    </pre>
+                </div>
+                <p>
+                    <img src="../../figures/2d/2D-17.gif" width="135" height="49" alt="Rectángulo" />
+                </p>
+                <p>
+                    La clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/geom/RoundRectangle2D.html">
+                        <code>RoundRectangle2D</code></a> representa un rectángulo con las esquinas redondeadas definido por una 
+                    ubicación (x, y), una dimensión (w x h), y el ancho y alto del arco de la esquina. Las subclases 
+                    <code>RoundRectangle2D.Float</code> y <code>RoundRectangle2D.Double</code> especifican un rectángulo redondeado 
+                    en coma flota y precisión doble.
+                </p>
+                <p>
+                    El rectángulo redondeado se especifica con los parámetros siguientes:
+                </p>
+                <ul>
+                    <li>Ubicación</li>
+                    <li>Ancho</li>
+                    <li>Alto</li>
+                    <li>Ancho del arco de esquina</li>
+                    <li>Alto del arco de esquina</li>
+                </ul>
+                <p>
+                    Para establecer la ubicación, tamaño, y los arcos de un objeto <code>RoundRectangle2D</code>, use el método 
+                    <code>setRoundRect(double a, double y, double w, double h, double arcWidth, double arcHeight)</code>. Por 
+                    ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+// dibuja RoundRectangle2D.Double
+g2.draw(new RoundRectangle2D.Double(x, y,
+                                   rectwidth,
+                                   rectheight,
+                                   10, 10));
+                    </pre>
+                </div>
+                <p>
+                    <img src="../../figures/2d/2D-18.gif" width="135" height="49" alt="Rectángulo redondeado" />
+                </p>
+                <h2>Elipse</h2>
+                <p>
+                    La clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/geom/Ellipse2D.html"><code>Ellipse2D</code></a>
+                    representa una elipse definida por un rectángulo delimitador. Las subclases <code>Ellipse2D.Float</code> y 
+                    <code>Ellipse2D.Double</code> especifican una elipse en coma flotante y precisión doble.
+                </p>
+                <p>
+                    La elipse se define completamente por una ubicación, una anchura y una altura. Por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+// dibuja Ellipse2D.Double
+g2.draw(new Ellipse2D.Double(x, y,
+                             rectwidth,
+                             rectheight));
+                    </pre>
+                </div>
+                <p>
+                    <img src="../../figures/2d/2D-20.gif" width="136" height="49" alt="Elipse" />
+                </p>
+                <h2>Arco</h2>
+                <p>
+                    Para dibujar un fragmento de una elipse, use la clase 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/geom/Arc2D.html"><code>Arc2D</code></a>. Esta clase 
+                       representa un arco definido por un ractángulo delimintador, un ángulo de inicio, una extensión angular, y un 
+                       tipo de cierre. Las subclases <code>Arc2D.Float</code> y <code>Arc2D.Double</code> especifican un arco en 
+                       coma flotante y precisón doble.
+                </p>
+                <p>
+                    La clase <code>Arc2D</code> define los tres tipos de arcos siguientes, representados por sus constantes 
+                    correspondientes en esta clase:OPEN, PIE y CHORD.
+                </p>
+                <div class="centrado">
+                    <img src="../../figures/2d/2D-19.gif" width="71" height="51" alt="Arco" />
+                </div>
+                <p>
+                    Varios métodos establecen el tamaño y parámetros del arco:
+                </p>
+                <ul>
+                    <li>Directamente, por coordenadas</li>
+                    <li>Por <code>Point2D</code> y <code>Dimension2D</code> suministrados</li>
+                    <li>Copiando un <code>Arc2D</code> existente</li>
+                </ul>
+                <p>
+                    También, puede usar el método <code>setArcByCenter</code> para especificar un arco desde un punto central, 
+                    dado por sus coordenadas y un radio.
+                </p>
+                <div class="codeblock">
+                    <pre>
+// dibuja Arc2D.Double
+g2.draw(new Arc2D.Double(x, y,
+                         rectwidth,
+                         rectheight,
+                         90, 135,
+                         Arc2D.OPEN));
+                    </pre>
+                </div>
+                <p>
+                    <img src="../../figures/2d/2D-19.gif" width="71" height="51" alt="Arco" />
+                </p>
+                <p>
+                    El código de ejemplo 
+                    <a class="SourceLink" target="_blank" href="examples/ShapesDemo2D.java"
+                       onclick="showCode('../../displayCode.html', 'examples/ShapesDemo2D.java'); return false;">
+                        <code>ShapesDemo2D.java</code></a> contiene implementaciones de todas las primitivas geométricas descritas. 
+                        Para más información sobre las clases y métodos representados en esta sección, vea la especificación 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/geom/package-summary.html">
+                        <code>java.awt.geom</code></a>.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="arbitrary.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Trabajando con la Geometría
+            <br /><b>Página siguiente:</b> Dibujando Formas Arbitrarias
+        </div>
+    </body>
+</html> 

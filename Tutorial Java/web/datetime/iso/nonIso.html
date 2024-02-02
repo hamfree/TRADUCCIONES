@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />        
+        <title>
+            Conversión de Fechas No-ISO (Los Tutoriales de Java&trade; &gt; Fecha y Hora &gt; Calendario Estándar)
+        </title>
+        <meta name="description" content="Este tutorial de Java de fecha y tiempo describe cómo usar las IPAs java.time
+              introducidas en el KDJ 8 para escribir código de fechas y tiempo. El núcleo del paquete usa el calendario estándar
+              como está definido en el sistema de calendario ISO." />
+        <meta name="keywords" content="java programming, learn java, java sample code, datetime, date time, JSR 310, date-time,
+              date, time, java.time, jdk8, ISO" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Calendario Estándar</a></div>
+                <div class="linkAHEAD"><a href="overview.html">Información General</a></div>
+                <div class="linkAHEAD"><a href="enum.html">DayOfWeek y Enumeraciones de Month</a></div>
+                <div class="linkAHEAD"><a href="date.html">Clase Date</a></div>
+                <div class="linkAHEAD"><a href="datetime.html">Clases Date y Time</a></div>
+                <div class="linkAHEAD"><a href="timezones.html">Zonas horarias y Clases de Compensación</a></div>
+                <div class="linkAHEAD"><a href="instant.html">Clase Instant</a></div>
+                <div class="linkAHEAD"><a href="format.html">Parseado y Formateado</a></div>
+                <div class="linkAHEAD"><a href="temporal.html">El Paquete Temporal</a></div>
+                <div class="linkBHEAD"><a href="adjusters.html">Temporal Adjuster</a></div>
+                <div class="linkBHEAD"><a href="queries.html">Temporal Query</a></div>
+                <div class="linkAHEAD"><a href="period.html">Period y Duration</a></div>
+                <div class="linkAHEAD"><a href="clock.html">Clock</a></div>
+                <div class="nolinkAHEAD">Conversión de Fechas No-ISO</div>
+                <div class="linkAHEAD"><a href="legacy.html">Código Date-Time Heredado</a></div>
+                <div class="linkAHEAD"><a href="summary.html">Sumario</a></div>
+                <div class="linkQUESTIONS"><a href="QandE/questions.html">Preguntas y Ejercicios</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Fecha y Hora<br />
+                <b>Lección:</b> Calendario Estándar
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Fecha y Hora</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Calendario Estándar</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="clock.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="legacy.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Conversión de Fechas No-ISO</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Este tutorial no describe el paquete
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/time/chrono/package-summary.html">
+                        <code>java.time.chrono</code></a> en ningún detalle. Sin embargo, podría ser util saber que este paquete
+                    suministra varias cronologías predefinidas que no están basadas en ISO, tales como la Japonesa, la Malaya,
+                    la China y la Budista Tailandesa. Puede también usar este paquete para crear su propia cronología.
+                </p>
+                <p>
+                    Esta sección le muestra cómo convertir entre una fecha basada en ISO y una fecha en una de las otras cronologías
+                    predefinidas.
+                </p>
+                <h2>
+                    Convertir a una Fecha No Basada en ISO
+                </h2>
+                <p>
+                    Puede convertir una fecha basada en ISO a una fecha en otra cronología usando el método
+                    <code>from(TemporalAccessor)</code>, tal como en
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/time/chrono/JapaneseDate.html#from-java.time.temporal.TemporalAccessor-">
+                        <code>JapaneseDate.from(TemporalAccessor)</code></a>. Este método lanza una <code>DateTimeException</code>
+                    si es incapaz de convertir la fecha a una instancia válida. El código siguiente conviete una instancia de
+                    <code>LocalDateTime</code> a varias fechas de calendarios predefinidos no ISO:
+                </p>
+                <div class="codeblock">
+                    <pre>
+LocalDateTime date = LocalDateTime.of(2013, Month.JULY, 20, 19, 30);
+JapaneseDate jdate     = JapaneseDate.from(date);
+HijrahDate hdate       = HijrahDate.from(date);
+MinguoDate mdate       = MinguoDate.from(date);
+ThaiBuddhistDate tdate = ThaiBuddhistDate.from(date);
+                    </pre>
+                </div>
+                <p>
+                    El ejemplo
+                    <a class="SourceLink" target="_blank" href="examples/StringConverter.java"
+                       onclick="showCode('../../displayCode.html', 'examples/StringConverter.java'); return false;">
+                        <code>StringConverter</code></a> convierte desde una <code>LocalDate</code> a una
+                    <code>ChronoLocalDate</code> a una <code>String</code> y de vuelta. El método <code>toString</code> toma una
+                    intancia de <code>LocalDate</code> y una <code>Chronology</code> y devuelve la cadena convertida usando la
+                    <code>Chronology</code> suministrada. La clase <code>DateTimeFormatterBuilder</code> es usada para construir
+                    una cadena que pueda ser usada para imprimir la fecha:
+                </p>
+                <div class="codeblock">
+                    <pre>
+/**
+ * Convierte un valor LocalDate (ISO a una fecha ChronoLocalDate
+ * usando la Chronology suministrada, y entonces formatea la
+ * ChronoLocalDate a una String usando una DateTimeFormatter con un
+ * patrón SHORT basado en la Chronology y en la Locale actual.
+ *
+ * @param localDate - la fecha ISO a convertir y dar formato.
+ * @param chrono - una Chronology opcional. Si es null, entonces se usa IsoChronology.
+ */
+public static String toString(LocalDate localDate, Chronology chrono) {
+    if (localDate != null) {
+        Locale locale = Locale.getDefault(Locale.Category.FORMAT);
+        ChronoLocalDate cDate;
+        if (chrono == null) {
+            chrono = IsoChronology.INSTANCE;
+        }
+        try {
+            cDate = chrono.date(localDate);
+        } catch (DateTimeException ex) {
+            System.err.println(ex);
+            chrono = IsoChronology.INSTANCE;
+            cDate = localDate;
+        }
+        DateTimeFormatter dateFormatter =
+            DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
+                             .withLocale(locale)
+                             .withChronology(chrono)
+                             .withDecimalStyle(DecimalStyle.of(locale));
+        String pattern = "M/d/yyyy GGGGG";
+        return dateFormatter.format(cDate);
+    } else {
+        return "";
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Cuando el método es invocado con la fecha siguiente para las cronologías predefinidas:
+                </p>
+                <div class="codeblock">
+                    <pre>
+LocalDate date = LocalDate.of(1996, Month.OCTOBER, 29);
+System.out.printf("%s%n",
+     StringConverter.toString(date, JapaneseChronology.INSTANCE));
+System.out.printf("%s%n",
+     StringConverter.toString(date, MinguoChronology.INSTANCE));
+System.out.printf("%s%n",
+     StringConverter.toString(date, ThaiBuddhistChronology.INSTANCE));
+System.out.printf("%s%n",
+     StringConverter.toString(date, HijrahChronology.INSTANCE));
+                    </pre>
+                </div>
+                <p>
+                    La salida se ve así:
+                </p>
+                <div class="codeblock">
+                    <pre>
+10/29/0008 H
+10/29/0085 1
+10/29/2539 B.E.
+6/16/1417 1
+                    </pre>
+                </div>
+                <h2>
+                    Convertir a una Fecha basada en ISO
+                </h2>
+                <p>
+                    Puede convertir desde una fecha no basada en ISO a una instancia <code>LocalDate</code> usando el método
+                    estático
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html#from-java.time.temporal.TemporalAccessor-">
+                        <code>LocalDate.from</code></a>, como es mostrado en el ejemplo siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+LocalDate date = LocalDate.from(JapaneseDate.now());
+                    </pre>
+                </div>
+                <p>
+                    Otras clases basadas en el tiempo también suministran este método, el cual lanza una
+                    <code>DateTimeException</code> si la fecha no puede ser convertida.
+                </p>
+                <p>
+                    El método <code>fromString</code>, del ejemplo
+                    <a class="SourceLink" target="_blank" href="examples/StringConverter.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/StringConverter.java'); return false;">
+                        <code>StringConverter</code></a>, analiza una <code>String</code> que contiene una fecha no basada en ISO
+                    y devuelve una instancia <code>LocalDate</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+/**
+ * Analiza una String a una ChronoLocalDate usando una DateTimeFormatter
+ * con un patrón corto basado en el Locale actual y la
+ * Chronology suministrada, entonces convierte esto a un valor
+ * LocalDate (ISO).
+ *
+ * @param text   - el texto de la fecha de entrada en el formato CORTO esperado
+ *                 para la Chronology y la Locale actual.
+ *
+ * @param chrono - una Chronology opcional. Si es null, entonces
+ *                 se usa IsoChronology.
+ */
+public static LocalDate fromString(String text, Chronology chrono) {
+    if (text != null &amp;&amp; !text.isEmpty()) {
+        Locale locale = Locale.getDefault(Locale.Category.FORMAT);
+        if (chrono == null) {
+           chrono = IsoChronology.INSTANCE;
+        }
+        String pattern = "M/d/yyyy GGGGG";
+        DateTimeFormatter df = new DateTimeFormatterBuilder().parseLenient()
+                              .appendPattern(pattern)
+                              .toFormatter()
+                              .withChronology(chrono)
+                              .withDecimalStyle(DecimalStyle.of(locale));
+        TemporalAccessor temporal = df.parse(text);
+        ChronoLocalDate cDate = chrono.date(temporal);
+        return LocalDate.from(cDate);
+    }
+return null;
+}
+                    </pre>
+                </div>
+                <p>
+                    Cuando el método es invocado con las cadenas siguientes:
+                </p>
+                <div class="codeblock">
+                    <pre>
+System.out.printf("%s%n", StringConverter.fromString("10/29/0008 H",
+    JapaneseChronology.INSTANCE));
+System.out.printf("%s%n", StringConverter.fromString("10/29/0085 1",
+    MinguoChronology.INSTANCE));
+System.out.printf("%s%n", StringConverter.fromString("10/29/2539 B.E.",
+    ThaiBuddhistChronology.INSTANCE));
+System.out.printf("%s%n", StringConverter.fromString("6/16/1417 1",
+    HijrahChronology.INSTANCE));
+                    </pre>
+                </div>
+                <p>
+                    Las cadenas impresas deben volver a convertirse todas al 29 de octubre de 1996:
+                </p>
+                <div class="codeblock">
+                    <pre>
+1996-10-29
+1996-10-29
+1996-10-29
+1996-10-29
+                    </pre>
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="clock.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="legacy.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Clock<br />
+            <b>Página siguiente:</b> Legacy Date-Time Code
+        </div>
+    </body>
+</html> 

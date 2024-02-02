@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Usando JAX-RS con JAXB</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jaxrs-advanced006.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jaxrs-advanced008.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GKKNJ">
+      <h2 id="using-jax-rs-with-jaxb">Usando JAX-RS con JAXB</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Java Architecture for XML Binding (JAXB) es una tecnología de enlace de XML a Java que simplifica 
+            el desarrollo de servicios web al permitir transformaciones entre esquemas y objetos Java y entre 
+            documentos de instancia XML e instancias de objetos Java. Un esquema XML define los elementos de 
+            datos y la estructura de un documento XML. Puede utilizar las API y las herramientas de JAXB para 
+            establecer asignaciones entre las clases de Java y el esquema XML. La tecnología JAXB proporciona 
+            las herramientas que le permiten convertir sus documentos XML hacia y desde objetos Java.
+          </p>
+        </div>
+        <div class="paragraph">
+            <p>Al usar JAXB, puede manipular objetos de datos de las siguientes maneras.</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>
+                Puede comenzar con una definición de esquema XML (XSD) y usar <code>xjc</code>, la herramienta 
+                de compilación de esquemas JAXB, para crear un conjunto de clases Java anotadas por JAXB que 
+                se asignan a los elementos y tipos definidos en el esquema XSD.
+              </p>
+            </li>
+            <li>
+              <p>
+                Puede comenzar con un conjunto de clases Java y usar <code>schemagen</code>, la herramienta 
+                generadora de esquemas JAXB, para generar un esquema XML.
+              </p>
+            </li>
+            <li>
+              <p>
+                Una vez que existe una asignación entre el esquema XML y las clases de Java, puede usar el 
+                tiempo de ejecución de enlace JAXB para clasificar y desclasificar sus documentos XML hacia y 
+                desde objetos Java y usar las clases Java resultantes para ensamblar una aplicación de 
+                servicios web.
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div class="paragraph">
+          <p>
+            XML es un formato de medios común que los servicios RESTful consumen y producen. Para deserializar 
+            y serializar XML, puede representar solicitudes y respuestas mediante objetos anotados JAXB. Su 
+            aplicación JAX-RS puede utilizar los objetos JAXB para manipular datos XML. Los objetos JAXB se 
+            pueden utilizar como parámetros de entidad de solicitud y entidades de respuesta. El entorno de 
+            tiempo de ejecución de JAX-RS incluye interfaces de proveedor estándar 
+            <code>MessageBodyReader</code> y <code>MessageBodyWriter</code> para leer y escribir objetos JAXB 
+            como entidades.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Con JAX-RS, habilita el acceso a sus servicios mediante la publicación de recursos. Los recursos 
+            son simplemente clases Java simples con algunas anotaciones JAX-RS adicionales. Estas anotaciones 
+            expresan lo siguiente:
+          </p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>La ruta del recurso (la URL que usa para acceder a él)</p>
+            </li>
+            <li>
+              <p>
+                El método HTTP que utiliza para llamar a un determinado método (por ejemplo, el método 
+                <code>GET</code> o <code>POST</code>)
+              </p>
+            </li>
+            <li>
+              <p>El tipo MIME con el que un método acepta o responde</p>
+            </li>
+          </ul>
+        </div>
+        <div class="paragraph">
+          <p>
+            Al definir los recursos para su aplicación, considere el tipo de datos que desea exponer. Es 
+            posible que ya tenga una base de datos relacional que contenga información que desea exponer a los 
+            usuarios, o puede tener contenido estático que no reside en una base de datos pero que debe 
+            distribuirse como recursos. Con JAX-RS, puede distribuir contenido de múltiples fuentes. Los 
+            servicios web RESTful pueden usar varios tipos de formatos de entrada/salida para solicitud y 
+            respuesta. El ejemplo de <code>customer</code>, descrito en 
+            <a href="jaxrs-advanced008.html#GKOIB">La Aplicación de Ejemplo cliente</a>, utiliza XML.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Los recursos tienen representaciones. Una representación de recursos es el contenido del mensaje 
+            HTTP que se envía o se devuelve desde el recurso mediante el URI. Cada representación que admite 
+            un recurso tiene un tipo de medio correspondiente. Por ejemplo, si un recurso va a devolver 
+            contenido con formato XML, puede usar <code>application/xml</code> como tipo de medio asociado en 
+            el mensaje HTTP. Según los requisitos de su aplicación, los recursos pueden devolver 
+            representaciones en un formato único preferido o en múltiples formatos. JAX-RS proporciona 
+            anotaciones <code>@Consumes</code> y <code>@Produces</code> para declarar los tipos de medios que 
+            son aceptables para que un método de recurso lea y escriba.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            JAX-RS también mapea tipos de Java hacia y desde representaciones de recursos utilizando 
+            proveedores de entidades. Un proveedor de entidades <code>MessageBodyReader</code> lee una entidad 
+            de solicitud y deserializa la entidad de solicitud en un tipo Java. Un proveedor de entidad 
+            <code>MessageBodyWriter</code> serializa desde un tipo Java a una entidad de respuesta. Por 
+            ejemplo, si se utiliza un valor <code>String</code> como parámetro de entidad de solicitud, el 
+            proveedor de entidad <code>MessageBodyReader</code> deserializa el cuerpo de la solicitud en una 
+            nueva <code>String</code>. Si se utiliza un tipo JAXB como tipo de retorno en un método de 
+            recurso, <code>MessageBodyWriter</code> serializa el objeto JAXB en un cuerpo de respuesta.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            De forma predeterminada, el entorno de tiempo de ejecución JAX-RS intenta crear y utilizar una 
+            clase <code>JAXBContext</code> predeterminada para las clases JAXB. Sin embargo, si la clase 
+            <code>JAXBContext</code> predeterminada no es adecuada, puede proporcionar una clase 
+            <code>JAXBContext</code> para la aplicación utilizando una interfaz de proveedor 
+            <code>ContextResolver</code> de JAX-RS.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Las siguientes secciones explican cómo usar JAXB con métodos de recursos JAX-RS.
+          </p>
+        </div>
+        <div class="sect2" id="sthref147">
+          <h3 id="using-java-objects-to-model-your-data">Usando Objetos de Java para Modelar Sus Datos</h3>
+          <div class="paragraph">
+            <p>
+              Si no tiene una definición de esquema XML para los datos que desea exponer, puede modelar sus 
+              datos como clases Java, agregar anotaciones JAXB a estas clases y usar JAXB para generar un 
+              esquema XML para sus datos. Por ejemplo, si los datos que desea exponer son una colección de 
+              productos y cada producto tiene una identificación, un nombre, una descripción y un precio, 
+              puede modelarlo como una clase Java de la siguiente manera:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@XmlRootElement(name="product")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Product {
+    @XmlElement(required=true)
+    protected int id;
+    @XmlElement(required=true)
+    protected String name;
+    @XmlElement(required=true)
+    protected String description;
+    @XmlElement(required=true)
+    protected int price;
+    public Product() {}
+    // Métodos getter y setter
+    // ...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Ejecute el generador de esquemas JAXB en la línea de comando para generar la definición de 
+              esquema XML correspondiente:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+schemagen Product.java
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>Este comando genera el esquema XML como un archivo <code>.xsd</code>:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema"&gt;
+    &lt;xs:element name="product" type="product"/&gt;
+    &lt;xs:complexType name="product"&gt;
+      &lt;xs:sequence&gt;
+        &lt;xs:element name="id" type="xs:int"/&gt;
+        &lt;xs:element name="name" type="xs:string"/&gt;
+        &lt;xs:element name="description" type="xs:string"/&gt;
+        &lt;xs:element name="price" type="xs:int"/&gt;
+      &lt;/xs:sequence&gt;
+    &lt;xs:complexType&gt;
+&lt;/xs:schema&gt;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Una vez que tenga esta asignación, puede crear objetos <code>Product</code> en su aplicación, 
+              devolverlos y usarlos como parámetros en los métodos de recursos JAX-RS. El tiempo de ejecución 
+              de JAX-RS utiliza JAXB para convertir los datos XML de la solicitud en un objeto 
+              <code>Product</code> y para convertir un objeto <code>Product</code> en datos XML para la 
+              respuesta. La siguiente clase de recurso proporciona un ejemplo simple:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Path("/product")
+public class ProductService {
+    @GET
+    @Path("/get")
+    @Produces("application/xml")
+    public Product getProduct() {
+        Product prod = new Product();
+        prod.setId(1);
+        prod.setName("Mattress");
+        prod.setDescription("Queen size mattress");
+        prod.setPrice(500);
+        return prod;
+    }
+    @POST
+    @Path("/create")
+    @Consumes("application/xml")
+    public Response createProduct(Product prod) {
+        // Procesar o almacenar el producto y devolver una respuesta
+        // ...
+    }
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Algunos EID, como el EID de NetBeans, ejecutarán la herramienta generadora de esquemas 
+              automáticamente durante el proceso de compilación si agrega clases Java que tienen anotaciones 
+              JAXB a su proyecto. Para ver un ejemplo detallado, consulte 
+              <a href="jaxrs-advanced008.html#GKOIB">La Aplicación de Ejemplo customer</a>. El ejemplo de 
+              <code>customer</code> contiene una relación más compleja entre las clases de Java que modelan 
+              los datos, lo que da como resultado una representación XML más jerárquica.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="sthref148">
+          <h3 id="starting-from-an-existing-xml-schema-definition">
+            Empezando desde una Definición de Esquema XML Existente
+          </h3>
+          <div class="paragraph">
+            <p>
+              Si ya tiene una definición de esquema XML en un archivo <code>.xsd</code> para los datos que 
+              desea exponer, use la herramienta de compilación de esquemas JAXB. Considere este ejemplo simple 
+              de un archivo <code>.xsd</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;xs:schema targetNamespace="http://xml.product"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           xmlns:myco="http://xml.product"&gt;
+  &lt;xs:element name="product" type="myco:Product"/&gt;
+  &lt;xs:complexType name="Product"&gt;
+    &lt;xs:sequence&gt;
+      &lt;xs:element name="id" type="xs:int"/&gt;
+      &lt;xs:element name="name" type="xs:string"/&gt;
+      &lt;xs:element name="description" type="xs:string"/&gt;
+      &lt;xs:element name="price" type="xs:int"/&gt;
+    &lt;/xs:sequence&gt;
+  &lt;/xs:complexType&gt;
+&lt;/xs:schema&gt;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Ejecute la herramienta de compilación de esquemas en la línea de comando de la siguiente manera:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+xjc Product.xsd
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Este comando genera el código fuente para las clases de Java que corresponden a los tipos 
+              definidos en el archivo <code>.xsd</code>. La herramienta de compilación de esquemas genera una 
+              clase Java para cada <code>complexType</code> definido en el archivo <code>.xsd</code>. Los 
+              campos de cada clase Java generada son los mismos que los elementos dentro del 
+              <code>complexType</code> correspondiente, y la clase contiene métodos getter y setter para estos 
+              campos.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              En este caso, la herramienta de compilación de esquemas genera las clases 
+              <code>product.xml.Product</code> y <code>product.xml.ObjectFactory</code>. La clase 
+              <code>Product</code> contiene anotaciones JAXB y sus campos corresponden a los de la definición 
+              <code>.xsd</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "Product", propOrder = {
+    "id",
+    "name",
+    "description",
+    "price"
+})
+public class Product {
+    protected int id;
+    @XmlElement(required = true)
+    protected String name;
+    @XmlElement(required = true)
+    protected String description;
+    protected int price;
+    // Métodos setter y getter
+    // ...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Puede crear instancias de la clase <code>Product</code> desde su aplicación (por ejemplo, desde 
+              una base de datos). La clase generada <code>product.xml.ObjectFactory</code> contiene un método 
+              que le permite convertir estos objetos en elementos JAXB que se pueden devolver como XML dentro 
+              de los métodos de recursos JAX-RS:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@XmlElementDecl(namespace = "http://xml.product", name = "product")
+public JAXBElement&lt;Product&gt; createProduct(Product value) {
+    return new JAXBElement&lt;Product&gt;(_Product_QNAME, Product.class, null, value);
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El código siguiente muestra cómo utilizar las clases generadas para devolver un elemento JAXB 
+              como XML en un método de recurso JAX-RS:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Path("/product")
+public class ProductService {
+    @GET
+    @Path("/get")
+    @Produces("application/xml")
+    public JAXBElement&lt;Product&gt; getProduct() {
+        Product prod = new Product();
+        prod.setId(1);
+        prod.setName("Mattress");
+        prod.setDescription("Queen size mattress");
+        prod.setPrice(500);
+        return new ObjectFactory().createProduct(prod);
+    }
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para los métodos de recurso <code>@POST</code> y <code>@PUT</code>, puede usar un objeto 
+              <code>Product</code> directamente como parámetro. JAX-RS asigna los datos XML de la solicitud a 
+              un objeto <code>Product</code>.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Path("/product")
+public class ProductService {
+    @GET
+    // ...
+    @POST
+    @Path("/create")
+    @Consumes("application/xml")
+    public Response createProduct(Product prod) {
+        // Procesa o almacena el producto y devuelve una respuesta
+        // ...
+    }
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="sthref149">
+          <h3 id="using-json-with-jax-rs-and-jaxb">Usando JSON con JAX-RS y JAXB</h3>
+          <div class="paragraph">
+            <p>
+              JAX-RS puede leer y escribir XML automáticamente usando JAXB, pero también puede funcionar con 
+              datos JSON. JSON es un formato simple basado en texto para el intercambio de datos derivado de 
+              JavaScript. Para los ejemplos anteriores, la representación XML de un producto es
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;product&gt;
+  &lt;id&gt;1&lt;/id&gt;
+  &lt;name&gt;Mattress&lt;/name&gt;
+  &lt;description&gt;Queen size mattress&lt;/description&gt;
+  &lt;price&gt;500&lt;/price&gt;
+&lt;/product&gt;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>La representación JSON equivalente es</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+{
+    "id":"1",
+    "name":"Mattress",
+    "description":"Queen size mattress",
+    "price":500
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Puede agregar el formato <code>application/json</code> o <code>MediaType.APPLICATION_JSON</code> 
+              a la anotación <code>@Produces</code> en métodos de recursos para producir respuestas con datos 
+              JSON:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@GET
+@Path("/get")
+@Produces({"application/xml","application/json"})
+public Product getProduct() { ... }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              En este ejemplo, la respuesta predeterminada es XML, pero la respuesta es un objeto JSON si el 
+              cliente realiza una solicitud <code>GET</code> que incluye este encabezado:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+Accept: application/json
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los métodos de recursos también pueden aceptar datos JSON para clases anotadas JAXB:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@POST
+@Path("/create")
+@Consumes({"application/xml","application/json"})
+public Response createProduct(Product prod) { ... }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El cliente debe incluir el siguiente encabezado al enviar datos JSON con una solicitud 
+              <code>POST</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+Content-Type: application/json
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jaxrs-advanced006.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jaxrs-advanced008.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

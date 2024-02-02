@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Usando Eventos en Aplicaciones CDI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="cdi-adv004.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="cdi-adv006.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GKHIC">
+      <h2 id="using-events-in-cdi-applications">Usando Eventos en Aplicaciones CDI</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Los eventos permiten que los beans se comuniquen sin ninguna dependencia del tiempo de 
+            compilación. Un bean puede definir un evento, otro bean puede disparar el evento y otro bean puede 
+            manejar el evento. Además, los eventos se pueden disparar de forma asíncrona. Los beans pueden 
+            estar en paquetes separados e incluso en niveles separados de la aplicación.
+          </p>
+        </div>
+        <div class="sect2" id="GKHHY">
+          <h3 id="defining-events">Definiendo Eventos</h3>
+          <div class="paragraph">
+            <p>Un evento consta de lo siguiente:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>El objeto de evento, un objeto Java</p>
+              </li>
+              <li>
+                <p>Cero o más tipos de calificadores, los calificadores de eventos</p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Por ejemplo, en el ejemplo de <code>billpayment</code> descrito en 
+              <a href="cdi-adv-examples005.html#GKHPA">
+                El Ejemplo billpayment: Usando Eventos e Interceptores
+              </a>, un bean <code>PaymentEvent</code> define un evento utilizando tres propiedades, que tienen 
+              métodos setter y getter:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+    public String paymentType;
+    public BigDecimal value;
+    public Date datetime;
+    public PaymentEvent() {
+    }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El ejemplo también define calificadores que distinguen entre dos tipos de 
+              <code>PaymentEvent</code>. Cada evento también tiene el calificador predeterminado 
+              <code>@Any</code>.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="GKHNF">
+          <h3 id="using-observer-methods-to-handle-events">
+            Usando Métodos de Observer para Manejar Eventos
+          </h3>
+          <div class="paragraph">
+            <p>Un controlador de eventos utiliza un método de observer para consumir eventos.</p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Cada método de observer toma como parámetro un evento de un tipo de evento específico que se 
+              anota con la anotación <code>@Observes</code> y con cualquier calificador para ese tipo de 
+              evento. El método del observer recibe una notificación de un evento si el objeto del evento 
+              coincide con el tipo de evento y si todos los calificadores del evento coinciden con los 
+              calificadores del evento del método del observer.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El método del observer puede tomar otros parámetros además del parámetro del evento. Los 
+              parámetros adicionales son puntos de inyección y pueden declarar calificadores.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El controlador de eventos para el ejemplo <code>billpayment</code>, <code>PaymentHandler</code>, 
+              define dos métodos de observer, uno para cada tipo de <code>PaymentEvent</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public void creditPayment(@Observes @Credit PaymentEvent event) {
+    ...
+}
+public void debitPayment(@Observes @Debit PaymentEvent event) {
+    ...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="sect3">
+            <h4 id="conditional-and-transactional-observer-methods">
+              Métodos de Observer condicionales y transaccionales
+            </h4>
+            <div class="paragraph">
+              <p>Los métodos de observer también pueden ser condicionales o transaccionales:</p>
+            </div>
+            <div class="ulist">
+              <ul>
+                <li>
+                  <p>
+                    Un método de observer condicional recibe notificación de un evento solo si ya existe una 
+                    instancia del bean que define el método de observer en el contexto actual. Para declarar 
+                    un método de observer condicional, especifique 
+                    <code>notifyObserver=IF_EXISTS</code> como argumento para <code>@Observes</code>:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Observes(notifyObserver=IF_EXISTS)
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      Para obtener el comportamiento incondicional predeterminado, puede especificar 
+                      <code>@Observes(notifyObserver=ALWAYS)</code>.
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    Un método de observer transaccional es notificado de un evento durante la fase anterior o 
+                    posterior a la finalización de la transacción en la que se disparó el evento. También 
+                    puede especificar que la notificación se produzca solo después de que la transacción se 
+                    haya completado con éxito o sin éxito. Para especificar un método de observer 
+                    transaccional, utilice cualquiera de los siguientes argumentos para 
+                    <code>@Observes</code>:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Observes(during=BEFORE_COMPLETION)
+@Observes(during=AFTER_COMPLETION)
+@Observes(during=AFTER_SUCCESS)
+@Observes(during=AFTER_FAILURE)
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      Para obtener el comportamiento no transaccional predeterminado, especifique 
+                      <code>@Observes(while=IN_PROGRESS)</code>.
+                    </p>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      Un método observer que se llama antes de completar una transacción puede llamar al 
+                      método <code>setRollbackOnly</code> en la instancia de la transacción para forzar una 
+                      reversión de la transacción.
+                    </p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="paragraph">
+              <p>
+                Los métodos de observer pueden arrojar excepciones. Si un método de observer transaccional 
+                genera una excepción, el contenedor detecta la excepción. Si el método de observer no es 
+                transaccional, la excepción finaliza el procesamiento del evento y no se llama a ningún otro 
+                método de observer para el evento.
+              </p>
+            </div>
+          </div>
+          <div class="sect3">
+            <h4 id="observer-method-ordering">Orden del Método Observer</h4>
+            <div class="paragraph">
+              <p>
+                Antes de que se genere una determinada notificación de evento de observer, el contenedor 
+                determina el orden en que se invocan los métodos de observer para ese evento. El orden del 
+                método del observer se establece mediante la declaración de la anotación 
+                <code>@Priority</code> en un parámetro de evento de un método del observer, como en el 
+                siguiente ejemplo:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+void afterLogin(@Observes @Priority(javax.interceptor.Interceptor.Priority.APPLICATION) LoggedInEvent event) { ... }
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>Tenga en cuenta lo siguiente:</p>
+            </div>
+            <div class="ulist">
+              <ul>
+                <li>
+                  <p>
+                    Si no se especifica la anotación <code>@Priority</code>, el valor predeterminado es 
+                    <code>javax.interceptor.Interceptor.Priority.APPLICATION + 500</code>.
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Si a dos o más métodos de observer se les asigna la misma prioridad, el orden en que se 
+                    invocan no está definido y, por lo tanto, es impredecible.
+                  </p>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GKHIH">
+          <h3 id="firing-events">Disparando Eventos</h3>
+          <div class="paragraph">
+            <p>
+              Los beans disparan eventos implementando una instancia de la interfaz 
+              <code>javax.enterprise.event.Event</code>. Los eventos se pueden disparar de forma síncrona o 
+              asíncrona.
+            </p>
+          </div>
+          <div class="sect3">
+            <h4 id="firing-events-synchronously">Activación de Eventos de Forma Sincrónica</h4>
+            <div class="paragraph">
+              <p>
+                Para activar un evento sincrónicamente, llame al método 
+                <code>javax.enterprise.event.Event.fire</code>. Este método dispara un evento y notifica a 
+                cualquier método observer.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                En el ejemplo de <code>billpayment</code>, un bean administrado llamado 
+                <code>PaymentBean</code> activa el evento apropiado utilizando la información que recibe de la 
+                interfaz de usuario. En realidad, hay cuatro beans de eventos, dos para el objeto de evento y 
+                dos para la carga útil. El bean gestionado inyecta los dos beans de eventos. El método 
+                <code>pay</code> usa una instrucción <code>switch</code> para elegir qué evento activar, 
+                usando <code>new</code> para crear la carga útil.
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+    @Inject
+    @Credit
+    Event&lt;PaymentEvent&gt; creditEvent;
+    @Inject
+    @Debit
+    Event&lt;PaymentEvent&gt; debitEvent;
+    private static final int DEBIT = 1;
+    private static final int CREDIT = 2;
+    private int paymentOption = DEBIT;
+    ...
+    @Logged
+    public String pay() {
+        ...
+        switch (paymentOption) {
+            case DEBIT:
+                PaymentEvent debitPayload = new PaymentEvent();
+                // llena la carga útil ...
+                debitEvent.fire(debitPayload);
+                break;
+            case CREDIT:
+                PaymentEvent creditPayload = new PaymentEvent();
+                // llena la carga útil ...
+                creditEvent.fire(creditPayload);
+                break;
+            default:
+                logger.severe("¡Opción de pago no válida!");
+        }
+        ...
+    }
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                El argumento del método <code>fire</code> es un <code>PaymentEvent</code> que contiene la 
+                carga útil. El evento disparado luego es consumido por los métodos del observer.
+              </p>
+            </div>
+          </div>
+          <div class="sect3">
+            <h4 id="firing-events-asynchronously">Activación de Eventos de Forma Asincrónica</h4>
+            <div class="paragraph">
+              <p>
+                Para activar un evento de forma asíncrona, llame al método 
+                <code>javax.enterprise.event.Event.fireAsync</code>. Este método llama a todos los 
+                observers asincrónicos resueltos en uno o más subprocesos diferentes.
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Inject Event&lt;LoggedInEvent&gt; loggedInEvent;
+public void login() {
+    ...
+    loggedInEvent.fireAsync( new LoggedInEvent(user) );
+}
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>La invocación del método <code>fireAsync()</code> regresa inmediatamente.</p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Cuando los eventos se activan de forma asíncrona, los métodos de observer se notifican de 
+                forma asíncrona. En consecuencia, no se puede garantizar el orden del método del observer, 
+                porque la invocación del método del observer y la activación de eventos asincrónicos ocurren 
+                en subprocesos separados.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="cdi-adv004.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="cdi-adv006.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

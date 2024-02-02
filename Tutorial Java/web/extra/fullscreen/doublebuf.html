@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Búfer Doble e Intercambio de Páginas (Los Tutoriales de Java&trade; &gt; Extras &gt; IPA del Modo Exclusivo de
+            Pantalla-Completa)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe los genéricos, la IPA del modo de pantalla completo, y 
+              los recursos relacionados con la certificación de Java" />
+        <meta name="keywords" content="programación en java, aprender java, ejemplos de código java, genéricos de java, IPA del 
+              modo de pantalla completa, certificación" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">IPA del Modo Exclusivo de Pantalla-Completa</a></div>
+                <div class="linkAHEAD"><a href="exclusivemode.html">Modo Exclusivo de Pantalla-Completa</a></div>
+                <div class="linkAHEAD"><a href="displaymode.html">Modo de Pantalla</a></div>
+                <div class="linkAHEAD"><a href="rendering.html">Renderizado Pasivo versus Activo</a></div>
+                <div class="nolinkAHEAD">Búfer Doble e Intercambio de Páginas</div>
+                <div class="linkAHEAD"><a href="bufferstrategy.html">BufferStrategy y BufferCapabilities</a></div>
+                <div class="linkAHEAD"><a href="example.html">Ejemplos</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Extras<br />
+                <b>Lección:</b> IPA del Modo Exclusivo de Pantalla-Completa
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Extras</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">IPA del Modo Exclusivo de Pantalla-Completa</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="rendering.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="bufferstrategy.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Búfer Doble e Intercambio de Páginas</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Suponga que tiene que dibujar una imagen completa en la pantalla, píxel por píxel o línea por línea. Si fuera a dibujar 
+                    tal cosa directamente a la pantalla (usando, digamos, <code>Graphics.drawLine</code>), probablemente notaría con mucha 
+                    decepción que lleva un poco de tiempo. Probablemente incluso notará artefactos visibles de cómo se dibuja su imagen. En 
+                    lugar de ver cómo se dibujan las cosas de esta manera y a este ritmo, la mayoría de los programadores usan una técnica 
+                    llamada <i>búfer doble</i>.
+                </p>
+                <p>
+                    La noción tradicional del búfer doble en las aplicaciones Java es bastante sencilla: crear una imagen fuera de pantalla, 
+                    dibujar a esa imagen usando el objeto de gráficos de la imagen, luego, en un paso, llamar a <code>drawImage</code> usando 
+                    el objeto graphics de la ventana objetivo y la imagen fuera de pantalla. Es posible que ya haya notado que Swing usa esta 
+                    técnica en muchos de sus componentes, normalmente activada por defecto, usando el método <code>setDoubleBuffered</code>.
+                </p>
+                <p>
+                    La superficie de pantalla se conoce comúnmente como la <i>superficie primaria</i>, y la imagen fuera de la pantalla 
+                    utilizada para el búfer doble se conoce como <i>búfer de respaldo</i>. El acto de copiar el contenido de una superficie a 
+                    otra se denomina con frecuencia transferencia de líneas en bloque, o <i>blitting</i> (blt generalmente se pronuncia 
+                    &quot;blit&quot; y no debe confundirse con un sandwich BLT).
+                </p>
+                <div class="centrado">
+                    <img src="../../figures/extra/fullscreen/doubleBuffering.gif" width="432" height="315" alt="Búfer Doble" />
+                </div>
+                <p>
+                    La superficie primaria se manipula normalmente a través del objeto gráfico de cualquier componente que se muestre; 
+                    cuando se está en modo de pantalla completa, cualquier operación que use los gráficos de la ventana a pantalla completa 
+                    es una manipulación directa de la memoria de pantalla. Por esta razón, puede aprovechar otras capacidades en el modo 
+                    exclusivo de pantalla completa que de otra forma no estarían disponibles debido a la sobrecarga del sistema de 
+                    ventanas. Una de tales técnicas que sólo están disponibles en el modo exclusivo de pantalla completa es una forma de 
+                    búfer doble llamada <i>intercambio de página</i>.
+                </p>
+                <h2>
+                    Intercambio de páginas
+                </h2>
+                <p>
+                    Muchas tarjetas gráficas tienen la noción de un <i>puntero de vídeo</i>, el cual es simplemente una dirección en la 
+                    memoria de vídeo. Este puntero le dice a la tarjeta gráfica dónde buscar los contenidos del vídeo a ser mostrado durante 
+                    el siguiente ciclo de refresco. En algunas tarjetas gráficas y en algunos sistemas operativos, este puntero puede incluso 
+                    ser manipulado por programación. Suponga que ha creado un búfer de respaldo (en memoria de vídeo) del ancho, alto y 
+                    profundidad de bit exacto de la pantalla, luego dibujó a ese búfer de la misma forma que haría usando búfer doble, usted 
+                    ha cambiado simplemente el puntero de vídeo a su búfer de respaldo. Durante el refresco siguiente, la tarjeta gráfica 
+                    usaría ahora su imagen para visualizarla. Este conmutador se llama intercambio de página, y la ganancia de rendimiento 
+                    sobre el búfer doble basado en blt es que sólo un puntero necesita moverse en la memoria en lugar de copiar todo el 
+                    contenido de un búfer a otro.
+                </p>
+                <p>
+                    Cuando un intercambio de página ocurre, el puntero al viejo búfer de respaldo ahora apunta a la superficie primaria y el 
+                    puntero a la vieja superficie primaria ahora apunta a la memoria del búfer de respaldo. Esto lo configura automáticamente 
+                    para la siguiente operación de extracción.
+                </p>
+                <div class="centrado">
+                    <img src="../../figures/extra/fullscreen/pageFlipping.gif" width="474" height="544" alt="Intercambio de páginas" />
+                </div>
+                <p>
+                    Algunas veces es ventajoso configurar múltiples búferes de respaldo en una <i>cadena de intercambios</i>. Esto es 
+                    particularmente útil cuando la cantidad de tiempo gastada dibujando es mayor que la frecuencia de refresco del monitor. 
+                    Una cadena de intercambios es simplemente dos o más búferes de respaldo (algunas veces llamados 
+                    <i>búferes intermediarios</i> más la superficie primaria (esto es algunas veces llamado búfer triple, búfer cuádruple, 
+                    etc.). En una cadena de intercambio, el siguiente búfer de respaldo disponible se convierte en la superficie primaria, 
+                    etc. hasta el búfer de respaldo más posterior que se utiliza para dibujar.
+                </p>
+                <h2>
+                    Beneficios del doble búfer e intercambio de página
+                </h2>
+                <p>
+                    Si su métrica de rendimiento es simplemente la velocidad a la que se produce el doble búfer o el cambio de página frente 
+                    al renderizado directo, puede sentirse decepcionado. Es posible que sus números para el renderizado directo superen con 
+                    creces los del doble búfer y que esos números superen con creces los del intercambio de página. Cada una de estas 
+                    técnicas se utiliza para mejorar el <i>rendimiento percibido</i>, que es mucho más importante en aplicaciones gráficas 
+                    que el <i> rendimiento numérico </i>.
+                </p>
+                <p>
+                    El búfer doble se usa principalmente para eliminar los dibujos visibles que pueden hacer que una aplicación parezca 
+                    amateur, lenta o parezca parpadear. El intercambio de página se usa principalmente para eliminar también el 
+                    <i>desgarro</i>, un efecto de división que ocurre cuando el dibujo en la pantalla ocurre más rápido que la frecuencia de 
+                    actualización del monitor. Un dibujo más suave significa un mejor rendimiento percibido y una experiencia de usuario 
+                    mucho mejor.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="rendering.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="bufferstrategy.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos
+                            <a href="../../information/cpyr.html">avisos legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Renderizado Pasivo versus Activo<br />
+            <b>Página siguiente:</b> BufferStrategy y BufferCapabilities
+        </div>
+    </body>
+</html> 

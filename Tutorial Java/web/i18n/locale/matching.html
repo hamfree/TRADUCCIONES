@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Filtrado de Etiquetas de Lenguaje y Búsqueda (Los Tutoriales de Java&trade; &gt; Internacionalización &gt; 
+            Estableciendo la Localización)
+        </title>
+        <meta name="description" content="Este tutorial de internacionalización de Java describe la configuración regional, 
+              aislando datos específicos de la configuración regional, formateando datos, nombre de dominio internacionalizado e 
+              identificador de recursos" />
+        <meta name="keywords" content="java programming, learn java, java sample code, i18n, internationalization, locale, text
+              formatting" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Estableciendo la Localización</a></div>
+                <div class="linkAHEAD"><a href="create.html">Creando una Localización</a></div>
+                <div class="linkAHEAD"><a href="extensions.html">Extensiones BCP 47</a></div>
+                <div class="linkAHEAD"><a href="identify.html">Identificando Localizaciones Disponibles</a></div>
+                <div class="nolinkAHEAD">Filtrado de Etiquetas de Lenguaje y Búsqueda</div>
+                <div class="linkAHEAD"><a href="scope.html">El Alcance de una Localización</a></div>
+                <div class="linkAHEAD"><a href="services.html">Servicios SPI sensibles a la Localización</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Internacionalización<br />
+                <b>Lección:</b> Estableciendo la Localización
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Internacionalización</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Estableciendo la Localización</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="identify.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="scope.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Filtrado de Etiquetas de Lenguaje y Búsqueda</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    El lenguaje de Programación Java contiene soporte de internacionalización para etiquetas de idioma, filtrado 
+                    de etiquetas de idioma, y búsqueda de etiquetas de idioma. Estas características están especificadas por el 
+                    <a class="OutsideLink" target="_blank" href="http://tools.ietf.org/html/bcp47">IETF BCP 47</a>
+                    , el cual contiene <a class="OutsideLink" target="_blank" href="http://tools.ietf.org/html/rfc5646">
+                        RFC 5646 &quot;Tags for Identifying Languages&quot;</a>
+                    y <a class="OutsideLink" target="_blank" href="http://tools.ietf.org/html/rfc4647">
+                        RFC 4647 &quot;Matching of Language Tags.&quot;</a>. Esta lección describe cómo se proporciona este 
+                    soporte en el KDJ.
+                </p>
+                <h2>
+                    <a id="what-tags">¿Qué Son las Etiquetas de Idioma?</a>
+                </h2>
+                <p>
+                    Las etiquetas de idioma son cadenas de formato especial que proporcionan información sobre un idioma 
+                    particular. Una etiqueta de idioma podría ser algo simple (tal como "en" para el inglés), algo complejo (tal 
+                    como "zh-cmn-Hans-CN" para Chino, Mandarín, silabario simplificado, como se usa en China), o algo entre medias 
+                    (tal como "sr-Latn", para Serbio escrito usando silabario de Latín). Las etiquetas de idioma consisten en 
+                    &quot;subetiquetas&quot; separadas por guiones; esta terminología se usa en toda la documentación de la IPA.
+                </p>
+                <p>
+                    La clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Locale.html"><code>java.util.Locale</code></a> 
+                    proporciona soporte para las etiquetas de idioma. Un <code>Locale</code> contiene diferentes campos: idioma 
+                    (tales como "en" para inglés, o "ja" para japonés), silabario (tal como "Latn" para Latín o "Cyrl" para 
+                    Cirílico), país (tal como "US" para los Estados Unidos de América o "FR" para Francia), variante (la cual 
+                    indica alguna variante de una configuración regional), y extensiones (las cuales proporcionan un mapa de claves 
+                    de carácter único a valores <code>String</code>, indicando extensiones aparte de la identificación del idioma).
+                    Para crear un objeto <code>Locale</code> desde una <code>String</code> etiqueta de idioma, invoque 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Locale.html#forLanguageTag-java.lang.String-">
+                        <code>Locale.forLanguageTag(String)</code></a>, pasándole la etiqueta de idioma como su único argumento. 
+                    Hacer esto crea y devuelve un objeto nuevo <code>Locale</code> para utilizar en su aplicación.
+                </p>
+                <p>
+                    Ejemplo 1:
+                </p>
+                <div class="codeblock">
+                    <pre>
+package languagetagdemo;
+
+import java.util.Locale;
+
+public class LanguageTagDemo {
+     public static void main(String[] args) {
+         Locale l = Locale.forLanguageTag("en-US");
+     }
+}
+                    </pre>
+                </div>
+                <p>
+                    Tenga en cuenta que la IPA de configuración regional solo requiere que su etiqueta de idioma esté bien formada 
+                    sintácticamente. No realiza ninguna validación adicional (como verificar si la etiqueta está registrada en el 
+                    Registro de subetiquetas de idioma de la IANA).
+                </p>
+
+                <h2>
+                    <a id="what-ranges">¿Qué son los Rangos de Idioma?</a>
+                </h2>
+                <p>
+                    Los rangos de idioma (representados por la clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Locale.LanguageRange.html">
+                        <code>java.util.Locale.LanguageRange</code></a>) identifican conjuntos de etiquetas de idioma que comparten 
+                    atributos específicos. Los rangos de idioma se clasifican en básicos o extendidos, y son similares a las 
+                    etiquetas de idioma en que consisten en subetiquetas separadas por guiones. Ejemplos de rangos de idioma 
+                    básicos incluyen "en" (inglés), "ja-JP" (japonés, Japón), y "*" (un rango de idioma especial que coincide 
+                    con cualquier etiqueta de idioma). Ejemplos de rangos de idioma extendidos incluyen "*-CH" (cualquier 
+                    lenguaje, Suiza), "es-*" (español, cualquier región), y "zh-Hant-*" (chino tradicional, cualquier región).
+                </p>
+                <p>
+                    Además, los rangos de idioma pueden ser almacenados en Listas de Prioridad de Idiomas, las cuales habilitan a 
+                    los usuarios a priorizar sus preferencias de idioma en una lista ponderada. Las Listas de Prioridad de Idioma 
+                    se expresan colocando objetos 
+                    <code>LanguageRange</code> dentro de una 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/List.html"><code>java.util.List</code></a>, la 
+                    cual puede después ser pasada a los métodos de <code>Locale</code> que aceptan una <code>List</code> de 
+                    objetos <code>LanguageRange</code>.
+                </p>
+                <h2>
+                    <a id="creating-range">Crear un Rango de Idioma</a>
+                </h2>
+                <p>
+                    La clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Locale.LanguageRange.html">
+                        <code>Locale.LanguageRange</code></a> proporciona dos constructores diferentes para crear rangos de idioma:
+                </p>
+                <ul>
+                    <li>
+                        <code>public Locale.LanguageRange(String range)</code>
+                    </li>
+                    <li>
+                        <code>public Locale.LanguageRange(String range, double weight)</code>
+                    </li>
+                </ul>
+                <p>
+                    La única diferencia entre ellos es que la segunda versión permite que se especifique un peso; este peso será 
+                    considerado si el rango se coloca dentro de una Lista de Prioridad de Idiomas.
+                </p>
+                <p>
+                    <code>Locale.LanguageRange</code> también especifica algunas constantes que se usan con estos constructores:
+                </p>
+                <ul>
+                    <li>
+                        <code>public static final double MAX_WEIGHT</code>
+                    </li>
+                    <li>
+                        <code>public static final double MIN_WEIGHT</code>
+                    </li>
+                </ul>
+                <p>
+                    La constante <code>MAX_WEIGHT</code> contiene una valor de 1.0, lo cual indica que es una buena opción para el 
+                    usuario. La constante <code>MIN_WEIGHT</code> contiene un valor de 0.0, lo que indica que no lo es.
+                </p>
+                <p>
+                    Ejemplo 2:
+                </p>
+                <div class="codeblock">
+                    <pre>
+package languagetagdemo;
+
+import java.util.Locale;
+
+public class LanguageTagDemo {
+
+     public static void main(String[] args) {
+         // Create Locale
+         Locale l = Locale.forLanguageTag("en-US");
+
+         // Define Some LanguageRange Objects
+         Locale.LanguageRange range1 = new Locale.LanguageRange("en-US",Locale.LanguageRange.MAX_WEIGHT);
+         Locale.LanguageRange range2 = new Locale.LanguageRange("en-GB*",0.5);
+         Locale.LanguageRange range3 = new Locale.LanguageRange("fr-FR",Locale.LanguageRange.MIN_WEIGHT);
+     }
+}
+                    </pre>
+                </div>
+                <p>
+                    El ejemplo 2 crea tres rangos de idioma: inglés (Estados Unidos de América), inglés (Gran Bretaña), y francés 
+                    (Francia). Estos rangos son ponderados para expresar las preferencias del usuario, en el orden de más preferido 
+                    a menos preferido.
+                </p>
+                <h2><a id="creating-lpl">Crear una Lista de Prioridad de Idioma</a></h2>
+                <p>
+                    Puede crear una Lista de Prioridad de Idioma desde una lista de rangos de idioma usando el método 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Locale.LanguageRange.html#parse-java.lang.String-">
+                        <code>LanguageRange.parse(String)</code></a>. Este método acpeta una lista de rangos de idioma separados por 
+                    comas, realiza una comprobación sintáctica para cada rango de idioma en los rangos dados, y luego devuelve 
+                    la Lista de Prioridad de Idiomas recién creada.
+                </p>
+                <p>
+                    Para información detallada sobre el formato requerido del parámetro "ranges", vea la especificación del IPA 
+                    para este método.
+                </p>
+                <p>
+                    Ejemplo 3:
+                </p>
+                <div class="codeblock">
+                    <pre>
+package languagetagdemo;
+
+import java.util.Locale;
+
+import java.util.List;
+
+public class LanguageTagDemo {
+
+    public static void main(String[] args) {
+
+        // Create Locale
+
+        Locale l = Locale.forLanguageTag("en-US");
+
+        // Create a Language Priority List
+
+        String ranges = "en-US;q=1.0,en-GB;q=0.5,fr-FR;q=0.0";
+
+        List&lt;Locale.LanguageRange&gt; languageRanges = Locale.LanguageRange.parse(ranges)
+
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    El ejemplo 3 crea los mismos tres rangos de idioma que el ejemplo 2, pero los almacena en un objeto 
+                    <code>String</code>, el cual se pasa al método <code>parse(String)</code>. La <code>List</code> devuelta de 
+                    objetos <code>LanguageRange</code> es la Lista de Prioridad de Idiomas.
+                </p>
+                <h2>
+                    <a id="filtering">Filtrar Etiqueetas de Idioma</a>
+                </h2>
+                <p>
+                    El filtrado de etiquetas de idioma es el proceso de hacer coincidir un conjunto de etiquetas de idioma con la 
+                    lista de prioridad de idioma de un usuario. El resultado del filtrado será una lista completa de todos los 
+                    resultados coincidentes. La clase <code>Locale</code> define dos métodos de filtro que devuelven una lista de 
+                    objetos <code>Locale</code>. Sus firmas son como siguen:
+                </p>
+                <ul>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/Locale.html#filter-java.util.List-java.util.Collection-">
+                            <code>public static List&lt;Locale&gt; filter (List&lt;Locale.LanguageRange&gt; priorityList, Collection&lt;Locale&gt; locales)</code></a>    
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/Locale.html#filter-java.util.List-java.util.Collection-java.util.Locale.FilteringMode-">
+                            <code>public static List&lt;Locale&gt; filter (List&lt;Locale.LanguageRange&gt; priorityList, Collection&lt;Locale&gt; locales, Locale.FilteringMode mode)</code></a>
+                    </li>
+                </ul>
+                <p>
+                    En ambos métodos, el primer argumento especifica la Lista de Prioridad de Idioma del usuario como se describió 
+                    en la sección previa.
+                </p>
+                <p>
+                    El segundo argumento especifica una <code>Collection</code> de objetos <code>Locale</code> para comparar. Las 
+                    coincidencias en sí mismas tomarán lugar de acuerdo a las reglas especificadas por la RFC 4647.
+
+                </p>
+                <p>
+                    El tercer argumento (si se proporciona) especifica el "modo de filtrado" a usar. La enumeración 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Locale.FilteringMode.html">
+                        <code>Locale.FilteringMode</code></a> proporciona una variedad de diferentes valores a elegir, tales como 
+                    <code>AUTOSELECT_FILTERING</code> (para filtrado de rangos de idioma básicos) o <code>EXTENDED_FILTERING</code> 
+                    (para filtrado de rangos de idioma extendidos).
+                </p>
+                <p>
+                    El ejemplo 4 proporciona una demostración de filtrado de etiquetas de idioma.
+                </p>
+                <p>
+                    Ejemplo 4:
+                </p>
+                <div class="codeblock">
+                    <pre>
+package languagetagdemo;
+
+import java.util.Locale;
+import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
+
+public class LanguageTagDemo {
+
+    public static void main(String[] args) {
+
+        // Create a collection of Locale objects to filter
+        Collection&lt;Locale&gt; locales = new ArrayList&lt;&gt;();
+        locales.add(Locale.forLanguageTag("en-GB"));
+        locales.add(Locale.forLanguageTag("ja"));
+        locales.add(Locale.forLanguageTag("zh-cmn-Hans-CN"));
+        locales.add(Locale.forLanguageTag("en-US"));
+
+        // Express the user's preferences with a Language Priority List
+        String ranges = "en-US;q=1.0,en-GB;q=0.5,fr-FR;q=0.0";
+        List&lt;Locale.LanguageRange&gt; languageRanges = Locale.LanguageRange.parse(ranges);
+
+        // Now filter the Locale objects, returning any matches
+        List&lt;Locale&gt; results = Locale.filter(languageRanges,locales);
+
+        // Print out the matches
+        for(Locale l : results){
+        System.out.println(l.toString());
+        }
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    La salida de este programa es:
+                </p>
+                <p>
+                    en_US<br/>
+                    en_GB
+                </p>
+                <p>
+                    Esta lista devuelta está ordenada de acuerdo a los pesos especificados en la Lista de Prioridad de Idiomas del 
+                    usuario.
+                </p>
+                <p>
+                    La clase <code>Locale</code> también define métodos <code>filterTags</code> para filtrar etiquetas de idioma 
+                    como objetos <code>String</code>.
+                </p>
+                <p>
+                    Las firmas de los métodos son como siguen:
+                </p>
+                <ul>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/Locale.html#filterTags-java.util.List-java.util.Collection-">
+                            <code>public static List&lt;String&gt; filterTags (List&lt;Locale.LanguageRange&gt; priorityList, Collection&lt;String&gt; tags)</code></a>
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/Locale.html#filterTags-java.util.List-java.util.Collection-java.util.Locale.FilteringMode-">
+                            <code>public static List&lt;String&gt; filterTags (List&lt;Locale.LanguageRange&gt; priorityList, Collection&lt;String&gt; tags, Locale.FilteringMode mode)</code></a>
+                    </li>
+                </ul>
+                <p>
+                    El ejemplo 5 proporciona la misma búsqueda que el ejemplo 4, pero usa objetos <code>String</code> en vez de 
+                    objetos <code>Locale</code>.
+                </p>
+                <p>
+                    Ejemplo 5:
+                </p>
+                <div class="codeblock">
+                    <pre>
+package languagetagdemo;
+
+import java.util.Locale;
+import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
+
+public class LanguageTagDemo {
+
+    public static void main(String[] args) {
+
+        // Create a collection of String objects to match against
+        Collection&lt;String&gt; tags = new ArrayList&lt;&gt;();
+        tags.add("en-GB");
+        tags.add("ja");
+        tags.add("zh-cmn-Hans-CN");
+        tags.add("en-US");
+
+        // Express user's preferences with a Language Priority List
+        String ranges = "en-US;q=1.0,en-GB;q=0.5,fr-FR;q=0.0";
+        List&lt;Locale.LanguageRange&gt; languageRanges = Locale.LanguageRange.parse(ranges);
+
+        // Now search the locales for the best match
+        List&lt;String&gt; results = Locale.filterTags(languageRanges,tags);
+
+        // Print out the matches
+        for(String s : results){
+            System.out.println(s);
+        }
+    }
+} 
+                    </pre>
+                </div>
+                <p>
+                    Como antes, la búsqueda coincidirá y devolverá "en-US" y "en-GB" (en ese orden).
+                </p>
+                <h2>
+                    <a id="lookup">Realizar Búsquedas de Etiquetas de Idioma</a>
+                </h2>
+                <p>
+                    En contraste al filtrado de etiquetas de idioma, la búsqueda de etiquetas de idioma es el proceso de comparar 
+                    rangos de idioma con conjuntos de etiquetas de idioma y devolver la etiqueta de lenguaje que mejor coincida con 
+                    el rango. El RFC4657 establece que:
+                    &quot; La búsqueda produce el resultado único que mejor coincide con las preferencias del usuario de la lista 
+                    de etiquetas disponibles, por lo que es útil en los casos en los que se requiere un solo elemento (y para los 
+                    cuales solo se puede devolver un solo elemento). Por ejemplo, si un proceso insertara un mensaje de error 
+                    legible por humanos en un encabezado de protocolo, podría seleccionar el texto según la lista de prioridad de 
+                    idioma del usuario. Dado que el proceso puede devolver solo un artículo, se ve obligado a elegir un solo 
+                    artículo y tiene que devolver algún artículo, incluso si ninguna de las etiquetas de idioma del contenido 
+                    coincide con la lista de prioridad de idioma proporcionada por el usuario.&quot;
+                </p>
+                <p>
+                    Ejemplo 6:
+                </p>
+                <div class="codeblock">
+                    <pre>
+package languagetagdemo;
+
+import java.util.Locale;
+import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
+
+public class LanguageTagDemo {
+
+    public static void main(String[] args) {
+
+        // Create a collection of Locale objects to search
+        Collection&lt;Locale&gt; locales = new ArrayList&lt;&gt;();
+        locales.add(Locale.forLanguageTag("en-GB"));
+        locales.add(Locale.forLanguageTag("ja"));
+        locales.add(Locale.forLanguageTag("zh-cmn-Hans-CN"));
+        locales.add(Locale.forLanguageTag("en-US"));
+
+        // Express the user's preferences with a Language Priority List
+        String ranges = "en-US;q=1.0,en-GB;q=0.5,fr-FR;q=0.0";
+        List&lt;Locale.LanguageRange&gt; languageRanges = Locale.LanguageRange.parse(ranges);
+
+        // Find the BEST match, and return just one result
+        Locale result = Locale.lookup(languageRanges,locales);
+        System.out.println(result.toString());
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    En contraste a los ejemplos de filtrado, la demostración de búsqueda en el ejemplo 6 devuelve el único objeto 
+                    que mejor coincide (<code>en-US</code> en este caso). Para completar, el Ejemplo 7 muestra cómo realizar la 
+                    misma búsqueda usando objetos <code>String</code>.
+                </p>
+                <p>
+                    Ejemplo 7:
+                </p>
+                <div class="codeblock">
+                    <pre>
+package languagetagdemo;
+
+import java.util.Locale;
+import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
+
+public class LanguageTagDemo {
+
+    public static void main(String[] args) {
+        // Create a collection of String objects to match against
+        Collection&lt;String&gt; tags = new ArrayList&lt;&gt;();
+        tags.add("en-GB");
+        tags.add("ja");
+        tags.add("zh-cmn-Hans-CN");
+        tags.add("en-US");
+
+        // Express user's preferences with a Language Priority List
+        String ranges = "en-US;q=1.0,en-GB;q=0.5,fr-FR;q=0.0";
+        List&lt;Locale.LanguageRange&gt; languageRanges = Locale.LanguageRange.parse(ranges);
+
+        // Find the BEST match, and return just one result
+        String result = Locale.lookupTag(languageRanges, tags);
+        System.out.println(result);
+    }
+} 
+                    </pre>
+                </div>
+                <p>
+                    Este ejemplo devuelve el único objeto que coincide mejor con la Lista de Prioridades de Idioma del usuario.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="identify.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="scope.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Identificando Localizaciones Disponibles<br />
+            <b>Página siguiente:</b> El Alcance de una Localización
+        </div>
+    </body>
+</html> 

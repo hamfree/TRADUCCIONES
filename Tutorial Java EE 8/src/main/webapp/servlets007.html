@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Invocando Otros Recursos Web</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="servlets006.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="servlets008.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BNAGI">
+      <h2 id="invoking-other-web-resources">Invocando Otros Recursos Web</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Los componentes web pueden invocar otros recursos web tanto directa como indirectamente. Un 
+            componente web invoca indirectamente otro recurso web incrustando una URL que apunta a otro 
+            componente web en el contenido devuelto a un cliente. Mientras se ejecuta, un componente web 
+            invoca directamente otro recurso, ya sea incluyendo el contenido de otro recurso o reenviando una 
+            solicitud a otro recurso.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Para invocar un recurso disponible en el servidor que ejecuta un componente web, primero debe 
+            obtener un objeto <code>RequestDispatcher</code> utilizando el método 
+            <code>getRequestDispatcher("URL")</code>. Puede obtener un objeto <code>RequestDispatcher</code> 
+            de una solicitud o del contexto web; sin embargo, los dos métodos tienen un comportamiento 
+            ligeramente diferente. El método toma la ruta al recurso solicitado como argumento. Una solicitud 
+            puede tomar una ruta relativa (es decir, una que no comience con <code>/</code>), pero el contexto 
+            web requiere una ruta absoluta. Si el recurso no está disponible o si el servidor no ha 
+            implementado un objeto <code>RequestDispatcher</code> para ese tipo de recurso, 
+            <code>getRequestDispatcher</code> devolverá un valor nulo. Su servlet debe estar preparado para 
+            lidiar con esta condición.
+          </p>
+        </div>
+        <div class="sect2" id="BNAGJ">
+          <h3 id="including-other-resources-in-the-response">Incluyendo Otros Recursos en la Respuesta</h3>
+          <div class="paragraph">
+            <p>
+              Suele ser útil incluir otro recurso web, como contenido de banner o información de derechos de 
+              autor, en la respuesta devuelta por un componente web. Para incluir otro recurso, invoque el 
+              método <code>include</code> de un objeto <code>RequestDispatcher</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+include(request, response);
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Si el recurso es estático, el método <code>include</code> habilita las inclusiones programáticas 
+              del lado del servidor. Si el recurso es un componente web, el efecto del método es enviar la 
+              solicitud al componente web incluido, ejecutar el componente web y luego incluir el resultado de 
+              la ejecución en la respuesta del servlet contenedor. Un componente web incluido tiene acceso al 
+              objeto de solicitud pero está limitado en lo que puede hacer con el objeto de respuesta.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>Puede escribir en el cuerpo de la respuesta y confirmar una respuesta.</p>
+              </li>
+              <li>
+                <p>
+                  No puede establecer encabezados ni llamar a ningún método, como <code>setCookie</code>, que 
+                  afecte los encabezados de la respuesta.
+                </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="sect2" id="BNAGK">
+          <h3 id="transferring-control-to-another-web-component">
+            Transfiriendo el Control a Otros Componentes Web
+          </h3>
+          <div class="paragraph">
+            <p>
+              En algunas aplicaciones, es posible que desee que un componente web realice el procesamiento 
+              preliminar de una solicitud y que otro componente genere la respuesta. Por ejemplo, es posible 
+              que desee procesar parcialmente una solicitud y luego transferirla a otro componente, según la 
+              naturaleza de la solicitud.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para transferir el control a otro componente web, invoque el método <code>forward</code> de un 
+              <code>RequestDispatcher</code>. Cuando se reenvía una solicitud, la URL de la solicitud se 
+              establece en la ruta de la página reenviada. El URI original y sus partes constituyentes se 
+              guardan como los siguientes atributos de solicitud:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+javax.servlet.forward.request_uri
+javax.servlet.forward.context_path
+javax.servlet.forward.servlet_path
+javax.servlet.forward.path_info
+javax.servlet.forward.query_string
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El método <code>forward</code> debe usarse para otorgar a otro recurso la responsabilidad de 
+              responder al usuario. Si ya ha accedido a un objeto <code>ServletOutputStream</code> o 
+              <code>PrintWriter</code> dentro del servlet, no puede usar este método; hacerlo genera una 
+              <code>IllegalStateException</code>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="servlets006.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="servlets008.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

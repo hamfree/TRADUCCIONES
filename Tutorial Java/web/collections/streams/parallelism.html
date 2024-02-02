@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />        
+        <title>Paralelismo (Los Tutoriales de Java&trade; &gt; Colecciones &gt; Operaciones de Agregación)</title>
+        <meta name="description" content="Este tutorial de Java sobre colecciones describe los interfaces, implementaciones, y
+              algoritmos en el marco de trabajo de Colecciones de Java" />
+        <meta name="keywords" content="programacion java , aprender java, codigo de ejemplo de java, colecciones de java,
+              set, list, queue, map, array, arraylist" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Operaciones de Agregación</a></div>
+                <div class="linkAHEAD"><a href="reduction.html">Reducción</a></div>
+                <div class="nolinkAHEAD">Paralelismo</div>
+                <div class="linkQUESTIONS"><a href="QandE/questions.html">Preguntas y Ejercicios</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Colecciones<br />
+                <b>Lección:</b> Operaciones de Agregación
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;
+                <a href="../index.html" target="_top">Colecciones</a>&nbsp;&gt;
+                <a href="index.html" target="_top">Operaciones de Agregación</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="reduction.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="QandE/questions.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Paralelismo</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    La computación paralela implica dividir un problema en subproblemas, resolver esos problemas simultáneamente
+                    (en paralelo, con cada subproblema ejecutándose en un hilo separado), y entonces combinar los resultados de las
+                    soluciones a los subproblemas. Java SE suministra el
+                    <a class="TutorialLink" target="_top"
+                       href="../../essential/concurrency/forkjoin.html">marco de trabajo fork/join</a>, lo que le permite
+                    implementar más fácilmente informática paralela en sus aplicaciones. Sin embargo, con este marco de trabajo,
+                    debe especificar cómo los problemas son subdivididos (particionados). Con las operaciones de agregación, el
+                    tiempo de ejecución de Java realiza este particionado y combinación de las soluciones por usted.
+                </p>
+                <p>
+                    Una dificultad en la implementación del paralelismo en aplicaciones que usan colecciones es que las colecciones
+                    no son seguras para multihilo, lo cual significa que los hilos múltiples no pueden manipular una colección sin
+                    introducir 
+                    <a class="TutorialLink" target="_top" href="../../essential/concurrency/interfere.html">
+                        Interferencias entre Hilos</a> o
+                    <a class="TutorialLink" target="_top"
+                       href="../../essential/concurrency/memconsist.html">Errores de Consistencia en Memoria
+                    </a>. El Marco de Trabajo de Colecciones suministra
+                    <a class="TutorialLink" target="_top"
+                       href="../../collections/implementations/wrapper.html">Implementaciones de Wrapper
+                    </a>, los cuales agregan sincronización automática a una colección arbitraria, haciéndola segura para 
+                    subprocesos. Sin embargo, la sincronización introduce 
+                    <a class="TutorialLink" target="_top"
+                       href="../../essential/concurrency/sync.html#thread_contention">contención de hilos</a>. Desea evitar la
+                    contención de hilos porque evita que los hilos se ejecuten en paralelo. Las operaciones de agregación y los
+                    flujos paralelos le habilitan a implementar el paralelismo con colecciones no-seguras-para-multihilo
+                    suministradas que no modifican la colección mientras usted está operando en ellas.
+                </p>
+                <p>
+                    Tenga en cuenta que el paralelismo no es automáticamente más rápido que realizar operaciones en serie, aunque
+                    puede ser si tiene bastantes datos y núcleos de procesador. Mientras las operaciones de agregación le habilitan
+                    a implementar fácilmente el paralelismo, es aún su responsabilidad para determinar si su aplicación es adecuada
+                    para el paralelismo.
+                </p>
+                <p>
+                    Esta sección cubre los temas siguientes:
+                </p>
+                <ul>
+                    <li>
+                        <a href="#executing_streams_in_parallel">Ejecutar Flujos en Paralelo</a>
+                    </li>
+                    <li>
+                        <a href="#concurrent_reduction">Reducción Concurrente</a>
+                    </li>
+                    <li>
+                        <a href="#ordering">Ordenación</a>
+                    </li>
+                    <li>
+                        <a href="#side_effects">Efectos Secundarios</a>
+                    </li>
+                    <li>
+                        <a href="#laziness">Pereza</a>
+                    </li>
+                    <li>
+                        <a href="#interference">Interferencia</a>
+                    </li>
+                    <li>
+                        <a href="#stateful_lambda_expressions">Expresiones Lambda con Estado</a>
+                    </li>
+                </ul>
+                <p>
+                    Puede encontrar los extractos del código descritos en esta sección en el ejemplo
+                    <a class="SourceLink" target="_blank" href="examples/ParallelismExamples.java"
+                       onclick="showCode('../../displayCode.html', 'examples/ParallelismExamples.java'); return false;">
+                        <code>ParallelismExamples</code></a>.
+                </p>
+                <h2>
+                    <a id="executing_streams_in_parallel">Ejecutar Flujos en Paralelo</a>
+                </h2>
+                <p>
+                    Puede ejecutar flujos en serio o en paralelo. Cuando un flujo se ejecuta en paralelo, el tiempo de ejecución de
+                    Java particiona el flujo en múltiples subflujos. Las operaciones agregadas iteran y procesan estas
+                    subcorrientes en paralelo y luego combinan los resultados.
+                </p>
+                <p>
+                    Cuando crea un flujo, es siempre un flujo en serie a menos que se especifique lo contrario. Para crear un
+                    flujo paralelo, invoque la operación
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Collection.html#parallelStream--">
+                        <code>Collection.parallelStream</code></a>. Alternativamente, invoque la operación
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/BaseStream.html#parallel--">
+                        <code>BaseStream.parallel</code></a>. Por ejemplo, la sentencia siguiente calcula la edad media de todos los
+                    miembros masculinos en paralelo:
+                </p>
+                <pre class="codeblock">
+double average = roster
+    .parallelStream()
+    .filter(p -> p.getGender() == Person.Sex.MALE)
+    .mapToInt(Person::getAge)
+    .average()
+    .getAsDouble();
+                </pre>
+                <h2>
+                    <a id="concurrent_reduction">Reducción Concurrente</a>
+                </h2>
+                <p>
+                    Considere de nuevo el ejemplo siguiente (lo cual es descrito en la sección
+                    <a class="TutorialLink" target="_top"
+                       href="../../collections/streams/reduction.html">Reducción
+                    </a>) que agrupa los miembros por género. Este ejemplo invoca la operación <code>collect</code>, el cual reduce
+                    la colección <code>roster</code> en un <code>Map</code>:
+                </p>
+                <pre class="codeblock">
+Map&lt;Person.Sex, List&lt;Person&gt;&gt; byGender =
+    roster
+        .stream()
+        .collect(
+            Collectors.groupingBy(Person::getGender));
+                </pre>
+                <p>
+                    Lo siguiente es el equivalente en paralelo:
+                </p>
+                <pre class="codeblock">
+ConcurrentMap&lt;Person.Sex, List&lt;Person&gt;&gt; byGender =
+    roster
+        .parallelStream()
+        .collect(
+            Collectors.groupingByConcurrent(Person::getGender));
+                </pre>
+                <p>
+                    Esto se denomina <em>reducción concurrente</em>. El tiempo de ejecución de Java realiza una reducción
+                    concurrente si todo lo siguiente es verdadero para una tubería particular que contiene la operación
+                    <code>collect</code>:
+                </p>
+                <ul>
+                    <li>
+                        El flujo es paralelo.
+                    </li>
+                    <li>
+                        El parámetro de esta operación <code>collect</code>, el collector, tiene la característica
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collector.Characteristics.html#CONCURRENT">
+                            <code>Collector.Characteristics.CONCURRENT</code>
+                        </a>. Para determinar las características de un collector, invoque el método
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collector.Characteristics.html">
+                            <code>Collector.characteristics</code></a>.
+                    </li>
+                    <li>
+                        O la secuencia está desordenada, o el colector tiene la característica
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collector.Characteristics.html#UNORDERED">
+                            <code>Collector.Characteristics.UNORDERED</code>
+                        </a>. Para asegurarse que el flujo no es ordenado, invoque la operación
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/BaseStream.html#unordered--">
+                            <code>BaseStream.unordered</code></a>.
+                    </li>
+                </ul>
+                <p>
+                    <strong>Nota</strong>: Este ejemplo devuelve una instancia de
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentMap.html">
+                        <code>ConcurrentMap</code></a> en vez de <code>Map</code> e invoca la operación
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collectors.html#groupingByConcurrent-java.util.function.Function-">
+                        <code>groupingByConcurrent</code></a>  en vez de <code>groupingBy</code>. (Vea la sección
+                    <a class="TutorialLink" target="_top"
+                       href="../../essential/concurrency/collections.html">Colecciones Concurrentes</a> para más información sobre 
+                    <code>ConcurrentMap</code>.) A diferencia de la operación <code>groupingByConcurrent</code>, la operación
+                    <code>groupingBy</code> funciona mal con transmisiones paralelas. (Esto es porque opera mezclando dos mapas
+                    por claves, lo cual es potencialmente costoso). De forma similar, la operación
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collectors.html#toConcurrentMap-java.util.function.Function-java.util.function.Function-">
+                        <code>Collectors.toConcurrentMap</code></a> funciona mejor con flujos paralelos que la operación 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collectors.html#toMap-java.util.function.Function-java.util.function.Function-">
+                        <code>Collectors.toMap</code></a>.
+                </p>
+                <h2>
+                    <a id="ordering">Orden</a>
+                </h2>
+                <p>
+                    El orden en el cual una tubería procesa los elementos de un flujo depende de si el flujo es ejecutado en serio 
+                    o en paralelo, la fuente del flujo, y las operaciones intermedias. Por ejemplo, considere el ejemplo siguiente 
+                    que imprime los elementos de una instancia de <code>ArrayList</code> con la operación <code>forEach</code>
+                    varias veces:
+                </p>
+                <pre class="codeblock">
+Integer[] intArray = {1, 2, 3, 4, 5, 6, 7, 8 };
+List&lt;Integer&gt; listOfIntegers =
+    new ArrayList&lt;&gt;(Arrays.asList(intArray));
+
+System.out.println("listaDeEnteros:");
+listOfIntegers
+    .stream()
+    .forEach(e -&gt; System.out.print(e + " "));
+System.out.println("");
+
+System.out.println("listaDeEnteros ordenados en orden invertido:");
+Comparator&lt;Integer&gt; normal = Integer::compare;
+Comparator&lt;Integer&gt; reversed = normal.reversed(); 
+Collections.sort(listOfIntegers, reversed);  
+listOfIntegers
+    .stream()
+    .forEach(e -&gt; System.out.print(e + " "));
+System.out.println("");
+     
+System.out.println("Flujo paralelo");
+listOfIntegers
+    .parallelStream()
+    .forEach(e -&gt; System.out.print(e + " "));
+System.out.println("");
+    
+System.out.println("Otro flujo paralelo:");
+listOfIntegers
+    .parallelStream()
+    .forEach(e -&gt; System.out.print(e + " "));
+System.out.println("");
+     
+System.out.println("Con forEachOrdered:");
+listOfIntegers
+    .parallelStream()
+    .forEachOrdered(e -> System.out.print(e + " "));
+System.out.println("");
+                </pre>
+                <p>
+                    Este ejemplo consiste en cinco tuberías. Imprime resultados similares a los siguientes:
+                </p>
+                <pre class="codeblock">
+listaDeEnteros:
+1 2 3 4 5 6 7 8
+listaDeEnteros ordenados en orden invertido:
+8 7 6 5 4 3 2 1
+Flujo paralelo:
+3 4 1 6 2 5 7 8
+Otro flujo paralelo:
+6 3 1 5 7 8 4 2
+Con forEachOrdered:
+8 7 6 5 4 3 2 1
+                </pre>
+                <p>
+                    Este ejemplo hace lo siguiente:
+                </p>
+                <ul>
+                    <li>
+                        La primera tubería imprime los elementos de la lista <code>listOfIntegers</code> en el orden que fueron
+                        agregados a la lista.
+                    </li>
+                    <li>
+                        La tubería segunda imprime los elementos de <code>listOfIntegers</code> después de que fuese ordenado por
+                        el método
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/Collections.html#sort-java.util.List-">
+                            <code>Collections.sort</code></a>.
+                    </li>
+                    <li>
+                        La tercera y cuarta tuberías imprime los elementos de la lista en un orden aleatorio aparentemente. Recuerde
+                        que las operaciones de flujo usan iteraciones internas cuando procesa los elementos de un flujo.
+                        Consecuentemente, cuando ejecuta un flujo en paralelo, el compilador Java y el tiempo de ejecución
+                        determina el orden en cual para procesar los elementos de flujo para maximizar los beneficios de la
+                        computación paralelo a menos que se especifique lo contrario por la operación de la secuencia.
+                    </li>
+                    <li>
+                        La quinta tubería usa el método
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html#forEachOrdered-java.util.function.Consumer-">
+                            <code>forEachOrdered</code>
+                        </a>, el cual procesa los elementos del flujo en el orden especificado por su fuente, independientemente de 
+                        si ejecutó la secuencia en serie o en paralelo. Note que puede perder los beneficios del paralelismo si usa 
+                        operaciones como <code>forEachOrdered</code> con flujos paralelos.
+                    </li>
+                </ul>
+                <h2>
+                    <a id="side_effects">Efectos laterales</a>
+                </h2>
+                <p>
+                    Un método o una expresión tiene un efecto lateral si, además de devolver o producir un valor, también modifica
+                    el estado del ordenador. Los ejemplos incluyen reducciones mutables (las operaciones que usan la operación 
+                    <code>collect</code>; vea la sección
+                    <a class="TutorialLink" target="_top" href="../../collections/streams/reduction.html">Reducción</a> para más
+                    información) así como invocar el método <code>System.out.println</code>para depurar. El KDJ
+                    maneja ciertos efectos laterales en tuberías bien. En particular, el método <code>collect</code> está diseñado
+                    para realizar las operaciones de flujo más comunes que tienen efectos lateras de una manera segura para la 
+                    computación paralela. Operaciones como <code>forEach</code> y <code>peek</code> están diseñadas con efectos
+                    secundarios; una expresión lambda que devuelve void, tal como una que invoca <code>System.out.println</code>,
+                    puede no hacer nada pero tiene efectos secundarios. Aun así, debería usar las operaciones <code>forEach</code>
+                    y <code>peek</code> con cuidado; si usa una de estas operaciones con un flujo paralelo, entonces el tiempo de
+                    ejecución de Java puede invocar la expresión lambda que especificó como su parámetro concurrentemente para
+                    hilos múltiples. Además de esto, nunca pase como parámetros expresiones lambda que tienen efectos laterales en
+                    operaciones tales como <code>filter</code> y <code>map</code>. Las secciones siguientes describen la
+                    <a href="#interference">interferencia</a> y
+                    <a href="#stateful_lambda_expressions">expresiones lambda con estado</a>, ambas pueden ser fuentes de efectos
+                    secundarios y pueden devolver resultados inconsistentes y no predecibles, especialmente en los flujos paralelos.
+                    Sin embargo, el concepto de <a href="#laziness">pereza</a> es descrito primero, porque tiene un efecto directo
+                    sobre la interferencia.
+                </p>
+                <h3>
+                    <a id="laziness">Pereza</a>
+                </h3>
+                <p>
+                    Todas las operaciones intermedias son <em>perezosas</em>. Una expresión, método, o algoritmo es perezoso si su
+                    valor es evaluado sólo cuando es requerido. (Un algoritmo es <em>impaciente</em> si es evaluado o procesado
+                    inmediatamente). Las operaciones intermedias son perezosas porque no empiezan procesando el contenido del flujo
+                    hasta que la operación terminal comienza. Procesar los flujos perezosamente habilitan al compilador de Java y
+                    al tiempo de ejecución a optimizar como procesan flujos. Por ejemplos, en una tubería tal como el ejemplo
+                    <code>filter</code>-<code>mapToInt</code>-<code>average</code> descrito en la sección
+                    <a class="TutorialLink" target="_top" href="../../collections/streams/index.html">Operaciones de Agregación</a>,
+                    la operación <code>average</code> podría obtener los primeros varios enteros del flujo creado por la operación
+                    <code>mapToInt</code>, la cual obtiene elementos de la operación <code>filter</code>. La operación
+                    <code>average</code> repetiría este proceso hasta que ha obtenido todos los elementos requeridos del flujo, y
+                    entonces calcularía la media.
+                </p>
+                <h3>
+                    <a id="interference">Interferencia</a>
+                </h3>
+                <p>
+                    Las expresiones lambda en operaciones de flujo no deberían <em>interferir</em>. La interferencia ocurre cuando
+                    el fuente de un flujo es modificado mientras una tubería procesa el flujo. Por ejemplo, el código siguiente 
+                    intenta concatenar la cadena contenida en la <code>List</code> <code>listOfStrings</code>. Sin embargo, lanza
+                    una  <code>ConcurrentModificationException</code>:
+                </p>
+                <pre class="codeblock">
+try {
+    List&lt;String&gt; listOfStrings =
+        new ArrayList&lt;&gt;(Arrays.asList("uno", "dos"));
+         
+    // Esto fallará ya que la operación Peek intentará agregar la
+    // cadena "tres" a la fuente después de que la operación terminal haya
+    // comenzado.
+             
+    String concatenatedString = listOfStrings
+        .stream()
+        
+        // ¡No haga esto! La interferencia ocurre aquí.
+        .peek(s -&gt; listOfStrings.add("tres"))
+        
+        .reduce((a, b) -&gt; a + " " + b)
+        .get();
+                 
+    System.out.println("Cadena concatenada: " + concatenatedString);
+         
+} catch (Exception e) {
+    System.out.println("Excepción capturada: " + e.toString());
+}
+                </pre>
+                <p>
+                    Este ejemplo concatena las cadenas contenidas en <code>listOfStrings</code> en un valor
+                    <code>Optional&lt;String&gt;</code> con la operación <code>reduce</code>, la cual es una operación terminal.
+                    Sin embargo, la tubería aquí invoca la operación intermedia <code>peek</code>, la cual intenta agregar un
+                    nuevo elemento a <code>listOfStrings</code>. Recuerde, todas las operaciones intermedias son perezosas. Esto
+                    significa que la tubería en este ejemplo comienza la ejecución cuando la operación <code>get</code> se invoca,
+                    y termina la ejecución cuando la operación <code>get</code> se termina. El argumento de la operacion
+                    <code>peek</code> intenta modificar el flujo fuente durante la ejecución de la tubería, lo cual causa que el
+                    tiempo de ejecución de Java lance una <code>ConcurrentModificationException</code>.
+                </p>
+                <h3>
+                    <a id="stateful_lambda_expressions">Expresiones Lambda con estado</a>
+                </h3>
+                <p>
+                    Evite usar <em>expresiones lambda con estado</em> como parámetros en operaciones de flujo. Una expresión lambda
+                    con estado es una cuyo resultado depende de cualquier estado que pueda cambiar durante la ejecución de una
+                    tubería. El ejemplo siguiente agrega elementos de la <code>List</code> <code>listOfIntegers</code> a una nueva
+                    instancia <code>List</code> con la operación intermedia <code>map</code>. Lo hace dos veces, primero con un
+                    flujo serial y entonces con un flujo paralelo:
+                </p>
+                <pre class="codeblock">
+List&lt;Integer&gt; serialStorage = new ArrayList&lt;&gt;();
+     
+System.out.println("Flujo serial:");
+listOfIntegers
+    .stream()
+    
+    // ¡No haga esto! Use una expresión lambda con estado.
+    .map(e -&gt; { serialStorage.add(e); return e; })
+    
+    .forEachOrdered(e -&gt; System.out.print(e + " "));
+System.out.println("");
+     
+serialStorage
+    .stream()
+    .forEachOrdered(e -&gt; System.out.print(e + " "));
+System.out.println("");
+
+System.out.println("Flujo paralelo:");
+List&lt;Integer&gt; parallelStorage = Collections.synchronizedList(
+    new ArrayList&lt;&gt;());
+listOfIntegers
+    .parallelStream()
+    
+    // ¡No haga esto! Usa una expresión lambda con estado.
+    .map(e -&gt; { parallelStorage.add(e); return e; })
+    
+    .forEachOrdered(e -&gt; System.out.print(e + " "));
+System.out.println("");
+     
+parallelStorage
+    .stream()
+    .forEachOrdered(e -&gt; System.out.print(e + " "));
+System.out.println("");
+                </pre>
+                <p>
+                    La expresión lambda <code>e -&gt; { parallelStorage.add(e); return e; }</code> es una expresión lambda con
+                    estado. Su resultado puede variar cada vez que se ejecuta el código. Este ejemplo imprime lo siguiente:
+                </p>
+                <pre class="codeblock">
+Flujo serial:
+8 7 6 5 4 3 2 1
+8 7 6 5 4 3 2 1
+Flujo paralelo:
+8 7 6 5 4 3 2 1
+1 3 6 2 4 5 8 7
+                </pre>
+                <p>
+                    La operación <code>forEachOrdered</code> procesa elementos en el orden especificado por el flujo,
+                    independientemente de si la secuencia se ejecuta en serie o en paralelo. Sin embargo, cuando un flujo es 
+                    ejecutado en paralelo, la operación <code>map</code> procesa elementos del flujo especificado por el tiempo de
+                    ejecución de Java y compilador. Consecuentemente, el orden en el cual la expresión lambda
+                    <code>e -&gt; { parallelStorage.add(e); return e; }</code> agrega elementos a la <code>List</code>
+                    <code>parallelStorage</code> puede variar cada vez que el código es ejecutado. Para obtener resultados
+                    determinísticos y predecibles, asegúrese de que los parámetros de expresión lambda en las operaciones de flujo
+                    no sean con estado.
+                </p>
+                <p>
+                    <strong>Nota</strong>: Este ejemplo invoca el método
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Collections.html#synchronizedList-java.util.List-">
+                        <code>synchronizedList</code></a> de forma que la <code>List</code> <code>parallelStorage</code> es segura 
+                    para multihilo. Recuerde que las colecciones no son seguras para programación multihilo. Esto significa que
+                    múltiples hilos no deberían acceder a una colección particular al mismo tiempo. Suponga que no invoca el
+                    método <code>synchronizedList</code> cuando crea <code>parallelStorage</code>:
+                </p>
+                <pre class="codeblock">
+List&lt;Integer&gt; parallelStorage = new ArrayList&lt;&gt;();
+                </pre>
+                <p>
+                    El ejemplo se comporta de forma errática porque múltiples hilos acceden y modifican
+                    <code>parallelStorage</code> sin un mecanismo como la sincronización para planificar cuando un hilo particular
+                    puede acceder a la instancia <code>List</code>. En consecuencia, el ejemplo podría imprimir resultados
+                    similares a los siguientes:
+                </p>
+                <pre class="codeblock">
+Parallel stream:
+8 7 6 5 4 3 2 1
+null 3 5 4 7 8 1 2
+                </pre>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="reduction.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;
+                <a target="_top" href="QandE/questions.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos
+                            <a href="../../information/cpyr.html">avisos legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Reducción<br />
+            <b>Página siguiente:</b> Preguntas y Ejercicios: Operaciones de Agregación
+        </div>
+    </body>
+</html> 

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />        
+        <title>
+            Parseado y Formateado (Los Tutoriales de Java&trade; &gt; Fecha y Hora &gt; Calendario Estándar)
+        </title>
+        <meta name="description" content="Este tutorial de Java de fecha y tiempo describe cómo usar las IPAs java.time
+              introducidas en el KDJ 8 para escribir código de fechas y tiempo. El núcleo del paquete usa el calendario estándar
+              como está definido en el sistema de calendario ISO." />
+        <meta name="keywords" content="java programming, learn java, java sample code, datetime, date time, JSR 310, date-time,
+              date, time, java.time, jdk8, ISO" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Calendario Estándar</a></div>
+                <div class="linkAHEAD"><a href="overview.html">Información General</a></div>
+                <div class="linkAHEAD"><a href="enum.html">DayOfWeek y Enumeraciones de Month</a></div>
+                <div class="linkAHEAD"><a href="date.html">Clase Date</a></div>
+                <div class="linkAHEAD"><a href="datetime.html">Clases Date y Time</a></div>
+                <div class="linkAHEAD"><a href="timezones.html">Zonas horarias y Clases de Compensación</a></div>
+                <div class="linkAHEAD"><a href="instant.html">Clase Instant</a></div>
+                <div class="nolinkAHEAD">Parseado y Formateado</div>
+                <div class="linkAHEAD"><a href="temporal.html">El Paquete Temporal</a></div>
+                <div class="linkBHEAD"><a href="adjusters.html">Temporal Adjuster</a></div>
+                <div class="linkBHEAD"><a href="queries.html">Temporal Query</a></div>
+                <div class="linkAHEAD"><a href="period.html">Period y Duration</a></div>
+                <div class="linkAHEAD"><a href="clock.html">Clock</a></div>
+                <div class="linkAHEAD"><a href="nonIso.html">Conversión de Fechas No-ISO</a></div>
+                <div class="linkAHEAD"><a href="legacy.html">Código Date-Time Heredado</a></div>
+                <div class="linkAHEAD"><a href="summary.html">Sumario</a></div>
+                <div class="linkQUESTIONS"><a href="QandE/questions.html">Preguntas y Ejercicios</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Fecha y Hora<br />
+                <b>Lección:</b> Calendario Estándar
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Fecha y Hora</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Calendario Estándar</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="instant.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="temporal.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Parseado y Formateado</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Las clases basadas-en-el-tiempo en la IPA Fecha-Tiempo suministran métodos <code>parse</code> para analizar una
+                    cadena que contiene información sobre fecha y tiempo. Estas clases también suministran métodos 
+                    <code>format</code> para dar formato para visualizar los objetos basados-en-el-tiempo. En ambos casos, el 
+                    proceso es similar: usted ofrece una patrón a <code>DateTimeFormatter</code> para crear un objeto formatedor.
+                    Este formateador es entonces pasado al método
+                    <code>parse</code> o <code>format</code>.
+                </p>
+                <p>
+                    La clase <code>DateTimeFormatter</code> ofrece numerosos
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#predefined">
+                        formateadores predefinidos</a>, o puede definir el suyo propio.
+                </p>
+                <p>
+                    Los métodos <code>parse</code> y <code>format</code> lanzan una excepción si ocurre un problema durante
+                    el proceso de conversión. Por lo tanto, su código de análisis debería capturar el error
+                    <code>DateTimeParseException</code> y su código de formateo debería capturar el error
+                    <code>DateTimeException</code>. Para más información sobre el manejo de excepciones, vea
+                    <a class="TutorialLink" target="_top" 
+                       href="../../essential/exceptions/handling.html">Capturando y Manejando Excepciones</a>.
+                </p>
+                <p>
+                    La clase <code>DateTimeFormatter</code> es a la vez inmutable y segura para programación multihilo; puede (y
+                    debe) asignarse a una constante estática cuando sea apropiado.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Nota de Versión:</strong>&nbsp;Los objetos de fecha-tiempo <code>java.time</code> pueden ser usados
+                    directamente con <code>java.util.Formatter</code> y <code>String.format</code> usando el formato familiar
+                    basado en patrones que era usado con las clases heredadas <code>java.util.Date</code> y
+                    <code>java.util.Calendar</code>.
+                    <hr />
+                </div>
+                <h2>
+                    Analizar
+                </h2>
+                <p>
+                    El método de un argumento
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html#parse-java.lang.CharSequence-">
+                        <code>parse(CharSequence)</code></a> en la clase <code>LocalDate</code> usa el formateador
+                    <code>ISO_LOCAL_DATE</code>. Para especificar un formateador diferente, puede usar el método de dos argumentos
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html#parse-java.lang.CharSequence-java.time.format.DateTimeFormatter-">
+                        <code>parse(CharSequence, DateTimeFormatter)</code></a>. El ejemplo siguiente usa el formateador 
+                    predefinido <code>BASIC_ISO_DATE</code>, el cual sua el formato <code>19590709</code> para July 9, 1959.
+                </p>
+                <div class="codeblock">
+                    <pre>
+String in = ...;
+LocalDate date = LocalDate.parse(in, DateTimeFormatter.BASIC_ISO_DATE);
+                    </pre>
+                </div>
+                <p>
+                    Puede también definir un formateador usando su propio patrón. El código siguiente, del ejemplo
+                    <a class="SourceLink" target="_blank" href="examples/Parse.java"
+                       onclick="showCode('../../displayCode.html', 'examples/Parse.java'); return false;">
+                        <code>Parse</code></a>, crea un formateador que aplica un formato de "MMM d yyyy". Esto formato especifica
+                    tres caracteres para representar el mes, un dígito para representar el dia del mes, y cuatro dígitos para
+                    representar el año. Un formateador creado usando este patrón reconocería cadenas tales como "Jan 3 2003" o
+                    "Mar 23 1994". Sin embargo, para especificar el formato como "MMM dd yyyy", con dos caracteres para el día
+                    del mes, entonces tendría que usar siempre dos caracteres, rellenando con un cero para las fechas
+                    de-un-sólo-dígito: "Jun 03 2003".
+                </p>
+                <div class="codeblock">
+                    <pre>
+String input = ...;
+try {
+    DateTimeFormatter formatter =
+                      DateTimeFormatter.ofPattern("MMM d yyyy");
+    LocalDate date = LocalDate.parse(input, formatter);
+    System.out.printf("%s%n", date);
+}
+catch (DateTimeParseException exc) {
+    System.out.printf("%s no es analizable!%n", input);
+    throw exc;      // Relanza la excepción.
+}
+// 'date' ha sido analizada exitosamente
+                    </pre>
+                </div>
+                <p>
+                    La documentación para la clase <code>DateTimeFormatter</code> especifica la
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#patterns">
+                        lista completa de símbolos</a> que puede usar para especificar un patrón para formatear o analizar.
+                </p>
+                <p>
+                    El ejemplo <code>StringConverter</code> en la página
+                    <a class="TutorialLink" target="_top" href="nonIso.html">Conversión de Fechas No-ISO</a> suministra otros
+                    ejemplos de un formateador de fechas.
+                </p>
+                <h2>
+                    Formatear
+                </h2>
+                <p>
+                    El método
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html#format-java.time.format.DateTimeFormatter-">
+                        <code>format(DateTimeFormatter)</code></a> convierte un objeto basado-en-el-tiempo en una representación de
+                    cadena usando el formato especificado. El código siguiente, del ejemplo
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/Flight.java"
+                       onclick="showCode('../../displayCode.html', 'examples/Flight.java'); return false;">
+                        <code><code>Flight</code></code></a>, convierte una instancia de <code>ZonedDateTime</code> usando el
+                    formato "MMM d yyy  hh:mm a". La fecha es definida en la misma forma que fue usada para el ejemplo previo
+                    de análisis, pero este patrón también incluye la hora, minutos, y componentes a.m. y p.m.
+                </p>
+                <div class="codeblock">
+                    <pre>
+ZoneId leavingZone = ...;
+ZonedDateTime departure = ...;
+
+try {
+    DateTimeFormatter format = DateTimeFormatter.ofPattern("MMM d yyyy  hh:mm a");
+    String out = departure.format(format);
+    System.out.printf("SALIDA:  %s (%s)%n", out, leavingZone);
+}
+catch (DateTimeException exc) {
+    System.out.printf("%s no puedo ser formateado!%n", departure);
+    throw exc;
+}
+                    </pre>
+                </div>
+                <p>
+                    La salida para este ejemplo, que imprime tanto la hora de llegada como la de salida, es como sigue:
+                </p>
+                <div class="codeblock">
+                    <pre>
+SALIDA:  Jul 20 2013  07:30 PM (America/Los_Angeles)
+LLEGADA: Jul 21 2013  10:20 PM (Asia/Tokyo)
+                    </pre>
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="instant.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="temporal.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Instant Class<br />
+            <b>Página siguiente:</b> El Paquete Temporal
+        </div>
+    </body>
+</html> 

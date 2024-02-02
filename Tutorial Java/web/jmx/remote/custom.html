@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Creando un Cliente JMX Personalizado (Los Tutoriales de Java&trade; &gt; Extensiones de Gestión de Java (JMX) &gt;
+            Gestión Remota)
+        </title>
+        <meta name="description" content="Este tutorial de JMX Java describe la tecnología de Extensiones de Gestión de Java (JMX): 
+              mbeans, notificaciones y gestión remota" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jmx, java management extension, mbeans,
+              mxbeans" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Gestión Remota</a></div>
+                <div class="linkAHEAD"><a href="jconsole.html">Exponiendo un Recurso de Gestión Remota por JConsole</a></div>
+                <div class="nolinkAHEAD">Creando un Cliente JMX Personalizado</div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Extensiones de Gestión de Java (JMX)<br />
+                <b>Lección:</b> Gestión Remota
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Extensiones de Gestión de Java (JMX)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Gestión Remota</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="jconsole.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../end.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Creando un Cliente JMX Personalizado</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Las lecciones previas en este recorrido le han enseñando cómo crear MBeans y MXBeans de tecnología JMX, y 
+                    registrarlos con un agente JMX. Sin embargo, todos los ejemplos previos han usado un cliente JMX existente, 
+                    JConsole. Esta lección le demostrará cómo crear su propio cliente JMX personalizado.
+                </p>
+                <p>
+                    Un ejemplo de un cliente JMX personalizado,
+                    <a class="SourceLink" target="_blank" href="../examples/Client.java"
+                       onclick="showCode('../../displayCode.html', '../examples/Client.java'); return false;">
+                        <code>Client</code></a> se incluye en 
+                    <a class="SourceLink" target="_blank" href="../examples/jmx_examples.zip"
+                       onclick="showCode('../../displayCode.html', '../examples/jmx_examples.zip'); return false;">
+                        <code>jmx_examples.zip</code></a>. Este cliente JMX interactúa con el mismo MBean, MXBean y agente JMX que 
+                    fueron vistos en las lecciones previas. Debido al tamaño de la clase <code>Client</code>, será examinada 
+                    en fragmentos en las siguientes secciones.
+                </p>
+                <h2>
+                    Importar las Clases de IPA Remotas de JMX
+                </h2>
+                <p>
+                    Para ser capaz de crear conexiones a agentes JMX que se están ejecutando remotamente desde el cliente JMX, debe 
+                    utilizar las clases de
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/remote/package-summary.html">
+                        <code>javax.management.remote</code></a>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+package com.example;
+...
+
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+
+public class Client {
+...
+                    </pre>
+                </div>
+                <p>
+                    La clase <code>Client</code> estará creando instancias de 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/remote/JMXConnector.html">
+                        <code>JMXConnector</code></a>, para lo cual necesitará una 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/remote/JMXConnectorFactory.html">
+                        <code>JMXConnectorFactory</code></a> y un 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/remote/JMXServiceURL.html">
+                        <code>JMXServiceURL</code></a>.
+                </p>
+                <h2>
+                    Crear un Listener de Notificación
+                </h2>
+                <p>
+                    El cliente JMX necesita un gestor de notificación, para escuchar y procesar cualquier notificación que podría 
+                    ser enviada por los MBeans que se registraron en el servidor MBean del agente JMX. El gestor de notificación 
+                    del cliente JMX es una instancia de la interfaz 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/NotificationListener.html">
+                        <code>NotificationListener</code></a>, como se muestra abajo.
+                </p>
+                <div class="codeblock">
+                    <pre>
+... 
+
+public static class ClientListener implements NotificationListener {
+
+    public void handleNotification(Notification notification,
+            Object handback) {
+        echo("\nReceived notification:");
+        echo("\tClassName: " + notification.getClass().getName());
+        echo("\tSource: " + notification.getSource());
+        echo("\tType: " + notification.getType());
+        echo("\tMessage: " + notification.getMessage());
+        if (notification instanceof AttributeChangeNotification) {
+            AttributeChangeNotification acn =
+                (AttributeChangeNotification) notification;
+            echo("\tAttributeName: " + acn.getAttributeName());
+            echo("\tAttributeType: " + acn.getAttributeType());
+            echo("\tNewValue: " + acn.getNewValue());
+            echo("\tOldValue: " + acn.getOldValue());
+        }
+    }
+}    
+...       
+                    </pre>
+                </div>
+                <p>
+                    Este listener de notificación determina el origen de cualquier notificación que reciba, y recupera la 
+                    información almacenada en la notificación. Después realiza diferentes acciones con la información de 
+                    notificación de acuerdo al tipo de notificación recibida. En este caso, cuando el listener recibe 
+                    notificaciones del tipo 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/AttributeChangeNotification.html">
+                        <code>AttributeChangeNotification</code></a> obtendrá el nombre y el tipo del atributo MBean que ha 
+                    cambiado, como también sus viejos y nuevos valores, llamando a los métodos de 
+                    <code>AttributeChangeNotification</code> <code>getAttributeName</code>, <code>getAttributeType</code>, 
+                    <code>getNewValue</code> y <code>getOldValue</code>.
+                </p>
+                <p>
+                    Más adelante en el código se crea una nueva instancia de <code>ClientListener</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+ 
+ClientListener listener = new ClientListener();
+
+                    </pre>
+                </div>
+                <h2>
+                    Crear un Cliente Conector RMI
+                </h2>
+                <p>
+                    La clase <code>Client</code> crea un conector cliente RMI que se configura para conectar a un conector servidor 
+                    RMI que lanzará cuando inicie el agente JMX, <code>Main</code>. Esto permitirá al cliente JMX interactuar con 
+                    el agente JMX como si estuvieran ejecutándose en la misma máquina.
+                </p>
+                <div class="codeblock">
+                    <pre>
+...
+    
+public static void main(String[] args) throws Exception {
+
+echo("\nCreate an RMI connector client and " +
+    "connect it to the RMI connector server");
+JMXServiceURL url = 
+    new JMXServiceURL("service:jmx:rmi:///jndi/rmi://:9999/jmxrmi");
+JMXConnector jmxc = JMXConnectorFactory.connect(url, null);
+...        
+                    </pre>
+                </div>
+                <p>
+                    Como puede ver, el <code>Client</code> define un 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/remote/JMXServiceURL.html">
+                        <code>JMXServiceURL</code></a> llamado <code>url</code>, que representa la ubicación en la cual el conector 
+                    cliente espera encontrar el conector servidor. Esta URL permite al conector cliente recuperar la referencia 
+                    al conector servidor RMI <code>jmxrmi</code> del registro RMI que se ejecuta en el puerto 9999 del host 
+                    local, y conectarse al conector servidor RMI.
+                </p>
+                <p>
+                    Con el registro RMI así identificado, se puede crear el conector cliente. El conector cliente, 
+                    <code>jmxc</code>, es una instancia de la interfaz 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/remote/JMXConnector.html">
+                        <code>JMXConnector</code></a>, creada por el método <code>connect()</code> de 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/remote/JMXConnectorFactory.html">
+                        <code>JMXConnectorFactory</code></a>. Al método <code>connect()</code> se le pasan los parámetros 
+                    <code>url</code> y un mapa de entorno nulo cuando se le llama.
+                </p>
+                <h2>
+                    Conectar al Servidor MBean Remoto 
+                </h2>
+                <p>
+                    Con la conexión RMI en su lugar, el cliente JMX debe conectarse al servidor MBean remoto, de modo que pueda 
+                    interactuar con los diversos MBeans registrados en él por el agente JMX remoto.
+                </p>
+                <div class="codeblock">
+                    <pre>
+...
+        
+MBeanServerConnection mbsc = 
+    jmxc.getMBeanServerConnection();
+                
+...     
+                    </pre>
+                </div>
+                <p>
+                    Una instancia de 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/MBeanServerConnection.html">
+                        <code>MBeanServerConnection</code></a>, llamada mbsc, se crea entonces llamando al método 
+                    <code>getMBeanServerConnection()</code> de la instancia <code>JMXConnector</code> <code>jmxc</code>.
+                </p>
+                <p>
+                    El conector cliente está ahora conectado al servidor MBean creado por el agente JMX, y puede registrar MBeans 
+                    y realizar operaciones con ellos con la conexión permaneciendo completamente transparente para ambos extremos.
+                </p>
+                <p>
+                    Para empezar, el cliente define algunas operaciones simples para descubrir información sobre los MBeans que se 
+                    encuentran en el servidor MBean del agente.
+                </p>
+                <div class="codeblock">
+                    <pre>
+...
+        
+echo("\nDomains:");
+String domains[] = mbsc.getDomains();
+Arrays.sort(domains);
+for (String domain : domains) {
+    echo("\tDomain = " + domain);
+}
+        
+...
+        
+echo("\nMBeanServer default domain = " + mbsc.getDefaultDomain());
+
+echo("\nMBean count = " +  mbsc.getMBeanCount());
+echo("\nQuery MBeanServer MBeans:");
+Set&lt;ObjectName&gt; names = 
+    new TreeSet&lt;ObjectName&gt;(mbsc.queryNames(null, null));
+for (ObjectName name : names) {
+    echo("\tObjectName = " + name);
+}
+      
+...
+        
+                    </pre>
+                </div>
+                <p>
+                    El cliente llama a varios métodos de <code>MBeanServerConnection</code> para obtener los dominios en los cuales 
+                    los diferentes MBeans están operando, el número de MBeans registrados en el servidor MBean, y los objetos 
+                    nombre para cada uno de los MBeans que descubre.
+                </p>
+                <h2>
+                    Realización de Operaciones en MBeans Remotos a Través de Proxies
+                </h2>
+                <p>
+                    El cliente accede al MBean <code>Hello</code> en el servidor MBean a través de la conexión del servidor MBean 
+                    creando un <strong>proxy</strong> MBean. Este proxy MBean es local al cliente, y emula al MBean remoto.
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+...
+
+ObjectName mbeanName = new ObjectName("com.example:type=Hello");
+HelloMBean mbeanProxy = JMX.newMBeanProxy(mbsc, mbeanName, 
+                                          HelloMBean.class, true);
+
+echo("\nAdd notification listener...");
+mbsc.addNotificationListener(mbeanName, listener, null, null);
+
+echo("\nCacheSize = " + mbeanProxy.getCacheSize());
+
+mbeanProxy.setCacheSize(150);
+
+echo("\nWaiting for notification...");
+sleep(2000);
+echo("\nCacheSize = " + mbeanProxy.getCacheSize());
+echo("\nInvoke sayHello() in Hello MBean...");
+mbeanProxy.sayHello();
+
+echo("\nInvoke add(2, 3) in Hello MBean...");
+echo("\nadd(2, 3) = " + mbeanProxy.add(2, 3));
+
+waitForEnterPressed();
+        
+...
+        
+                    </pre>
+                </div>
+                <p>
+                    Los proxies MBean le permiten acceder a un MBean a través de una interfaz Java, permitiéndole hacer llamadas 
+                    al proxy en vez de tener que escribir un código extenso para acceder a un MBean remoto. Un proxy MBean para 
+                    <code>Hello</code> se crea aquí llamando al método <code>newMBeanProxy()</code> en la clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/JMX.html">
+                        <code>javax.management.JMX</code></a>, pasándole el <code>MBeanServerConnection</code> del MBean, el objeto 
+                    nombre, el nombre de la clase de la interfaz MBean y <code>true</code>, para significar que el proxy debe 
+                    comportarse como un 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/NotificationBroadcaster.html">
+                        <code>NotificationBroadcaster</code></a>. El cliente JMX puede ahora realizar las operaciones definidas por 
+                    <code>Hello</code> como si fueran las operaciones de un MBean registrado localmente. El cliente JMX también 
+                    agrega un listener de notificación y cambia el atributo <code>CacheSize</code> del MBean, para hacerle 
+                    enviar una notificación.
+                </p>
+                <h2>
+                    Realización de Operaciones en MXBeans Remotos a Través de Proxies
+                </h2>
+                <p>
+                    Puede crear proxies para los MXBeans exactamente de la misma forma que crea proxies de MBean.
+                </p>
+                <div class="codeblock">
+                    <pre>
+...
+        
+ObjectName mxbeanName = new ObjectName ("com.example:type=QueueSampler");
+QueueSamplerMXBean mxbeanProxy = JMX.newMXBeanProxy(mbsc, 
+    mxbeanName,  QueueSamplerMXBean.class);
+QueueSample queue1 = mxbeanProxy.getQueueSample();
+echo("\nQueueSample.Date = " + queue1.getDate());
+echo("QueueSample.Head = " + queue1.getHead());
+echo("QueueSample.Size = " + queue1.getSize());
+echo("\nInvoke clearQueue() in QueueSampler MXBean...");
+mxbeanProxy.clearQueue();
+
+QueueSample queue2 = mxbeanProxy.getQueueSample();
+echo("\nQueueSample.Date = " +  queue2.getDate());
+echo("QueueSample.Head = " + queue2.getHead());
+echo("QueueSample.Size = " + queue2.getSize());
+
+...
+                    </pre>
+                </div>
+                <p>
+                    Como se muestra arriba, para crear un proxy para un MXBean, todo lo que tiene que hacer es llamar a 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/JMX.html#newMXBeanProxy-javax.management.MBeanServerConnection-javax.management.ObjectName-java.lang.Class-">
+                        <code>JMX.newMXBeanProxy</code></a> en vez de a <code>newMBeanProxy</code>. El proxy MXBean
+                    <code>mxbeanProxy</code> permite al cliente invocar las operaciones del MXBean <code>QueueSample</code> como si 
+                    fueran las operaciones de un MXBean registrado localmente.
+                </p>
+                <h2>
+                    Cerrar la Conexión
+                </h2>
+                <p>
+                    Una vez el cliente JMX ha obtenido toda la información que necesita y realizado todas las operaciones 
+                    requeridas en los MBeans en el servidor MBean del agente JMX remoto, la conexión debe ser cerrada.
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+jmxc.close();
+
+                    </pre>
+                </div>
+                <p>
+                    La conexión se cierra con una llamada al método 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/remote/JMXConnector.html#close--">
+                        <code>JMXConnector.close</code></a>.
+                </p>
+                <h3>
+                    Para Ejecutar el Ejemplo del Cliente JMX Personalizado
+                </h3>
+                <p>
+                    Este ejemplo requiere la versión 6 de la plataforma Java SE. Para supervisar el agente JMX <code>Main</code> 
+                    remotamente usando un cliente JMX personalizado 
+                    <a class="SourceLink" target="_blank" href="../examples/Client.java"
+                       onclick="showCode('../../displayCode.html', '../examples/Client.java'); return false;">
+                        <code>Client</code></a>, siga estos pasos:
+                </p>
+                <ol>
+                    <li>
+                        Si no lo ha hecho ya, salve 
+                        <a class="SourceLink" target="_blank" href="../examples/jmx_examples.zip"
+                           onclick="showCode('../../displayCode.html', '../examples/jmx_examples.zip'); return false;">
+                            <code>jmx_examples.zip</code></a> en su directorio <code>work_dir</code>.
+                    </li>
+                    <li>
+                        Descomprima el paquete de clases de ejemplo usando el siguiente comando en una ventana terminal.
+                        <div class="codeblock">
+                            <pre>
+unzip jmx_examples.zip
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        Compile las clases Java de ejemplo desde dentro del directorio <code>work_dir</code>.
+                        <div class="codeblock">
+                            <pre>
+javac com/example/*.java
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        Inicie la aplicación <code>Main</code>, especificando las propiedades que exponen a <code>Main</code> para 
+                        la gestión remota:
+                        <div class="codeblock">
+                            <pre>
+java -Dcom.sun.management.jmxremote.port=9999 \
+     -Dcom.sun.management.jmxremote.authenticate=false \
+     -Dcom.sun.management.jmxremote.ssl=false \ 
+     com.example.Main
+                            </pre>
+                        </div>
+                        <p>
+                            Se genera una confirmación de que <code>Main</code> está esperando a que ocurra algo.
+                        </p>
+                    </li>
+                    <li>
+                        Inicie la aplicación <code>Client</code> en una ventana terminal diferente:
+                        <div class="codeblock">
+                            <pre>
+java com.example.Client
+                            </pre>
+                        </div>
+                        <p>
+                            Se visualiza una confirmación de que se ha obtenido una <code>MBeanServerConnection</code>.
+                        </p>
+                    </li>
+                    <li>
+                        Presione Intro.
+                        <p>
+                            Se visualizan los dominios en los cuales se registraron todos los MBeans en el servidor MBean iniciados 
+                            por  <code>Main</code>.
+                        </p>
+                    </li>
+                    <li>
+                        Presione Intro de nuevo.
+                        <p>
+                            Se visualiza el número de MBeans que se registraron en el servidor MBean, como también los objetos 
+                            nombre de todos estos MBeans. Los MBeans visualizados incluyen todos los MXBeans estándar de plataforma 
+                            en ejecución en la MV de Java, como también el MBean <code>Hello</code> y el MXBean 
+                            <code>QueueSampler</code> que fue registrado en el servidor MBean por <code>Main</code>.
+                        </p>
+                    </li>
+                    <li>
+                        Presione Intro de nuevo.
+                        <p>
+                            Se invocan las operaciones del MBean <code>Hello</code> por <code>Client</code>, con los resultados 
+                            siguientes:
+                        </p>
+                        <ul>
+                            <li>
+                                Se agrega un listener de notificación a <code>Client</code> para escuchar las notificaciones de 
+                                <code>Main</code>.
+                            </li>
+                            <li>
+                                El valor del atributo <code>CacheSize</code> se cambia de 200 a 150.
+                            </li>
+                            <li>
+                                En la ventana terminal en la cual inició <code>Main</code>, se visualiza la confirmación del cambio 
+                                del atributo <code>CacheSize</code>.
+                            </li>
+                            <li>
+                                En la ventana terminal en la cual inició <code>Client</code>, se visualiza una notificación de 
+                                <code>Main</code>, informando a <code>Client</code> del cambio del atributo <code>CacheSize</code>.
+                            </li>
+                            <li>
+                                Se invoca la operación <code>sayHello</code> del MBean <code>Hello</code>.
+                            </li>
+                            <li>
+                                En la ventana terminal en la cual inició <code>Main</code>,  se visualiza el mensaje 
+                                &quot;Hello world&quot;.
+                            </li>
+                            <li>
+                                Se invoca la operación <code>add</code> del MBean <code>Hello</code>, con los valores 2 y 3 como 
+                                parámetros. El resultado es visualizado por <code>Client</code>.
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        Presione Intro de nuevo.
+                        <p>
+                            Se invocan las operaciones del MXBean <code>QueueSampler</code> por <code>Client</code>, con los 
+                            resultados siguientes:
+                        </p>
+                        <ul>
+                            <li>
+                                Se visualizan los valores <code>date</code>, <code>head</code>, y <code>size</code> de 
+                                <code>QueueSample</code>.
+                            </li>
+                            <li>
+                                Se invoca la operación <code>clearQueue</code>.
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        Presione Intro de nuevo.
+                        <p>
+                            El <code>Client</code> cierra la conexión al servidor MBean y se visualiza una confirmación.
+                        </p>
+                    </li>
+                </ol>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="jconsole.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../end.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Exponiendo un Recurso de Gestión Remota por JConsole<br />
+            <b>Página siguiente:</b> Final de la Lección
+        </div>
+    </body>
+</html> 

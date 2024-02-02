@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Usando las Anotaciones @PostConstruct y @PreDestroy con Clases de Beans Gestionados en CDI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="cdi-basic013.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="cdi-basic015.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BABJFEAI">
+      <h2 id="using-the-postconstruct-and-predestroy-annotations-with-cdi-managed-bean-classes">
+        Usando las Anotaciones @PostConstruct y @PreDestroy con Clases de Beans Gestionados en CDI
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Las clases de bean administradas por CDI y sus superclases admiten las anotaciones para la 
+            inicialización y la preparación para la destrucción de un bean. Estas anotaciones se definen en 
+            JSR 250: Anotaciones comunes para la plataforma Java 
+            (<code><a href="http://jcp.org/en/jsr/detail?id=250" class="bare">
+                http:/ /jcp.org/en/jsr/detail?id=250</a></code>).
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>
+                <a href="#CIHEHHCH">
+                  Para Inicializar un Bean Gestionado Usando la Anotación @PostConstruct
+                </a>
+              </p>
+            </li>
+            <li>
+              <p>
+                <a href="#CIHBAFAC">
+                  Para Preparar la Destrucción de un Bean Gestionado Usando la Anotación @PreDestroy
+                </a>
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="CIHEHHCH">
+          <h3 id="to-initialize-a-managed-bean-using-the-postconstruct-annotation">
+            Para Inicializar un Bean Gestionado Usando la Anotación @PostConstruct
+          </h3>
+          <div class="paragraph">
+            <p>
+              La inicialización de un bean administrado especifica el método de devolución de llamada del 
+              ciclo de vida al que el marco CDI debe llamar después de la inyección de dependencia pero antes 
+              de que la clase se ponga en servicio.
+            </p>
+          </div>
+          <div class="olist arabic">
+            <ol class="arabic">
+              <li>
+                <p>
+                  En la clase de bean administrado o cualquiera de sus superclases, defina un método que 
+                  realice la inicialización que necesita.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Anote la declaración del método con la anotación 
+                  <code>javax.annotation.PostConstruct</code>.
+                </p>
+              </li>
+            </ol>
+          </div>
+          <div class="paragraph">
+            <p>
+              Cuando el bean gestionado se inyecta en un componente, CDI llama al método después de que se 
+              hayan producido todas las inyecciones y después de que se hayan llamado todos los 
+              inicializadores.
+            </p>
+          </div>
+          <table class="tableblock frame-all grid-all spread">
+            <colgroup>
+              <col style="width: 100%;">
+            </colgroup>
+            <tbody>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <div>
+                    <div class="paragraph">
+                      <p>Nota:</p>
+                    </div>
+                    <div class="paragraph">
+                      <p>
+                        Según lo dispuesto en JSR 250, si el método anotado se declara en una superclase, se 
+                        llama al método a menos que una subclase de la clase declarante anule el método.
+                      </p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="paragraph">
+            <p>
+              El bean administrado <code>UserNumberBean</code> en 
+              <a href="cdi-basicexamples003.html#GJCXV">El Ejemplo de CDI guessnumber-cdi</a> usa 
+              <code>@PostConstruct</code> para anotar un método que restablece todos los campos de bean:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@PostConstruct
+public void reset () {
+    this.minimum = 0;
+    this.userNumber = 0;
+    this.remainingGuesses = 0;
+    this.maximum = maxNumber;
+    this.number = randomInt.get();
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="CIHBAFAC">
+          <h3 id="to-prepare-for-the-destruction-of-a-managed-bean-using-the-predestroy-annotation">
+            Para Preparar la Destrucción de un Bean Gestionado Usando la Anotación @PreDestroy
+          </h3>
+          <div class="paragraph">
+            <p>
+              La preparación para la destrucción de un bean administrado especifica el método de devolución de 
+              llamada del ciclo de vida que indica que el contenedor está a punto de destruir un componente de 
+              la aplicación.
+            </p>
+          </div>
+          <div class="olist arabic">
+            <ol class="arabic">
+              <li>
+                <p>
+                  En la clase de bean administrado o cualquiera de sus superclases, prepárese para la 
+                  destrucción del bean administrado.
+                </p>
+                <div class="paragraph">
+                  <p>
+                    En este método, realice cualquier limpieza necesaria antes de que se destruya el bean, 
+                    como liberar un recurso que el bean ha estado reteniendo.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <p>
+                  Anote la declaración del método con la anotación <code>javax.annotation.PreDestroy</code>.
+                </p>
+              </li>
+            </ol>
+          </div>
+          <div class="paragraph">
+            <p>CDI llama a este método antes de comenzar a destruir el bean.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="cdi-basic013.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="cdi-basic015.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

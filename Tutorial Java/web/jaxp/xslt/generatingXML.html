@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Generando XML desde una Estructura de Datos Arbitraria (Los Tutoriales de Java&trade; &gt;
+            IPA de Java para Procesado de XML (JAXP) &gt; Transformaciones del Lenguaje Extensible de Hojas de Estilo (XLST))
+        </title>
+        <meta name="description" content="Este tutorial de Java JAXP describe la IPA de Java para el procesado de XML (jaxp), XSLT, 
+              SAX, y tópicos de XML relacionados" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jaxp, xml, xslt, sax" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Transformaciones del Lenguaje Extensible de Hojas de Estilo (XLST)</a></div>
+                <div class="linkAHEAD"><a href="intro.html">Introduciendo XSL, XSLT, y XPath</a></div>
+                <div class="linkAHEAD"><a href="xpath.html">Cómo trabaja XPath</a></div>
+                <div class="linkAHEAD"><a href="writingDom.html">Escribiendo un DOM como si fuera un archivo XML</a></div>
+                <div class="nolinkAHEAD">Generando XML desde una Estructura de Datos Arbitraria</div>
+                <div class="linkAHEAD"><a href="transformingXML.html">Transformando Datos de XML con XSLT</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> IPA de Java para Procesado de XML (JAXP)<br />
+                <b>Lección:</b> Transformaciones del Lenguaje Extensible de Hojas de Estilo (XLST)
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">IPA de Java para Procesado de XML (JAXP)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Transformaciones del Lenguaje Extensible de Hojas de Estilo (XLST)</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="writingDom.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="transformingXML.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Generando XML desde una Estructura de Datos Arbitraria</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Esta sección usa XSLT para convertir una estructura de datos arbitraria en XML.
+                </p>
+                <p>
+                    Aquí tiene un resumen del proceso:
+                </p>
+                <ol>
+                    <li>
+                        <p>
+                            Modificar un programa existente que lee los datos, para hacerle generar eventos SAX. (Si ese programa 
+                            es un analizador real o simplmente un filtro de datos de alguna clase es irrelevante por el momento).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Usar el &quot;analizador&quot; SAX para construir un <code>SAXSource</code> para la transformación.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Usar el mismo objeto <code>StreamResult</code> que se creó en el pasado ejercicio para visualizar los 
+                            resultados. (Pero tenga en cuenta que puede crear fácilmente un objeto <code>DOMResult</code> para 
+                            crear un DOM en memoria).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Conecte la fuente al resultado usando el objeto transformador para hacer la conversión.
+                        </p>
+                    </li>
+                </ol>
+                <p>
+                    Para principiantes, necesita un conjunto de datos que quiera convertir y un programa capaza de leer los datos. 
+                    Las dos siguientes secciones crean un fichero de datos simple y un programa que lo lee.
+                </p>
+                <p>
+                    <a id="gghhh"></a>
+                </p>
+                <h2>
+                    Crear un Fichero Simple
+                </h2>
+                <p>
+                    Este ejemplo usa el conjunto de datos de una libreta de direcciones, <code>PersonalAddressBook.ldif</code>. Si 
+                    no lo ha hecho ya, <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                                          onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                        <code>descargue los ejemplos XSLT</code></a> y descomprímalos dentro del directorio 
+                    <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>. El fichero mostrado aquí 
+                    fue producido crean una nueva libreta de direcciones en Netscape Messenger, dándole algunos datos ficticios 
+                    (una tarjeta de dirección), y después exportándola en el formato Formato de Intercambio de Datos LDAP (LDIF). 
+                    Contenida en el directorio <code>xslt/data</code> después de que descomprima los ejemplos XSLT.
+                </p>
+
+                <p>
+                    La siguiente <a href="#gghhj">Figura&nbsp;</a> muestra la entrada de la libreta de direcciones que fue creada.
+                </p>
+                <p>
+                    <a id="gghhj"></a>
+                </p>
+                <p>
+                    Figura&nbsp; Entrada de la Libreta de Direcciones
+                </p>
+                <p>
+                    <img src="../../figures/jaxp/intro/addressBook.gif" 
+                         alt="Captura de los detalles de una tarjeta de contacto de Mozilla Thunderbird." 
+                         width="302" height="344" />
+                </p>
+                <p>
+                    Exportar la libreta de direccoines produce un fichero como el que se muestra a continuación. Las partes del 
+                    fichero que nos interesan se muestran en negrita.
+                </p>
+                <div class="codeblock">
+                    <pre>
+dn: cn=Fred Flintstone,mail=fred@barneys.house
+modifytimestamp: 20010409210816Z
+cn: Fred Flintstone
+<b>xmozillanickname: Fred</b>
+<b>mail: Fred@barneys.house</b>
+<b>xmozillausehtmlmail: TRUE</b>
+<b>givenname: Fred</b>
+<b>sn: Flintstone</b>
+<b>telephonenumber: 999-Quarry</b>
+<b>homephone: 999-BedrockLane</b>
+<b>facsimiletelephonenumber: 888-Squawk</b>
+<b>pagerphone: 777-pager</b>
+<b>cellphone: 555-cell</b>
+<b>xmozillaanyphone: 999-Quarry</b>
+<b>objectclass: top</b>
+<b>objectclass: person</b>
+                    </pre>
+                </div>
+                <p>
+                    Tenga en cuenta que cada línea del fichero contiene un nombre de variable, dos puntos y un espacio seguido por 
+                    un valor para la variable. La variable <code>sn</code> contiene el apellido de la persona (apellido) y la 
+                    variable <code>cn</code> contiene el campo <code>DisplayName</code> de la entrada de la libreta de direcciones.
+                </p>
+                <p>
+                    <a id="gghhy"></a>
+                </p>
+                <h2>
+                    Crear un Analizador Simple
+                </h2>
+                <p>
+                    El siguiente paso es crear un programa que analize los datos.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> El código descrito en esta sección está en <code>AddressBookReader01.java</code>, que se 
+                    encuentra en el directorio <code>xslt</code> después de que descomprima los 
+                    <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                       onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                        <code>ejemplos XSL</code></a> dentro del directorio 
+                    <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                </p>
+                <hr />
+                <p>
+                    El texto para el programa se muestra a continuación. Es un programa extremadamente simple que ni siquiera se 
+                    repite para múltiples entradas porque, después de todo, es sólo una demostración.
+                </p>
+                <div class="codeblock">
+                    <pre>
+import java.io.*; 
+
+public class AddressBookReader01 { 
+
+    public static void main(String argv[]) {
+        // Check the arguments
+        if (argv.length != 1) {
+            System.err.println("Usage: java AddressBookReader01 filename");
+            System.exit (1);
+        }
+
+        String filename = argv[0];
+        File f = new File(filename);
+        AddressBookReader01 reader = new AddressBookReader01();
+        reader.parse(f);
+    }
+
+    // Parse the input file
+    public void parse(File f) {
+        try {
+            // Get an efficient reader for the file
+            FileReader r = new FileReader(f);
+            BufferedReader br = new BufferedReader(r);
+
+            // Read the file and display its contents.
+            String line = br.readLine();
+            while (null != (line = br.readLine())) {
+                if (line.startsWith("xmozillanickname: "))
+                    break;
+            }
+
+            output("nickname", "xmozillanickname", line);
+            line = br.readLine();
+            output("email",  "mail", line);
+
+            line = br.readLine();
+            output("html", "xmozillausehtmlmail", line);
+
+            line = br.readLine();
+            output("firstname","givenname", line);
+
+            line = br.readLine();
+            output("lastname", "sn", line);
+
+            line = br.readLine();
+            output("work", "telephonenumber", line);
+
+            line = br.readLine();
+            output("home", "homephone", line);
+
+            line = br.readLine();
+            output("fax", "facsimiletelephonenumber", line);
+
+            line = br.readLine();
+            output("pager", "pagerphone", line);
+
+            line = br.readLine();
+            output("cell", "cellphone", line);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Este programa contiene tres métodos:
+                </p>
+                <dl>
+                    <dt>
+                        <code>main</code>
+                    </dt>
+                    <dd>
+                        <p>
+                            El método <code>main</code> obtiene el nombre del fichero desde la línea de comandos, crea una 
+                            instancia  del analizador, y lo configura para que funcione analizando el fichero. Este método 
+                            desaparecerá cuando convertamos el programa en un analizador SAX. (Esa es una razón para colocar el 
+                            código de análisis en un método separado).
+                        </p>
+                    </dd>
+                    <dt>
+                        <code>parse</code>
+                    </dt>
+                    <dd>
+                        <p>
+                            Este método opera en el objeto <code>File</code> enviado por la rutina main. Como ouede ver, es muy 
+                            sencillo. La única concesión a la eficiencia es el uso de un <code>BufferedReader</code>, que puede 
+                            volverse importante cuando comienze a operar con ficheros grandes.
+                        </p>
+                    </dd>
+                    <dt>
+                        <code>output</code>
+                    </dt>
+                    <dd>
+                        <p>
+                            El método output contiene la lógica para la estructura de una línea. Toma tres argumentos. El primer 
+                            argumento da al método un nombre a visualizar, de forma que pueda emitir <code>html</code> como un 
+                            nombre de variable, en vez de <code>xmozillausehtmlmail</code>. El segundo argumento da el nombre de la 
+                            variable almacenada en el fichero (<code>xmozillausehtmlmail</code>). El tercer argumento da la línea 
+                            que contiene los datos. Luego, la rutina elimina el nombre de la variable desde el principio de la 
+                            línea y genera el nombre deseado, más los datos.
+                        </p>
+                    </dd>
+                </dl>
+                <p>
+                    <a id="gghni"></a>
+                </p>
+                <h3>
+                    Ejecutar el Ejemplo <code>AddressBookReader01</code>
+                </h3>
+                <ol>
+                    <li>
+                        <b>Navegue al directorio <code>samples</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+% cd <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>
+                            <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                               onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                                <code>Descargue los ejemplos XSLT pulsando este enlace</code></a> y descomprímalos dentro del 
+                            directorio <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.</b>
+                    </li>
+                    <li>
+                        <b>Navegue al directorio <code>xslt</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+cd xslt
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Compile el ejemplo <code>AddressBookReader01</code>.</b>
+                        <p>
+                            Teclee el siguiente comando:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+% javac AddressBookReader01.java
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Ejecute el ejemplo <code>AddressBookReader01</code> sobre un fichero de datos.</b>
+                        <p>
+                            En el caso de abajo, <code>AddressBookReader01</code> se ejecuta sobre el fichero 
+                            <code>PersonalAddressBook.ldif</code> mostrado arriba, encontrado en el directorio 
+                            <code>xslt/data</code> después de que ha descomprimido el paquete de ejemplos.
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+% java AddressBookReader01 data/PersonalAddressBook.ldif
+                            </pre>
+                        </div>
+                        <p>
+                            Verá la siguiente salida:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+nickname: Fred
+email: Fred@barneys.house
+html: TRUE
+firstname: Fred
+lastname: Flintstone
+work: 999-Quarry
+home: 999-BedrockLane
+fax: 888-Squawk
+pager: 777-pager
+cell: 555-cell
+                            </pre>
+                        </div>
+                        <p>
+                            Esto es un poco más legible que el fichero mostrado en <a href="#gghhh">Crear un Fichero Simple</a>.
+                        </p>
+                    </li>
+                </ol>
+                <p>
+                    <a id="gghhe"></a>
+                </p>
+                <h2>
+                    Crear un Analizador que Genera Eventos SAX
+                </h2>
+                <p>
+                    Esta seccióm muestra cómo hacer que el analizador genere eventos SAX, de forma que pueda usarlos como la base 
+                    para un objeto <code>SAXSource</code> en una transformación XSLT.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> El código descrito en esta sección está en <code>AddressBookReader02.java</code>, que se 
+                    encuentra en el directorio <code>xslt</code> después de que descomprima los 
+                    <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                       onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                        <code>ejemplos XSLT</code></a> dentro del directorio 
+                    <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>. 
+                    <code> AddressBookReader02.java </code> está adaptado de <code> AddressBookReader01.java </code>, por lo que 
+                    aquí solo se discutirán las diferencias de código entre los dos ejemplos.
+                </p>
+                <hr />
+                <p>
+                    <code>AddressBookReader02</code> requiere las siguientes clases remarcadas que no fueron usadas en 
+                    <code>AddressBookReader01</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+import java.io.*; 
+
+<b>import org.xml.sax.*;</b>
+<b>import org.xml.sax.helpers.AttributesImpl;</b>
+                    </pre>
+                </div>
+                <p>
+                    La aplicación también extiende <code>XmlReader</code>. Este cambio convierte la aplicación en un analizador que 
+                    genera los eventos SAX apropiados.
+                </p>
+                <div class="codeblock">
+                    <pre>
+public class AddressBookReader02 <b>implements XMLReader</b> { /* ... */ }
+                    </pre>
+                </div>
+                <p>
+                    A diferencia del ejemplo <code>AddressBookReader01</code>, esta aplicación no tiene un método <code>main</code>.
+                </p>
+                <p>
+                    Las variables globales siguientes serán usadas más tarde en esta sección:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public class AddressBookReader02 implements XMLReader {
+    <b>ContentHandler handler;</b>
+
+    <b>String nsu = "";</b>  
+    <b>Attributes atts = new AttributesImpl();</b>
+    <b>String rootElement = "addressbook";</b>
+
+    <b>String indent = "\n ";</b>
+
+    // ...
+}
+                    </pre>
+                </div>
+                <p>
+                    El <code>ContentHandler</code> de SAX es el objeto que obtendrá los eventos SAX generados por el analizador. 
+                    Para convertir la aplicación en un <code>XmlReader</code>, la aplicación define un método 
+                    <code>setContentHandler</code>. La variable handler contendrá una referencia al objeto que se envía cuando se 
+                    invoca <code>setContentHandler</code>.
+                </p>
+                <p>
+                    Cuando el analizador genera eventos SAX de elemento, necesitará proporcionar el espacio de nombres y la 
+                    información de atributos. Ya que esta es una aplicación simple, define valores nulos para ambos.
+                </p>
+                <p>
+                    La aplicación también define un elemento raíz para la estructura de datos (<code>addressbook</code>) y 
+                    configura una cadena de sangría para mejora la legilibilidad de la salida.
+                </p>
+                <p>
+                    Además, el método de análisis se modifica para que tome un <code>InputSource</code> (en lugar de un 
+                    <code>File</code>) como argumento y tenga en cuenta las excepciones que puede generar:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public void parse<b>(InputSource input)</b> <b>throws IOException, SAXException</b>
+                    </pre>
+                </div>
+                <p>
+                    Ahora, en vez de crear una nueva instancia <code>FileReader</code> como se hizo en 
+                    <code>AddressBookReader01</code>, el lector es encapsulado por el objeto <code>InputSource</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+try {
+    <b>java.io.Reader r = input.getCharacterStream();</b>
+    BufferedReader Br = new BufferedReader(r);
+    // ...
+}
+                    </pre>
+                </div>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> La siguiente sección muestra como crear el objeto fuente de entrada y lo que se pone en él 
+                    será, de hecho, un lector almacenado en un búffer. Pero el <code>AddressBookReader</code> podría ser usada 
+                    por algún otro, en algún lugar de la línea. Este paso asegura que el procesamiento será eficiente, 
+                    independientemente del lector que se le dé.
+                </p>
+                <hr />
+                <p>
+                    El siguiente paso es modificar el método parse para generar eventos SAX para el inicio del documento y el 
+                    elemento raíz. El siguiente código remarcado hace eso:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public void parse(InputSource input) {
+    try {
+        // ...
+        String line = br.readLine();
+        while (null != (line = br.readLine())) {
+            if (line.startsWith("xmozillanickname: ")) 
+                break;
+        }
+
+        <b>if (handler == null) {</b>
+            <b>throw new SAXException("No content handler");</b>
+        <b>}</b>
+
+        <b>handler.startDocument();</b> 
+        <b>handler.startElement(nsu, rootElement, rootElement, atts);</b>
+
+        output("nickname", "xmozillanickname", line);
+        // ...
+        output("cell", "cellphone", line);
+
+        <b>handler.ignorableWhitespace("\n".toCharArray(),</b> 
+            <b>0,  // start index</b>
+            <b>1   // length</b>
+        <b>);</b> 
+        handler.endElement(nsu, rootElement, rootElement);
+        handler.endDocument(); 
+    }
+    catch (Exception e) {
+        // ...
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Aquí, la aplicación comprueba para asegurarse que el analizador está apropiadamente configurado con un 
+                    <code>ContentHandler</code>. (Para esta aplicación, a nosotros no nos importa nada más). Luego genera los 
+                    eventos para el inicio del documento y el elemento raíz, y termina enviando el evento final para el elemento 
+                    raíz y el evento final para el documento.
+                </p>
+                <p>
+                    Dos elementos son dignos de mención en este punto:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            El evento <code>setDocumentLocator</code> no ha sido enviado, porque eso es opcional. Si fuera 
+                            importante, ese evento se enviaría inmediatamente antes del evento <code>startDocument</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Un evento <code>ignorableWhitespace</code> se genera antes del final del elemento raíz. Esto, también, 
+                            es opcional, pero mejora drásticamente la legibilidad de la salida, como se verá en breve. (En este 
+                            caso, el espacio en blanco consiste de una única línea nueva, que se envía de la misma forma que los 
+                            caracteres se envían al método de caracteres: como una matriz de caracteres, un índice inicial, y 
+                            una longitud).
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Ahora que los eventos SAX se generan para el documento y el elemento raíz, el siguiente paso es modificar el 
+                    método de salida para generar los apropiados eventos de elemento para cada elemento de datos. Elimine la 
+                    llamada a <code>System.out.println(name + &quot;: &quot; + text)</code> y agregue el siguiente código 
+                    remarcado que consigue eso:
+                </p>
+                <div class="codeblock">
+                    <pre>
+void output(String name, String prefix, String line) 
+    throws SAXException {
+
+    int startIndex = 
+    prefix.length() + 2;   // 2=length of ": "
+    String text = line.substring(startIndex);
+
+    <b>int textLength = line.length() - startIndex;</b>
+    <b>handler.ignorableWhitespace (indent.toCharArray(),</b> 
+        <b>0,    // start index</b>
+        <b>indent.length()</b>
+    <b>);</b>
+    <b>handler.startElement(nsu, name, name /*"qName"*/, atts);</b>
+    <b>handler.characters(line.toCharArray(),</b> 
+        <b>startIndex,</b>
+        <b>textLength;</b>
+    <b>);</b>
+    <b>handler.endElement(nsu, name, name);</b>
+}
+                    </pre>
+                </div>
+                <p>
+                    Ya que los métodos <code>ContentHandler</code> pueden enviar <code>SAXExceptions</code> de vuelta al 
+                    analizador, el analizador debe estar preparado para tratar con ellas. En este caso, no se espera ninguna, por 
+                    lo que la aplicación simplemente puede fallar si ocurre alguna.
+                </p>
+                <p>
+                    La longitud de los datos es después calculada, de nuevo generando algunos espacios en blanco ignorables por 
+                    legibilidad. En este caso, sólo hay un nivel de datos, así que podemos usar una cadena de sangría fija. (Si los 
+                    datos fueran más estructurados, tendríamos que calcular cuánto espacio sangrar, dependiendo del anidamiento de 
+                    los datos).
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> La cadena de sangría no hace ninguna diferencia en los datos, pero hará que la salida sea 
+                    mucho más fácil de leer. Sin esa cadena, todos los elementos estarían concatenados de un extremo a otro:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;addressbook>
+&lt;nickname>Fred&lt;/nickname>
+&lt;email>...
+                    </pre>
+                </div>
+                <hr />
+                <p>
+                    A continuación, el siguiente método configura el analizador con el <code>ContentHandler</code> que va a recibir 
+                    los eventos que genera:
+                </p>
+                <div class="codeblock">
+                    <pre>
+void output(String name, String prefix, String line)
+    throws SAXException {
+    //  ...
+}
+
+// Allow an application to register a content event handler.
+<b>public void setContentHandler(ContentHandler handler) {</b>
+    <b>this.handler = handler;</b>
+<b>}</b>  
+
+// Return the current content handler.
+<b>public ContentHandler getContentHandler() {</b>
+    <b>return this.handler;</b>
+<b>}</b>
+                    </pre>
+                </div>
+                <p>
+                    Varios otros métodos deben ser implementados para satisfacer la interfaz <code>XmlReader</code>. Para el 
+                    propósito de este ejercicio, se generan métodos nulos para todos ellos. Una aplicación de producción, sin 
+                    embargo, requeriría que los métodos del manejador de errores sean implementados para producir una aplicación 
+                    más sólida. Para este ejemplo, sin embargo, el siguiente código genera métodos nulos para ellos:
+                </p>
+                <div class="codeblock">
+                    <pre>
+// Allow an application to register an error event handler.
+public void setErrorHandler(ErrorHandler handler) { } 
+
+// Return the current error handler.
+public ErrorHandler getErrorHandler() { 
+    return null; 
+}
+                    </pre>
+                </div>
+                <p>
+                    Luego, el siguiente código genera métodos nulos para el resto de la interfaz <code>XmlReader</code>. (La 
+                    mayoría de ellos son de valor para un analizador SAX real, pero tienen poco relación con una aplicación de 
+                    conversión de datos como esta).
+                </p>
+                <div class="codeblock">
+                    <pre>
+// Parse an XML document from a system identifier (URI).
+public void parse(String systemId) throws IOException, SAXException 
+{ } 
+
+// Return the current DTD handler.
+public DTDHandler getDTDHandler() { return null; } 
+
+// Return the current entity resolver.
+public EntityResolver getEntityResolver() { return null; } 
+
+// Allow an application to register an entity resolver.
+public void setEntityResolver(EntityResolver resolver) { } 
+
+// Allow an application to register a DTD event handler.
+public void setDTDHandler(DTDHandler handler) { } 
+
+// Look up the value of a property.
+public Object getProperty(String name) { return null; } 
+
+// Set the value of a property.
+public void setProperty(String name, Object value) { }  
+
+// Set the state of a feature.
+public void setFeature(String name, boolean value) { } 
+
+// Look up the value of a feature.
+public boolean getFeature(String name) { return false; }
+                    </pre>
+                </div>
+                <p>
+                    Ahora tiene una analizador que puede usar para generar eventos SAX. En la siguiente sección, lo usará para 
+                    construir un objeto fuente SAX que le permitirá transformar los datos en XML.
+                </p>
+                <p>
+                    <a id="gghik"></a>
+                </p>
+                <h2>
+                    Usar el Analizador como un <code>SAXSource</code>
+                </h2>
+                <p>
+                    Dado un analizador SAX para usar como fuente de eventos, puede construir un transformador para producir un 
+                    resultado. En esta sección, <code>TransformerApp</code> será actualizada para para producir un flujo de salida 
+                    de resultado, aunque podría producir fácilmente un resultado DOM.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> El código descrito en esta sección está en <code>TransformationApp03.java</code>, que se 
+                    encuentra en el directorio <code>xslt</code> después de que descomprima los 
+                    <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                       onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                        <code>ejemplos XSLT</code></a> dentro del directorio 
+                    <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                </p>
+                <hr />
+                <p>
+                    Para empezar, <code>TransformationApp03</code> difiere de <code>TransformationApp02</code> en las clases que 
+                    necesita importar para construir un objeto <code>SAXSource</code>. Estas clses se muestran remarcadas abajo. 
+                    Las clases de DOM ya no son necesarias en este punto, por lo que se han descartado, aunque dejarlas no hace 
+                    ningún daño.
+                </p>
+                <div class="codeblock">
+                    <pre>
+import org.xml.sax.SAXException; 
+import org.xml.sax.SAXParseException; 
+<b>import org.xml.sax.ContentHandler;</b>
+<b>import org.xml.sax.InputSource;</b>
+
+<b>import javax.xml.transform.sax.SAXSource;</b> 
+import javax.xml.transform.stream.StreamResult;
+                    </pre>
+                </div>
+                <p>
+                    A continuación, en vez de crear una instancia <code>DocumentBuilderFactory</code> de DOM, la aplicación crea 
+                    un analizador SAX, el cual es una instancia de <code>AddressBookReader</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public class TransformationApp03 {
+    static Document document;  
+    public static void main(String argv[]) {
+        // ...
+        // Create the sax "parser".
+        <b>AddressBookReader saxReader = new AddressBookReader();</b>
+
+        try {
+            File f = new File(argv[0]);
+            // ...
+        }
+        // ...
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Luego, el siguiente código remarcado construye un objeto <code>SAXSource</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+// Use a Transformer for output
+// ...
+Transformer transformer = tFactory.newTransformer();
+
+// Use the parser as a SAX source for input
+<b>FileReader fr = new FileReader(f);</b>
+<b>BufferedReader br = new BufferedReader(fr);</b>
+<b>InputSource inputSource = new InputSource(br);</b>
+<b>SAXSource source = new SAXSource(saxReader, inputSource);</b>
+StreamResult result = new StreamResult(System.out);
+transformer.transform(source, result);
+                    </pre>
+                </div>
+                <p>
+                    Aquí, <code>TransformationApp03</code> construye un lector con búffer (como se mencionó anteriormente) y lo 
+                    encapsula en un objeto de fuente de entrada. Luego crea un objeto <code>SAXSource</code>, pasándole el lector y 
+                    el objeto <code>InputSource</code>, y pasa eso al transformador.
+                </p>
+                <p>
+                    Cuando la aplicación se ejecuta, el transformador se configura a sí mismo como el <code>ContentHandler</code> 
+                    para el analizador SAX (el <code>AddressBookReader</code>) y le indica al analizador que opere sobre el objeto 
+                    <code>inputSource</code>. Los eventos generados por el analizador después van al transformador, el cual realiza 
+                    la cosa apropiada y pasa los datos al objeto resultado.
+                </p>
+                <p>
+                    Finalmente, <code>TransformationApp03</code> no genera excepciones, así que el código del manejo de excepciones 
+                    visto en <code>TransformationApp02</code> ya no está presente.
+                </p>
+                <p>
+                    <a id="gghmh"></a>
+                </p>
+                <h3>
+                    Ejecutar el Ejemplo <code>TransformationApp03</code>
+                </h3>
+                <ol>
+                    <li>
+                        <b>Navegue al directorio <code>samples</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+% cd <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>
+                            <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                               onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                                <code>Descargue los ejemplos XSLT pulsando este enlace</code></a> y descomprímalos dentro del 
+                            directorio <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.</b>
+                    </li>
+                    <li>
+                        <b>Navegue al directorio <code>xslt</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+cd xslt
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Compile el ejemplo <code>TransformationApp03</code>.</b>
+                        <p>
+                            Teclee el siguiente comando:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+% javac TransformationApp03.java
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Ejecute el ejemplo <code>TransformationApp03</code> sobre un fichero de datos que desee convertir en 
+                            XML.</b>
+                        <p>
+                            En el caso de abajo, <code>TransformationApp03</code> se ejecuta sobre el fichero 
+                            <code>PersonalAddressBook.ldif</code>, encontrado en el directorio <code>xslt/data</code> después de 
+                            que ha descomprimido el paquete de ejemplos.
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+% java TransformationApp03 
+  data/PersonalAddressBook.ldif
+                            </pre>
+                        </div>
+                        <p>
+                            Verá la siguiente salida:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;addressbook>
+    &lt;nickname>Fred&lt;/nickname>
+    &lt;email>Fred@barneys.house&lt;/email>
+    &lt;html>TRUE&lt;/html>
+    &lt;firstname>Fred&lt;/firstname>
+    &lt;lastname>Flintstone&lt;/lastname>
+    &lt;work>999-Quarry&lt;/work>
+    &lt;home>999-BedrockLane&lt;/home>
+    &lt;fax>888-Squawk&lt;/fax>
+    &lt;pager>777-pager&lt;/pager>
+    &lt;cell>555-cell&lt;/cell>
+&lt;/addressbook>
+                            </pre>
+                        </div>
+                        <p>
+                            Como puede ver, ¡el fichero en formato LDIF <code>PersonalAddressBook</code> ha sido convertido a XML!
+                        </p>
+                    </li>
+                </ol>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="writingDom.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="transformingXML.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Escribiendo un DOM como si fuera un archivo XML
+            <br /><b>Página siguiente:</b> Transformando Datos de XML con XSLT
+        </div>
+    </body>
+</html> 

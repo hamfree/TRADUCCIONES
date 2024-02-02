@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Procesamiento de Actualización de Protocolo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="servlets013.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="servlets014a.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BEIJHCDJ">
+      <h2 id="protocol-upgrade-processing">Procesamiento de Actualización de Protocolo</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            En HTTP/1.1, los clientes pueden solicitar cambiar a un protocolo diferente en la conexión actual 
+            usando el campo de encabezado <code>Upgrade</code>. Si el servidor acepta la solicitud de cambio 
+            al protocolo indicado por el cliente, genera una respuesta HTTP con estado 101 (cambio de 
+            protocolos). Después de este intercambio, el cliente y el servidor se comunican utilizando el 
+            nuevo protocolo.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Por ejemplo, un cliente puede realizar una solicitud HTTP para cambiar al protocolo XYZP de la 
+            siguiente manera:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+GET /xyzpresource HTTP/1.1
+Host: localhost:8080
+Accept: text/html
+Upgrade: XYZP
+Connection: Upgrade
+OtherHeaderA: Value
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            El cliente puede especificar parámetros para el nuevo protocolo mediante encabezados HTTP. El 
+            servidor puede aceptar la solicitud y generar una respuesta de la siguiente manera:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+HTTP/1.1 101 Switching Protocols
+Upgrade: XYZP
+Connection: Upgrade
+OtherHeaderB: Value
+(XYZP data)
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Java EE admite la funcionalidad de actualización del protocolo HTTP en servlets, como se describe 
+            en la <a href="#BEIBDHAG">Tabla 18-7</a>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p><a id="sthref110"></a><a id="BEIBDHAG"></a></p>
+        </div>
+        <div class="paragraph">
+          <p><strong>Tabla 18-7 Soporte de Actualización de Protocolo</strong></p>
+        </div>
+        <table class="tableblock frame-all grid-all" style="width: 80%;">
+          <colgroup>
+            <col style="width: 25%;">
+            <col style="width: 75%;">
+          </colgroup>
+          <tbody>
+            <tr>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock"><strong>Clase o Interfaz</strong></p></td>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock"><strong>Método</strong></p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock"><code>HttpServletRequest</code></p></td>
+              <td class="tableblock halign-left valign-top">
+                <div>
+                  <div class="paragraph">
+                    <p><code>HttpUpgradeHandler upgrade(Class handler)</code></p>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      El método upgrade inicia el proceso de actualización del protocolo. Este método 
+                      instancia una clase que implementa la interfaz <code>HttpUpgradeHandler</code> y le 
+                      delega la conexión.
+                    </p>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      Llame al método <code>upgrade</code> dentro de un método de servicio cuando acepte una 
+                      solicitud de un cliente para cambiar de protocolo.
+                    </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock"><code>HttpUpgradeHandler</code></p></td>
+              <td class="tableblock halign-left valign-top">
+                <div>
+                  <div class="paragraph">
+                    <p><code>void init(WebConnection wc)</code></p>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      Se llama al método <code>init</code> cuando el servlet acepta la solicitud para cambiar 
+                      de protocolo. Implementa este método y obtiene flujos de entrada y salida del objeto 
+                      <code>WebConnection</code> para implementar el nuevo protocolo.
+                    </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock"><code>HttpUpgradeHandler</code></p></td>
+              <td class="tableblock halign-left valign-top">
+                <div>
+                  <div class="paragraph">
+                    <p><code>void destroy()</code></p>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      El método <code>destroy</code> se llama cuando el cliente se desconecta. Implemente este 
+                      método y libere cualquier recurso asociado con el procesamiento del nuevo protocolo.
+                    </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock"><code>WebConnection</code></p></td>
+              <td class="tableblock halign-left valign-top">
+                <div>
+                  <div class="paragraph">
+                    <p><code>ServletInputStream getInputStream()</code></p>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      El método <code>getInputStream</code> proporciona acceso al flujo de entrada de la 
+                      conexión. Puede usar <a href="servlets013.html#BEIHICDH">E/S No Bloqueante</a> con el 
+                      flujo devuelto para implementar el nuevo protocolo.
+                    </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock"><code>WebConnection</code></p></td>
+              <td class="tableblock halign-left valign-top">
+                <div>
+                  <div class="paragraph">
+                    <p><code>ServletOutputStream getOutputStream()</code></p>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      El método <code>getOutputStream</code> proporciona acceso al flujo de salida de la 
+                      conexión. Puede usar <a href="servlets013.html#BEIHICDH">E/S No Bloqueante</a> con el 
+                      flujo devuelto para implementar el nuevo protocolo.
+                    </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="paragraph">
+          <p>
+            El siguiente código demuestra cómo aceptar una solicitud de actualización de protocolo HTTP de un 
+            cliente:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@WebServlet(urlPatterns={"/xyzpresource"})
+public class XYZPUpgradeServlet extends HttpServlet {
+   @Override
+   public void doGet(HttpServletRequest request,
+                     HttpServletResponse response) {
+      if ("XYZP".equals(request.getHeader("Upgrade"))) {
+         /* Acepta la solicitud de actualización */
+         response.setStatus(101);
+         response.setHeader("Upgrade", "XYZP");
+         response.setHeader("Connection", "Upgrade");
+         response.setHeader("OtherHeaderB", "Value");
+         /* Delega la conexión al controlador de actualización */
+         XYZPUpgradeHandler = request.upgrade(XYZPUpgradeHandler.class);
+         /* (el método de servicio regresa inmediatamente) */
+      } else {
+         /* ... respuesta de error de escritura ... */
+      }
+   }
+}
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>La clase <code>XYZPUpgradeHandler</code> maneja la conexión:</p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public class XYZPUpgradeHandler implements HttpUpgradeHandler {
+   @Override
+   public void init(WebConnection wc) {
+      ServletInputStream input = wc.getInputStream();
+      ServletOutputStream output = wc.getOutputStream();
+      /* ... implementa XYZP utilizando estos flujos (específico del protocolo) ... */
+   }
+   @Override
+   public void destroy() { ... }
+}
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            La clase que implementa <code>HttpUpgradeHandler</code> usa los flujos de la conexión actual para 
+            comunicarse con el cliente usando el nuevo protocolo. Consulte la especificación de Servlet 4.0 en
+            <code>
+              <a href="http://jcp.org/en/jsr/detail?id=369" class="bare">
+                http://jcp.org/en/jsr/detail?id=369
+              </a>
+            </code> para obtener detalles sobre la compatibilidad con la actualización del protocolo HTTP.
+          </p>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="servlets013.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="servlets014a.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

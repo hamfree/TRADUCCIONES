@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Hilos Iniciales (Los Tutoriales de Java&trade; &gt; Creando una IGU (Interfaz Gráfica de Usuario) con
+            JFC/Swing &gt; Concurrencia en Swing)
+        </title>
+        <meta name="description" content="Este tutorial de Swing Java describe el desarrollo de interfaces gráficas de usuario (GUI)
+              para aplicaciones y applets que utilizan componentes Swing" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java swing, java ui, java user interface,
+              swing components, swing events, swing layout  " />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">>Concurrencia in Swing</a></div>
+                <div class="nolinkAHEAD">Hilos Iniciales</div>
+                <div class="linkAHEAD"><a href="dispatch.html">El Hilo Despachador de Eventos</a></div>
+                <div class="linkAHEAD"><a href="worker.html">Hilos Worker y el hilo SwingWorker</a></div>
+                <div class="linkBHEAD"><a href="simple.html">Tareas en Segundo Plano Simples</a></div>
+                <div class="linkBHEAD"><a href="interim.html">Tareas que Tienen Resultados Provisionales</a></div>
+                <div class="linkBHEAD"><a href="cancel.html">Cancelando Tareas en Segundo Plano</a></div>
+                <div class="linkBHEAD"><a href="bound.html">Propiedades Ligadas y Métodos de Estado</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing<br />
+                <b>Lección:</b> Concurrencia en Swing
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Concurrencia en Swing</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="dispatch.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Hilos Iniciales</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Cada programa tiene un conjunto de hilos donde la lógica de la aplicación empieza. En los programas estándar, 
+                    hay sólo uno de tales hilos: el hilo que invoca el método <code>main</code>  de la clase del programa. En los
+                    applets los hilos iniciales son aquellos que construyen el objeto applet e invocan sus métodos 
+                    <code>init</code> y <code>start</code>; estas acciones pueden ocurrir en un hilo único, o en dos o tres hilos
+                    diferetnes, dependiendo de la implementación de la plataforma Java. En esta lección, llamaremos a estos hilos 
+                    los <i>hilos iniciales</i>.
+                </p>
+                <p>
+                    En los programas Swing, los hilos iniciales no tienen mucho que hacer. Su trabajo más esencial es crear un
+                    objeto <code>Runnable</code> que inicializará la IGU (Interfaz Gráfica del Usuario, GUI en inglés) y programar
+                    el objeto para la ejecución en el hilo de envío de eventos. Una vez la IGU se crea, el programa es conducido 
+                    primariamente por los eventos del IGU, cada uno de los cuales causan la ejecución de una pequeña tarea en el
+                    hilo de envío de eventos. El código de la aplicación puede programar tareas adicionales en el hilo de envío de
+                    eventos (si se completan rápidamente, de forma que no interfieran con el procesado de eventos) o un hilo de 
+                    trabajo (para las tareas de larga duración).
+                </p>
+                <p>
+                    Un hilo inicial programa la tarea de creación de la IGU invocando
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/swing/SwingUtilities.html#invokeLater-java.lang.Runnable-">
+                        <code>javax.swing.SwingUtilities.invokeLater</code></a> o
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/swing/SwingUtilities.html#invokeAndWait-java.lang.Runnable-">
+                        <code>javax.swing.SwingUtilities.invokeAndWait</code></a> . Ambos métodos toman un argumento único: el
+                    <code>Runnable</code> que define la nueva tarea. Su única diferencia está indicada por sus nombres:
+                    <code>invokeLater</code> simplemente programa la tarea y vuelve; <code>invokeAndWait</code> espera a que la
+                    tarea termine antes de volver.
+                </p>
+                <p>
+                    Puede ver ejemplos de esto a través del tutorial de Swing:
+                </p>
+                <div class="codeblock">
+                    <pre>
+SwingUtilities.invokeLater(new Runnable() {
+    public void run() {
+        createAndShowGUI();
+    }
+});
+                    </pre>
+                </div>
+                <p>
+                    En un applet, la tarea de creación de la IGU debe ser lanzada desde el método <code>init</code> usando
+                    <code>invokeAndWait</code>; de otra forma, <code>init</code> puede volver antes de que la IGU se cree, lo cual
+                    podría crear problemas para el navegador web que está lanzando el applet. En otra clase de programa, programar
+                    la tarea de creación del IGU es usualmente la última tarea que el hilo inicial hace, así que no importa si usa
+                    <code>invokeLater</code> o <code>invokeAndWait</code>.
+                </p>
+                <p>
+                    ¿Porqué no crea la IGU el hilo inicial simplemente por sí mismo? Porque casi todo el código que crea o
+                    interactúa con los componentes Swing debe ejecutarse en el hilo de envío de eventos. Esta restricción es
+                    descrita más adelante en la sección siguiente.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="dispatch.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujetoa estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.</p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página Anterior:</b> Concurrencia en Swing<br />
+            <b>Página Siguiente:</b> El Hilo Despachador de Eventos
+        </div>
+    </body>
+</html>

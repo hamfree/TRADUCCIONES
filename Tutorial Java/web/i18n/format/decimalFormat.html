@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Personalizando Formatos (Los Tutoriales de Java&trade; &gt; Internacionalización &gt; Formateando)
+        </title>
+        <meta name="description" content="Este tutorial de internacionalización de Java describe la configuración regional, 
+              aislando datos específicos de la configuración regional, formateando datos, nombre de dominio internacionalizado e 
+              identificador de recursos" />
+        <meta name="keywords" content="java programming, learn java, java sample code, i18n, internationalization, locale,
+              text formatting" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Formateando</a></div>
+                <div class="linkAHEAD"><a href="numberintro.html">Números y Monedas</a></div>
+                <div class="linkBHEAD"><a href="numberFormat.html">Usando Formatos Predefinidos</a></div>
+                <div class="nolinkBHEAD">Personalizando Formatos</div>
+                <div class="linkAHEAD"><a href="dateintro.html">Fechas y Horas</a></div>
+                <div class="linkBHEAD"><a href="dateFormat.html">Usando Formatos Predefinidos</a></div>
+                <div class="linkBHEAD"><a href="simpleDateFormat.html">Personalizando Formatos</a></div>
+                <div class="linkBHEAD"><a href="dateFormatSymbols.html">Cambiando los Símbolos del Formato de Fecha</a></div>
+                <div class="linkAHEAD"><a href="messageintro.html">Mensajes</a></div>
+                <div class="linkBHEAD"><a href="messageFormat.html">Tratando con Mensajes Compuestos</a></div>
+                <div class="linkBHEAD"><a href="choiceFormat.html">Manejando plurales</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Internacionalización<br />
+                <b>Lección:</b> Formateando<br />
+                <b>Sección:</b> Números y Monedas
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Internacionalización</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Formateando</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="numberFormat.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="dateintro.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Personalizando Formatos</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Puede usar la clase <code>DecimalFormat</code> para dar formato a los números decimales como cadenas 
+                    específicas de la configuración regional. Esta clase le permite controlar la visualización de los ceros 
+                    iniciales y finales, los prefijos y sufijos, los separador de agrupamiento (miles), y el separador decimal. Si 
+                    quiere cambiar los símbolos de formato, tales como el separador de decimales, puede usar 
+                    <code>DecimalFormatSymbols</code> en conjunción con la clase <code>DecimalFormat</code>. Estas clases ofrecen 
+                    mucha flexibilidad en el formato de los números, pero pueden hacer su código más complejo.
+                </p>
+                <p>
+                    El texto que sigue usa ejemplos que demuestran las clases <code>DecimalFormat</code> y 
+                    <code>DecimalFormatSymbols</code>. El código de los ejemplos en este material son de un programa de ejemplo 
+                    llamado 
+                    <a class="SourceLink" target="_blank" href="examples/DecimalFormatDemo.java"
+                       onclick="showCode('../../displayCode.html', 'examples/DecimalFormatDemo.java'); return false;">
+                        <code>DecimalFormatDemo</code></a>.
+                </p>
+                <h2>
+                    Construir Patrones
+                </h2>
+                <p>
+                    Usted especifica las propiedades de formato de <code>DecimalFormat</code> con un patrón <code>String</code>. El 
+                    patrón determina cómo se ve el número formateado. Para una descripción completa de la sintaxis del patrón, vea 
+                    <a href="#numberpattern">Sintaxis de Patrón de Formato de Número</a>.
+                </p>
+                <p>
+                    El ejemplo que sigue crea un formateados pasando un patrón de tipo <code>String</code> al constructor de 
+                    <code>DecimalFormat</code>. El método <code>format</code> acepta un valor <code>double</code> como un argumento 
+                    y devuelve el número formateado en un objeto <code>String</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+DecimalFormat myFormatter = new DecimalFormat(pattern);
+String output = myFormatter.format(value);
+System.out.println(value + &quot; &quot; + pattern + &quot; &quot; + output);
+                    </pre>
+                </div>
+                <p>
+                    La salida de las lineas de código anteriores se describen en la tabla siguiente. El <code>valor</code> es el 
+                    número, un <code>double</code>. que va a ser formateado. El <code>patrón</code> es el objeto 
+                    <code>String</code> que especifica las propiedades de formato. La <code>salida</code> , la cual es un objeto 
+                    <code>String</code>, representa el número formateado.
+                </p>
+                <table class="celda">
+                    <caption>Salida del Programa <code>DecimalFormatDemo</code></caption>
+                    <tr>
+                        <th id="h1" class="celda"><code>valor</code></th>
+                        <th id="h2" class="celda"><code>patrón</code></th>
+                        <th id="h3" class="celda"><code>salida</code></th>
+                        <th id="h4" class="celda">Explicación</th>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda">123456.789</td>
+                        <td headers="h2" class="celda">###,###.###</td>
+                        <td headers="h3" class="celda">123,456.789</td>
+                        <td headers="h4" class="celda">
+                            El signo de la almohadilla (#) denota un dígito, la coma es un marcador de posición para el separador 
+                            de agrupación, y el punto es un marcador de posición para el separador decimal.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda">123456.789</td>
+                        <td headers="h2" class="celda">###.##</td>
+                        <td headers="h3" class="celda">123456.79</td>
+                        <td headers="h4" class="celda">
+                            El <code>valor</code> tiene tres dígitos a la derecha del punto decimal, pero el <code>patrón</code> 
+                            tiene sólo dos. El método <code>format</code> maneja esto redondeando hacia arriba.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda">123.78</td>
+                        <td headers="h2" class="celda">000000.000</td>
+                        <td headers="h3" class="celda">000123.780</td>
+                        <td headers="h4" class="celda">
+                            El <code>patrón</code> especifica los ceros iniciales y finales, porque el carácter 0 se usa en vez del 
+                            signo almohadilla (#).
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda">12345.67</td>
+                        <td headers="h2" class="celda">$###,###.###</td>
+                        <td headers="h3" class="celda">&#36;12,345.67</td>
+                        <td headers="h4" class="celda">
+                            El primer carácter en el <code>patrón</code> es el signo dólar ($). Tenga en cuenta que eso es 
+                            inmediatamente precede el dígito más a la izquierda en la <code>salida</code> formateada.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda">12345.67</td>
+                        <td headers="h2" class="celda">\u00A5###,###.###</td>
+                        <td headers="h3" class="celda">&#165;12,345.67</td>
+                        <td headers="h4" class="celda">
+                            El <code>patrón</code> especifica el signo de moneda para el yen japonés (&#165;) con el valor Unicode 
+                            00A5.
+                        </td>
+                    </tr>
+                </table>
+                <h2>
+                    Formato Sensible a la Configuración Regional
+                </h2>
+                <p>
+                    El ejemplo anterior creó un objeto <code>DecimalFormat</code> para el <code>Locale</code> predeterminado. Si 
+                    quiere un objeto <code>DecimalFormat</code> para un <code>Locale</code> no predeterminado, instancie un 
+                    <code>NumberFormat</code> y entonces conviértalo por moldeo en un <code>DecimalFormat</code>. Aquí hay un 
+                    ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+NumberFormat nf = NumberFormat.getNumberInstance(loc);
+DecimalFormat df = (DecimalFormat)nf;
+df.applyPattern(pattern);
+String output = df.format(value);
+System.out.println(pattern + &quot; &quot; + output + &quot; &quot; + loc.toString());
+                    </pre>
+                </div>
+                <p>
+                    Ejecutar el código de ejemplo previo resulta en la salida que sigue. El número formateado, el cual está en la 
+                    segunda columna, varía con el <code>Locale</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+###,###.###      123,456.789     en_US
+###,###.###      123.456,789     de_DE
+###,###.###      123 456,789     fr_FR
+                    </pre>
+                </div>
+                <p>
+                    Hasta ahora, los patrones de formato descritos aquí siguen las convenciones del inglés de EE.UU. Por ejemplo, 
+                    en el patrón ###,###.## la coma es el separador de miles y el punto representa el punto decimal. Esta 
+                    convención está bien, siempre que sus usuarios finales no esté expuestos a ella. Sin embargo, algunas 
+                    aplicaciones, tales como las hojas de cálculo y los generadores de informes, permiten a los usuarios finales 
+                    definir sus propios patrones de formato. Para estas aplicaciones los patrones de formato especificados por los 
+                    usuarios finales deben usar notación localizada. En estos casos querrá invocar el método 
+                    <code>applyLocalizedPattern</code> del objeto <code>DecimalFormat</code>.
+                </p>
+                <h2>
+                    Alterar los Símbolos de Formato
+                </h2>
+                <p>
+                    Puede usar la clase 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/text/DecimalFormatSymbols.html">DecimalFormatSymbols</a>
+                    &nbsp;para cambiar los símbolos que aparecen en los números formateados producidos por el método 
+                    <code>format</code>. Estos símbolos incluyen el separador decimal, el separador de agrupamiento, el signo 
+                    menos, y el signo de porcentaje, entre otros.
+                </p>
+                <p>
+                    El ejemplo siguiente demuestra la clase <code>DecimalFormatSymbols</code> aplicando un formato extraño a un 
+                    número. El format inusual es el resultado de las llamadas a los métodos <code>setDecimalSeparator</code>,
+                    <code>setGroupingSeparator</code>, y <code>setGroupingSize</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+DecimalFormatSymbols unusualSymbols = new DecimalFormatSymbols(currentLocale);
+unusualSymbols.setDecimalSeparator('|');
+unusualSymbols.setGroupingSeparator('^');
+
+String strange = &quot;#,##0.###&quot;;
+DecimalFormat weirdFormatter = new DecimalFormat(strange, unusualSymbols);
+weirdFormatter.setGroupingSize(4);
+
+String bizarre = weirdFormatter.format(12345.678);
+System.out.println(bizarre);
+                    </pre>
+                </div>
+                <p>
+                    Cuando lo ejecuta, este ejemplo imprime el número en un formato extraño:
+                </p>
+                <div class="codeblock">
+                    <pre>
+1^2345|678
+                    </pre>
+                </div>
+                <h2>
+                    <a id="numberpattern"></a>Sintaxis de Patrón de Formato de Número
+                </h2>
+                <p>
+                    Puede diseñar sus propios patrones de formato para números siguiendo las reglas especificadas por el siguietne 
+                    diagrama BNF:
+                </p>
+                <div class="codeblock">
+                    <pre>
+patrón     := subpatrón{;subpatrón}
+subpatrón  := {prefijo}entero{.fracción}{sufijo}
+prefijo    := '\\u0000'..'\\uFFFD' - caracteresEspeciales
+sufijo     := '\\u0000'..'\\uFFFD' - caracteresEspeciales
+entero     := '#'* '0'* '0'
+fracción   := '0'* '#'*
+                    </pre>
+                </div>
+                <p>
+                    La notación usada en el diagrama anterior se explica en la tabla siguiente:
+                </p>
+                <table class="celda">
+                    <caption>descripción de la notación</caption>
+                    <tr>
+                        <th id="h101" class="celda">Notación</th>
+                        <th id="h102" class="celda">Descripción</th>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda"><code>X*</code></td>
+                        <td headers="h102" class="celda">0 o más instancias de X</td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda"><code>(X | Y)</code></td>
+                        <td headers="h102" class="celda">ya sea X o Y</td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda"><code>X..Y</code></td>
+                        <td headers="h102" class="celda">cualquier carácter desde X hasta llegar a Y, inclusive</td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda"><code>S - T</code></td>
+                        <td headers="h102" class="celda">caracteres en S, excepto aquellos en T</td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda"><code>{X}</code></td>
+                        <td headers="h102" class="celda">X es opcional</td>
+                    </tr>
+                </table>
+                <p>
+                    En el diagrama BNF precedente, el primer subpatrón especifica el formato para los números positivos. El 
+                    segundo subpatrón, el cual es opcional, especifica el formato para los números negativos.
+                </p>
+                <p>
+                    Aunque no se indica en el diagrama BNF, puede aparecer una coma dentro de la parte entera.
+                </p>
+                <p>
+                    Dentro de los subpatrones, especifica el formato con símbolos especiales. Estos símbolos se describen en la 
+                    tabla siguiente:
+                </p>
+                <table class="celda">
+                    <caption>descripción del símbolo de formato</caption>
+                    <tr>
+                        <th id="h201" class="celda">Símbolo</th>
+                        <th id="h202" class="celda">Descripción</th>
+                    </tr>
+                    <tr>
+                        <td headers="h201" class="celda">0</td>
+                        <td headers="h202" class="celda">un dígito</td>
+                    </tr>
+                    <tr>
+                        <td headers="h201" class="celda">#</td>
+                        <td headers="h202" class="celda">un dígito, el cero se muestra como ausente</td>
+                    </tr>
+                    <tr>
+                        <td headers="h201" class="celda">.</td>
+                        <td headers="h202" class="celda">marca de posición para el separador decimal</td>
+                    </tr>
+                    <tr>
+                        <td headers="h201" class="celda">,</td>
+                        <td headers="h202" class="celda">marca de posición para el separador de agrupaciones</td>
+                    </tr>
+                    <tr>
+                        <td headers="h201" class="celda">E</td>
+                        <td headers="h202" class="celda">separa la mantisa y el exponenete en los formatos exponenciales</td>
+                    </tr>
+                    <tr>
+                        <td headers="h201" class="celda">;</td>
+                        <td headers="h202" class="celda">separa formatos</td>
+                    </tr>
+                    <tr>
+                        <td headers="h201" class="celda">-</td>
+                        <td headers="h202" class="celda">prefijo predeterminado de negativo</td>
+                    </tr>
+                    <tr>
+                        <td headers="h201" class="celda">%</td>
+                        <td headers="h202" class="celda">multiplica por 100 y se muestra como porcentaje</td>
+                    </tr>
+                    <tr>
+                        <td headers="h201" class="celda">?</td>
+                        <td headers="h202" class="celda">multiplica por 1000 y se muestra como por mil</td>
+                    </tr>
+                    <tr>
+                        <td headers="h201" class="celda">&#164;</td>
+                        <td headers="h202" class="celda">
+                            el signo de moneda, reemplazada por el símbolo de moneda; si se dobla, se reemplaza por el símbolo 
+                            internacional de moneda; si está presente en un patrón, el separador decimal monetario se usa en vez 
+                            del separador decimal
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h201" class="celda">X</td>
+                        <td headers="h202" class="celda">cualesquiera otros caracteres pueden usarse en el prefijo o sufijo</td>
+                    </tr>
+                    <tr>
+                        <td headers="h201" class="celda">&#39;</td>
+                        <td headers="h202" class="celda">usado para citar caracteres especiales en un prefijo o sufijo</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="numberFormat.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="dateintro.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Usando Formatos Predefinidos<br />
+            <b>Página siguiente:</b> Fechas y Horas
+        </div>
+    </body>
+</html> 

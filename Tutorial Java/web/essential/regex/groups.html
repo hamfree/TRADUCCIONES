@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Grupos de Captura (Los Tutoriales de Java&trade; &gt; Clases Esenciales &gt; Expresiones Regulares)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe las excepciones, la entrada/salida básica, concurrencia,
+              expresiones regulares, y el entorno de la plataforma" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java exception, java input output, java
+              threads, java regex, regular expressions, path, classpath, environment variable" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper  clearfix">       
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div> 
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Expresiones Regulares</a></div>
+                <div class="linkAHEAD"><a href="intro.html">Introducción</a></div>
+                <div class="linkAHEAD"><a href="test_harness.html">Clase Para Pruebas</a></div>
+                <div class="linkAHEAD"><a href="literals.html">Literales de Cadena</a></div>
+                <div class="linkAHEAD"><a href="char_classes.html">Clases Carácter</a></div>
+                <div class="linkAHEAD"><a href="pre_char_classes.html">Clases Carácter Predefinidas</a></div>
+                <div class="linkAHEAD"><a href="quant.html">Cuantificadores</a></div>
+                <div class="nolinkAHEAD">Grupos de Captura</div>
+                <div class="linkAHEAD"><a href="bounds.html">Comparadores Límite</a></div>
+                <div class="linkAHEAD"><a href="pattern.html">Métodos de la Clase Pattern</a></div>
+                <div class="linkAHEAD"><a href="matcher.html">Métodos de la Clase Matcher</a></div>
+                <div class="linkAHEAD"><a href="pse.html">Métodos de la Clase PatternSyntaxException</a></div>
+                <div class="linkAHEAD"><a href="unicode.html">Soporte de Unicode</a></div>
+                <div class="linkAHEAD"><a href="resources.html">Recursos Adicionales</a></div>
+                <div class="linkQUESTIONS"><a href="QandE/questions.html">Preguntas y Ejercicios</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Clases Esenciales<br />
+                <b>Lección:</b> Expresiones Regulares
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Clases Esenciales</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Expresiones Regulares</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="quant.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="bounds.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Grupos de Captura</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    En la
+                    <a class="TutorialLink" target="_top"
+                       href="quant.html">sección previa</a>, vimos cómo los cuantificadores se adjuntaban a un carácter, a una clase
+                    de caracteres, o a un grupo de captura en una vez. Pero hasta ahora, no hemos descrito la noción de los
+                    grupos de captura en detalle.
+                </p>
+                <p>
+                    Los <i>grupos de captura</i> son una forma de tratar múltiples caracteres como una unidad singular. Son creados
+                    colocando los caracteres a agrupar dentro de un conjunto de paréntesis. Por ejemplo, la expresión regular 
+                    <code>(dog)</code> crea un grupo simple conteniendo las letras <code>&quot;d&quot; &quot;o&quot;</code> y
+                    <code>&quot;g&quot;</code>. La porción de la cadena de entrada que coincide con el grupo de captura será salvada
+                    en memoria para más tarde recordarla a través de referencias inversas ( como se describe más abajo en la 
+                    sección, <a href="#backref">Referencias inversas</a>).
+                </p>
+                <h2>Numeración</h2>
+                <p>
+                    Como se describió en la IPA
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html">
+                        <code>Pattern</code></a> , los grupos de captura son numerados contando sus paréntesis de apertura de 
+                    izquierda a derecha. En la expresión <code>((A)(B(C)))</code>, por ejemplo, hay cuatro grupos:
+                </p>
+                <ol>
+                    <li><code>((A)(B(C)))</code></li>
+                    <li><code>(A)</code></li>
+                    <li><code>(B(C))</code></li>
+                    <li><code>(C)</code></li>
+                </ol>
+                <p>
+                    Para averiguar cuantos grupos están presentes en la expresión, llame al método <code>groupCount</code>
+                    de un objeto matcher. El método <code>groupCount</code> devuelve un <code>int</code> mostrando el número de
+                    grupos de captura presentes en el patrón del matcher. En este ejemplo, <code>groupCount</code> devolverá el
+                    número <code>4</code>, mostrando que el patrón contiene 4 grupos de captura.
+                </p>
+                <p>
+                    Hay también un grupo especial, el grupo 0, el cual siempre representa la expresión entera. Este grupo no es 
+                    incluído en el total informado por <code>groupCount</code>. Los grupos que comienzan con <code>(?</code> son
+                    puros, <i>grupos de no-captura</i> que no capturan texto y que no cuentan para el total de grupos. (Verá
+                    ejemplos  de grupos de no-captura más tarde en la sección
+                    <a class="TutorialLink" target="_top" 
+                       href="pattern.html">Métodos de la Clase Pattern</a>.)
+                </p>
+                <p>
+                    Es importante entender cómo los grupos son numerados porque algunos métodos de <code>Matcher</code> aceptan un
+                    <code>int</code> especificando un número particular de grupo como un parámetro:
+                </p>
+                <ul>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/regex/Matcher.html#start-int-">
+                            <code>public int start(int group)</code></a>: Devuelve el índice de inicio de las subsecuencia capturada
+                        por el grupo dado durante la operación de correspondencia previa.
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/regex/Matcher.html#end-int-">
+                            <code>public int end (int group)</code></a>: Devuelve el índice del último carácter, más uno, de la
+                        subsecuencia capturada por el grupo dado durante la operación de correspondencia previa.
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/regex/Matcher.html#group-int-">
+                            <code>public String group (int group)</code></a>: Devuelve una subsecuencia de entrada capturada por el
+                        grupo dado durante la operación de correspondencia previa.
+                    </li>
+                </ul>
+                <p>
+                    <a id="backref"></a>
+                </p>
+                <h2>Referencias Inversas</h2>
+                <p>
+                    La sección de la cadena de entrada que coincide con el grupo de captura(s) es salvada en memoria para más
+                    tarde ser recordada a través de <i>referencias inversas</i>. Una referencia inversa es especificada en la
+                    expresión regular como una barra invertida (<code>\</code>) seguida de un dígito indicando el número de grupo
+                    a ser recordado. Por ejemplo, la expresión
+                    <code>(\d\d)</code> define un grupo de captura que coincide con dos dígitos en una fila, la cual puede ser
+                    recordada más tarde en la expresión a través de la referencia inversa <code>\1</code>.
+                </p>
+                <p>
+                    Para que coincida con cualquier 2 dígitos, seguido de los mismos dos dígitos, usará <code>(\d\d)\1</code> como
+                    la expresión regular:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Introduzca su expresión regular: (\d\d)\1
+Introduzca la cadena de entrada donde buscar: 1212
+He encontrado el texto "1212" empezando en el índice 0 y terminando en el índice 4.
+                    </pre>
+                </div>
+                <p>
+                    Si cambia los dos últimos dígitos la coincidencia fallará:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Introduzca su expresión regular: (\d\d)\1
+Introduzca la cadena de entrada donde buscar: 1234
+No se encontraron coincidencias.
+                    </pre>
+                </div>
+                <p>
+                    Para grupos de captura anidados, la referencia inversa funciona exactamente de la misma forma: especifique una
+                    barra invertida seguida por el número del grupo a ser recordado.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="quant.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="bounds.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">
+                                Su uso de ésta
+                            </a>
+                            página y todo el material en las páginas bajo el anuncio &quot;Los Tutoriales de Java&quot; está sujeto
+                            a estos
+                            <a href="../../information/cpyr.html">
+                                avisos legales
+                            </a>
+                            .
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs
+                            </a>
+                            .
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión
+                            </a>
+                            .
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página Anterior:</b> Cuantificadores<br />
+            <b>Página Siguiente:</b> Comparadores Límite
+        </div>
+    </body>
+</html>

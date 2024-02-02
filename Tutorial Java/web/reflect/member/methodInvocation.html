@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Invocando Métodos (Los Tutoriales de Java&trade; &gt; La IPA de Reflexión &gt; Miembros)
+        </title>
+        <meta name="description" content="Este tutorial de reflexión de Java describe el uso de la reflexión para acceder y 
+              manipular clases, campos, métodos y constructores" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java reflection" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Miembros</a></div>
+                <div class="linkAHEAD"><a href="field.html">Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldTypes.html">Obteniendo los Tipos de los Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldModifiers.html">Recuperando y Analizando Modificadores de los Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldValues.html">Obteniendo y Estableciendo los Valores de los Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldTrouble.html">Solución de Problemas</a></div>
+                <div class="linkAHEAD"><a href="method.html">Métodos</a></div>
+                <div class="linkBHEAD"><a href="methodType.html">Obteniendo Información del Tipo del Método</a></div>
+                <div class="linkBHEAD"><a href="methodparameterreflection.html">Obteniendo los Nombre de los Parámetros del Método</a></div>
+                <div class="linkBHEAD"><a href="methodModifiers.html">Recuperando y Analizando Modificadores del Método</a></div>
+                <div class="nolinkBHEAD">Invocando Métodos</div>
+                <div class="linkBHEAD"><a href="methodTrouble.html">Solución de Problemas</a></div>
+                <div class="linkAHEAD"><a href="ctor.html">Constructores</a></div>
+                <div class="linkBHEAD"><a href="ctorLocation.html">Encontrando Constructores</a></div>
+                <div class="linkBHEAD"><a href="ctorModifiers.html">Recuperando y Analizando Modificadores del Constructor</a></div>
+                <div class="linkBHEAD"><a href="ctorInstance.html">Creando Nuevas Instancias de Clase</a></div>
+                <div class="linkBHEAD"><a href="ctorTrouble.html">Solución de Problemas</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> La IPA de Reflexión<br />
+                <b>Lección:</b> Miembros<br />
+                <b>Sección:</b> Métodos
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">La IPA de Reflexión</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Miembros</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="methodModifiers.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="methodTrouble.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Invocando Métodos</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Reflexión proporciona un medio para invocar métodos en una clase. Normalmente, esto solo sería necesario si no 
+                    es posible convertir una instancia de la clase al tipo deseado en código que no usa reflexión. Los métodos se 
+                    invocan con 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html#invoke-java.lang.Object-java.lang.Object...-">
+                        <code>java.lang.reflect.Method.invoke()</code></a>. El primer argumento es la instancia del objeto en el 
+                    cual este método particular va a ser invocado. (Si el método es <code>static</code>, el primer argumento 
+                    debe ser <code>null</code>). Los argumentos posteriores son los parámetros del método. Si el método 
+                    subyacente lanza una excepción, será envuelta por una 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/InvocationTargetException.html">
+                        <code>java.lang.reflect.InvocationTargetException</code></a>. La excepción del método original pues ser 
+                    recuperada usando el método 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/InvocationTargetException.html#getCause--">
+                        <code>InvocationTargetException.getCause()</code></a> del mecanismo de encadenamiento de excepciones.
+                </p>
+                <h2>
+                    Encontrar e Invocar un Método con una Declaración Específica
+                </h2>
+                <p>
+                    Considere un conjunto de pruebas que usa reflexión para invocar métodos de prueba privados en una clase 
+                    determinada. El ejemplo 
+                    <a class="SourceLink" target="_blank" href="example/Deet.java" 
+                       onclick="showCode('../../displayCode.html', 'example/Deet.java'); return false;">
+                        <code>Deet</code></a> buscar los métodos <code>public</code> en una clase que empieza con la cadena 
+                    &quot;<code>test</code>&quot;, tiene un tipo de retorno booleano, y un único parámetro 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Locale.html"><code>Locale</code></a>. Luego invoca 
+                    cada método de coincidencia.
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.Locale;
+import static java.lang.System.out;
+import static java.lang.System.err;
+
+public class Deet&lt;T&gt; {
+    private boolean testDeet(Locale l) {
+	// getISO3Language() may throw a MissingResourceException
+	out.format(&quot;Locale = %s, ISO Language Code = %s%n&quot;, l.getDisplayName(), l.getISO3Language());
+	return true;
+    }
+
+    private int testFoo(Locale l) { return 0; }
+    private boolean testBar() { return true; }
+
+    public static void main(String... args) {
+	if (args.length != 4) {
+	    err.format(&quot;Usage: java Deet &lt;classname&gt; &lt;langauge&gt; &lt;country&gt; &lt;variant&gt;%n&quot;);
+	    return;
+	}
+
+	try {
+	    Class&lt;?&gt; c = Class.forName(args[0]);
+	    Object t = c.newInstance();
+
+	    Method[] allMethods = c.getDeclaredMethods();
+	    for (Method m : allMethods) {
+		String mname = m.getName();
+		if (!mname.startsWith(&quot;test&quot;)
+		    || (m.getGenericReturnType() != boolean.class)) {
+		    continue;
+		}
+ 		Type[] pType = m.getGenericParameterTypes();
+ 		if ((pType.length != 1)
+		    || Locale.class.isAssignableFrom(pType[0].getClass())) {
+ 		    continue;
+ 		}
+
+		out.format(&quot;invoking %s()%n&quot;, mname);
+		try {
+		    m.setAccessible(true);
+		    Object o = m.invoke(t, new Locale(args[1], args[2], args[3]));
+		    out.format(&quot;%s() returned %b%n&quot;, mname, (Boolean) o);
+
+		// Handle any exceptions thrown by method to be invoked.
+		} catch (InvocationTargetException x) {
+		    Throwable cause = x.getCause();
+		    err.format(&quot;invocation of %s failed: %s%n&quot;,
+			       mname, cause.getMessage());
+		}
+	    }
+
+        // production code should handle these exceptions more gracefully
+	} catch (ClassNotFoundException x) {
+	    x.printStackTrace();
+	} catch (InstantiationException x) {
+	    x.printStackTrace();
+	} catch (IllegalAccessException x) {
+	    x.printStackTrace();
+	}
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    <code>Deet</code> invoca a 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getDeclaredMethods--">
+                        <code>getDeclaredMethods()</code></a> que devolverá todos los métodos explícitamente declarados en la 
+                    clase. También, se usa 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#isAssignableFrom-java.lang.Class-">
+                        <code>Class.isAssignableFrom()</code></a> para determinar si los parámetros del método localizado son 
+                    compatibles con la invocación deseada. Técnicamente el código podría haber comprobado si la siguiente 
+                    sentencia es <code>true</code> ya que 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Locale.html"><code>Locale</code></a> is 
+                    <code>final</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Locale.class == pType[0].getClass()
+                    </pre>
+                </div>
+                <p>
+                    Sin embargo, 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#isAssignableFrom-java.lang.Class-">
+                        <code>Class.isAssignableFrom()</code></a> es más general.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java Deet Deet ja JP JP</em>
+invoking testDeet()
+Locale = Japanese (Japan,JP), 
+ISO Language Code = jpn
+testDeet() returned true
+                    </pre>
+                </div>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java Deet Deet xx XX XX</em>
+invoking testDeet()
+invocation of testDeet failed: 
+Couldn't find 3-letter language code for xx
+                    </pre>
+                </div>
+                <p>
+                    Primero, observe que sólo <code>testDeet()</code> se ajusta a las restricciones de declaración forzadas por el 
+                    código. A continuación, cuando se le pasa a <code>testDeet()</code> un argumento no válido lanza una 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/MissingResourceException.html">
+                        <code>java.util.MissingResourceException</code></a> no comprobada. En reflexión, no hay distinción en el 
+                    manejo de excepciones comprobadas o no comprobadas. Todas son envueltas en una 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/InvocationTargetException.html">
+                        <code>InvocationTargetException</code></a>
+                </p>
+                <h2>
+                    Invocar Métodos con un Número Variable de Argumentos
+                </h2>
+                <p>
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html#invoke-java.lang.Object-java.lang.Object...-">
+                        <code>Method.invoke()</code></a> se puede usar para pasar un número variable de argumentos a un método. El 
+                    concepto clave que hay que entender es que los métodos de aridad variable se implementan como si los 
+                    argumentos variables estuvieran empaquetados en una matriz.
+                </p>
+                <p>
+                    El ejemplo 
+                    <a class="SourceLink" target="_blank" href="example/InvokeMain.java" 
+                       onclick="showCode('../../displayCode.html', 'example/InvokeMain.java'); return false;">
+                        <code>InvokeMain</code></a> ilustra cómo invocar el punto de entrada <code>main()</code> en cualquier clase 
+                        y pasar un conjunto de argumentos determinados en tiempo de ejecución.
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+
+public class InvokeMain {
+    public static void main(String... args) {
+	try {
+	    Class&lt;?&gt; c = Class.forName(args[0]);
+	    Class[] argTypes = new Class[] { String[].class };
+	    Method main = c.getDeclaredMethod(&quot;main&quot;, argTypes);
+  	    String[] mainArgs = Arrays.copyOfRange(args, 1, args.length);
+	    System.out.format(&quot;invoking %s.main()%n&quot;, c.getName());
+	    main.invoke(null, (Object)mainArgs);
+
+        // production code should handle these exceptions more gracefully
+	} catch (ClassNotFoundException x) {
+	    x.printStackTrace();
+	} catch (NoSuchMethodException x) {
+	    x.printStackTrace();
+	} catch (IllegalAccessException x) {
+	    x.printStackTrace();
+	} catch (InvocationTargetException x) {
+	    x.printStackTrace();
+	}
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Primero, para encontrar el método <code>main()</code> el código busca una clase con el nombre &quot;main&quot;  
+                    con un parámetro único que es una matriz de 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html"><code>String</code></a>. Ya que 
+                    <code>main()</code> es <code>static</code>, <code>null</code> es el primer argumento para 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html#invoke-java.lang.Object-java.lang.Object...-">
+                        <code>Method.invoke()</code></a>. El segundo argumento es la matriz de argumentos que se pasan.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java InvokeMain Deet Deet ja JP JP</em>
+invoking Deet.main()
+invoking testDeet()
+Locale = Japanese (Japan,JP), 
+ISO Language Code = jpn
+testDeet() returned true
+                    </pre>
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="methodModifiers.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="methodTrouble.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Recuperando y Analizando Modificadores del Método<br />
+            <b>Página siguiente:</b> Solución de Problemas
+        </div>
+    </body>
+</html> 

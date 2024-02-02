@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>
+      Usando Métodos de Producer, Campos de Producer, y Métodos de Disposer en Aplicaciones CDI
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="cdi-adv002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="cdi-adv004.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GKGKV">
+      <h2 id="using-producer-methods-producer-fields-and-disposer-methods-in-cdi-applications">
+        Usando Métodos de Producer, Campos de Producer, y Métodos de Disposer en Aplicaciones CDI
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Un método producer genera un objeto que luego se puede inyectar. Por lo general, utiliza métodos 
+            de producer en las siguientes situaciones:
+          </p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>Cuando desea inyectar un objeto que no es en sí mismo un bean</p>
+            </li>
+            <li>
+              <p>Cuando el tipo concreto del objeto a inyectar puede variar en tiempo de ejecución</p>
+            </li>
+            <li>
+              <p>
+                Cuando el objeto requiere alguna inicialización personalizada que el constructor de beans no 
+                realiza
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div class="paragraph">
+          <p>
+            Para obtener más información sobre los métodos de producer, consulte 
+            <a href="cdi-basic012.html#GJDID">Inyectando Objetos Usando Métodos del Productor</a>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Un campo del producer es una alternativa más simple a un método producer; es un campo de un bean 
+            que genera un objeto. Se puede utilizar en lugar de un simple método getter. Los campos de 
+            producer son particularmente útiles para declarar recursos Java EE, como fuentes de datos, 
+            recursos JMS y referencias de servicios web.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Un método o campo de producer se anota con la anotación 
+            <code>javax.enterprise.inject.Produces</code>.
+          </p>
+        </div>
+        <div class="sect2" id="sthref127">
+          <h3 id="using-producer-methods">Usando Métodos de Producer</h3>
+          <div class="paragraph">
+            <p>
+              Un método de producer puede permitirle seleccionar una implementación de bean en tiempo de 
+              ejecución en lugar de en tiempo de desarrollo o tiempo de implementación. Por ejemplo, en el 
+              ejemplo descrito en <a href="cdi-adv-examples003.html#GKHPY">El Ejemplo producermethodse: Usando 
+                un Método de Productor para Elegir una Implementación de Bean</a>, el bean administrado define 
+              el siguiente método de producer:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Produces
+@Chosen
+@RequestScoped
+public Coder getCoder() {
+    switch (coderType) {
+        case TEST:
+            return new TestCoderImpl();
+        case SHIFT:
+            return new CoderImpl();
+        default:
+            return null;
+    }
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Aquí, <code>getCoder</code> se convierte en efecto en un método getter, y cuando la propiedad 
+              <code>coder</code> se inyecta con el mismo calificador y otras anotaciones que el método, se usa 
+              la versión seleccionada de la interfaz.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Inject
+@Chosen
+@RequestScoped
+Coder coder;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Especificar el calificador es esencial: le dice a CDI qué <code>Coder</code> inyectar. Sin él, 
+              la implementación de CDI no podría elegir entre <code>CoderImpl</code>, 
+              <code>TestCoderImpl</code> y el devuelto por <code>getCoder</code> y cancelaría la 
+              implementación, informando el usuario de la dependencia ambigua.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="sthref128">
+          <h3 id="using-producer-fields-to-generate-resources">
+            Usando Campos de Producer para Generar Recursos
+          </h3>
+          <div class="paragraph">
+            <p>
+              Un uso común de un campo de producer es generar un objeto como un 
+              <code>DataSource</code> JDBC o una IPA de Java Persistence <code>EntityManager</code> (ver 
+              <a href="persistence-intro.html #BNBPZ">Capítulo 40, "Introducción a la IPA de Persistencia de 
+                Java,"</a> para más información). A continuación, el objeto puede ser gestionado por el 
+              contenedor. Por ejemplo, podría crear un calificador <code>@UserDatabase</code> y luego 
+              declarar un campo de producer para un administrador de entidades de la siguiente manera:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Produces
+@UserDatabase
+@PersistenceContext
+private EntityManager em;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El calificador <code>@UserDatabase</code> se puede usar cuando inyecta el objeto en otro bean, 
+              <code>RequestBean</code>, en otra parte de la aplicación:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+    @Inject
+    @UserDatabase
+    EntityManager em;
+    ...
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              <a href="cdi-adv-examples004.html#GKHRG">El Ejemplo producerfields: Usando los Campos de 
+                Producer para Generar Recursos</a> muestra cómo usar campos de producers para generar un 
+                administrador de entidades. Puede utilizar un mecanismo similar para inyectar objetos 
+                <code>@Resource</code>, <code>@EJB</code> o <code>@WebServiceRef</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para minimizar la dependencia de la inyección de recursos, especifique el campo de producer para 
+              el recurso en un lugar de la aplicación y luego inyecte el objeto donde lo necesite en la 
+              aplicación.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="sthref129">
+          <h3 id="using-a-disposer-method">Usando un Método de Disposer</h3>
+          <div class="paragraph">
+            <p>
+              Puede usar un método de producer o un campo de producer para generar un objeto que debe 
+              eliminarse cuando se completa su trabajo. Si lo hace, necesita un método de eliminación 
+              (disposer) correspondiente, anotado con una anotación <code>@Disposes</code>. Por ejemplo, puede 
+              cerrar el administrador de entidades de la siguiente manera:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public void close(@Disposes @UserDatabase EntityManager em) {
+    em.close();
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El método disposer se llama automáticamente cuando finaliza el contexto (en este caso, al final 
+              de la conversación, porque <code>RequestBean</code> tiene ámbito de conversación), y el 
+              parámetro en el método <code>close</code> recibe el objeto producido por el campo de producer.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="cdi-adv002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="cdi-adv004.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

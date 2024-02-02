@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            La Apariencia Nimbus (Los Tutoriales de Java&trade; &gt; Creando una IGU (Interfaz Gráfica de Usuario) con
+            JFC/Swing &gt; Modificando la Apariencia)
+        </title>
+        <meta name="description" content="Este tutorial de Swing Java describe el desarrollo de interfaces gráficas de usuario (GUI)
+              para aplicaciones y applets que utilizan componentes Swing" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java swing, java ui, java user interface,
+              swing components, swing events, swing layout  " />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Modificando la Apariencia</a></div>
+                <div class="linkAHEAD"><a href="plaf.html">Cómo Establecer la Apariencia</a></div>
+                <div class="linkAHEAD"><a href="synth.html">La Apariencia Synth</a></div>
+                <div class="linkBHEAD"><a href="synthExample.html">Un Ejemplo de Synth</a></div>
+                <div class="nolinkAHEAD">La Apariencia Nimbus</div>
+                <div class="linkBHEAD"><a href="custom.html">Cambiando la Apariencia de Nimbus</a></div>
+                <div class="linkBHEAD"><a href="size.html">Cambiando el Tamaño de un Componente</a></div>
+                <div class="linkBHEAD"><a href="color.html">Cambiando el Tema de Color</a></div>
+                <div class="linkBHEAD"><a href="info.html">Para Más Información</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing<br />
+                <b>Lección:</b> Modificando la Apariencia
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Modificando la Apariencia</a>&nbsp;&gt;&nbsp;
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="synthExample.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="custom.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>La Apariencia Nimbus</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Nimbus es un aspecto pulido y multiplataforma presentado en la Actualización 10 de Java SE 6 (6u10). La
+                    siguiente captura de pantalla, de SwingSet3 muestra el aspecto Nimbus.
+                </p>
+                <p style="text-align: center">
+                    <img src="../../figures/uiswing/lookandfeel/nimbus.png" width="701" height="642" class="imgbottom"
+                         alt="Captura de pantalla de SwingSet3 Usando el Aspecto Nimbus" />
+                </p>
+                <p>
+                    Nimbus usa gráficos vectoriales de Java 2D para dibujar el interfaz de usuario (IU, UI en inglés), en vez de
+                    bitmaps estáticos, de forma que el IU puede representarse de forma nítidad en cualquier resolución.
+                </p>
+                <p>
+                    Nimbus es muy personalizable. Puede usar el aspecto Nimbus como tal, o puede <em>skin</em> (personalizar)
+                    la apariencia con su propia marca.
+                </p>
+                <h2>
+                    <a id="enable">Habilitar la Apariencia Nimbus</a>
+                </h2>
+                <p>
+                    Por compatibilidad con versiones anteriores, Metal es aún el aspecto por defecto de Swing, pero puede cambiar a
+                    Nimbus de una de tres maneras:
+                </p>
+                <ul>
+                    <li>
+                        Agregue el código siguiente al hilo de envío de eventos antes de crear el interfaz gráfico de usuario (IGU):
+                        <div class="codeblock">
+                            <pre>
+import javax.swing.UIManager.*;
+
+try {
+    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+        if ("Nimbus".equals(info.getName())) {
+            UIManager.setLookAndFeel(info.getClassName());
+            break;
+        }
+    }
+} catch (Exception e) {
+    // Si Nimbus no está disponible, puede asignar al IGU otro aspecto.
+}
+                            </pre>
+                        </div>
+                        <p>
+                            La primera línea de código recupera la lista de todos las implementaciones de aspectos instaladas en
+                            la plataforma y después itera a través de la lista para determinar si Nimbus está disponible. Si es
+                            así, Nimbus es establecido como el aspecto a usar.
+                        </p>
+                        <div class="note">
+                            <hr />
+                            <strong>Nota de la Version:</strong>&nbsp;No establezca el aspecto Nimbus explícitamente invocando el
+                            método <code>UIManager.setLookAndFeel</code> porque no todas las versión o implementaciones de Java SE
+                            6 soportan Nimbus. Adicionalmente, la ubicación del paquete Nimbus cambió entre la Actualización 10 del
+                            KDJ 6  y las versiones de KDJ 7. Iterar a través de todas las implementaciones es una aproximación más
+                            robusta porque si Nimbus no está disponible, se usa el aspecto por defecto. Para la Actualización 10 del
+                            KDJ 6, el paquete Nimbus está ubicado en <code>com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel</code>.
+                            <hr />
+                        </div>
+                    </li>
+                    <li>
+                        Especifique Nimbus como el aspecto por defecto para una aplicación particular en la línea de comandos, como
+                        sigue:
+                        <div class="codeblock">
+                            <pre>
+java -Dswing.defaultlaf=javax.swing.plaf.nimbus.NimbusLookAndFeel <i>MyApp</i>
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        Establezca permanentemente el aspecto por defecto a Nimbus agregando la línea siguiente al fichero
+                        <code>&lt;<em>JAVA_HOME</em>&gt;/lib/swing.properties</code>:
+                        <div class="codeblock">
+                            <pre>
+swing.defaultlaf=javax.swing.plaf.nimbus.NimbusLookAndFeel
+                            </pre>
+                        </div>
+                        Si el fichero <code>swing.properties</code> no existe aún, necesita crearlo.
+                    </li>
+                </ul>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="synthExample.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="custom.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio &quot;
+                            Los Tutoriales de Java&quot; está sujeto a estos
+                            <a href="../../information/cpyr.html">avisos legales</a>.
+                        </p>
+                        <p class="footertext">Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.</p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Un Ejemplo de Synth<br />
+            <b>Página siguiente:</b> Cambiando la Apariencia de Nimbus
+        </div>
+    </body>
+</html>

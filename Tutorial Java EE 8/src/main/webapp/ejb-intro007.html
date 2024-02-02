@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Los Ciclos de Vida de los Enterprise Bean</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="ejb-intro006.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="ejb-intro008.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GIPLJ">
+      <h2 id="the-lifecycles-of-enterprise-beans">Los Ciclos de Vida de los Enterprise Bean</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Un Enterprise Bean pasa por varias etapas durante su vida o ciclo de vida. Cada tipo de 
+            enterprise bean (sesión con estado, sesión sin estado, sesión única o controlado por 
+            mensajes) tiene un ciclo de vida diferente.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Las descripciones que siguen se refieren a métodos que se explican junto con los 
+            ejemplos de código en los siguientes dos capítulos. Si es nuevo en Enterprise Beans, 
+            debe omitir esta sección y ejecutar primero los ejemplos de código.
+            
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p><a href="#GIPLN">El Ciclo de Vida de un Bean de Sesión con Estado</a></p>
+            </li>
+            <li>
+              <p><a href="#GIPLM">El Ciclo de Vida de un Bean de Sesión sin Estado</a></p>
+            </li>
+            <li>
+              <p><a href="#GIPRX">El Ciclo de Vida de un Bean de Sesión Singleton</a></p>
+            </li>
+            <li>
+              <p><a href="#GIPKW">El Ciclo de Vida de un Bean Controlado por Mensajes</a></p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="GIPLN">
+          <h3 id="the-lifecycle-of-a-stateful-session-bean">
+            El Ciclo de Vida de un Bean de Sesión con Estado
+          </h3>
+          <div class="paragraph">
+            <p>
+              La <a href="#GIPMI">Figura 35-2</a> ilustra las etapas por las que pasa un bean de 
+              sesión con estado durante su vida útil. El cliente inicia el ciclo de vida obteniendo 
+              una referencia a un bean de sesión con estado. El contenedor realiza cualquier 
+              inyección de dependencia y luego invoca el método anotado con 
+              <code>@PostConstruct</code>, si corresponde. El bean ahora está listo para que el 
+              cliente invoque sus métodos de negocio.
+            </p>
+          </div>
+          <div id="GIPMI" class="paragraph">
+            <div class="title">
+              <strong>Figura 35-2 Ciclo de Vida de un Bean de Sesión con Estado</strong>
+            </div>
+            <p>
+              <span class="image">
+                <img src="img/javaeett_dt_021.png" alt="Diagrama que muestra el ciclo de vida de un 
+                     bean de sesión con estado.">
+              </span>
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Mientras está en la etapa de preparación, el contenedor EJB puede decidir desactivar o 
+              pasivar el bean moviéndolo de la memoria al almacenamiento secundario. (Normalmente, 
+              el contenedor EJB usa un algoritmo de usado menos recientemente para seleccionar un 
+              bean para pasivación). El contenedor EJB invoca el método anotado 
+              <code>@PrePassivate</code>, si lo hay, inmediatamente antes de pasivarlo. Si un 
+              cliente invoca un método de negocio en el bean mientras está en la etapa pasiva, el 
+              contenedor EJB activa el bean, llama al método anotado <code>@PostActivate</code>, si 
+              lo hay, y luego lo mueve a la etapa de preparación.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Al final del ciclo de vida, el cliente invoca un método anotado <code>@Remove</code>, 
+              y el contenedor EJB llama al método anotado <code>@PreDestroy</code>, si lo hay. La 
+              instancia del bean está entonces lista para la recolección de basura.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Su código controla la invocación de un solo método de ciclo de vida: el método anotado 
+              <code>@Remove</code>. Todos los demás métodos en la <a href="#GIPMI">Figura 35-2</a> 
+              son invocados por el contenedor EJB. Ver 
+              <a href="resources.html#BNCJH">Capítulo 55, "Adaptadores de Recursos y Contratos"</a> 
+              para más información.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="GIPLM">
+          <h3 id="the-lifecycle-of-a-stateless-session-bean">
+            El Ciclo de Vida de un Bean de Sesión sin Estado
+          </h3>
+          <div class="paragraph">
+            <p>
+              Debido a que un bean de sesión sin estado nunca se pasiva, su ciclo de vida tiene solo 
+              dos etapas: inexistente y listo para la invocación de métodos comerciales. La 
+              <a href="#GIPNI">Figura 35-3</a> ilustra las etapas de un bean de sesión sin estado.
+            </p>
+          </div>
+          <div id="GIPNI" class="paragraph">
+            <div class="title">
+              <strong>Figura 35-3 Ciclo de Vida de un Bean de Sesión sin Estado o Singleton</strong>
+            </div>
+            <p>
+              <span class="image">
+                <img src="img/javaeett_dt_022.png" 
+                     alt="Diagrama que muestra el ciclo de vida de un bean de sesión sin estado o 
+                     singleton.">
+              </span>
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El contenedor EJB normalmente crea y mantiene un grupo de beans de sesión sin estado, 
+              comenzando el ciclo de vida del bean de sesión sin estado. El contenedor realiza 
+              cualquier inyección de dependencia y luego invoca el método anotado 
+              <code>@PostConstruct</code>, si existe. El bean ahora está listo para que un cliente 
+              invoque sus métodos de negocio.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Al final del ciclo de vida, el contenedor EJB llama al método anotado 
+              <code>@PreDestroy</code>, si existe. La instancia del bean está entonces lista para la 
+              recolección de basura.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="GIPRX">
+          <h3 id="the-lifecycle-of-a-singleton-session-bean">
+            El Ciclo de Vida de un Bean de Sesión Singleton
+          </h3>
+          <div class="paragraph">
+            <p>
+              Al igual que un bean de sesión sin estado, un bean de sesión singleton nunca se pasiva 
+              y solo tiene dos etapas, inexistentes y listas para la invocación de métodos de 
+              negocio, como se muestra en la <a href="#GIPNI">Figura 35-3</a>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El contenedor EJB inicia el ciclo de vida del bean de sesión singleton al crear la 
+              instancia singleton. Esto ocurre durante la implementación de la aplicación si el 
+              singleton se anota con la anotación <code>@Startup</code>. El contenedor realiza 
+              cualquier inyección de dependencia y luego invoca el método anotado 
+              <code>@PostConstruct</code>, si existe. El bean de sesión singleton ahora está listo 
+              para que el cliente invoque sus métodos de negocio.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Al final del ciclo de vida, el contenedor EJB llama al método anotado 
+              <code>@PreDestroy</code>, si existe. El bean de sesión singleton ahora está listo para 
+              la recolección de basura.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="GIPKW">
+          <h3 id="the-lifecycle-of-a-message-driven-bean">
+            El Ciclo de Vida de un Bean Controlado por Mensajes
+          </h3>
+          <div class="paragraph">
+            <p>
+              La <a href="#GIPLR">Figura 35-4</a> ilustra las etapas del ciclo de vida de un bean 
+              controlado por mensajes.
+            </p>
+          </div>
+          <div id="GIPLR" class="paragraph">
+            <div class="title">
+              <strong>Figura 35-4 Ciclo de Vida de un Bean Controlado por Mensajes</strong>
+            </div>
+            <p>
+              <span class="image">
+                <img src="img/javaeett_dt_023.png" 
+                     alt="Diagrama que muestra el ciclo de vida de un bean controlado por 
+                     mensajes.">
+              </span>
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El contenedor EJB generalmente crea un conjunto de instancias de beans controlados por 
+              mensajes. Para cada instancia, el contenedor EJB realiza estas tareas.
+            </p>
+          </div>
+          <div class="olist arabic">
+            <ol class="arabic">
+              <li>
+                <p>
+                  Si el bean controlado por mensajes utiliza inyección de dependencia, el contenedor 
+                  inyecta estas referencias antes de instanciar la instancia.
+                </p>
+              </li>
+              <li>
+                <p>El contenedor llama al método anotado <code>@PostConstruct</code>, si lo hay.</p>
+              </li>
+            </ol>
+          </div>
+          <div class="paragraph">
+            <p>
+              Al igual que un bean de sesión sin estado, un bean controlado por mensajes nunca se 
+              pasiva y solo tiene dos estados: inexistente y listo para recibir mensajes.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Al final del ciclo de vida, el contenedor llama al método anotado 
+              <code>@PreDestroy</code>, si lo hay. La instancia del bean está entonces lista para la 
+              recolección de basura.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="ejb-intro006.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="ejb-intro008.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

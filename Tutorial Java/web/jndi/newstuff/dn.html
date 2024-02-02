@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Recuperando el Nombre Distinguido (Los Tutoriales de Java&trade; &gt; Nombrado en Java e Interfaz de Directorio &gt; 
+            Nuevas funcionalidades en KDJ 5.0 y KDJ 6)
+        </title>
+        <meta name="description" content="Este tutorial de Java JNDI describe la tecnología de Nombrado en Java e Interfaz de 
+              Directorio (JNDI), operaciones de nombre y directorio, y LDAP" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jndi, ldap, jndi service provider" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Nuevas funcionalidades en KDJ 5.0 y KDJ 6</a></div>
+                <div class="nolinkAHEAD">Recuperando el Nombre Distinguido</div>
+                <div class="linkAHEAD"><a href="controls-std.html">Controles estándar de LDAP</a></div>
+                <div class="linkAHEAD"><a href="paged-results.html">Control de Resultados Paginados</a></div>
+                <div class="linkAHEAD"><a href="sort.html">Control de Ordenación</a></div>
+                <div class="linkAHEAD"><a href="mdsaIT.html">Gestionar Control de Referencia</a></div>
+                <div class="linkAHEAD"><a href="ldapname.html">Manipulando LdapName (Nombre Distinguido)</a></div>
+                <div class="linkAHEAD"><a href="rdn.html">Manipulando Nombre Distinguido Relativo (RDN)</a></div>
+                <div class="linkAHEAD"><a href="readtimeout.html">Configuración de Tiempo de Espera para Operaciones LDAP</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Nombrado en Java e Interfaz de Directorio<br />
+                <b>Lección:</b> Nuevas funcionalidades en KDJ 5.0 y KDJ 6
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Nombrado en Java e Interfaz de Directorio</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Nuevas funcionalidades en KDJ 5.0 y KDJ 6</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="controls-std.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Recuperando el Nombre Distinguido</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    En las versiones del KDJ anteriores a la 5.0, no hay forma directa de obtener el Nombre Distinguido (DN) de los 
+                    resultados de la búsqueda. El método <code>SearchResults.getName()</code> siempre devuelve el nombre que es 
+                    relativo al contexto en el cual se realizó la consulta. Para obtener el absoluto, o nombre completo de la 
+                    entrada de búsqueda se requiere cierta cantidad de contabilidad para rastrear los contextos ancestrales. Se 
+                    agregan dos nuevas IPAS a continuación en el KDJ 5.0 para recuperar el nombre absoluto del NameClassPair, 
+                    siempre que se realize una búsqueda, listado, o listado de vínculos en un contexto:
+                </p>
+                <ul>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/naming/NameClassPair.html#getNameInNamespace-Name-">
+                            <code>NameClassPair.getNameInNameSpace(Name name)</code></a>
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/naming/NameClassPair.html#getNameInNamespace-String-">
+                            <code>NameClassPair.getNameInNameSpace(String name)</code></a>
+                    </li>
+                </ul>
+                <p>
+                    Aquí tiene un ejemplo que recupera DNs desde una búsqueda LDAP:
+                </p>
+                <div class="codeblock">
+                    <pre>
+     public static void printSearchEnumeration(NamingEnumeration retEnum) {
+         try {
+             while (retEnum.hasMore()) {
+                 SearchResult sr = (SearchResult) retEnum.next();
+                 System.out.println(">>" + sr.getNameInNamespace());
+             }
+         } catch (NamingException e) {
+             e.printStackTrace();
+         }
+     }
+                    </pre>
+                </div>
+                <p>
+                    El ejemplo completo se puede obtener de 
+                    <a class="SourceLink" target="_blank" href="examples/FullName.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/FullName.java'); return false;">
+                        <code>aquí</code></a>. Este programa genera la salida de la siguiente manera:
+                </p>
+                <div class="codeblock">
+                    <pre>
+        >>cn=Jon Ruiz, ou=People, o=JNDITutorial
+        >>cn=Scott Seligman, ou=People, o=JNDITutorial
+        >>cn=Samuel Clemens, ou=People, o=JNDITutorial
+        >>cn=Rosanna Lee, ou=People, o=JNDITutorial
+        >>cn=Maxine Erlund, ou=People, o=JNDITutorial
+        >>cn=Niels Bohr, ou=People, o=JNDITutorial
+        >>cn=Uri Geller, ou=People, o=JNDITutorial
+        >>cn=Colleen Sullivan, ou=People, o=JNDITutorial
+        >>cn=Vinnie Ryan, ou=People, o=JNDITutorial
+        >>cn=Rod Serling, ou=People, o=JNDITutorial
+        >>cn=Jonathan Wood, ou=People, o=JNDITutorial
+        >>cn=Aravindan Ranganathan, ou=People, o=JNDITutorial
+        >>cn=Ian Anderson, ou=People, o=JNDITutorial
+        >>cn=Lao Tzu, ou=People, o=JNDITutorial
+        >>cn=Don Knuth, ou=People, o=JNDITutorial
+        >>cn=Roger Waters, ou=People, o=JNDITutorial
+        >>cn=Ben Dubin, ou=People, o=JNDITutorial
+        >>cn=Spuds Mackenzie, ou=People, o=JNDITutorial
+        >>cn=John Fowler, ou=People, o=JNDITutorial
+        >>cn=Londo Mollari, ou=People, o=JNDITutorial
+        >>cn=Ted Geisel, ou=People,o=JNDITutorial 
+                    </pre>
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="controls-std.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Nuevas funcionalidades en KDJ 5.0 y KDJ 6<br />
+            <b>Página siguiente:</b> Controles estándar de LDAP
+        </div>
+    </body>
+</html> 

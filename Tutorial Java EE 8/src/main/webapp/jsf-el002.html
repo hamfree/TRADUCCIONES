@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Sintaxis de Evaluación Inmediata y Diferida</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jsf-el001.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-el003.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="">
+      <h2 id="immediate-and-deferred-evaluation-syntax">Sintaxis de Evaluación Inmediata y Diferida</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            El EL apoya la evaluación inmediata y diferida de expresiones. La evaluación inmediata significa 
+            que la expresión se evalúa y el resultado se devuelve tan pronto como la página se representa por 
+            primera vez. La evaluación diferida significa que la tecnología que usa el lenguaje de expresión 
+            puede usar su propia maquinaria para evaluar la expresión en algún momento posterior durante el 
+            ciclo de vida de la página, siempre que sea apropiado hacerlo.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Las expresiones que se evalúan inmediatamente utilizan la sintaxis <code>${}</code>. Las 
+            expresiones cuya evaluación se aplaza utilizan la sintaxis <code>#{}</code>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Debido a su ciclo de vida multifásico, la tecnología JavaServer Faces utiliza principalmente 
+            expresiones de evaluación diferidas. Durante el ciclo de vida, se manejan los eventos de los 
+            componentes, se validan los datos y se realizan otras tareas en un orden particular. Por lo tanto, 
+            una implementación de JavaServer Faces debe posponer la evaluación de expresiones hasta el punto 
+            apropiado del ciclo de vida.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Otras tecnologías que usan EL pueden tener diferentes razones para usar expresiones diferidas.
+          </p>
+        </div>
+        <div class="sect2" id="BNAHS">
+          <h3 id="immediate-evaluation">Evaluación Inmediata</h3>
+          <div class="paragraph">
+            <p>
+              Todas las expresiones que utilizan la sintaxis <code>${}</code> se evalúan inmediatamente. Estas 
+              expresiones pueden aparecer como parte de un texto de plantilla (estático) o como el valor de un 
+              atributo de etiqueta que puede aceptar expresiones en tiempo de ejecución.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El siguiente ejemplo muestra una etiqueta cuyo atributo <code>value</code> hace referencia a una 
+              expresión de evaluación inmediata que actualiza la cantidad de libros recuperados del bean de 
+              respaldo llamado <code>catalog</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;h:outputText value="${catalog.bookQuantity}" /&gt;
+                </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              La implementación de JavaServer Faces evalúa la expresión <code>${catalog.bookQuantity}</code>, 
+              la convierte y pasa el valor devuelto al controlador de etiquetas. El valor se actualiza en la 
+              página.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BNAHT">
+          <h3 id="deferred-evaluation">Evaluación Diferida</h3>
+          <div class="paragraph">
+            <p>
+              Las expresiones de evaluación diferidas toman la forma <code>#{expr}</code> y se pueden evaluar 
+              en otras fases del ciclo de vida de una página según lo definido por cualquier tecnología que 
+              utilice la expresión. En el caso de la tecnología JavaServer Faces, su controlador puede evaluar 
+              la expresión en diferentes fases del ciclo de vida, dependiendo de cómo se utilice la expresión 
+              en la página.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El siguiente ejemplo muestra una etiqueta <code>h:inputText</code> de JavaServer Faces, que 
+              representa un componente de campo en el que un usuario ingresa un valor. El atributo 
+              <code>value</code> de la etiqueta <code>h:inputText</code> hace referencia a una expresión de 
+              evaluación diferida que apunta a la propiedad <code>name</code> del bean <code>customer</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;h:inputText id="name" value="#{customer.name}" /&gt;
+                </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para una solicitud inicial de la página que contiene esta etiqueta, la implementación de 
+              JavaServer Faces evalúa la expresión <code>#{customer.name}</code> durante la fase de respuesta 
+              de procesamiento del ciclo de vida. Durante esta fase, la expresión simplemente accede al valor 
+              de <code>name</code> del bean <code>customer</code>, como se hace en la evaluación inmediata.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para una solicitud de devolución, la implementación de JavaServer Faces evalúa la expresión en 
+              diferentes fases del ciclo de vida, durante las cuales el valor se recupera de la solicitud, se 
+              valida y se propaga al bean <code>customer</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Como se muestra en este ejemplo, las expresiones de evaluación diferida pueden ser</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>Expresiones de valor que se pueden usar para leer y escribir datos</p>
+              </li>
+              <li>
+                <p>Expresiones de método</p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las expresiones de valor (tanto inmediatas como diferidas) y las expresiones de método se 
+              explican en la siguiente sección.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jsf-el001.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-el003.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

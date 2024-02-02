@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Introducir y Convertir los Bytes Codificados de la Clave Pública (Los Tutoriales de Java&trade; &gt; Características de 
+            Seguridad en Java SE &gt; Generando y Verificando Firmas)
+        </title>
+        <meta name="description" content="Este tutorial de seguridad de Java describe el uso de firmas digitales, claves y servicios 
+              de criptografía" />
+        <meta name="keywords" content="programación java, aprender java, código ejemplo java, seguridad java, criptografía, firma 
+              digital, verificación firma, código de firma" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Generando y Verificando Firmas</a></div>
+                <div class="linkAHEAD"><a href="gensig.html">Generando una Firma Digital</a></div>
+                <div class="linkBHEAD"><a href="step1.html">Preparar la Estructura Inicial del Programa</a></div>
+                <div class="linkBHEAD"><a href="step2.html">Generar las Claves Públicas y Privadas</a></div>
+                <div class="linkBHEAD"><a href="step3.html">Firmando los Datos</a></div>
+                <div class="linkBHEAD"><a href="step4.html">Salvar la Firma y la Clave Pública en los Ficheros</a></div>
+                <div class="linkBHEAD"><a href="step5.html">Compilar y Ejecutar el Programa</a></div>
+                <div class="linkAHEAD"><a href="versig.html">Verificando una Signatura Digital</a></div>
+                <div class="linkBHEAD"><a href="vstep1.html">Preparar la Estructura Inicial del Programa</a></div>
+                <div class="nolinkBHEAD">Introducir y Convertir los Bytes Codificados de la Clave Pública</div>
+                <div class="linkBHEAD"><a href="vstep3.html">Introducir los Bytes de la Firma</a></div>
+                <div class="linkBHEAD"><a href="vstep4.html">Verificar la Firma</a></div>
+                <div class="linkBHEAD"><a href="vstep5.html">Compilar y Ejecutar el Programa</a></div>
+                <div class="linkAHEAD"><a href="enhancements.html">Debilidades y Alternativas</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Características de Seguridad en Java SE<br />
+                <b>Lección:</b> Generando y Verificando Firmas<br />
+                <b>Sección:</b> Verificando una Signatura Digital
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Características de Seguridad en Java SE</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Generando y Verificando Firmas</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="vstep1.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="vstep3.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Introducir y Convertir los Bytes Codificados de la Clave Pública</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    A continuación, <code>VerSig</code> necesita importar los bytes codificados de la clave pública desde el archivo 
+                    especificado como primer argumento de la línea de comandos y convertirlos en una <code>PublicKey</code>. Se 
+                    necesita una <code>PublicKey</code> porque es lo que el método <code>initVerify</code> de 
+                    <code>Signature</code> requiere para inicializar el objeto <code>Signature</code> para la verificación.
+                </p>
+                <p>
+                    Primero, leemos los bytes codificados de la clave pública.
+                </p>
+                <div class="codeblock">
+                    <pre>
+FileInputStream keyfis = new FileInputStream(args[0]);
+byte[] encKey = new byte[keyfis.available()];  
+keyfis.read(encKey);
+
+keyfis.close();
+                    </pre>
+                </div>
+                <p>
+                    Ahora la matriz de bytes <code>encKey</code> contiene los bytes codificados de la clave pública.
+                </p>
+                <p>
+                    Puede usar una clase <code>KeyFactory</code> para instanciar una clave pública DSA desde su codificación. La 
+                    clase <code>KeyFactory</code> proporciona conversiones entre claves opacas (del tipo <code>Key</code>) y 
+                    especificaciones de clave, que son representaciones transparentes del material de clave subyacente. Con una 
+                    clave opaca puede obtener el nombre del algoritmo, el nombre del formato, y los bytes codificados de la clave, 
+                    pero no el material de la clave, el cual, por ejemplo, puede consisitr de la clave en sí misma y los parámetros 
+                    del algoritmo usados para calcular la clave. (Tenga en cuenta que 
+                    <code>PublicKey</code>, debido a que extiende <code>Key</code>, es en sí misma una <code>Key</code>.)
+                </p>
+                <p>
+                    Así, primero necesita una especificación de clave. Puede obtener una a través de lo siguiente, asumiendo que la 
+                    clave fue codificada de acuerdo al estándar X.509, que es el caso, por ejemplo, si la clave fue generada con 
+                    el generador de pares de clave integrado DSA proporcionado por el proveedor SUN:
+                </p>
+                <div class="codeblock">
+                    <pre>
+X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(encKey);
+                    </pre>
+                </div>
+                <p>
+                    Ahora necesita un objeto <code>KeyFactory</code> para hacer la conversión. Ese objeto debe ser uno que funcione 
+                    con claves DSA.
+                </p>
+                <div class="codeblock">
+                    <pre>
+KeyFactory keyFactory = KeyFactory.getInstance("DSA", "SUN");
+                    </pre>
+                </div>
+                <p>
+                    Finalmente, puede usar el objeto <code>KeyFactory</code> para generar una <code>PublicKey</code> de la 
+                    especificación de clave.
+                </p>
+                <div class="codeblock">
+                    <pre>
+PublicKey pubKey =
+    keyFactory.generatePublic(pubKeySpec);
+                    </pre>
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="vstep1.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="vstep3.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Preparar la Estructura Inicial del Programa<br />
+            <b>Página siguiente:</b> Introducir los Bytes de la Firma
+        </div>
+    </body>
+</html> 

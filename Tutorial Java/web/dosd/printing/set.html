@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Imprimiendo un Documento de Múltiples Páginas (Los Tutoriales de Java&trade; &gt; Gráficos 2D &gt; Imprimiendo)
+        </title>
+        <meta name="description" content="Este tutorial de Java 2D describe gráficos 2D, geometría, IPA de texto, imágenes, 
+              impresión, temas 2D avanzados." />
+        <meta name="keywords" content="java programming, learn java, java sample code, java 2d" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Imprimiendo</a></div>
+                <div class="linkAHEAD"><a href="printable.html">Un Programa para Impresión Básica</a></div>
+                <div class="linkAHEAD"><a href="dialog.html">Usando los Cuadros de Diálogo de Configuración de Impresión</a></div>
+                <div class="nolinkAHEAD">Imprimiendo un Documento de Múltiples Páginas</div>
+                <div class="linkAHEAD"><a href="services.html">Trabajando con Servicios de Impresión y Atributos</a></div>
+                <div class="linkAHEAD"><a href="gui.html">Imprimiendo el Contenido del Interfaz de Usuario</a></div>
+                <div class="linkAHEAD"><a href="swing.html">Soporte para Impresión en los Componentes Swing</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Gráficos 2D<br />
+                <b>Lección:</b> Imprimiendo
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Gráficos 2D</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Imprimiendo</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="dialog.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="services.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Imprimiendo un Documento de Múltiples Páginas</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Usted ya ha aprendido cómo usar la interfaz 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/print/Printable.html"><code>Printable</code></a>
+                    para imprimir un documento de una sola página. Sin embargo, los documentos suelen tener más de una página 
+                    física. <em>Paginación</em> es el proceso de identificar la ubicación en un documento donde la página se rompe 
+                    e imprimir en consecuencia.
+                </p>
+                <p>
+                    En caso de imprimir varias imágenes gráficas, una por página, utilice el índice de página para recorrer estas 
+                    páginas e imprimir una en cada página. Por ejemplo, si se representan varias imágenes en la siguiente matriz:
+                </p>
+                <div class="codeblock">
+                    <pre>
+BufferedImage[] images = new BufferedImage[10];
+                    </pre>
+                </div>
+                <p>
+                    luego use el método <code>print()</code> como se muestra en el siguiente fragmento de código:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public int print(Graphics graphics,
+           PageFormat pageFormat, int pageIndex)
+           throws PrinterException {
+
+    if (pageIndex &lt; images.length) {
+        graphics.drawImage(images[pageIndex], 100, 100, null);
+        return PAGE_EXISTS;
+    } else {
+        return NO_SUCH_PAGE:
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Si el documento es continuo, la aplicación debe calcular cuánto contenido puede caber en cada página y dividir 
+                    la página en ese punto. Si el documento de texto consta de muchas líneas, la aplicación debe calcular cuántas de 
+                    estas líneas caben por completo en una página. La clase 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/Point.html"><code>Point</code></a> crea un punto que 
+                    representa una ubicación en (x, y)
+                </p>
+                <p>
+                    Para calcular la altura de una sola línea de texto, utilice la clase 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/FontMetrics.html"><code>FontMetrics</code></a>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+Font font = new Font("Serif", Font.PLAIN, 10);
+FontMetrics metrics = graphics.getFontMetrics(font);
+int lineHeight = metrics.getHeight();
+                    </pre>
+                </div>
+                <p>
+                    El parámetro <code>PageFormat</code> describe el área imprimible de la página. En particular, para encontrar el 
+                    espacio vertical de la página, use el siguiente fragmento de código:
+                </p>
+                <div class="codeblock">
+                    <pre>
+double pageHeight = pageFormat.getImageableHeight();
+                    </pre>
+                </div>
+                <p>
+                    Utilice el siguiente fragmento de código para calcular el número de líneas que caben en una página y el número 
+                    de saltos de página:
+                </p>
+                <div class="codeblock">
+                    <pre>
+int linesPerPage = ((int)pageHeight)/lineHeight);
+int numBreaks = (textLines.length-1)/linesPerPage;
+int[] pageBreaks = new int[numBreaks];
+for (int b=0; b &lt; numBreaks; b++) {
+    pageBreaks[b] = (b+1)*linesPerPage; 
+}
+                    </pre>
+                </div>
+                <p>
+                    Utilice el método <code>print()</code> para calcular el área imprimible por las siguientes razones:
+                </p>
+                <ul>
+                    <li>
+                        La medición del texto depende del <code>FontRenderContext</code> y esto está implícito en el objeto 
+                        <code>FontMetrics</code> devuelto por los gráficos de la impresora que no está disponible excepto dentro del 
+                        método <code>print()</code>.
+                    </li>
+                    <li>
+                        Es posible que el formato de la página no se revele hasta que se produzca la impresión. Dado que si el 
+                        usuario seleccionó un modo horizontal en el cuadro de diálogo de impresión, esta configuración debe tenerse 
+                        en cuenta. El objeto <code>PageFormat</code> pasado al método <code>print()</code> proporciona esta 
+                        información.
+                    </li>
+                </ul>
+                <p>
+                    Las posiciones de los saltos de página se utilizan como se representan en el siguiente fragmento de código:
+                </p>
+                <div class="codeblock">
+                    <pre>
+/* Dibuja cada línea que está en esta página.
+ * Incrementar la posición 'y' por lineHeight
+ * para cada línea.
+ */
+int y = 0; 
+int start = (pageIndex == 0) ? 0 : pageBreaks[pageIndex-1];
+int end   = (pageIndex == pageBreaks.length)
+                 ? textLines.length : pageBreaks[pageIndex];
+for (int line=start; line&lt;end; line++) {
+    y += lineHeight;
+    g.drawString(textLines[line], 0, y);
+}
+                    </pre>
+                </div>
+                <p>
+                    Si un documento contiene 100 líneas y solo caben 48 líneas en una página, una aplicación imprime 3 páginas con 
+                    saltos de página después de 48 y 96 líneas de texto. Las 4 líneas restantes se imprimen en la última página. El 
+                    código completo de este ejemplo está en 
+                    <a class="SourceLink" target="_blank" href="examples/PaginationExample.java"
+                       onclick="showCode('../../displayCode.html', 'examples/PaginationExample.java'); return false;">
+                        <code>PaginationExample.java</code></a>.
+                </p>
+                <p>
+                    Los siguientes factores de simplificación se utilizan en el código <code>PaginationExample</code>:
+                </p>
+                <ul>
+                    <li>Cada página tiene la misma altura.</li>
+                    <li>Se utiliza la misma fuente.</li>
+                </ul>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="dialog.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="services.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Usando los Cuadros de Diálogo de Configuración de Impresión<br />
+            <b>Página siguiente:</b> Trabajando con Servicios de Impresión y Atributos
+        </div>
+    </body>
+</html> 

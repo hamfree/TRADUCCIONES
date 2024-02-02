@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Instalando un Resource Bundle Personalizado Como una Extensión (Los Tutoriales de Java&trade; &gt;
+            Internacionalización &gt; Proveedores de Servicio para Internacionalización)
+        </title>
+        <meta name="description" content="Este tutorial de internacionalización de Java describe la configuración regional, 
+              aislando datos específicos de la configuración regional, formateando datos, nombre de dominio internacionalizado e 
+              identificador de recursos" />
+        <meta name="keywords" content="java programming, learn java, java sample code, i18n, internationalization, locale, text
+              formatting" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Proveedores de Servicio para Internacionalización</a></div>
+                <div class="nolinkAHEAD">Instalando un Resource Bundle Personalizado Como una Extensión</div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Internacionalización<br />
+                <b>Lección:</b> Proveedores de Servicio para Internacionalización
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Internacionalización</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Proveedores de Servicio para Internacionalización</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../end.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Instalando un Resource Bundle Personalizado Como una Extensión</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    La sección 
+                    <a class="TutorialLink" target="_top" 
+                       href="../../i18n/resbundle/control.html">Personalizando la Carga de un Resource Bundle</a> le muestra cómo 
+                    cambiar cómo se cargan los paquetes de recursos. Esto implica derivar una clase nueva desde la clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/ResourceBundle.Control.html">
+                        <code>ResourceBundle.Control</code></a>, y luego recuperar el paquete de recursos invocando el siguiente 
+                    método:
+                </p>
+                <div class="codeblock">
+                    <pre>
+ResourceBundle getBundle(
+  String baseName,
+  Locale targetLocale,
+  ResourceBundle.Control control)
+                    </pre>
+                </div>
+                <p>
+                    El parámetro <code>control</code> es su implementación de <code>ResourceBundle.Control</code>.
+                </p>
+                <p>
+                    La interfaz 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/spi/ResourceBundleControlProvider.html">
+                        <code>java.util.spi.ResourceBundleControlProvider</code></a> le habilita a cambiar cómo los métodos 
+                    siguientes cargan los paquetes de recursos:
+                </p>
+                <div class="codeblock">
+                    <pre>
+ResourceBundle getBundle(
+  String baseName,
+  Locale targetLocale)
+                    </pre>
+                </div>
+                <p>
+                    Note que esta versión del método 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/ResourceBundle.html#getBundle-java.lang.String-java.util.Locale-">
+                        <code>ResourceBundle.getBundle</code></a> no requiere una instancia de la clase 
+                    <code>ResourceBundle.Control</code>. <code>ResourceBundleControlProvider</code> es una interfaz de proveedor de 
+                    servicio (SPI). Los SPIs le permiten crear aplicaciones extensibles, las cuales son aquellas que puede extender 
+                    fácilmente sin modificar su código base original. Vea 
+                    <a class="TutorialLink" target="_top" 
+                       href="../../ext/basics/spi.html">Creando Aplicaciones Extensibles</a> para más información.
+                </p>
+                <p>
+                    Para usar los SPIs, cree primero un proveedor de servicio implementando un SPI como 
+                    <code>ResourceBundleControlProvider</code>. Cuando implementa un SPI, especifica cómo proporcionará el 
+                    servicio. el servicio que el SPI <code>ResourceBundleControlProvider</code> proporciona es obtener una 
+                    instancia apropiada de <code>ResourceBundle.Control</code> cuando su aplicación invoca el método  
+                    <code>ResourceBundle.getBundle(String baseName, Locale targetLocale)</code>. Usted empaqueta el proveedor de 
+                    servicio con el 
+                    <a class="TutorialLink" target="_top" 
+                       href="../../ext/index.html">Mecanismo de Extensión de Java</a> como una extensión instalada. Cuando ejecuta 
+                    su aplicación, no nombra sus extensiones en su ruta de clases; el entorno de ejecución encuentra y carga 
+                    estas extensiones.
+                </p>
+                <p>
+                    Una implementación instalada del SPI <code>ResourceBundleControlProvider</code> reemplaza la clase 
+                    predeterminada <code>ResourceBundle.Control</code> (la cual define el proceso de carga predeterminado de 
+                    paquetes). Consecuentemente, el interfaz <code>ResourceBundleControlProvider</code> le habilita a usar 
+                    cualquiera de las clases <code>ResourceBundle.Control</code> personalizadas sin cambios adicionales al código 
+                    fuente de su aplicación. Además, esta interfaz le habilita a escribir aplicaciones sin tener que referirse a 
+                    ninguna de sus clases <code>ResourceBundle.Control</code> personalizadas.
+                </p>
+                <p>
+                    El ejemplo 
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/rbcpsample/src/RBCPTest.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/rbcpsample/src/RBCPTest.java'); return false;">
+                        <code>RBCPTest.java</code></a> muestra cómo implementar la interfaz 
+                    <code>ResourceBundleControlProvider</code> y cómo empaquetarla como una extensión instalada. Este ejemplo, el 
+                    cual está empaquetado en un fichero zip  
+                    <code><a href="examples/rbcpsample/RBCPTest.zip">RBCPTest.zip</a></code>, consiste de los ficheros siguientes:
+                </p>
+                <ul>
+                    <li>
+                        <code>src</code>
+                        <ul>
+                            <li>
+                                <a class="SourceLink" target="_blank" 
+                                   href="examples/rbcpsample/src/java.util.spi.ResourceBundleControlProvider" 
+                                   onclick="showCode('../../displayCode.html',
+                                                   'examples/rbcpsample/src/java.util.spi.ResourceBundleControlProvider');
+                                           return false;">
+                                    <code>java.util.spi.ResourceBundleControlProvider</code></a>
+                            </li>
+                            <li>
+                                <a class="SourceLink" target="_blank" 
+                                   href="examples/rbcpsample/src/RBCPTest.java" 
+                                   onclick="showCode('../../displayCode.html',
+                                                   'examples/rbcpsample/src/RBCPTest.java');
+                                           return false;">
+                                    <code>RBCPTest.java</code></a>
+                            </li>
+                            <li><code>rbcp</code>
+                                <ul>
+                                    <li>
+                                        <a class="SourceLink" target="_blank" 
+                                           href="examples/rbcpsample/src/rbcp/PropertiesResourceBundleControl.java" 
+                                           onclick="showCode('../../displayCode.html',
+                                                           'examples/rbcpsample/src/rbcp/PropertiesResourceBundleControl.java');
+                                                   return false;">
+                                            <code>PropertiesResourceBundleControl.java</code></a>
+                                    </li>
+                                    <li>
+                                        <a class="SourceLink" target="_blank" 
+                                           href="examples/rbcpsample/src/rbcp/PropertiesResourceBundleControlProvider.java" 
+                                           onclick="showCode('../../displayCode.html',
+                                                           'examples/rbcpsample/src/rbcp/PropertiesResourceBundleControlProvider.java');
+                                                   return false;">
+                                            <code>PropertiesResourceBundleControlProvider.java</code></a>
+                                    </li>
+                                    <li>
+                                        <a class="SourceLink" target="_blank" 
+                                           href="examples/rbcpsample/src/rbcp/XMLResourceBundleControl.java" 
+                                           onclick="showCode('../../displayCode.html',
+                                                           'examples/rbcpsample/src/rbcp/XMLResourceBundleControl.java');
+                                                   return false;">
+                                            <code>XMLResourceBundleControl.java</code></a>
+                                    </li>
+                                    <li>
+                                        <a class="SourceLink" target="_blank" 
+                                           href="examples/rbcpsample/src/rbcp/XMLResourceBundleControlProvider.java" 
+                                           onclick="showCode('../../displayCode.html',
+                                                           'examples/rbcpsample/src/rbcp/XMLResourceBundleControlProvider.java');
+                                                   return false;">
+                                            <code>XMLResourceBundleControlProvider.java</code></a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <code>resources</code>
+                                <ul>
+                                    <li>
+                                        <a class="SourceLink" target="_blank" 
+                                           href="examples/rbcpsample/src/resources/RBControl.properties" 
+                                           onclick="showCode('../../displayCode.html',
+                                                           'examples/rbcpsample/src/resources/RBControl.properties');
+                                                   return false;">
+                                            <code>RBControl.properties</code></a>
+                                    </li>
+                                    <li>
+                                        <a class="SourceLink" target="_blank" 
+                                           href="examples/rbcpsample/src/resources/RBControl_zh.properties" 
+                                           onclick="showCode('../../displayCode.html',
+                                                           'examples/rbcpsample/src/resources/RBControl_zh.properties');
+                                                   return false;">
+                                            <code>RBControl_zh.properties</code></a>
+                                    </li>
+                                    <li>
+                                        <a class="SourceLink" target="_blank" 
+                                           href="examples/rbcpsample/src/resources/RBControl_zh_CN.properties" 
+                                           onclick="showCode('../../displayCode.html',
+                                                           'examples/rbcpsample/src/resources/RBControl_zh_CN.properties');
+                                                   return false;">
+                                            <code>RBControl_zh_CN.properties</code></a>
+                                    </li>
+                                    <li>
+                                        <a class="SourceLink" target="_blank" 
+                                           href="examples/rbcpsample/src/resources/RBControl_zh_HK.properties" 
+                                           onclick="showCode('../../displayCode.html',
+                                                           'examples/rbcpsample/src/resources/RBControl_zh_HK.properties');
+                                                   return false;">
+                                            <code>RBControl_zh_HK.properties</code></a>
+                                    </li>
+                                    <li>
+                                        <a class="SourceLink" target="_blank" 
+                                           href="examples/rbcpsample/src/resources/RBControl_zh_TW.properties" 
+                                           onclick="showCode('../../displayCode.html',
+                                                           'examples/rbcpsample/src/resources/RBControl_zh_TW.properties');
+                                                   return false;">
+                                            <code>RBControl_zh_TW.properties</code></a>
+                                    </li>
+                                    <li>
+                                        <a class="SourceLink" target="_blank" 
+                                           href="examples/rbcpsample/src/resources/XmlRB.xml" 
+                                           onclick="showCode('../../displayCode.html',
+                                                           'examples/rbcpsample/src/resources/XmlRB.xml');
+                                                   return false;">
+                                            <code>XmlRB.xml</code></a>
+                                    </li>
+                                    <li>
+                                        <a class="SourceLink" target="_blank" 
+                                           href="examples/rbcpsample/src/resources/XmlRB_ja.xml" 
+                                           onclick="showCode('../../displayCode.html',
+                                                           'examples/rbcpsample/src/resources/XmlRB_ja.xml');
+                                                   return false;">
+                                            <code>XmlRB_ja.xml</code></a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <code>lib</code>
+                        <ul>
+                            <li>
+                                <a href="#package-provider"><code>rbcontrolprovider.jar</code></a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <code>build</code>: Contiene todos los ficheros empaquetados en <code>rbcontrolprovider.jar</code> como 
+                        también el fichero de clases <code>RBCPTest.class</code>
+                    </li>
+                    <li>
+                        <a class="SourceLink" target="_blank" 
+                           href="examples/rbcpsample/build.xml" 
+                           onclick="showCode('../../displayCode.html', 'examples/rbcpsample/build.xml');
+                                   return false;">
+                            <code>build.xml</code></a>  
+                    </li>
+                </ul>
+                <p>
+                    Los pasos siguientes le muestran como recrear los contenidos del fichero <code>RBCPTest.zip</code>, cómo 
+                    funciona el ejemplo <code>RBCPTest</code>, y cómo ejecutarlo:
+                </p>
+                <ol>
+                    <li>
+                        <a href="#create-implementations-of-resourcebundle.control">Crear implementaciones de la clase 
+                            ResourceBundle.Control.</a>
+                    </li>
+                    <li>
+                        <a href="#implement-resourcebundlecontrolprovider">Implementar la interfaz 
+                            ResourceBundleControlProvider.</a>
+                    </li>
+                    <li>
+                        <a href="#invoke-resourcebundle.getbundle">En su aplicación, invocar el método ResourceBundle.getBundle.</a>
+                    </li>
+                    <li>
+                        <a href="#register-service-provider">Registrar el proveedor de servicio creando un fichero de 
+                            configuración.</a>
+                    </li>
+                    <li>
+                        <a href="#package-provider">Empaquetar el proveedor, sus clases requeridas, y el fichero de configuración 
+                            en un fichero JAR.</a>
+                    </li>
+                    <li>
+                        <a href="#run-rbcptest">Ejecutar el programa RBCPTest.</a>
+                    </li>
+                </ol>
+                <h2>
+                    <a id="create-implementations-of-resourcebundle.control">1. Crear implementaciones de la clase 
+                        ResourceBundle.Control.</a>
+                </h2>
+                <p>
+                    El ejemplo 
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/rbcpsample/src/RBCPTest.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/rbcpsample/src/RBCPTest.java');return false;">
+                        <code>RBCPTest.java</code></a> usa dos implementaciones de <code>ResourseBundle.Control</code>:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <a class="SourceLink" target="_blank" 
+                               href="examples/rbcpsample/src/rbcp/PropertiesResourceBundleControlProvider.java" 
+                               onclick="showCode('../../displayCode.html',
+                                               'examples/rbcpsample/src/rbcp/PropertiesResourceBundleControlProvider.java');
+                                       return false;">
+                                <code>PropertiesResourceBundleControlProvider.java</code></a>: Esta es la misma implementación de 
+                            <code>ResourceBundle.Control</code> que está definida en 
+                            <a class="TutorialLink" target="_top" 
+                               href="../resbundle/control.html">Personalizando la Carga de un Resource Bundle</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <a class="SourceLink" target="_blank" 
+                               href="examples/rbcpsample/src/rbcp/XMLResourceBundleControl.java" 
+                               onclick="showCode('../../displayCode.html',
+                                               'examples/rbcpsample/src/rbcp/XMLResourceBundleControl.java');
+                                       return false;">
+                                <code>XMLResourceBundleControl.java</code></a>: Esta implementación de 
+                            <code>ResourceBundle.Control</code> carga paquetes basados en XML con el método 
+                            <a class="APILink" target="_blank" 
+                               href="https://docs.oracle.com/javase/8/docs/api/java/util/Properties.html#loadFromXML-java.io.InputStream-">
+                                <code>Properties.loadFromXML</code></a>.
+                        </p>
+                    </li>
+                </ul>
+                <h3>
+                    Ficheros de Propiedades XML
+                </h3>
+                <p>
+                    Como se describió en la sección 
+                    <a class="TutorialLink" target="_top" 
+                       href="../resbundle/propfile.html">Respaldando un ResourceBundle con Ficheros de Propiedades</a>, los 
+                    ficheros de propiedades son simples ficheros de texto. Contienen un par clave-valor en cada línea. Los 
+                    ficheros de propiedad XML son simplemente como los ficheros de propiedades: contienen pares clave-valor 
+                    excepto que tienen una estructura XML. Lo siguiente es el fichero de propiedades XML <code>XmlRB.xml</code>:
+                </p>
+                <pre class="codeblock">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+
+&lt;!DOCTYPE properties [
+&lt;!ELEMENT properties ( comment?, entry* ) &gt;
+&lt;!ATTLIST properties version CDATA #FIXED "1.0"&gt;
+&lt;!ELEMENT comment (#PCDATA) &gt;
+&lt;!ELEMENT entry (#PCDATA) &gt;
+&lt;!ATTLIST entry key CDATA #REQUIRED&gt;
+]&gt;
+
+&lt;properties&gt;
+    &lt;comment&gt;Test data for RBCPTest.java&lt;/comment&gt;
+    &lt;entry key="type"&gt;XML&lt;/entry&gt;
+&lt;/properties&gt;
+                </pre>
+                <p>
+                    Lo siguiente es el fichero de propiedades de texto equivalente:
+                </p>
+                <pre class="codeblock">
+# Test data for RBCPTest.java
+type = XML
+                </pre>
+                <p>
+                    Todos los archivos de texto de propiedades XML tienen la misma estructura:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Una declaración DOCTYPE que especifica la Definición de Tipo de Documento (DTD): El DTD define la 
+                            estructura de un fichero XML. <strong>Nota</strong>: Puede utilizar la siguiente declaración DOCTYPE en 
+                            su lugar en un archivo de propiedades XML:
+                        </p>
+                        <pre class="codeblock">
+&lt;!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd"&gt;  
+                        </pre>
+                        <p>
+                            La URI de sistema (<code>http://java.sun.com/dtd/properties.dtd</code>) no es accedida cuando se 
+                            exportan o importan propiedades; es una cadena que identifica de forma exclusiva la DTD de los archivos 
+                            de propiedades XML.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Elemento Raíz <code>&lt;properties&gt;</code>: Este elemento contiene a todos los otros elementos.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Cualquier número de elementos <code>&lt;comment&gt;</code>: Son usados para comentarios.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Cualquier número de elementos <code>&lt;entry&gt;</code>: Use el atributo <code>key</code> para 
+                            especificar la clave; especifique el valor de la clave entre las etiquetas <code>&lt;entry&gt;</code>.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Vea la clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Properties.html"><code>Properties</code></a> para 
+                    más información sobre los ficheros de propiedades XML.
+                </p>
+                <h2>
+                    <a id="implement-resourcebundlecontrolprovider">2. Implementar la interfaz ResourceBundleControlProvider.</a>
+                </h2>
+                <p>
+                    Esta interfaz contiene un método, el método 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/spi/ResourceBundleControlProvider.html#getControl-java.lang.String-">
+                        <code>ResourceBundle.Control getControl(String baseName)</code></a>. El parámetro <code>baseName</code> es 
+                    el nombre del paquete de recursos. En la definición del método de <code>getBundle</code>, especifica la 
+                    instancia de <code>ResourceBundle.Control</code> que sería devuelta dado el nombre del paquete de recursos.
+                </p>
+                <p>
+                    El ejemplo <code>RBCPTest</code> contiene dos implementaciones de la interfaz 
+                    <code>ResourceBundleControlProvider</code>,
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/rbcpsample/src/rbcp/PropertiesResourceBundleControlProvider.java" 
+                       onclick="showCode('../../displayCode.html',
+                                       'examples/rbcpsample/src/rbcp/PropertiesResourceBundleControlProvider.java');
+                               return false;">
+                        <code>PropertiesResourceBundleControlProvider.java</code></a> y 
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/rbcpsample/src/rbcp/XMLResourceBundleControlProvider.java" 
+                       onclick="showCode('../../displayCode.html',
+                                       'examples/rbcpsample/src/rbcp/XMLResourceBundleControlProvider.java');
+                               return false;">
+                        <code>XMLResourceBundleControlProvider.java</code></a>. El método 
+                    <code>PropertiesResourceBundleControlProvider.getBundle</code> devuelve una instancia de 
+                    <code>PropertiesResourceBundleControl</code> si el nombre base del paquete de recursos empieza con 
+                    <code>resources.RBControl</code> (en este ejemplo, todos los ficheros de recursos están contenidos en el 
+                    paquete <code>resources</code>):
+                </p>
+                <pre class="codeblock">
+
+
+package rbcp;
+
+import java.util.ResourceBundle;
+import java.util.spi.ResourceBundleControlProvider;
+
+public class PropertiesResourceBundleControlProvider
+    implements ResourceBundleControlProvider {
+    static final ResourceBundle.Control PROPERTIESCONTROL =
+        new PropertiesResourceBundleControl();
+
+    public ResourceBundle.Control getControl(String baseName) {
+        System.out.println(&quot;Class: &quot; + getClass().getName() + &quot;.getControl&quot;);
+        System.out.println(&quot;    called for &quot; + baseName);
+
+        // Throws a NPE if baseName is null.
+        if (baseName.startsWith(&quot;resources.RBControl&quot;)) {
+            System.out.println(&quot;    returns &quot; + PROPERTIESCONTROL);
+            return PROPERTIESCONTROL;
+        }
+        System.out.println(&quot;    returns null&quot;);
+        System.out.println();
+        return null;
+    }
+}
+                </pre>
+                <p>
+                    De forma similar, el método <code>XMLResourceBundleControlProvider.getControl</code> devuelve una instancia de 
+                    <code>XMLResourceBundleControl</code> si el nombre base del paquete de recursos empieza con 
+                    <code>resources.Xml</code>.
+                </p>
+                <p>
+                    <strong>Nota</strong>: Puede crear una implementación de la interfaz <code>ResourceBundleControlProvider</code> 
+                    que devuelva o una instancia de <code>PropertiesResourceBundleControl</code> o de 
+                    <code>XMLResourceBundleControl</code> dependiendo del nombre base.
+                </p>
+                <h2>
+                    <a id="invoke-resourcebundle.getbundle">3. En su aplicación, invocar el método ResourceBundle.getBundle.</a>
+                </h2>
+                <p>
+                    La clase <code>RBCPTest</code> recupera paquetes de recursos con el método 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/ResourceBundle.html#getBundle-java.lang.String-java.util.Locale-">
+                        <code>ResourceBundle.getBundle</code></a>:
+                </p>
+                <pre class="codeblock">
+
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+public class RBCPTest {
+    public static void main(String[] args) {
+        ResourceBundle rb = ResourceBundle.getBundle(
+            &quot;resources.XmlRB&quot;, Locale.ROOT);
+        String type = rb.getString(&quot;type&quot;);
+        System.out.println(&quot;Root locale. Key, type: &quot; + type);
+        System.out.println();
+
+        rb = ResourceBundle.getBundle(&quot;resources.XmlRB&quot;, Locale.JAPAN);
+        type = rb.getString(&quot;type&quot;);
+        System.out.println(&quot;Japan locale. Key, type: &quot; + type);
+        System.out.println();
+
+        test(Locale.CHINA);
+        test(new Locale(&quot;zh&quot;, &quot;HK&quot;));
+        test(Locale.TAIWAN);
+        test(Locale.CANADA);
+    }
+
+    private static void test(Locale locale) {
+        ResourceBundle rb = ResourceBundle.getBundle(
+            &quot;resources.RBControl&quot;, locale);
+        System.out.println(&quot;locale: &quot; + locale);
+        System.out.println(&quot;    region: &quot; + rb.getString(&quot;region&quot;));
+        System.out.println(&quot;    language: &quot; + rb.getString(&quot;language&quot;));
+        System.out.println();
+    }
+}
+                </pre>
+                <p>
+                    Note que no aparecen implementaciones de <code>ResourceBundle.Control</code> o 
+                    <code>ResourceBundleControlProvider</code> en esta clase. Ya que la interfaz de 
+                    <code>ResourceBundleControlProvider</code> usa el Mecanismo de Extensión de Java, el entorno de ejecución 
+                    busca y carga estas implementaciones. Sin embargo, las implementaciones de 
+                    <code>ResourceBundleControlProvider</code> y otros proveedores de servicios que son instalados con el Mecanismo 
+                    de Extensión de Java se cargan usando la clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/ServiceLoader.html"><code>ServiceLoader</code></a> 
+                    . Usar esta clase significa que tiene que registrar el proveedor de servicio con un fichero de configuración, 
+                    el cual se describe en el paso siguiente.
+                </p>
+                <h2>
+                    <a id="register-service-provider">4. Registrar el proveedor de servicio creando un fichero de configuración.</a>
+                </h2>
+                <p>
+                    El nombre del fichero de configuración es el nombre completamente cualificado de la interfaz o clase que el 
+                    proveedor implementa. El fichero de configuración contien el nombre de clase completamente cualificado de su 
+                    proveedor. El fichero 
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/rbcpsample/src/java.util.spi.ResourceBundleControlProvider" 
+                       onclick="showCode('../../displayCode.html',
+                                       'examples/rbcpsample/src/java.util.spi.ResourceBundleControlProvider');
+                               return false;">
+                        <code>java.util.spi.ResourceBundleControlProvider</code></a> contiene los nombres completamente 
+                    cualificados de <code>PropertiesResourceBundleControlProvider</code> y 
+                    <code>XMLResourceBundleControlProvider</code>,  un nombre por línea:
+                </p>
+                <pre class="codeblock">
+rbcp.XMLResourceBundleControlProvider
+rbcp.PropertiesResourceBundleControlProvider
+                </pre>
+                <h2>
+                    <a id="package-provider">5. Empaquetar el proveedor, sus clases requeridas, y el fichero de configuración 
+                        en un fichero JAR.</a>
+                </h2>
+                <p>
+                    Compile los ficheros fuente. Desde el directorio que contiene el fichero <code>build.xml</code>, ejecute el 
+                    comando siguiente:
+                </p>
+                <pre class="codeblock">javac -d build src/java.* src/rbcp/*.java</pre>
+                <p>
+                    Este comando compilará los ficheros fuente contenidos en el directorio <code>src</code> y coloca los ficheros 
+                    de clases en el directorio <code>build</code>. En Windows, asegurese de que usa la barra invertida 
+                    (<code>\</code>) para separar directorios y nombres de ficheros.
+                </p>
+                <p>
+                    Cree un fichero JAR que contenga los ficheros de clases compilados, los ficheros de recursos, y el fichero de 
+                    configuración en la estructura de directorios siguientes:
+                </p>
+                <ul>
+                    <li><code>META-INF</code>
+                        <ul>
+                            <li><code>services</code>
+                                <ul>
+                                    <li><code>java.util.spi.ResourceBundleControlProvider</code></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><code>rbcp</code>
+                        <ul>
+                            <li><code>PropertiesResourceBundleControl.class</code></li>
+                            <li><code>PropertiesResourceBundleControlProvider.class</code></li>
+                            <li><code>XMLResourceBundleControl.class</code></li>
+                            <li><code>XMLResourceBundleControlProvider.class</code></li>
+                        </ul>
+                    </li>
+                    <li><code>resources</code>
+                        <ul>
+                            <li><code>RBControl.properties</code></li>
+                            <li><code>RBControl_zh.properties</code></li>
+                            <li><code>RBControl_zh_CN.properties</code></li>
+                            <li><code>RBControl_zh_HK.properties</code></li>
+                            <li><code>RBControl_zh_TW.properties</code></li>
+                            <li><code>XmlRB.xml</code></li>
+                            <li><code>XmlRB_ja.xml</code></li>
+                        </ul>
+                    </li>
+                </ul>
+                <p>
+                    Note que el fichero de configuración <code>java.util.spi.ResourceBundleControlProvider</code> debe ser 
+                    empaquetado en el directorio <code>/META-INF/services</code>. Este ejemplo empaqueta estos ficheros en el 
+                    fichero JAR <code>rbcontrolprovider.jar</code> en el directorio <code>lib</code>.
+                </p>
+                <p>
+                    Vea 
+                    <a class="TutorialLink" target="_top" 
+                       href="../../deployment/jar/index.html">Empaquetando Programas en Ficheros JAR</a> para más información sobre 
+                    la creación de ficheros JAR.
+                </p>
+                <p>
+                    Alternativamente, descargue e instale <a href="http://ant.apache.org/">Apache Ant</a>, el cual es una 
+                    herramienta que le habilita a automatizar los procesos de construcción, tales como la compilación de ficheros 
+                    Java y la creación de ficheros JAR. Asegurese de que el fichero ejecutable de Apache Ant está en su variable 
+                    de entorno <code>PATH</code> de forma que pueda ejecutarlo desde cualquier directorio. Una vez ha instalado 
+                    Apache Ant, siga estos pasos:
+                </p>
+                <ol>
+                    <li>
+                        <p>
+                            Edite el fichero 
+                            <a class="SourceLink" target="_blank" href="examples/rbcpsample/build.xml" 
+                               onclick="showCode('../../displayCode.html', 'examples/rbcpsample/build.xml'); return false;">
+                                <code>build.xml</code></a> y cambie <code>${JAVAC}</code> al nombre de la ruta completa de su 
+                            compilador de Java , <code>javac</code>, y <code>${JAVA}</code> al nombre de la ruta completa 
+                            de su ejecutable Java de tiempo de ejecución, <code>java</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Ejecute el comando siguiente desde el mismo directorio que contiene el fichero <code>build.xml</code>:
+                        </p>
+                        <pre class="codeblock">ant jar</pre>
+                        <p>
+                            Este comando compila los ficheros fuentes de Java y los empaqueta, junto con los ficheros de recursos 
+                            y configuraicón requeridos, en el fichero JAR <code>rbcontrolprovider.jar</code> en el directorio 
+                            <code>lib</code>.
+                        </p>
+                    </li>
+                </ol>
+                <h2>
+                    <a id="run-rbcptest">6. Ejecutar el programa RBCPTest.</a>
+                </h2>
+                <p>
+                    En el prompt de comandos, ejecute el comando siguiente desde el directorio que contiene el fichero 
+                    <code>build.xml</code>:
+                </p>
+                <pre class="codeblock">java -Djava.ext.dirs=lib -cp build RBCPTest</pre>
+                <p>
+                    Este comando asume lo siguiente:
+                </p>
+                <ul>
+                    <li>
+                        El fichero JAR que contiene el código compilado del ejemplo RBCPTest está en el directorio <code>lib</code>.
+                    </li>
+                    <li>
+                        La clase compilada, <code>RBCPTest.class</code>, está en el directorio <code>build</code>.
+                    </li>
+                </ul>
+                <p>
+                    Alternativamente, use Apache Ant y ejecute el comando siguiente desde el directorio que contiene el fichero 
+                    <code>build.xml</code>:
+                </p>
+                <pre class="codeblock">ant run</pre>
+                <p>
+                    Cuand instala una extensión de Java, habitualmente coloca el fichero JAR de la extensión en el directorio 
+                    <code>lib/ext</code>  de su EEJ. Sin embargo, este comando especifica el directorio que contiene las 
+                    extensiones de Java con la propiedad del sistema <code>java.ext.dirs</code>.
+                </p>
+                <p>
+                    El programa <code>RBCPTest</code> intenta primero recuperar los paquetes de recursos con el nombre base 
+                    <code>resources.XmlRB</code> y las configuraciones regionales <code>Locale.ROOT</code> y 
+                    <code>Local.JAPAN</code>. La salida del programa recuperando estos paquetes de recursos es similar a la 
+                    siguiente:
+                </p>
+                <pre class="codeblock">
+Class: rbcp.XMLResourceBundleControlProvider.getControl
+    called for resources.XmlRB
+    returns rbcp.XMLResourceBundleControl@16c1857
+Root locale. Key, type: XML
+
+Class: rbcp.XMLResourceBundleControlProvider.getControl
+    called for resources.XmlRB
+    returns rbcp.XMLResourceBundleControl@16c1857
+Japan locale. Key, type: Value from Japan locale
+                </pre>
+                <p>
+                    El programa obtiene de forma exitosa una instancia de <code>XMLResourceBundleControl</code> y accede a los 
+                    ficheros de propiedades <code>XmlRB.xml</code> y <code>XmlRB_ja.xml</code>.
+                </p>
+                <p>
+                    Cuando el programa <code>RBCPTest</code> intenta recuperar un paquete de recursos, llama a todas las clases 
+                    definidas en el fichero de configuración <code>java.util.spi.ResourceBundleControlProvider</code>. Por ejemplo, 
+                    cuando el programa recupera el paquete de recursos con el nombre base <code>resources.RBControl</code> y la 
+                    configuración regional <code>Locale.CHINA</code>, imprime la salida siguiente:
+                </p>
+                <pre class="codeblock">
+Class: rbcp.XMLResourceBundleControlProvider.getControl
+    called for resources.RBControl
+    returns null
+
+Class: rbcp.PropertiesResourceBundleControlProvider.getControl
+    called for resources.RBControl
+    returns rbcp.PropertiesResourceBundleControl@1ad2911
+locale: zh_CN
+    region: China
+    language: Simplified Chinese
+                </pre>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../end.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Proveedores de Servicio para Internacionalización<br />
+            <b>Página siguiente:</b> Final de la Lección
+        </div>
+    </body>
+</html> 

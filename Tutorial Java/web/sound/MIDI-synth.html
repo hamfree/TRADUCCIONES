@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Sintetizando Sonido (Los Tutoriales de Java&trade; &gt; Sonido)
+        </title>
+        <meta name="description" content="" />
+        <meta name="keywords" content="java programming, learn java, java sample code, " />
+        <link rel="stylesheet" href="../indice.css" type="text/css"/>
+        <script src="../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkAHEAD"><a href="sampled-overview.html">Descripción del Paquete Sampled</a></div>
+                <div class="linkAHEAD"><a href="accessing.html">Accediendo a los Recursos del Sistema de Audio</a></div>
+                <div class="linkAHEAD"><a href="playing.html">Reproducción de Audio</a></div>
+                <div class="linkAHEAD"><a href="capturing.html">Grabando Audio</a></div>
+                <div class="linkAHEAD"><a href="controls.html">Procesando Audio con Controles</a></div>
+                <div class="linkAHEAD"><a href="converters.html">Usando Ficheros y Convertidores de Formato</a></div>
+                <div class="linkAHEAD"><a href="overview-MIDI.html">Descripción del Paquete MIDI</a></div>
+                <div class="linkAHEAD"><a href="accessing-MIDI.html">Accediendo a los Recursos del Sistema MIDI</a></div>
+                <div class="linkAHEAD"><a href="MIDI-messages.html">Transmitiendo y Recibiendo Mensajes MIDI</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-intro.html">Introducción a los Secuenciadores</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-methods.html">Utilizando Métodos del Secuenciador</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-adv.html">Usando Características Avanzadas del Secuenciador</a></div>
+                <div class="nolinkAHEAD">Sintetizando Sonido</div>
+                <div class="linkAHEAD"><a href="SPI-intro.html">Introducción a los Interfaces de los Proveedores de Servicio</a></div>
+                <div class="linkAHEAD"><a href="SPI-providing-sampled.html">Proporcionando Servicios de Audio Sampleado</a></div>
+                <div class="linkAHEAD"><a href="SPI-providing-MIDI.html">Proporcionando Servicios MIDI</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Sonido
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="./index.html" target="_top">Sonido</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="MIDI-seq-adv.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="SPI-intro.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Sintetizando Sonido</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    La mayoría de los programas que utilizan el paquete MIDI de IPA de Sonido de Java lo hacen para sintetizar 
+                    sonido. Todo el aparato de archivos, eventos, secuencias y secuenciadores MIDI, que se describió anteriormente, 
+                    casi siempre tiene el objetivo de enviar eventualmente datos musicales a un sintetizador para convertirlos en 
+                    audio. (Las posibles excepciones incluyen programas que convierten MIDI en notación musical que puede ser leída 
+                    pro un músico, y programas que envían mensajes a dispositivos externos controlados por MIDI tales como mesas de 
+                    mezclas).
+                </p>
+                <p>
+                    La interfaz <code>Synthesizer</code> es por lo tanto fundamental para el paquete MIDI. Esta página muestra cómo 
+                    manipular un sintetizador para reproducir sonido. Muchos programas simplemente usarán un secuenciador para 
+                    enviar los datos de un archivo MIDI al sintetizador, y no necesitarán invocar muchos métodos de 
+                    <code>Synthesizer</code> directamente. Sin embargo, es posible controlar un sintetizador directamente, sin usar 
+                    secuenciadores o incluso objetos <code>MidiMessage</code>, como se explica cerca del final de esta página.
+                </p>
+                <p>
+                    La arquitectura de síntesis puede parecer compleja para los lectores que no están familiarizados con MIDI. Su 
+                    IPA incluye tres interfaces:
+                </p>
+                <ul>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/sound/midi/Synthesizer.html">
+                            <code>Synthesizer</code></a>
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/sound/midi/MidiChannel.html">
+                            <code>MidiChannel</code></a>
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/sound/midi/Soundbank.html">
+                            <code>Soundbank</code></a>
+                    </li>
+                </ul>
+                <p>
+                    Y cuatro clases:
+                </p>
+                <ul>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/sound/midi/Instrument.html">
+                            <code>Instrument</code></a>
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/sound/midi/Patch.html">
+                            <code>Patch</code></a>
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/sound/midi/SoundbankResource.html">
+                            <code>SoundbankResource</code></a>
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/sound/midi/VoiceStatus.html">
+                            <code>VoiceStatus</code></a>
+                    </li>
+                </ul>
+                <p>
+                    Como orientación para todo este IPA, la siguiente sección explica algunos de los conceptos básicos de la 
+                    síntesis MIDI y cómo se reflejan en el IPA de Sonido de Java.
+                </p>
+                <p></p>
+                <h2>
+                    Entender la Síntesis MIDI
+                </h2>
+                <p>
+                    ¿Cómo genera sonido un sintetizador? Dependiendo de su implementación, puede usar una o más técnias de síntesis 
+                    de sonido. Por ejemplo, muchos sintetizadores utilizan síntesis de tablas de ondas. Un sintetizador de tabla 
+                    de ondas lee trozos de audio almacenados de memoria, tocándolos a diferentes frecuencias de muestreo y 
+                    repitiéndolos para crear notas de diferentes tonos y duraciones. Por ejemplo, para sintetizar el sonido de un 
+                    saxofono tocando la nota C#4 (nota MIDI número 61), el sintentizador puede acceder a un fragmento muy corto de 
+                    la grabación de un saxofón tocando la nota Midle C (nota MIDI número 60), y luego recorre repetidamente este 
+                    fragmento a una frecuencia de muestreo ligeramente más rápida de la que se grabó, lo que crea una nota larga de 
+                    un tono ligeramente más alto. Otros sintetizadors usan técnicas tales como la modulación de frecuencia (FM), 
+                    síntesis aditiva, o modelado físico, que no hace uso de audio almacenado sino que en su lugar genera el audio 
+                    desde cero usando diferentes algoritmos.
+                </p>
+                <p></p>
+                <h3>
+                    Instrumentos
+                </h3>
+                <p>
+                    Lo que todos las técnicas de síntesis tienen en común es la habilidad de crear muchs clases de sonidos. 
+                    Diferentes algoritmos, o diferenes configuraciones de parámetros con el mismo algoritmo, crean resultados 
+                    que suenan diferentes. Un <em>instrumento</em> es una especificación para sintetizar un cierto tipo de sonido. 
+                    Ese sonido puede emular un instrumento musical tradicoinal, tal como un piano o un violín; puede emular alguna 
+                    otra clase de fuente de sonido, por ejemplo, un teléfono o helicóptero; o puede que no emule ningún sonido del 
+                    "mundo real". Una especificación llamada MIDI General define una lista estándar de 128 instrumentos, pero la 
+                    mayoría de los sintetizadores también admiten otros instrumentos. Muchos sintetizadores proporcionan una 
+                    colección de instrumentos integrados que están siempre disponibles para su uso; algunos sintetizadors tambíen 
+                    soportan mecanismos para cargar instrumentos adicionales.
+                </p>
+                <p>
+                    Un instrumento puede ser específico del proveedor &mdash; en otras palabras, aplicable a un solo sintetizador 
+                    o varios modelos del mismo vendedor. Esta incompatibilidad se produce cuando dos sintetizadores diferentes 
+                    utilizan diferentes técnicas de síntesis de sonido, o diferentes algoritmos y parámetros internos, incluso si la 
+                    técnica fundamental es la misma. Ya que los detalles de la técnica de síntesis es a menudo propietaria, la 
+                    incompatibilidad es común. La IPA de Sonido de Java incluye formas de detectcar si un sintetizador dado admite 
+                    un instrumento determinado.
+                </p>
+                <p>
+                    Por lo general, un instrumento puede considerarse un preajuste; no tiene que saber nada sobre los detalles de 
+                    la técnica de síntesis que produce su sonido. Sin embargo, puede aún variar aspectos de su sonido. Cada mensaje 
+                    Note On especifica el tono y volumen de una nota individual. Puede también alterar el sonido a través de otros 
+                    comandos MIDI tales como los mensajes de controlador o mensajes exclusivos de sistema.
+                </p>
+                <p></p>
+                <h3>
+                    Canales
+                </h3>
+                <p>
+                    Muchos sintetizadores son <em>multitímbricos</em> (algunos veces llamados <em>politímbricos</em>), lo que 
+                    significa que pueden reproducir las notas de diferentes instrumnetos simultáneamente. (<em>Timbre</em> es la 
+                    calidad de sonido característica que permite al oyente distinguir un tipo de instrumento musical de otros 
+                    tipos). Los sintetizadores multitímbricos pueden permiter a un escuchante distinguir una clase de instrumento 
+                    musical de otras clases). Los sintetizadores multitímbricos pueden emular un conjunto entero de instrumentos 
+                    del mundo real, en vez de solo un instrumento a la vez. Los sintetizadores MIDI normalmente implementan esta 
+                    característica aprovechándose de los diferentes canales MIDI en los cuales la especificación MIDI permite que 
+                    los datos se transmitan. En este caso, el sintetizador es en realidad una colección de unidades de generacón 
+                    de sonido, cada una emulando un instrumento diferente y respondiendo independientemente a los mensajes que se 
+                    reciben en los diferentes canales MIDI. Ya que la especificación MIDI proporciona solo 16 canales, un 
+                    sintetizador MIDI típico puede reproducir hasta 16 instrumentos diferentes a la vez. El sintetizador recibe 
+                    un flujo de comandos MIDI, muchos de los cuales son comandos de canal. (Los comandos de canal se destinan a un 
+                    canal MIDI particular; para más información, vea la especificación MIDI). Si el sintetizador es multitímbrico, 
+                    redirige cada comando de canal a la unidad de generación de sonido correcta, de acuerdo al número de canal 
+                    indicado en el comando.
+                </p>
+                <p>
+                    En la IPA de Sonido de Java, estas unidades de generación de sonido son instancias de clases que implementan la 
+                    interfaz <code>MidiChannel</code>. Un objeto <code>synthesizer</code> que tiene al menos un objeto 
+                    <code>MidiChannel</code>. Si el sintetizador es multitímbrico, tiene más de uno, normalmente 16. Cada 
+                    <code>MidiChannel</code> representa una unidad de generación de sonido independiente.
+                </p>
+                <p>
+                    Debido a que los objetos <code>MidiChannel</code> de un sintetizador son más o menos independientes, la 
+                    asignación de instrumentos a los canales no tiene por qué ser única. Por ejemplo, los 16 canales podrían estar 
+                    tocando un timbre de piano, como si hubiera un conjunto de 16 panos. Cualquier agrupación es posible &mdash; 
+                    por ejemplo, los canales 1, 5 y 8 podrían esar tocando sonidos de guitarras, mientas los canales 2 y 3 tocan la 
+                    percursión y el canal 12 tiene un timbre de bajo. El instrumento que está siendo reproducido en un canal MIDI 
+                    dado puede ser cambiado dinámicamente; esto se conoce como un <em>cambio de programa</em>.
+                </p>
+                <p>
+                    Aunque la mayoría de los sintetizadores permiten que solo 16 o menos instrumentos estén activos en un momento 
+                    dado, estos instrumentos generalmente pueden elegirse de una selección mucho mayor y asignarse a canales 
+                    particulares según sea necesario.
+                </p>
+                <p></p>
+                <h3>
+                    Bancos de Sonidos y Parches
+                </h3>
+                <p>
+                    Los instrumentos se organizan jerárquicamente en un sintetizador, por número de banco y número de programa. Los 
+                    bancos y programas se pueden considerar como filas y columnas en una tabla bidimensional de instrumentos. Un 
+                    banco es una colección de programas. La especificación MIDI permite hasta 128 programas en un banco, y hasta 
+                    128 bancos. Sin embargo, un sintetizador particular podría admitir un solo banco, o unos pocos bancos, y podría 
+                    admitir menos de 128 programas por banco.
+                </p>
+                <p>
+                    En la IPA de Sonido de Java, hay un nivel más alto en la jerarquía: un banco de sonido. Los bancos de sonido 
+                    pueden contener hasta 128 bancos, cada uno conteniendo hasta 128 instrumentos. Algunos sintetizadores pueden 
+                    cargar un banco de sonido entero en memoria.
+                </p>
+                <p>
+                    Para seleccionar un instrumento del banco de sonido actual, especifique un número de banco y un número de 
+                    programa. La especificación MIDI logra con dos comandos MIDI: selección de banco y cambio de progrmaa. En la 
+                    IPA de Sonido de Java, la combinación de un número de banco y un número de programa se encapsula en un objeto 
+                    <code>Patch</code>. Usted cambia el canal MIDI del instrumento actual especificando un patch nuevo. El patch 
+                    puede ser considerado el índice de bidimensional de los instrumentos en el banco de sonidos actual.
+                </p>
+                <p>
+                    Podría estar preguntándose si los bancos de sonido, también, están indexados numéricamente. La respuesta es no;
+                    la especificación MIDI no lo prevé. En la IPA de Sonido de Java, un objeto <code>Soundbank</code> se puede 
+                    obtener leyendo un archivo de banco de sonidos. Si el banco de sonido es admitido por el sintetizador, sus 
+                    instrumentos pueden ser cargados en el sintetizador individualmente como se desee, o todos de una vez. Muchos 
+                    sintetizadores tienen un banco de sonidos integrado o predeterminado; los instrumentos contenidos en este banco 
+                    de sonido están siempre disponibles para el sintetizador.
+                </p>
+                <p></p>
+                <h3>
+                    Voces
+                </h3>
+                <p>
+                    Es importante distinguir entre el número de <em>timbres</em> que un sintetizador puede reproducir 
+                    simultáneamente y el número de <em>notas</em> que puede reproducir simultáneamente. El primero se describió 
+                    anteriormente en "Canales". La habilidad de reproducir múltiples notas de una vez se denomina 
+                    <em>polifonía</em>. Incluso un sintetizador que no es multitímbrico puede generalmente reproducir más de una 
+                    nota a la vez (todos tienen el mismo timbre, pero diferentes tonos). Por ejemplo, tocar cualquier acorde, como 
+                    una tríada de sol mayor o un acorde de séptima de si menor, requiere polifonía. Cualquier sintetizador que 
+                    genera sonido en tiempo real tiene una limitación en el número de notas que puede sintetizar de una vez. En la 
+                    IPA de Sonido de Java, el sintetizador informa de esta limitación a través del método 
+                    <code>getMaxPolyphony</code>.
+                </p>
+                <p>
+                    Una <em>voz</em> es una sucesión de notas únicas, tales como una melodia que una persona puede cantar. La 
+                    polifonía consiste de múltiples voces, tales como las partes cantadas por un coro. Un sintetizador de 32 voces, 
+                    por ejemplo, puede tocar 32 notas simultáneamente. (Sin embargo, alguna literatura MIDI usa la palabra "voz" 
+                    en un sentido diferente, similar al significado de "instrumento" o "timbre").
+                </p>
+                <p>
+                    El proceso de asignar notas MIDI entrante a voces específicas se conoce como <em>asignación de voz</em>. Un 
+                    sintetizador mantiene una lista de voces, realizando un seguimiento de cuáles están activos (lo que significa 
+                    que actualmente tienen notas que suenan). Cuando una nota para de sonar, la voz se vuelve inactiva, 
+                    significando que está ahora libre de aceptar la siguiente petición note-on que el sintetizador recibe. Un flujo 
+                    entrante de comandos MIDI puede facilmente solicitar más notas simultáneas que el sintetizador es capaz de 
+                    generar. Cuando todas las voces del sintetizador están activas, ¿Cómo se debe manejar la próxima petición 
+                    Note On? Los sintetizadores pueden implementar diferentes estrategias: La nota solicitada más recientemente 
+                    puede ser ignorada; o se puede tocar interrumpiendo otra nota, como la que haya comenzado menos recientemente.
+                </p>
+                <p>
+                    Aunque la especificación MIDI no lo requiere, un sintetizador puede hacer público los contenidos de sus voces. 
+                    La IPA de Sonido de Java incluye una clase <code>VoiceStatus</code> para este propósito.
+                </p>
+                <p>
+                    Un objeto <code>VoiceStatus</code> informa del estado activo o inactivo actual de la voz, el canal MIDI, el 
+                    banco y el número de programa, el número de nota MIDI, y el volumen MIDI.
+                </p>
+                <p>
+                    Con estos antecedentes, examinemos los detalles de la IPA de Sonido de Java para síntesis.
+                </p>
+                <p></p>
+                <h2>
+                    Gestionar Instrumentos y Bancos de Sonido
+                </h2>
+                <p>
+                    En muchos casos, un programa puede hacer uso de un objeto <code>Synthesizer</code> sin invocar explícitamente 
+                    casi nada de la IPA de síntesis. Por ejemplo, suponga que está tocando un archivo MIDI estándar. Usted lo carga 
+                    en un objeto <code>Sequence</code>, el cual usted reproduce haciendo que un secuenciador envíe los datos al 
+                    sintetizador predeterminado. Los datos en la secuencia controlan el sintetizador según lo previsto, tocando 
+                    todas las notas correctas en los momentos correctos.
+                </p>
+                <p>
+                    Sin embargo, hay casos donde este escenario simple es inadecuado. La secuencia contiene la música correcta, 
+                    ¡pero los sonidos de los instrumentos son todos incorrectos! Esta lamentable situación probablemente surgió 
+                    porque el creador del archivo MIDI tenía en mente instrumentos diferentes a los que están cargados actualmente 
+                    en el sintetizador.
+                </p>
+                <p>
+                    La Especificación MIDI 1.0 proporciona los comandos bank-select (selección de banco) y program-change (cambio 
+                    de programa), que afectan a qué instrumento está actualmente tocando en cada canal MIDI. Sin embargo, la 
+                    especificación no define qué instrumento debe residir en cada ubicación de patch (banco y número de programa). 
+                    La especificación MIDI General soluciona este problema definiendo un banco conteniendo 128 programas que 
+                    corresponden a sonidos de instrumentos específicos. Un sintetizador General MIDI usa 128 instrumentos que 
+                    coinciden con este conjunto especificado. Diferentes sintetizadores General MIDI pueden sonar bastante 
+                    diferentes, incluso cuando reproducen lo que se supone va a ser el mismo instrumento. Sin embargo, un archivo 
+                    MIDI debería sonar en su mayor parte similar (aunque no sea idéntico), sin importar qué sintetizador General 
+                    MIDI lo esté reproduciendo.
+                </p>
+                <p>
+                    No obstante, no todos los creadores de archivos MIDI quieren limitarse al conjunto de 128 timbres definidos por 
+                    General MIDI. Esta sección muestra cómo cambiar los instrumentos del conjunto predeterminado que viene con el 
+                    sintetizador. (Si no hay un valor predeterminado, lo que significa que no se cargan instrumentos cuando accede
+                    al sintetizador, tendrás que usar este IPA para empezar en cualquier caso).
+                </p>
+                <p></p>
+                <h3>
+                    Aprender Qué Instrumentos Están Cargados
+                </h3>
+                <p>
+                    Para aprender si los instrumentos actualmente cargados en el sintetizador son los que usted quiere, puede 
+                    invocar este método de <code>Synthesizer</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Instrument[] getLoadedInstruments() 
+                    </pre>
+                </div>
+                <p>
+                    e iterar sobre la matriz devuelta para ver exactamente qué instrumentos son cargados actualmente. 
+                    Lo más probable es que muestre los nombres de los instrumentos en la interfaz de usuario (utilizando el método 
+                    <code>getName</code> de <code>Instrument</code>) y deje que el usuario decida si utilizar esos instrumentos o 
+                    cargar otros. El IPA de <code>Instrument</code> incluye un método que informa a qué banco de sonido pertenece el 
+                    instrumento. El nombre del banco de sonido puede ayudar a su programa o al usuario a determinar exactamente qué 
+                    es el instrumento.
+                </p>
+                <p>
+                    Este método de <code>Synthesizer</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Soundbank getDefaultSoundbank() 
+                    </pre>
+                </div>
+                <p>
+                    le devuelve el banco de sonido predeterminado. La IPA de <code>Soundbank</code> incluye métodos para recuperar 
+                    el nombre, el proveedor y el número de versión del banco de sonidos, mediante los cuales el programa o el 
+                    usuario pueden verificar la identidad del banco. Sin embargo, cuando obtiene un sintetizador por primera vez, 
+                    no puede asumir que los instrumentos del banco de sonido predeterminado se han cargado en el sintetizador. Por 
+                    ejemplo, un sintetizador puede tener una gran variedad de instrumentos integrados disponibles para su uso, pero 
+                    debido a su memoria limitada, es posible que no los cargue automáticamente.
+                </p>
+                <h3>
+                    Cargar Diferentes Instrumentos
+                </h3>
+                <p>
+                    El usuario puede decidir cargar instrumentos que son diferentes de los actuales (o puede tomar esa decisión 
+                    mediante programación). El método siguiente le indica qué instrumentos vienen con el sintetizador (en lugar de 
+                    tener que cargarlos desde archivos del banco de sonido):
+                </p>
+                <div class="codeblock">
+                    <pre>
+Instrument[] getAvailableInstruments()
+                    </pre>
+                </div>
+                <p>
+                    Puede cargar cualquiera de estos instrumentos invocando:
+                </p>
+                <div class="codeblock">
+                    <pre>
+boolean loadInstrument(Instrument instrument) 
+                    </pre>
+                </div>
+                <p>
+                    El instrumento se carga en el sintetizador en la ubicación especificada por el objeto <code>Patch</code> del 
+                    instrumento (que puede ser recuperado usando el método <code>getPatch</code> de <code>Instrument</code>).
+                </p>
+                <p>
+                    Para cargar instrumentos desde otros bancos de sonidos, invoque primero el método 
+                    <code>isSupportedSoundbank</code> de <code>Synthesizer</code> para asegurarse que el banco de sonido es 
+                    compatible con este sintetizador (si no lo es, puede iterar sobre los sintetizadores del sistema para intentar 
+                    encontrar uno que admita el banco de sonido). Puede después invocar uno de estos métodos para cargar 
+                    instrumentos desde el banco de sonido:
+                </p>
+                <div class="codeblock">
+                    <pre>
+boolean loadAllInstruments(Soundbank soundbank) 
+boolean loadInstruments(Soundbank soundbank, 
+  Patch[] patchList) 
+                    </pre>
+                </div>
+                <p>
+                    Como los nombres sugieren, el prmiero de estos carga el conjunto entero de instrumentos desde un banco de 
+                    sonido dado, y el segundo carga los instrumentos seleccionados desde el banco de sonido. Podría también usar el 
+                    método <code>getInstruments</code> de <code>Soundbank</code> para acceder a todos los instrumentos, después 
+                    itere sobre ellos y cargue los instrumentos seleccionados de una vez usando <code>loadInstrument</code>.
+                </p>
+                <p>
+                    No es necesario que todos los instrumentos que cargue sean del mismo banco de sonido. Puede usar 
+                    <code>loadInstrument</code> o <code>loadInstruments</code> para cargar ciertos instrumentos desde un banco de 
+                    sonido, otro conjunto desde un banco de sonido diferente, y así.
+                </p>
+                <p>
+                    Cada instrumento tiene su propio objeto <code>Patch</code> que especifica la ubicación en el sintetizador donde 
+                    el instrumento debe ser cargado. La ubicación se define por un número de banco y un número de programa. No hay 
+                    una IPA para cambiar la ubicación cambiando el número de programa o banco del parche.
+                </p>
+                <p>
+                    Sin embargo, es posible cargar un instrumento en una ubicación diferente a la especificada por su parche, 
+                    usando el siguiente método de <code>Synthesizer</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+boolean remapInstrument(Instrument from, Instrument to) 
+                    </pre>
+                </div>
+                <p>
+                    Este método descarga su primer argumento del sintetizador, y coloca su segundo argumento en cualquier lugar del 
+                    parche del sintetizador que haya sido ocupado por el primer argumento.
+                </p>
+                <h3>
+                    Descargar Instrumentos
+                </h3>
+                <p>
+                    La carga de un instrumento en una ubicación de programa descarga automáticamente cualquier instrumento que ya 
+                    estuviera en esa ubicación, si lo hubiera. Puede también explícitamente descargar instrumentos sin 
+                    reemplazarlos necesariamente con unos nuevos. <code>Synthesizer</code> incluye tres métodos de descarga que 
+                    se corresponden con los tres métodos de carga. Si el sintetizador recibe un mensaje de cambio de programa que 
+                    selecciona una ubicación de programa donde actualmenteo no hay cargado ningún instrumentos, no habrá ningún 
+                    sonido del canal MIDI en el que se envió el mensaje de cambio de programa.
+                </p>
+                <p></p>
+                <h3>
+                    Acceder a los Recursos del Banco de Sonido
+                </h3>
+                <p>
+                    Algunos sintetizadores almacenan otra información además de los instrumentos en sus bancos de sonido. Por 
+                    ejemplo, un sintetizador de tabla de ondas almacena muestras de audio que uno o más instrumentos pueden 
+                    acceder. Dado que las muestras pueden ser compartidas por varios instrumentos, se almacenan en el banco de 
+                    sonido independientemente de cualquier instrumento. Tanto la interfaz <code>Soundbank</code> y la clase 
+                    <code>Instrument</code> proporcionan una llamada de método <code>getSoundbankResources</code>, que devuelve una 
+                    lista de objetos <code>SoundbankResource</code>. Los detalles de estos objetos son específicos del sintetizador 
+                    para el cual el banco de sonido se diseñó. En el caso de la síntesis de tabla de ondas, un recurso puede ser 
+                    un objeto que encapsula una serie de muestras de audio, tomada desde un trozo de una grabación de sonido. Los 
+                    sintetizadores que usan otras técnicas de síntesis pueden almacenar otras clases de objetos en la matriz 
+                    <code>SoundbankResources</code> del sintetizador.
+                </p>
+                <p></p>
+                <h2>
+                    Preguntar por las Capacidades y Estado Actual del Sintetizador 
+                </h2>
+                <p>
+                    La interfaz <code>Synthesizer</code> incluye métodos que devuelven la información sobre las capacidades del 
+                    sintetizador:
+                </p>
+                <div class="codeblock">
+                    <pre>
+    public long getLatency()
+    public int getMaxPolyphony()
+                    </pre>
+                </div>
+                <p>
+                    La latencia mide el retraso en el peor de los casos entre el momento en que se envía un mensaje MIDI al 
+                    sintetizador y el momento en que el sintetizador produce realmente el resultado correspondiente. Por ejemplo, 
+                    un sintetizador puede tardar unos milisegundos en comenzar a generar audio después de recibir un evento de nota 
+                    activada.
+                </p>
+                <p>
+                    El método <code>getMaxPolyphony</code> indica cuántas notas puede tocar el sintetizador simultáneamente, como 
+                    se describió anteriormente en <a href="#121777">Voces</a>. Como se mencionó en la misma descripción, un 
+                    sintetizador puede proporcionar información sobre sus voces. Esto se logra mediante el siguiente método:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public VoiceStatus[] getVoiceStatus()
+                    </pre>
+                </div>
+                <p>
+                    Cada <code>VoiceStatus</code> en la matriz devuelta informa del estado activo o inactivo actual de la voz, 
+                    canal MIDI, banco y número de programa, número de nota MIDI, y volumen MIDI. La longitud de la matriz debe ser 
+                    normalmente el mismo número devuelto por <code>getMaxPolyphony</code>. Si el sintetizador no está tocando, 
+                    todos sus objetos <code>VoiceStatus</code> tienen sus campos activos establecidos a <code>false</code>.
+                </p>
+                <p>
+                    Puede aprender información adicional sobre el estado actual de un sintetizador recuperando sus objetos 
+                    <code>MidiChannel</code> y consultando su estado. Esto se describe más en la sección siguiente.
+                </p>
+                <p></p>
+                <h2>
+                    Usar Canales
+                </h2>
+                <p>
+                    Algunas veces es útil o necesario acceder a los objetos <code>MidiChannel</code> del sintetizador directamente.
+                    Esta sección describe tales situaciones.
+                </p>
+                <p></p>
+                <h3>
+                    Controlar el Sintetizador sin Usar un Secuenciador
+                </h3>
+                <p>
+                    Cuando se utiliza una secuencia, como una lectura de un archivo MIDI, no es necesario que usted mismo envíe 
+                    comandos MIDI al sintetizador. En su lugar, simplemente cargue la secuencia en un secuenciador, conecte el 
+                    secuenciador al sintetizador, y déjelo correr. El secuenciador se cuida de planificar los eventos, y el 
+                    resultado es una actuación musical. Este escenario funciona bien cuando la música deseada se conoce por 
+                    adelantado, lo que es verdad cuando se lee de un archivo.
+                </p>
+                <p>
+                    En algunas situaciones, sin embargo, la música se genera al vuelo mientras se está tocando. Por ejemplo, la 
+                    interfaz de usuario puede mostrar un teclado musica o un diapasón de guitarra y permitir que el usuario toque 
+                    notas a voluntad haciendo clic con el ratón. Como otro ejemplo, una aplicación podría usar un sintetizador no 
+                    para reproducir música per se, sino para generar efectos de sonido en respuesta a las acciones del usuario. 
+                    Este escenario es típico de los juegos. Como ejemplo final, la aplicación podría estar reproduciendo música que 
+                    se lee desde un archivo, pero la interfaz de usuario permite al usuario interactuar con la música, modificándola 
+                    dinámicamente. En todos estos casos, la aplicación envía comandos directamente al sintetizador, ya que los 
+                    mensajes MIDI necesitan ser entregados inmediatamente, en lugar de ser programados para algún punto determinado 
+                    en el futuro.
+                </p>
+                <p>
+                    Hay al menos dos formas de enviar un mensaje MIDI al sintetizador sin usar un secuenciador. Lo primero es 
+                    construir un <code>MidiMessage</code> y pasarlo al sintetizador usando el método send de <code>Receiver</code>. 
+                    Por ejemplo, para producir una Middle C (número de nota MIDI 60) en el canal MIDI 5 (basado en uno) 
+                    inmediatamente, podría hacer lo siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+    ShortMessage myMsg = new ShortMessage();
+    // Reproduce la nota Middle C (60) moderadamente alto
+    // (velocidad = 93) en el canal 4 (basado en cero).
+    myMsg.setMessage(ShortMessage.NOTE_ON, 4, 60, 93); 
+    Synthesizer synth = MidiSystem.getSynthesizer();
+    Receiver synthRcvr = synth.getReceiver();
+    synthRcvr.send(myMsg, -1); // -1 significa sin marca de tiempo
+                    </pre>
+                </div>
+                <p>
+                    La segunda forma es omitir la capa de transmisión de mensajes (es decir, la IPA de <code>MidiMessage</code> y 
+                    <code>Receiver</code>) completamente, e interactuar con los objetos <code>MidiChannel</code> del sintetizador. 
+                    Primero necesita recuperar los objetos <code>MidiChannel</code> del sintetizador, usando el siguiente método  
+                    <code>Synthesizer</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public MidiChannel[] getChannels()
+                    </pre>
+                </div>
+                <p>
+                    después de lo cual puede invocar directamente los métodos <code>MidiChannel</code> deseados. Esta es una ruta 
+                    más inmediata que enviar el correspondiente <code>MidiMessages</code> al <code>Receiver</code> del 
+                    sintetizador y permitir que el sintetizador  maneja la comunicación con sus propios <code>MidiChannels</code>. 
+                    Por ejemplo, el código correspondiente al ejemplo precedente debería ser:
+                </p>
+                <div class="codeblock">
+                    <pre>
+    Synthesizer synth = MidiSystem.getSynthesizer();
+    MidiChannel chan[] = synth.getChannels(); 
+    // Comprueba nulos; tal vez no existan los 16 canales.
+    if (chan[4] != null) {
+         chan[4].noteOn(60, 93); 
+    }
+                    </pre>
+                </div>
+                <h3>
+                    Obtener el Estado Actual de un Canal
+                </h3>
+                <p>
+                    La interfaz <code>MidiChannel</code> proporciona métodos que corresponde uno a uno a cada uno de los mensajes 
+                    de "voz de canal" o "modo de canal" definidos por la especificación MIDI. Vimos un caso con el uso del método 
+                    noteOn en el ejemplo previo. Sin embargo, además de estos métodos canónicos, la interfaz 
+                    <code>MidiChannel</code> de Java Sound IPA agrega algunos métodos "get" para recuperar el valor establecido más 
+                    recientemente por los métodos correspondientes de voz o modo "set":
+                </p>
+                <div class="codeblock">
+                    <pre>
+    int       getChannelPressure()
+    int       getController(int controller)
+    boolean   getMono()
+    boolean   getOmni() 
+    int       getPitchBend() 
+    int       getPolyPressure(int noteNumber)
+    int       getProgram()
+                    </pre>
+                </div>
+                <p>
+                    Estos métodos pueden ser útiles para visualizar el estado del canal al usuario, o para decidir qué valores 
+                    enviar posteriormente al canal.
+                </p>
+                <h3>
+                    Silenciar y Poner en Solitario un Canal
+                </h3>
+                <p>
+                    La IPA de Sonido de Java agrega las nociones de silenciado y solo por canal, que no requiere la especificación 
+                    MIDI. Son similares al solo y silencian las pistas de una secuencia MIDI.
+                </p>
+                <p>
+                    Si el silencio está activado, este canal no sonará, pero los otros canales no se verán afectados. Si solo está 
+                    activado, este canal y cualquier otro canal solo sonará (si no está silenciado), pero no sonará ningún otro 
+                    canal. Un canal que esté tanto en solo como en silencio no sonará. El <code>MidiChannel</code> IPA incluye 
+                    cuatro métodos:
+                </p>
+                <div class="codeblock">
+                    <pre>
+    boolean      getMute() 
+    boolean      getSolo()
+    void         setMute(boolean muteState) 
+    void         setSolo(boolean soloState)
+                    </pre>
+                </div>
+                <h2>
+                    Permiso para Reproducir Sonido Sintetizado
+                </h2>
+                <p>
+                    El audio producido por cualquier sintetizador MIDI instalado generalmente se enruta a través del sistema de 
+                    audio muestrado. Si su programa no tiene permiso para reproducir audio, el sonido del sintetizador no será 
+                    oído, y se lanzará una excepción de seguridad. Para más información sobre permisos de audio, vea la descripción 
+                    previa de 
+                    <a class="TutorialLink" target="_top" href="accessing.html#113223">Permisos para Usar Recursos de Audio </a>.
+                </p>
+                <p></p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="MIDI-seq-adv.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="SPI-intro.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            "Los Tutoriales de Java" está sujeto a estos <a href="../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Usando Características Avanzadas del Secuenciador<br />
+            <b>Página siguiente:</b> Introducción a los Interfaces de los Proveedores de Servicio
+        </div>
+    </body>
+</html> 

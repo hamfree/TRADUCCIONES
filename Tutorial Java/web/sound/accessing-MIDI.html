@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Accediendo a los Recursos del Sistema MIDI (Los Tutoriales de Java&trade; &gt; Sonido)
+        </title>
+        <meta name="description" content="" />
+        <meta name="keywords" content="java programming, learn java, java sample code, " />
+        <link rel="stylesheet" href="../indice.css" type="text/css"/>
+        <script src="../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkAHEAD"><a href="sampled-overview.html">Descripción del Paquete Sampled</a></div>
+                <div class="linkAHEAD"><a href="accessing.html">Accediendo a los Recursos del Sistema de Audio</a></div>
+                <div class="linkAHEAD"><a href="playing.html">Reproducción de Audio</a></div>
+                <div class="linkAHEAD"><a href="capturing.html">Grabando Audio</a></div>
+                <div class="linkAHEAD"><a href="controls.html">Procesando Audio con Controles</a></div>
+                <div class="linkAHEAD"><a href="converters.html">Usando Ficheros y Convertidores de Formato</a></div>
+                <div class="linkAHEAD"><a href="overview-MIDI.html">Descripción del Paquete MIDI</a></div>
+                <div class="nolinkAHEAD">Accediendo a los Recursos del Sistema MIDI</div>
+                <div class="linkAHEAD"><a href="MIDI-messages.html">Transmitiendo y Recibiendo Mensajes MIDI</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-intro.html">Introducción a los Secuenciadores</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-methods.html">Utilizando Métodos del Secuenciador</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-adv.html">Usando Características Avanzadas del Secuenciador</a></div>
+                <div class="linkAHEAD"><a href="MIDI-synth.html">Sintetizando Sonido</a></div>
+                <div class="linkAHEAD"><a href="SPI-intro.html">Introducción a los Interfaces de los Proveedores de Servicio</a></div>
+                <div class="linkAHEAD"><a href="SPI-providing-sampled.html">Proporcionando Servicios de Audio Sampleado</a></div>
+                <div class="linkAHEAD"><a href="SPI-providing-MIDI.html">Proporcionando Servicios MIDI</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Sonido
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="./index.html" target="_top">Sonido</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="overview-MIDI.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="MIDI-messages.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Accediendo a los Recursos del Sistema MIDI</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    La IPA de Sonido de Java ofrece un modelo flexible para la configuración del sistema MIDI, al igual que lo hace 
+                    para la configuración del sistema de audio muestreado. Una implementación de la IPA de Sonido de Java puede 
+                    por sí misma proporciona diferentes clases de dispositivos MIDI, y los proveedores de servicios pueden 
+                    suministrar e instalar otros adicionales por parte de los usuarios. Puede escribir su programa de tal manera 
+                    que haga pocas suposiciones sobre qué dispositivos MIDI específicos están instalados en la computadora. En su 
+                    lugar, el programa puede aprovechar los valores predeterminados del sistema MIDI, o puede permitir al usuario 
+                    seleccionar entre los dispositivos que estén disponibles.
+                </p>
+                <p>
+                    Esta sección muestra cómo su programa puede aprender qué recursos MIDI han sido instalados, y cómo obtener 
+                    acceso a los que se desea. Después de que ha accedido y abierto los dispositivos, puede conectarlos unos con 
+                    otros, como se describe más tarde en 
+                    <a class="TutorialLink" target="_top" href="MIDI-messages.html">Transmitiendo y Recibiendo Mensajes MIDI</a>.
+                </p>
+                <h2>
+                    La Clase MidiSystem
+                </h2>
+                <p>
+                    El rol d ela clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/midi/MidiSystem.html"><code>MidiSystem</code></a> 
+                    en el paquete MIDI de la IPA de Sonido de Java&#39;s es directamente análogo al rol de 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/AudioSystem.html">
+                        <code>AudioSystem</code></a> en el paquete de audio muestreado. <code>MidiSystem</code> actúa como cámara 
+                        de compensación para acceder a los recursos MIDI instalados.
+                </p>
+                <p>
+                    Puede consultar a <code>MidiSystem</code> para aprender que clases de dispositivos están instalados, y entonces 
+                    usted puede iterar sobre los dispositivos disponibles y obtener acceso a los que desea. Por ejemplo, un 
+                    programa de aplicación puede empezar preguntando a <code>MidiSystem</code> qué sintetizadores están 
+                    disponibles, y después visualizar una lista de ellos, desde la cual el usuario puede seleccionar uno. Un 
+                    programa simple de aplicación puede simplemente usar el sintetizador predeterminado del sistema.
+                </p>
+                <p>
+                    La clase <code>MidiSystem</code> también proporciona métodos para traducir entre archivos MIDI y 
+                    <code>Sequences</code>. Puede informar del formato de archivo de un archivo MIDI y puede escrbir archivos de 
+                    tipos diferentes.
+                </p>
+                <p>
+                    Un programa de aplicación puede obtener los recursos siguientes de <code>MidiSystem</code>:
+                </p>
+                <ul>
+                    <li>Secuenciadores</li>
+                    <li>Sintetizadores</li>
+                    <li>Transmisores (tales como aquellos asociados con los puertos de entrada MIDI)</li>
+                    <li>Receptores (tales como aquellos asociados con los puertos de salida MIDI)</li>
+                    <li>Datos de archivos estándar MIDI</li>
+                    <li>Datos de los archivos de bancos de sonidos</li>
+                </ul>
+                <p>
+                    Esta página se enfoca en los primeros cuatro de estos tipos de recursos. Los otros se describen más tarde en 
+                    este tutorial.
+                </p>
+                <h2>
+                    Obtener los Dispositivos Predeterminados
+                </h2>
+                <p>
+                    Un programa de aplicación MIDI que usa la IPA de Sonido de Java empieza obteniendo los dispositivos que 
+                    necesita, los cuales pueden consistir de uno o más secuenciadores, sintetizadores, puertos de entrada, o 
+                    puertos de salida.
+                </p>
+                <p>
+                    Hay un dispositivo sintetizador predeterminada, un dispositivo secuenciador predeterminado, un dispositivo 
+                    de transmisión predeterminada, y un dispositivo de recepción predeterminado. Los dos últimos dispositivos 
+                    normalmente representan los puertos de entrada y salida MIDI, respectivamente, si hay alguno disponible en el 
+                    sistema. (es fácil confundirse acerca de la direccionalidad aquí. Piense en la transmisión o recepción de los 
+                    puertos en relación con el software, no en relación con ningún dispositivo físico externo conectado a los 
+                    puertos físicos. Un puerto de entrada MIDI <em>transmite</em> datos desde un dispositivo externo a una 
+                    IPA de Sonido de Java <code>Receiver</code>, e igualmente un puerto de salida MIDI <em>recibe</em> datos de un 
+                    objeto de software y transmite los datos a un dispositivo externo).
+                </p>
+                <p>
+                    Un programa de aplicación simple puede simplemente usar el predeterminado en lugar de explorar todos los 
+                    dispositivos instalados. La clase <code>MidiSystem</code> incluye los métodos siguientes para recuperar los 
+                    recursos predeterminados:
+                </p>
+                <div class="codeblock">
+                    <pre>
+static Sequencer getSequencer()
+static Synthesizer getSynthesizer()
+static Receiver getReceiver()
+static Transmitter getTransmitter()
+                    </pre>
+                </div>
+                <p>
+                    Los primeros dos de estos métodos obtienen los recursos de secuenciación y síntesis predeterminados del 
+                    sistema, que representan dispositivos físicos o se implementan íntegramente en software. El método 
+                    <code>getReceiver</code> obtiene un objeto <code>Receiver</code> que toma los mensajes MIDI enviados a este y 
+                    los transmite al dispositivo receptor predeterminado. Del mismo modo, el método getTransmitter obtiene un 
+                    objeto Transmitter que puede enviar mensajes MIDI a algún receptor en nombre del dispositivo de transmisión 
+                    predeterminado.
+                </p>
+                <p></p>
+                <h2>
+                    Aprender Qué Dispositivos Están Instalados
+                </h2>
+                <p>
+                    En lugar de usar los dispositivos predeterminados, un enfoque más completo es seleccionar los dispositivos 
+                    deseados del conjunto completo de dispositivos que están instalandos en el sistema. Un programa de aplicación 
+                    puede seleccionar los dispositivos deseados programadamente, o puede visualizar una lista de dispositivos 
+                    disponibles y permitir al usuario seleccionar cuales usar. La clase <code>MidiSystem</code> proporcioa un 
+                    método para aprender qué dispositivos están instalados, y un método correspondiente para obtener un dispositivo 
+                    de un tipo dado.
+                </p>
+                <p>
+                    Aquí está el método para aprender sobre los dispositivos instalados:
+                </p>
+                <div class="codeblock">
+                    <pre>
+ tatic MidiDevice.Info[] getMidiDeviceInfo()
+                    </pre>
+                </div>
+                <p>
+                    Como puede ver, devuelve una matriz de objetos de información. Cada uno de estos objetos devueltos 
+                    <code> MidiDevice.Info </code> identifica un tipo de secuenciador, sintetizador, puerto u otro dispositivo que 
+                    está instalado. (Por lo general, un sistema tiene como máximo una instancia de un tipo determinado. Por ejemplo, 
+                    un modelo determinado de sintetizador de un determinado proveedor se instalará solo una vez). El 
+                    <code>MidiDevice.Info</code> incluye las cadenas siguientes para describir el dispositivo:
+                </p>
+                <ul>
+                    <li>Nombre</li>
+                    <li>Número de Versión</li>
+                    <li>Fabricante (la compañía que creó el dispositivo)</li>
+                    <li>Una descripción del dispositivo</li>
+                </ul>
+                <p>
+                    Puede visualizar estas cadenas en su interfaz de usuario para permitir que el usuario seleccione desde la lista 
+                    de dispositivos.
+                </p>
+                <p>
+                    Sin embargo, para usar las cadenas programáticamente para seleccionar un dispositivo (a diferencia de mostrar 
+                    las cadenas al usuario), necesita saber por adelantado cuáles podrían ser. La compañía que proporciona cada 
+                    dispositivo debe incluir esta información en su documentación. Un programa de aplicación que requiere o 
+                    prefiere un dispositivo particular puede usar esta información para localizar ese dispositivo. Este enfoque 
+                    tiene la desventaja de limitar el programa a las implementaciones de dispositivos que conoce de antemano.
+                </p>
+                <p>
+                    Otro enfoque, más general, es seguir adelante e iterar sobre los objetos <code>MidiDevice.Info</code>, 
+                    obteniendo cada dispositivo correspondiente, y determinando mediante programación si es adecuado para su uso 
+                    (o al menos adecuado para incluirlo en una lista de la que el usuario puede elegir). La siguiente sección 
+                    describe cómo hacer esto.
+                </p>
+                <h2>
+                    Obtener un Dispositivo Deseado
+                </h2>
+                <p>
+                    Una vez se encuentra el objeto info de un dispositivo apropiado, el programa de aplicación invoca el 
+                    siguiente método <code>MidiSystem</code> para obtener el dispositivo correspondiente en sí:
+                </p>
+                <div class="codeblock">
+                    <pre>
+static MidiDevice getMidiDevice(MidiDevice.Info info)
+                    </pre>
+                </div>
+                <p>
+                    Puede usar este método si ya ha encontrado el objeto info describiendo el dispositivo que usted necesita. Sin 
+                    embargo, si no puede interpretar los objetos info devueltos por <code>getMidiDeviceInfo</code> para determinar 
+                    que dispositivo necesita, y si no quiere visualizar información sobre todos los dispositivos al usuario, es 
+                    posible que pueda hacer lo siguiente en su lugar; iterar sobre todos los objetos <code>MidiDevice.Info</code> 
+                    devueltos por <code>getMidiDeviceInfo</code>, obtener los dispositivos correspondientes usando el método de 
+                    arriba, y comprobar cada dispositivo para ver si es adecuado. En otras palabras, puede consultar cada 
+                    dispositivo por su clases y sus capacidades antes de incluirlo en la lista que muestra al usuario, o como una 
+                    forma de decidir sobre un dispositivo mediante programación sin involucrar al usuario. Por ejemplo, si su 
+                    programa necesita un sintetizador, puede obtener cada una de los dispositivos instalados, mirar cuales son las 
+                    instancias de clases que implementan la interfaz <code>Synthesizer</code>, y después visualizarlos en una lista 
+                    desde la cual el usuario puede elegir uno, como sigue:
+                </p>
+                <div class="codeblock">
+                    <pre>
+// Obtiene información sobre todos los sintetizadores instalados.
+Vector synthInfos;
+MidiDevice device;
+MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
+for (int i = 0; i &lt; infos.length; i++) {
+    try {
+        device = MidiSystem.getMidiDevice(infos[i]);
+    } catch (MidiUnavailableException e) {
+          // Maneja o lanza una excepción...
+    }
+    if (device instanceof Synthesizer) {
+        synthInfos.add(infos[i]);
+    }
+}
+// Ahora, visualiza las cadenas desde las lista synthInfos en el IGU.    
+                    </pre>
+                </div>
+                <p>
+                    Cualquier otro ejemplo, podría elegir un dispositivo mediante programación, sin involucrar al usuario. Suponga 
+                    que quiere obtener el sintetizador que puede tocar la mayoría de las notas simultáneamente. Itera sobre todos 
+                    los objetos MidiDevice.Info, como arriba, pero después de determinar que un dispositivo es un sintetizador, 
+                    usted consulta sus capacidades invocando el método <code>getMaxPolyphony</code> de <code>Synthesizer</code>. 
+                    Usted reserva el sintetizador que tiene la polifonía mas grande, como se describe en la siguiente sección. 
+                    Incluso aunque usted no pregunte al usuario para elegir un sintetizador, puede aún mostrar las cadenas del 
+                    objeto <code>MidiDevice.Info</code> elegido, simplemente para información del usuario.
+                </p>
+                <p></p>
+                <h2>
+                    Abrir Dispositivos
+                </h2>
+                <p>
+                    La sección previa mostró como obtener un dispositivo instalado. Sin embargo, un dispositio puede estar instalado 
+                    pero no estar disponible. Por ejemplo, otro programa de aplicación puede tener uso exclusivo de este. Para 
+                    reservar realmente un dispositivo para su programa, debe utilizar el método <code>open</code> de 
+                    <code>MidiDevice</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+if (!(device.isOpen())) {
+    try {
+      device.open();
+  } catch (MidiUnavailableException e) {
+          // maneja o lanza una excepción...
+  }
+}
+                    </pre>
+                </div>
+                <p>
+                    Una vez ha accedido y reservado un dispositivo abriéndolo, probablemente querrá conectarlo a uno o más 
+                    dispositivos para permitir el flujo de los datos MIDI entre ellos. Este procedimiento se describe más tarde 
+                    en <a class="TutorialLink" target="_top" href="MIDI-messages.html">Transmitiendo y Recibiendo Mensajes MIDI</a>.
+                </p>
+                <p>
+                    Cuando termine con un dispositivo, lo libera para que lo usen otros programas invocando el método 
+                    <code>close</code> de <code>MidiDevice</code>.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="overview-MIDI.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="MIDI-messages.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Descripción del Paquete MIDI<br />
+            <b>Página siguiente:</b> Transmitiendo y Recibiendo Mensajes MIDI
+        </div>
+    </body>
+</html> 

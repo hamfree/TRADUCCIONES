@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Sellando Paquetes en Extensiones (Los Tutoriales de Java&trade; &gt; El Mecanismo de Extensión &gt; Haciendo 
+            Extensiones Seguras)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe cómo crear y usar extensiones o paquetes opcionales  y 
+              hacerlos seguros" />
+        <meta name="keywords" content="programar java, aprender java, código ejemplo java, extensiones de java, paquetes opcionales 
+              java" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Haciendo Extensiones Seguras</a></div>
+                <div class="linkAHEAD"><a href="policy.html">Fijando Privilegios para Extensiones</a></div>
+                <div class="nolinkAHEAD">Sellando Paquetes en Extensiones</div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> El Mecanismo de Extensión<br />
+                <b>Lección:</b> Haciendo Extensiones Seguras
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">El Mecanismo de Extensión</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Haciendo Extensiones Seguras</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="policy.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../end.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Sellando Paquetes en Extensiones</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Puede opcionalmente <em>sellar</em> paquetes en los ficheros JAR de extensión como una medida adicional de 
+                    seguridad. Si un paquete se sella, todas las clases definidas en ese paquete deben estar en un fichero JAR 
+                    único.
+                </p>
+                <p>
+                    Sin el sellado, un programa &quot;hostil&quot; podría crear una clase y definirla como miembro de uno de sus 
+                    paquetes de extensión. El software hostil tendría entonces acceso libre a los miembros protegidos del paquete 
+                    de su paquete de extensión.
+                </p>
+                <p>
+                    El sellado de paquetes en extensiones no es diferente del sellado de cualquier clase empaquetada en JAR. Para 
+                    sellar su paquetes de extensión, debe agregar la cabecera <code>Sealed</code> al manifiesto del fichero JAR que 
+                    contiene tu extensión. Puede sellar paquetes individuales asociando una cabecera <code>Sealed</code> con las 
+                    cabeceras <code>Name</code> del paquete. Un encabezado <code>Sealed</code> no asociado con un paquete 
+                    individual en el archivo indica que todos los paquetes están sellados. Un encabezado <code>Sealed</code> 
+                    &quot;global&quot; es anulado por cualquier cabecera <code>Sealed</code> asociada con paquetes individuales. 
+                    El valor asociado con la cabecera <code>Sealed</code> es <code>true</code> o <code>false</code>.
+                </p>
+                <h2>
+                    Ejemplos
+                </h2>
+                <p>
+                    Veamos unos pocos ejemplos de ficheros de manifiesto. Para estos ejemplos suponga que el fichero JAR contiene 
+                    estos paquetes:
+                </p>
+                <div class="codeblock">
+                    <pre>
+com/myCompany/package_1/
+com/myCompany/package_2/
+com/myCompany/package_3/
+com/myCompany/package_4/
+                    </pre>
+                </div>
+                <p>
+                    Suponga que quiere sellar todos los paquetes. Podría hacer eso simplemente agregando una cabecera 
+                    <code>Sealed</code> a nivel de archivo al manifiesto de esta forma:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Manifest-Version: 1.0
+Sealed: true
+                    </pre>
+                </div>
+                <p>
+                    Todos los paquetes en cualquier fichero JAR que tenga este manifiesto estará sellado.
+                </p>
+                <p>
+                    Si quería sellar sólo <code>com.myCompany.package_3</code>, podría hacerlo con este manifiesto:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Manifest-Version: 1.0
+
+Name: com/myCompany/package_3/
+Sealed: true
+                    </pre>
+                </div>
+                <p>
+                    En este ejemplo la única cabecera <code>Sealed</code> es aquella asocida con la cabecera <code>Name</code> del 
+                    paquete <code>com.myCompany.package_3</code>, así que sólo ese paquete es sellado. (La cabecera 
+                    <code>Sealed</code> se asocia con la cabecera <code>Name</code> porque no hay líneas en blanco entre ellas).
+                </p>
+                <p>
+                    Para un ejemplo final, suponga que quería sellar todos los paquetes <em>excepto el </em> 
+                    <code>com.myCompany.package_2</code>. Podría logras esto con un manifiesto como este:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Manifest-Version: 1.0
+Sealed: true
+
+Name: com/myCompany/package_2/
+Sealed: false
+                    </pre>
+                </div>
+                <p>
+                    En este ejemplo la cabecera a nivel de archivo <code>Sealed:&nbsp;true</code> indica que todos los paquetes en 
+                    el fichero JAR van a ser sellados. Sin embargo, el manifiesto también tiene una cabecera 
+                    <code>Sealed:&nbsp;false</code> asociada con el paquete <code>com.myCompany.package_2</code>, y esa cabecera 
+                    sobreescribe el sellado a nivel de archivo para ese paquete. Por lo tanto este manifiesto causará que todos los 
+                    paquetes serán sellados excepto <code>com.myCompany.package_2</code>.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="policy.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../end.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Fijando Privilegios para Extensiones<br />
+            <b>Página siguiente:</b> Final de la Lección
+        </div>
+    </body>
+</html> 

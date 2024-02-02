@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Fijando Privilegios para Extensiones (Los Tutoriales de Java&trade; &gt; El Mecanismo de Extensión &gt; 
+            Haciendo Extensiones Seguras)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe cómo crear y usar extensiones o paquetes opcionales  y 
+              hacerlos seguros" />
+        <meta name="keywords" content="programar java, aprender java, código ejemplo java, extensiones de java, paquetes opcionales 
+              java" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Haciendo Extensiones Seguras</a></div>
+                <div class="nolinkAHEAD">Fijando Privilegios para Extensiones</div>
+                <div class="linkAHEAD"><a href="sealing.html">Sellando Paquetes en Extensiones</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> El Mecanismo de Extensión<br />
+                <b>Lección:</b> Haciendo Extensiones Seguras
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">El Mecanismo de Extensión</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Haciendo Extensiones Seguras</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="sealing.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Fijando Privilegios para Extensiones</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Si hay un 
+                    <a class="TutorialLink" target="_top" href="../../essential/environment/security.html">Gestor de Seguridad</a>
+                    en vigor, se deben cumplir las siguientes condiciones para permitir que cualquier software, incluído el sofware 
+                    de extensión, realize operaciones sensibles a la seguridad:
+                </p>
+                <ul>
+                    <li>
+                        El código sensible a la seguridad en la extensión debe estar envuelto en un objeto 
+                        <code>PrivilegedAction</code>.
+                    </li>
+                    <li>
+                        La política de seguridad implementada por el gestor de seguridad debe otorgar el permiso apropiado a la 
+                        extensión. Por defecto, a las extensiones instalados se les otorgan todos los permisos de seguridad como 
+                        si fueran parte de la plataforma principal de la IPA. Los permisos otorgados por la política de seguridad 
+                        se aplican sólo al código envuelto en la instancia <code>PrivilegedAction</code>.
+                    </li>
+                </ul>
+                <p>
+                    Veamos cada una de estas condiciones un poco más en detalle, con algunos ejemplos.
+                </p>
+                <h2>
+                    Usar la Clase PrivilegedAction
+                </h2>
+                <p>
+                    Suponga que quiere modificar la clase <code>RectangleArea</code> en el ejemplo de extensión de la lección 
+                    previa para escribir áreas de rectángulo a un fichero en vez de a la salida estándar. Escribir a un fichero, 
+                    sin embargo, es una operación sensible a la seguridad, así que si su software va a ejecutarse bajo un gestor 
+                    de seguridad, necesitará marcar su código como privilegiado. Hay dos pasos que necesita dar para hacer eso:
+                </p>
+                <ol>
+                    <li>
+                        Necesita colocar el código que realiza las operacoines sensibles a a la seguridad dentro del método 
+                        <code>run</code> de un objeto del tipo <code>java.security.PrivilegedAction</code>.
+                    </li>
+                    <li>
+                        Debe usar ese objeto <code>PrivilegedAction</code> como el argumento en una llamada al método 
+                        <code>doPrivileged</code> de <code>java.security.AccessController</code>.
+                    </li>
+                </ol>
+                <p>
+                    Si aplicamos esas pautas a la clase <code>RectangleArea</code>, nuestra definición de clase se vería así:
+                </p>
+                <div class="codeblock">
+                    <pre>
+import java.io.*;
+import java.security.*;
+
+public final class RectangleArea {
+    public static void
+    writeArea(final java.awt.Rectangle r) {
+        AccessController.
+          doPrivileged(new PrivilegedAction() {
+            public Object run() {
+                try { 
+                    int area = r.width * r.height;
+                    String userHome = System.getProperty("user.home");
+                    FileWriter fw = new FileWriter( userHome + File.separator
+                        + "test" + File.separator + "area.txt");
+                    fw.write("The rectangle's area is " + area);
+                    fw.flush();
+                    fw.close();
+                } catch(IOException ioe) {
+                    System.err.println(ioe);
+                }
+                return null;
+            }
+        });
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    El único método en esta clase, <code>writeArea</code>, calcula el área de un rectángulo, y escribe el área a 
+                    un fichero llamado <code>area.txt</code> en el directorio <code>test</code> bajo el directorio de inicio del 
+                    usuario.
+                </p>
+                <p>
+                    Las sentencias sensibles a la seguridad que tratan con el fichero de salida son colocadas dentro del método 
+                    <code>run</code> de una nueva instancia de <code>PrivilegedAction</code>. (Note que <code>run</code> requiere 
+                    que una instancia de <code>Object</code> sea devuelta. El objeto devuelto puede ser <code>null</code>). La 
+                    nueva instancia <code>PrivilegedAction</code> es entonces pasada como un argumento en una llamada a 
+                    <code>AccessController.doPrivileged</code>.
+                </p>
+                <p>
+                    Para más información sobre el uso de <code>doPrivileged</code>, vea 
+                    <a class="OutsideLink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/doprivileged.html">IPA for Privileged
+                        Blocks</a> en la documentación del KDJ&trade;.
+                </p>
+                <p>
+                    Envolver el código sensible a la seguridad en un objeto <code>PrivilegedAction</code> de esta manera es el 
+                    primer requisito para habilitar que una extensión realize operaciones sensibles a la seguridad. El segundo 
+                    requisito es: obtener el gestor de seguridad para otorgar al código privilegiado los permisos apropiados.
+                </p>
+                <h2>
+                    Especificar Permisos con la Política de Seguridad
+                </h2>
+                <p>
+                    La política de seguridad en vigor en tiempo de ejecución se especifica con un <em>fichero de políticas</em>. 
+                    La política por defecto está establecida en el fichero <code>lib/security/java.policy</code> en el software del 
+                    EEJ.
+                </p>
+                <p>
+                    El fichero de políticas asigna privilegios de seguridad al software usando entradas <em>grant</em>. El fichero 
+                    de políticas contiene un número variable de entradas grant. El fichero de políticas por defecto tiene esta 
+                    entrada grant para las extensiones instaladas:
+                </p>
+                <div class="codeblock">
+                    <pre>
+grant codeBase "file:${{java.ext.dirs}}/*" {
+    permission java.security.AllPermission;
+};
+                    </pre>
+                </div>
+                <p>
+                    Esta entrada especifica que los ficheros en los directorios especificados por 
+                    <code>file:${{java.ext.dirs}}/*</code> van a tener el permiso llamado 
+                    <code>java.security.AllPermission</code>. (Dese cuenta que desde Java 6,
+                    <code>java.ext.dirs</code> se refiere a una ruta de directorios como la de <code>classpath</code>, calda una 
+                    de las cuales pueden contener extensiones instaladas).  No es muy difícil adivinar que 
+                    <code>java.security.AllPermission</code> otorga a las extensiones instaladas todos los privilegios de seguridad 
+                    que son posibles de otorgar.
+                </p>
+                <p>
+                    Por defecto, entonces, las extensiones instaladas no tienen restricciones de seguridad. El software de 
+                    extensión puede realizar operaciones sensibles a la seguridad como si no se hubiera instalado ningún gestor de 
+                    seguridad, siempre que el código sensible a la seguridad esté contenido en una instancia de 
+                    <code>PrivilegedAction</code> pasado como argumento en una llamada a <code>doPrivileged</code>.
+                </p>
+                <p>
+                    Para limitar los privilegios otorgados a las extensiones, necesita modificar el fichero de políticas. Para 
+                    denegar todos los privilegios a todas las extensiones, podría simplemente eliminar la entrada grant de arriba.
+                </p>
+                <p>
+                    No todos los permisos son tan completos como el <code>java.security.AllPermission</code> otorgado por defecto.
+                    Después de borrar la entrada grant por defecto, puede introducir una nueva entrada grant por permisos 
+                    partículares, incluyendo:
+                </p>
+                <ul>
+                    <li>
+                        <code>java.awt.<b>AWTPermission</b></code>
+                    </li>
+                    <li>
+                        <code>java.io.<b>FilePermission</b></code>
+                    </li>
+                    <li>
+                        <code>java.net.<b>NetPermission</b></code>
+                    </li>
+                    <li>
+                        <code>java.util.<b>PropertyPermission</b></code>
+                    </li>
+                    <li>
+                        <code>java.lang.reflect.<b>ReflectPermission</b></code>
+                    </li>
+                    <li>
+                        <code>java.lang.<b>RuntimePermission</b></code>
+                    </li>
+                    <li>
+                        <code>java.security.<b>SecurityPermission</b></code>
+                    </li>
+                    <li>
+                        <code>java.io.<b>SerializablePermission</b></code>
+                    </li>
+                    <li>
+                        <code>java.net.<b>SocketPermission</b></code>
+                    </li>
+                </ul>
+                <p>
+                    La documentación 
+                    <a class="OutsideLink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/permissions.html">Permissions in the
+                        KDJ</a> proporciona detalles sobre cada uno de estos permisos. Veamos aquellos necesarios para usar 
+                    RectangleArea como una extensión.
+                </p>
+                <p>
+                    El método <code>RectangleArea.writeArea</code> necesita dos permisos: uno para determinar la ruta al directorio 
+                    de inicio del usuario, y el otro para escribir a un fichero. Asumiendo que la clase <code>RectangleArea</code> 
+                    está empaquetada en el fichero <code>area.jar</code>, podría otorgar privilegios de escritura al agregar esta 
+                    entrada al fichero de política:
+                </p>
+                <div class="codeblock">
+                    <pre>
+grant codeBase "file:${java.home}/lib/ext/area.jar" {
+    permission java.io.PropertyPermission "user.home",
+        "read";
+    permission java.io.FilePermission
+        "${user.home}${/}test${/}*", "write";
+};
+                    </pre>
+                </div>
+                <p>
+                    La parte <code>codeBase&nbsp;&quot;file:${java.home}/lib/ext/area.jar&quot;</code> de esta entrada garantiza 
+                    que cualquier permiso especificado por esta entrada se aplicará sólo al <code>area.jar</code>. El 
+                    <code>java.io.PropertyPermission</code> permite acceso a las propiedades. El primer argumento, 
+                    <code>&quot;user.home&quot;</code>, nombra la propiedad, y el segundo argumento, <code>&quot;read&quot;</code>,
+                    indica que la propiedad pueda ser leída. (La otra elección es <code>&quot;write&quot;</code>.)
+                </p>
+                <p>
+                    El <code>java.io.FilePermission</code> permite el acceso a los ficheros. El primer argumento, 
+                    <code>&quot;${user.home}${/}test${/}*&quot;</code>, indica que se está otorgando a <code>area.jar</code> 
+                    permiso para acceder a todos los ficheros en el directorio <code>test</code> que está en el directorio de 
+                    inicio del usuario. (Note que <code>${/}</code> es un separador de fichero independiente de la plataforma). El 
+                    segundo argumento indica que el acceso al fichero que se está otorgando es sólo para escritura. (Otras 
+                    elecciones para el segundo argumento son <code>&quot;read&quot;</code>, <code>&quot;delete&quot;</code>, y 
+                    <code>&quot;execute&quot;</code>).
+                </p>
+                <h2>
+                    Firmando Extensiones
+                </h2>
+                <p>
+                    Puede usar este fichero de políticas para colocar restricciones adicionales sobre los permisos otorgados a las 
+                    extensiones requiríendoles que estén firmadas por un entidad confiable. (Para una revisión de la firma y 
+                    verificación de ficheros JAR, vea la lección 
+                    <a class="TutorialLink" target="_top" 
+                       href="../../deployment/jar/signing.html">Firmando Ficheros JAR</a> en este tutorial).
+                </p>
+                <p>
+                    Para permitir la verificación de la firma de extensiones u otro software en conjunción con la concesión de 
+                    permisos, el fichero de política debe contener una <em>entrada de almacén de claves</em>. La entrada del 
+                    almacén de claves especifica qué almacén de claves es usado en la verificación. Las entradas de Keystore tienen 
+                    la forma 
+                </p>
+                <div class="codeblock">
+                    <pre>
+keystore "<i>keystore_url</i>";
+                    </pre>
+                </div>
+                <p>
+                    La URL <em>keystore_url</em> es  o absoluta o relativa. Si es relativa, la URL es relativa a la ubicación del 
+                    fichero de políticas. Por ejemplo, para usar el almacén de claves por defecto usado por <code>keytool</code>, 
+                    agregue esta entrada a <code>java.policy</code>
+                </p>
+                <div class="codeblock">
+                    <pre>
+keystore "file://${user.home}/.keystore";
+                    </pre>
+                </div>
+                <p>
+                    Para indicar que una extensión debe estar firmada en orden para que se le concedan privilegios de seguridad, 
+                    use el campo <code>signedBy</code>. Por ejemplo, la entrada siguiente indica que se le otorgan a la extensión 
+                    <code>area.jar</code> los privilegios listados sólo si está firmado por los usuarios identificados en el 
+                    almacén de claves por los alias Robert y Rita:
+                </p>
+                <div class="codeblock">
+                    <pre>
+grant signedBy "Robert,Rita",
+    codeBase "file:${java.home}/lib/ext/area.jar" {
+        permission java.io.PropertyPermission
+            "user.home", "read";
+        permission java.io.FilePermission
+            "${user.home}${/}test${/}*", "write";
+};
+                    </pre>
+                </div>
+                <p>
+                    Si se omite el campo <code>codeBase</code>, como en el siguiente &quot;grant&quot;, los permisos se garantizan 
+                    a <em>cualquier</em> software, incluyendo las extensiones instaladas o descargadas, que están firmadas por 
+                    &quot;Robert&quot; o &quot;Rita&quot;:
+                </p>
+                <div class="codeblock">
+                    <pre>
+grant signedBy "Robert,Rita" {
+    permission java.io.FilePermission "*", "write";  
+};
+                    </pre>
+                </div>
+                <p>
+                    Para más detalles sobre el formato del fichero de políticas, vea la sección 3.3.1 de la 
+                    <a class="OutsideLink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/spec/security-spec.doc3.html#20131">
+                        Security Architecture Specification</a> en la documentación del KDJ.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="sealing.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Haciendo Extensiones Seguras<br />
+            <b>Página siguiente:</b> Sellando Paquetes en Extensiones
+        </div>
+    </body>
+</html> 

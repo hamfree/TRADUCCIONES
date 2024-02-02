@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Cómo Establecer la Apariencia (Los Tutoriales de Java&trade; &gt; Creando una IGU (Interfaz Gráfica de Usuario) con
+            JFC/Swing &gt; Modificando la Apariencia)
+        </title>
+        <meta name="description" content="Este tutorial de Swing Java describe el desarrollo de interfaces gráficas de usuario (GUI)
+              para aplicaciones y applets que utilizan componentes Swing" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java swing, java ui, java user interface,
+              swing components, swing events, swing layout  " />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Modificando la Apariencia</a></div>
+                <div class="nolinkAHEAD">Cómo Establecer la Apariencia</div>
+                <div class="linkAHEAD"><a href="synth.html">La Apariencia Synth</a></div>
+                <div class="linkBHEAD"><a href="synthExample.html">Un Ejemplo de Synth</a></div>
+                <div class="linkAHEAD"><a href="nimbus.html">La Apariencia Nimbus</a></div>
+                <div class="linkBHEAD"><a href="custom.html">Cambiando la Apariencia de Nimbus</a></div>
+                <div class="linkBHEAD"><a href="size.html">Cambiando el Tamaño de un Componente</a></div>
+                <div class="linkBHEAD"><a href="color.html">Cambiando el Tema de Color</a></div>
+                <div class="linkBHEAD"><a href="info.html">Para Más Información</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing<br />
+                <b>Lección:</b> Modificando la Apariencia
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Modificando la Apariencia</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="synth.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Cómo Establecer la Apariencia</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    La arquitectura de Swing está diseñada de forma que pueda cambiar el "aspecto" (L&amp;F) del IGU de
+                    su aplicación (vea
+                    <a class="OutsideLink" target="_blank"
+                       href="http://www.oracle.com/technetwork/java/architecture-142923.html">
+                        Una Visión General a la Arquitectura Swing</a>). El "Aspecto" se refiera a la apariencia de los
+                    controles visuales del IGU (más formalmente, los <code>JComponents</code>) y "sensación" se
+                    refiere a la forma en que se comportan los controles visuales.
+                </p>
+                <p>
+                    La arquitectura de Swing habilita múltiples L&amp;Fs separando cada componente en dos clases distintas: una
+                    subclase <code>JComponent</code> y una subclase <code>ComponentUI</code> correspondiente. Por ejemplo, cada
+                    instancia de <code>JList</code> tiene una implementación concreta de <code>ListUI</code> (<code>ListUI</code>
+                    extiende <code>ComponentUI</code>). La subclase <code>ComponentUI</code> recibe varios nombres en la
+                    documentación de Swing: "IU", "IU del componente", "delegado IU" y "delegado de aspecto" se utilizan para
+                    identificar la subclase<code>ComponentUI</code>.
+                </p>
+                <p>
+                    La mayoría de los desarrolladores nunca necesitan interactuar con el delegado IU directamente. En su mayor
+                    parte, el delegado IU es utilizado internamente por la subclase <code>JComponent</code> para la funcionalidad
+                    crucial, con métodos de cobertura proporcionados por la subclase <code>JComponent</code> para todos los accesos
+                    al delegado IU. Por ejemplo, todo el pintado en las subclases <code>JComponent</code> es delegado al delegado
+                    IU. Al delegar el pintado, el 'aspecto' puede variar dependiendo del Aspecto.
+                </p>
+                <p>
+                    Es responsabilidad de cada Aspecto suministrar una implementación concreta para cada una de las subclases
+                    <code>ComponentUI</code> definidas por Swing. Por ejemplo, el Aspecto Java <em>(Java Look And Feel, en
+                        inglés</em> crea una instancia de <code>MetalTabbedPaneUI</code> para suministrar el Aspecto de
+                    <code>JTabbedPane</code>. Swing maneja la creación real del delegado UI por usted &mdash; en su mayor parte,
+                        nunca necesitará interactuar directamente con el delegado de UI.
+                </p>
+                <p>El resto de esta sección describe los siguientes temas:</p>
+                <ul>
+                    <li><a href="#available">Apariencias Disponibles</a></li>
+                    <li><a href="#programmatic">Estableciendo la Apariencia de Forma Programada</a></li>
+                    <li><a href="#commandLine">Especificar la Apariencia: En Línea de Comandos</a></li>
+                    <li><a href="#properties">Especificar la Apariencia: swing.properties</a></li>
+                    <li><a href="#steps">Cómo UI Manager Elije la Apariencia</a></li>
+                    <li><a href="#dynamic">Cambiar la Apariencia Después del Inicio</a></li>
+                    <li><a href="#example">Un Ejemplo</a></li>
+                    <li><a href="#themes">Temas</a></li>
+                    <li><a href="#swingset2">El Programa de Demostración SwingSet2</a></li>
+                </ul>
+                <h2>
+                    <a id="available">Apariencias Disponibles</a>
+                </h2>
+                <p>
+                    El EEJ <em>(Entorno de Ejecución Java, JRE o Java Runtime Environment en inglés)</em> de Sun suministra los
+                    siguientes Aspectos o L&amp;Fs:
+                </p>
+                <ol>
+                    <li>
+                        <p>
+                            <code>CrossPlatformLookAndFeel</code> &mdash; este es el "Aspecto Java" (también llamado "Metal") que
+                            tiene el mismo aspecto en todas las plataformas. Es parte de la IPA de Java
+                            (<code>javax.swing.plaf.metal</code>) y es el aspecto predeterminado que será usado si no hace nada en
+                            su código para establecer un Aspecto o Aspecto diferente.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>SystemLookAndFeel</code> &mdash; aquí, la aplicación usa el Aspecto que es nativo al sistema en
+                            el que se está ejecutando. El Aspecto System se determina en tiempo de ejecución, donde la aplicación
+                            le pide al sistema que le devuelva el nombre del Aspecto apropiado.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Synth &mdash; la base para crear su propio aspecto con un fichero XML.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Multiplexing &mdash; una forma de hacer que los métodos del IU deleguen en varias implementaciones 
+                            diferentes de aspecto al mismo tiempo.
+                        </p>
+                    </li>
+                </ol>
+                <p>
+                    Para Linux y Solaris, el Aspecto System es "GTK+" si GTK+ 2.2 o superior está instalada, "Motif" de lo
+                    contrario. Para Windows, el Aspecto System es "Windows" el cual imita el Aspecto del SO Windows particular que
+                    se está ejecutando &mdash; Windows clásico, XP, o Vista. Los Aspectos GTK+, Motif, y Windows son suministrados
+                    por Sun y enviados junto con el KDJ <em>(Kit de Desarrollo de Java, JDK o Java Development Kit, en inglés)</em>
+                    y EEJ de Java, aunque no forman parte de la IPA de Java.
+                </p>
+                <p>
+                    Apple suministra su propia MVJ <em>(Máquina Virtual de Java, JVM o Java Virtual Machine, en inglés)</em> que
+                    incluye su Aspecto propietario.
+                </p>
+                <p>En resumen, cuando usa el <code>SystemLookAndFeel</code>, esto es lo que verá:</p>
+                <table style="border-spacing: 2px;border: 2px outset">
+                    <caption>Lo que el usuario ve cuando usa la apariencia del sistema</caption>
+                    <tr>
+                        <th id="h1" style="font-weight: bold;padding: 2px" class="celda">Platforma</th>
+                        <th id="h2" style="font-weight: bold;padding: 2px" class="celda">Aspecto</th>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="border: 1px inset;padding: 2px">Solaris, Linux con GTK+ 2.2 o posterior</td>
+                        <td headers="h2" style="border: 1px inset;padding: 2px">GTK+</td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="border: 1px inset;padding: 2px">Otros Solaris, Linux</td>
+                        <td headers="h2" style="border: 1px inset;padding: 2px">Motif</td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="border: 1px inset;padding: 2px">IBM UNIX</td>
+                        <td headers="h2" style="border: 1px inset;padding: 2px">IBM*</td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="border: 1px inset;padding: 2px">HP UX</td>
+                        <td headers="h2" style="border: 1px inset;padding: 2px">HP*</td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="border: 1px inset;padding: 2px">Windows Clásico</td>
+                        <td headers="h2" style="border: 1px inset;padding: 2px">Windows</td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="border: 1px inset;padding: 2px">Windows XP</td>
+                        <td headers="h2" style="border: 1px inset;padding: 2px">Windows XP</td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="border: 1px inset;padding: 2px">Windows Vista</td>
+                        <td headers="h2" style="border: 1px inset;padding: 2px">Windows Vista</td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="border: 1px inset;padding: 2px">Macintosh</td>
+                        <td headers="h2" style="border: 1px inset;padding: 2px">Macintosh*</td>
+                    </tr>
+                </table>
+                <p>* Suministrado por el proveedor del sistema.</p>
+                <p>
+                    Usted no ve el Aspecto System en la IPA. Los paquetes GTK+, Motif, y Windows que se requieren son enviados
+                    junto con el KDJ de Java como:
+                </p>
+                <div class="codeblock">
+                    <pre>
+com.sun.java.swing.plaf.gtk.GTKLookAndFeel
+com.sun.java.swing.plaf.motif.MotifLookAndFeel
+com.sun.java.swing.plaf.windows.WindowsLookAndFeel
+                    </pre>
+                </div>
+                <p>
+                    Tenga en cuenta que la ruta incluye <code>java</code>, y no <code>javax</code>.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Nota:</strong>&nbsp;El Aspecto GTK+ sólo se ejecutará en Unix o sistemas Linux con GTK+ 2.2 o posterior
+                    instalado, mientras que el Aspecto Windows se ejecuta sólo en sistemas Windows. Como el Aspecto Java (Metal),
+                    el Aspecto Motif se ejecutará en cualquier plataforma.
+                    <hr />
+                </div>
+                <p>
+                    Todos los Aspecto de Sun tienen una gran cantidad de elementos comunes. Estos elementos comunes están definidos 
+                    en el aspecto <code>Basic</code>  en la IPA (<code>javax.swing.plaf.basic</code>). Los Aspectos Motif y Windows
+                    están construidas extendiendo las clases IU delegadas en <code>javax.swing.plaf.basic</code> (un Aspecto
+                    personalizado puede ser construído haciendo lo mismo). El Aspecto "Basic"  no se usa sin ser extendido.
+                </p>
+                <p>
+                    En la IPA usted verá cuatro paquetes de Aspecto:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>javax.swing.plaf.basic</code> &mdash; Delegados IU básicos para ser extendidos cuando se crea un
+                            Aspecto personalizado.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>javax.swing.plaf.metal</code> &mdash; El Aspecto Java, también conocido como el Aspecto
+                            CrossPlatform ("Metal" fue el nombre del proyecto en Sun para este Aspecto) El actual "tema" por
+                            defecto (descrito abajo) para este Aspecto es "Ocean", así que es a menudo referido como el Aspecto
+                            Ocean.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>javax.swing.plaf.multi</code> &mdash; una apariencia de multiplexación que permite que los
+                            métodos IU deleguen en varias implementaciones de apariencia al mismo tiempo. Puede ser usado para
+                            aumentar el comportamiento de un aspecto particular, por ejemplo con un Aspecto que proporciona pistas
+                            de audio sobre el Aspecto Windows. Esta es una forma de crear una apariencia accesible para
+                            discapacitados.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>javax.swing.plaf.synth</code> &mdash; un Aspecto facilmente configurado usando ficheros XML
+                            (descrito en la siguiente sección de esta lección).
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    No está limitado a los Aspectos que se suministran con la plataforma Java. Puede usar cualquier Aspecto que
+                    esté en la ruta de clases de su programa. Los Aspectos externos son usualmente proporcionados en uno o más
+                    ficheros JAR que usted añade a la ruta de clases de su programa en tiempo de ejecución. Por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+java -classpath .;C:\java\lafdir\customlaf.jar YourSwingApplication
+                    </pre>
+                </div>
+                <p>
+                    Una vez un Aspecto externo está en el camino de clases de su programa, su programa puede usarlo como cualquiera
+                    de los Aspectos empaquetados con la plataforma Java.
+                </p>
+                <h2>
+                    <a id="programmatic">Estableciendo la Apariencia de Forma Programada</a>
+                </h2>
+                <div class="note">
+                    <hr />
+                    <strong>Nota:</strong>&nbsp;Si usted va a establecer el Aspecto, debe hacerlo como el primer paso en su
+                    aplicación. De otra forma corre el riesgo de iniciar el Aspecto Java en vez del Aspecto que ha solicitado. Esto
+                    puede ocurrir inadvertidamente cuando un campo estático referencia una clase Swing, lo cual causa que el 
+                    Aspecto se cargue. Si no se ha especificado aún ningún Aspecto, el Aspecto por defecto para el EEJ se carga.
+                    Para el EEJ de Sun el predeterminado es el Aspecto Java, para el EEJ de Apple es el Aspecto Apple, etcétera.
+                    <hr />
+                </div>
+                <p>
+                    El Aspecto que los componentes de Swing usan es especificado a través de la clase <code>UIManager</code> en el
+                    paquete <code>javax.swing</code>. Cada vez que se crea un componente Swing, el componente solicita al
+                    administrador IU el delegado IU que implementa el Aspecto del componente. Por ejemplo,
+                    cada constructor de <code>JLabel</code> pregunta al administrador IU por el objeto delegado IU apropiado para
+                    la etiqueta. Después usa ese objeto delegado IU para implementar todo el pintado y gestión de eventos.
+                </p>
+                <p>
+                    Para especificar mediante programación un Aspecto, use el método <code>UIManager.setLookAndFeel()</code> con el
+                    nombre completamente cualificado de la subclase apropiada del <code>LookAndFeel</code> como su argumento. Por
+                    ejemplo, el código en negrita en el siguiente esbozo hace que el programa use el Aspecto Java multiplataforma:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public static void main(String[] args) {
+    try {
+            // Establece el Aspecto Java multiplataforma (también llamado "Metal")
+        <b>UIManager.setLookAndFeel(
+            UIManager.getCrossPlatformLookAndFeelClassName());</b>
+    }
+    catch (UnsupportedLookAndFeelException e) {
+       // maneja la excepción
+    }
+    catch (ClassNotFoundException e) {
+       // maneja la excepción
+    }
+    catch (InstantiationException e) {
+       // maneja la excepción
+    }
+    catch (IllegalAccessException e) {
+       // maneja la excepción
+    }
+
+    new SwingApplication(); //Crea y muestra el IGU.
+}
+                    </pre>
+                </div>
+                <p>Alternativamente, este código hace que el programa use el Aspecto System:</p>
+                <div class="codeblock">
+                    <pre>
+public static void main(String[] args) {
+    try {
+            // Establece el Aspecto System
+        <b>UIManager.setLookAndFeel(
+            UIManager.getSystemLookAndFeelClassName());</b>
+    }
+    catch (UnsupportedLookAndFeelException e) {
+       // maneja la excepción
+    }
+    catch (ClassNotFoundException e) {
+       // maneja la excepción
+    }
+    catch (InstantiationException e) {
+       // maneja la excepción
+    }
+    catch (IllegalAccessException e) {
+       // maneja la excepción
+    }
+
+    new SwingApplication(); //Crea y muestra el IGU.
+}
+                    </pre>
+                </div>
+                <p>
+                    Puede también usar el nombre de clase real de un Aspecto como el argumento a
+                    <code>UIManager.setLookAndFeel()</code>. Por ejemplo,
+                </p>
+                <div class="codeblock">
+                    <pre>
+// Establece el Aspecto Java multiplataforma (llamado también "Metal")
+UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+                    </pre>
+                </div>
+                <p>o</p>
+                <div class="codeblock">
+                    <pre>
+// Establece el Aspecto Motif en cualquier plataforma
+UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+                    </pre>
+                </div>
+                <p>
+                    No está limitado a los argumentos precedentes. Puede especificar el nombre de cualquier Aspecto que esté en la
+                    ruta de clases de su programa.
+                </p>
+                <h2>
+                    <a id="commandLine">Especificar la Apariencia: En Línea de Comandos</a>
+                </h2>
+                <p>
+                    Puede especificar el Aspecto en la línea de comandos usando la bandera <code>-D</code> para establecer la
+                    propiedad <code>swing.defaultlaf</code>. Por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+java -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel MyApp
+
+java -Dswing.defaultlaf=com.sun.java.swing.plaf.windows.WindowsLookAndFeel MyApp
+                    </pre>
+                </div>
+                <h2>
+                    <a id="properties">Especificar la Apariencia: swing.properties File</a>
+                </h2>
+                <p>
+                    Otra forma de especificar el Aspecto actual es usar el fichero <code>swing.properties</code> para establecer
+                    la propiedad <code>swing.defaultlaf</code> property. Este fichero, el cual necesita crear, está ubicado en el
+                    directorio <code>lib</code> de la versión de Sun de Java (otros vendedores de Java pueden usar una ubicación
+                    diferente). Por ejemplo, si está usando el interprete de Java en <code><em>javaHomeDirectory</em>\bin</code>,
+                    entonces el fichero <code>swing.properties</code> (si existe) está en
+                    <code><em>javaHomeDirectory</em>\lib</code>. Aquí tiene un ejmeplo de los contenidos de un fichero
+                    <a href="swing.properties"><code>swing.properties</code></a>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+# Swing properties
+swing.defaultlaf=com.sun.java.swing.plaf.windows.WindowsLookAndFeel
+                    </pre>
+                </div>
+                <h2>
+                    <a id="steps">Cómo UI Manager Elije la Apariencia</a>
+                </h2>
+                <p>
+                    Aquí tiene los pasos que determinan la apariencia que sucede cuando el gestor de IU necesita establecer un
+                    Aspecto:
+                </p>
+                <ol>
+                    <li>
+                        Si el programa establece el Aspecto antes de que se necesite un Aspecto, el gestor de IU intenta crear una
+                        instancia de la clase de aspecto. Si tiene éxito, todos los componentes usarán ese Aspecto.
+                    </li>
+                    <li>
+                        Si el programa no ha especificado satisfactoriamente un Aspecto, entonces el gestor de IU usa el Aspecto
+                        especificado por la propiedad <code>swing.defaultlaf</code>. Si la propiedad está especificada tanto en el
+                        fichero <code>swing.properties</code> <em>y</em> en la línea de comandos, la definición en línea de
+                        comandos toma precedencia.
+                    </li>
+                    <li>
+                        Si ninguna de estos pasos ha resultado en un Aspecto válido, el Entorno de Máquina Virtual de Sun usará el
+                        Aspecto Java. Otros vendedores, tales como Apple, usarán su Aspecto por defecto.
+                    </li>
+                </ol>
+                <h2>
+                    <a id="dynamic">Cambiar la Apariencia Después del Inicio</a>
+                </h2>
+                <p>
+                    Puede cambiar el Aspecto con <code>setLookAndFeel</code> incluso después de que el IGU del programa sea
+                    visible. Para hacer que los componentes existentes reflejen el nuevo Aspecto, invoque el método 
+                    <code>updateComponentTreeUI</code> de <code>SwingUtilities</code> una ve por cada contenedor de nivel superior.
+                    Luego tal vez desee redimensionar cada contenedor de nivel superior para reflejar los nuevos tamaños de los
+                    componentes que contienen. Por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+UIManager.setLookAndFeel(lnfName);
+SwingUtilities.updateComponentTreeUI(frame);
+frame.pack();
+                    </pre>
+                </div>
+                <h2>
+                    <a id="example">Un Ejemplo</a>
+                </h2>
+                <p>
+                    En el ejemplo siguiente, <code>LookAndFeelDemo.java</code>, puede experimentar con Aspectos diferentes. El
+                    programa crea una IGU simple con un botón y una etiqueta. Cada vez que pulse el botón, la etiqueta se
+                    incrementa.
+                </p>
+                <p>
+                    Puede cambiar el Aspecto cambiando la constante <code>LOOKANDFEEL</code> en la línea 18. Los comentarios de las
+                    líneas precedentes le indican qué valores son aceptables:
+                </p>
+                <div class="codeblock">
+                    <pre>
+    // Especifique el aspecto a usar definiendo la constante LOOKANDFEEL
+    // Los valores válidos son: null (usa el aspecto por defecto), "Metal", "System", "Motif",
+    // y "GTK"
+    final static String LOOKANDFEEL = "Motif";
+                    </pre>
+                </div>
+                <p>
+                    Aquí la constante está establecida en "Motif", el cual es un Aspecto que se ejecutará en cualquier plataforma
+                    (como será el predeterminado, "Metal"). "GTK+" no se ejecutará en Windows, y "Windows" se ejecutará sólo en
+                    Windows. Si elije un Aspecto que no se ejecutará, obtendrá el Aspecto Java o Metal.
+                </p>
+                <p>
+                    En la sección del código donde el Aspecto en realidad está configurado, verá diferentes formas de establecerlo,
+                    como se describió anteriormente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+if (LOOKANDFEEL.equals("Metal")) {
+   lookAndFeel = UIManager.getCrossPlatformLookAndFeelClassName();
+   //  una forma alternativa de establecer el Aspecto Metal es reemplazar la línea previa con:
+   // lookAndFeel = "javax.swing.plaf.metal.MetalLookAndFeel";
+                    </pre>
+                </div>
+                <p>
+                    Puede verificar que ambos argumentos funcionan al comentar/descomentar las dos alternativas.
+                </p>
+                <p>
+                    Aquí tiene un listado del fichero fuente
+
+                    <a class="SourceLink" target="_blank"
+                       href="../examples/lookandfeel/LookAndFeelDemoProject/src/lookandfeel/LookAndFeelDemo.java"
+                       onclick="showCode('../../displayCode.html',
+                                       '../examples/lookandfeel/LookAndFeelDemoProject/src/lookandfeel/LookAndFeelDemo.java');
+                               return false;">
+                        <code>LookAndFeelDemo</code>
+                    </a>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+package lookandfeel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.plaf.metal.*;
+
+public class LookAndFeelDemo implements ActionListener {
+    private static String labelPrefix = &quot;Number of button clicks: &quot;;
+    private int numClicks = 0;
+    final JLabel label = new JLabel(labelPrefix + &quot;0    &quot;);
+
+    // Especifique el aspecto a usar definiendo la constante LOOKANDFEEL
+    // Los valores válidos son: null (usa el predeterminado), &quot;Metal&quot;, &quot;System&quot;, &quot;Motif&quot;,
+    // y &quot;GTK&quot;
+    final static String LOOKANDFEEL = &quot;Metal&quot;;
+
+    // Si elije el Aspecto Metal, puede también elegir un tema.
+    // Especifique el tema a usar definiendo la constante THEME
+    // Los valores válidos son: &quot;DefaultMetal&quot;, &quot;Ocean&quot;,  y &quot;Test&quot;
+    final static String THEME = &quot;Test&quot;;
+
+
+    public Component createComponents() {
+        JButton button = new JButton(&quot;¡Soy un botón de Swing!&quot;);
+        button.setMnemonic(KeyEvent.VK_I);
+        button.addActionListener(this);
+        label.setLabelFor(button);
+
+        JPanel pane = new JPanel(new GridLayout(0, 1));
+        pane.add(button);
+        pane.add(label);
+        pane.setBorder(BorderFactory.createEmptyBorder(
+                                        30, //arriba
+                                        30, //izquierda
+                                        10, //abajo
+                                        30) //derecha
+                                        );
+
+        return pane;
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        numClicks++;
+        label.setText(labelPrefix + numClicks);
+    }
+
+    private static void initLookAndFeel() {
+        String lookAndFeel = null;
+
+        if (LOOKANDFEEL != null) {
+            if (LOOKANDFEEL.equals(&quot;Metal&quot;)) {
+                lookAndFeel = UIManager.getCrossPlatformLookAndFeelClassName();
+              // una forma alternativa de establecer el Aspecto Metal es reemplazar la
+              // línea previa con :
+              // lookAndFeel = &quot;javax.swing.plaf.metal.MetalLookAndFeel&quot;;
+
+            }
+
+            else if (LOOKANDFEEL.equals(&quot;System&quot;)) {
+                lookAndFeel = UIManager.getSystemLookAndFeelClassName();
+            }
+
+            else if (LOOKANDFEEL.equals(&quot;Motif&quot;)) {
+                lookAndFeel = &quot;com.sun.java.swing.plaf.motif.MotifLookAndFeel&quot;;
+            }
+
+            else if (LOOKANDFEEL.equals(&quot;GTK&quot;)) {
+                lookAndFeel = &quot;com.sun.java.swing.plaf.gtk.GTKLookAndFeel&quot;;
+            }
+
+            else {
+                System.err.println(&quot;Unexpected value of LOOKANDFEEL specified: &quot;
+                                   + LOOKANDFEEL);
+                lookAndFeel = UIManager.getCrossPlatformLookAndFeelClassName();
+            }
+
+            try {
+
+
+                UIManager.setLookAndFeel(lookAndFeel);
+
+                // Si Aspecto = &quot;Metal&quot;, establece el tema
+
+                if (LOOKANDFEEL.equals(&quot;Metal&quot;)) {
+                  if (THEME.equals(&quot;DefaultMetal&quot;))
+                     MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
+                  else if (THEME.equals(&quot;Ocean&quot;))
+                     MetalLookAndFeel.setCurrentTheme(new OceanTheme());
+                  else
+                     MetalLookAndFeel.setCurrentTheme(new TestTheme());
+
+                  UIManager.setLookAndFeel(new MetalLookAndFeel());
+                }
+
+
+
+
+            }
+
+            catch (ClassNotFoundException e) {
+                System.err.println(&quot;No se pudo encontrar la clase para el aspecto especificado:&quot;
+                                   + lookAndFeel);
+                System.err.println(&quot;¿Incluyó la biblioteca Aspecto en la ruta de clases?&quot;);
+                System.err.println(&quot;Usando el aspecto predeterminado.&quot;);
+            }
+
+            catch (UnsupportedLookAndFeelException e) {
+                System.err.println(&quot;No se puede usar el Aspecto especificado(&quot;
+                                   + lookAndFeel
+                                   + &quot;) en esta plataforma.&quot;);
+                System.err.println(&quot;Usando el aspecto predeterminado.&quot;);
+            }
+
+            catch (Exception e) {
+                System.err.println(&quot;No se pudo obtener un aspecto específico (&quot;
+                                   + lookAndFeel
+                                   + &quot;), por alguna razón.&quot;);
+                System.err.println(&quot;Usando el aspecto predeterminado.&quot;);
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static void createAndShowGUI() {
+        //Establece el aspecto.
+        initLookAndFeel();
+
+        //Asegúrate de tener buenas decoraciones para las ventanas.
+        JFrame.setDefaultLookAndFeelDecorated(true);
+
+        //Crea y configura la ventana.
+        JFrame frame = new JFrame(&quot;SwingApplication&quot;);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        LookAndFeelDemo app = new LookAndFeelDemo();
+        Component contents = app.createComponents();
+        frame.getContentPane().add(contents, BorderLayout.CENTER);
+
+        //Visualiza la ventana.
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        //Programa un trabajo para el hilo despachador de eventos:
+        //crear y mostrar el IGU de esta aplicación.
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                createAndShowGUI();
+            }
+        });
+    }
+}
+                    </pre>
+                </div>
+                <h2>
+                    <a id="themes">Temas</a>
+                </h2>
+                <p>
+                    Los temas fueron introducidos como una forma de cambiar facilmente los colores y fuentes de los Aspectos 
+                    Multiplataforma Java (Metal). En el programa de ejemplo, <code>LookAndfeelDemo.java</code>, listado arriba,
+                    puede cambiar el tema del Aspecto Metal estableciendo la constante <code>THEME</code> en la línea 23 a uno de
+                    los tres valores:
+                </p>
+                <ul>
+                    <li>
+                        <code>DefaultMetal</code>
+                    </li>
+                    <li>
+                        <code>Ocean</code>
+                    </li>
+                    <li>
+                        <code>Test</code>
+                    </li>
+                </ul>
+                <p>
+                    <code>Ocean</code>, el cual es un poco más suave que el puro Metal, ha sido el tema por defecto para el Aspecto
+                    Metal (Java) desde Java SE 5. A pesar de su nombre, <code>DefaultMetal</code> no es el tema por defecto para
+                    Metal (lo fue antes de Java SE 5, lo que explica su nombre). El tema <code>Test</code> es un tema definido en 
+                    <a class="SourceLink" target="_blank"
+                       href="../examples/lookandfeel/LookAndFeelDemoProject/src/lookandfeel/TestTheme.java"
+                       onclick="showCode('../../displayCode.html',
+                                       '../examples/lookandfeel/LookAndFeelDemoProject/src/lookandfeel/TestTheme.java');
+                               return false;">
+                        <code>TestTheme.java</code>
+                    </a>, el cual debe compilar con <code>LookAndfeelDemo.java</code>. Como está escrito,
+                    <code>TestTheme.java</code> establece los tres colores primarios (con resultados algo extraños). Puede modificar
+                    <code>TestTheme.java</code> para probar cualquier color que le guste.
+                </p>
+                <p>
+                    La sección del código donde el tema es establecido se encuentra al principio de la línea 92 de 
+                    <code>LookAndfeelDemo.java</code>. Tenga en cuenta que debe usar el Aspecto Metal para establecer un tema.
+                </p>
+                <div class="codeblock">
+                    <pre>
+ if (LOOKANDFEEL.equals("Metal")) {
+    if (THEME.equals("DefaultMetal"))
+       MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
+    else if (THEME.equals("Ocean"))
+       MetalLookAndFeel.setCurrentTheme(new OceanTheme());
+    else
+       MetalLookAndFeel.setCurrentTheme(new TestTheme());
+
+    UIManager.setLookAndFeel(new MetalLookAndFeel());
+ }
+                    </pre>
+                </div>
+                <h2>
+                    <a id="swingset2">El Programa de Demostración SwingSet2</a>
+                </h2>
+                <p>
+                    Cuando descarga el paquete de los
+                    <a class="OutsideLink" target="_blank"
+                       href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                        Ejemplos y Demostraciones del KDJ y JavaFX
+                    </a>
+                    y lo abre, hay una carpeta <code>demo\jfc</code> que contiene un programa de demostración llamado
+                    <code>SwingSet2</code>. Este programa tiene una IGU gráficamente rica y le permite cambiar el Aspecto desde el 
+                    menú. Además, si está usando el Aspecto Java (Metal), puede elegir una variedad de temas diferentes. Los 
+                    ficheros para los variados temas (por ejemplo, <code>RubyTheme.java</code>) se encuentran en la carpeta
+                    <code>SwingSet2\src</code>.
+                </p>
+                <p>
+                    Este es el tema "Ocean", el cual es el tema por defecto para el Aspecto multi-plataforma Java (Metal):
+                </p>
+                <p style="text-align:center">
+                    <img src="../../figures/uiswing/lookandfeel/OceanLAF.gif" width="665" height="607" class="imgbottom" alt="" />
+                </p>
+                <p>
+                    Este es el tema "Steel", el cual fuel el tema original para el Aspecto multiplataforma Java (Metal):
+                </p>
+                <p style="text-align:center">
+                    <img src="../../figures/uiswing/lookandfeel/MetalLAF.gif" width="665" height="607" class="imgbottom" alt="" />
+                </p>
+                <p>
+                    Para ejecutar el programa demostración <code>SwingSet2</code> en un sistema que tenga el KDJ instalado, use el
+                    comando:
+                </p>
+                <div class="codeblock">
+                    <pre>
+java -jar SwingSet2.jar
+                    </pre>
+                </div>
+                <p>
+                    Esto le dará el tema por defecto del Ocean.
+                </p>
+                <p>
+                    Para obtener el Aspecto metak, ejecuta esto:
+                </p>
+                <div class="codeblock">
+                    <pre>
+java -Dswing.metalTheme=steel -jar SwingSet2.jar
+                    </pre>
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="synth.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.</p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Modificando la Apariencia<br />
+            <b>Página siguiente:</b> La Apariencia Synth
+        </div>
+    </body>
+</html>

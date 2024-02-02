@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Cómo trabaja XPath (Los Tutoriales de Java&trade; &gt; IPA de Java para Procesado de XML (JAXP) &gt; Transformaciones 
+            del Lenguaje Extensible de Hojas de Estilo (XLST))
+        </title>
+        <meta name="description" content="Este tutorial de Java JAXP describe la IPA de Java para el procesado de XML (jaxp), XSLT, 
+              SAX, y tópicos de XML relacionados" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jaxp, xml, xslt, sax" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Transformaciones del Lenguaje Extensible de Hojas de Estilo (XLST)</a></div>
+                <div class="linkAHEAD"><a href="intro.html">Introduciendo XSL, XSLT, y XPath</a></div>
+                <div class="nolinkAHEAD">Cómo trabaja XPath</div>
+                <div class="linkAHEAD"><a href="writingDom.html">Escribiendo un DOM como si fuera un archivo XML</a></div>
+                <div class="linkAHEAD"><a href="generatingXML.html">Generando XML desde una Estructura de Datos Arbitraria</a></div>
+                <div class="linkAHEAD"><a href="transformingXML.html">Transformando Datos de XML con XSLT</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> IPA de Java para Procesado de XML (JAXP)<br />
+                <b>Lección:</b> Transformaciones del Lenguaje Extensible de Hojas de Estilo (XLST)
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">IPA de Java para Procesado de XML (JAXP)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Transformaciones del Lenguaje Extensible de Hojas de Estilo (XLST)</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="intro.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="writingDom.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Cómo trabaja XPath</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    La especificación XPath es la base para una variedad de especificaciones, incluye XSLT y las especificaciones 
+                    de enlace/direccionamiento tal como <code>XPointer</code>. Así un entendimiento de XPath es fundamental para 
+                    una gran cantidad de uso avanzado de XML. Esta sección proporciona una introducción a XPath en el contexto de 
+                    XSLT.
+                    <a id="gchmd"></a>
+                </p>
+                <h2>
+                    Expresiones XPath
+                </h2>
+                <p>
+                    En general, una expresión XPath especifica un patrón que selecciona un conjunto de nodos XML. Las plantillas 
+                    XSLT después usan esos patrones cuando aplica las transformaciones. (<code>XPointer</code>, por otro lado, 
+                    agrega mecanismos para definir un <b>punto</b> o un <b>rango</b> de forma que las expresiones XPath pueden 
+                    usarse para el direccionamiento).
+                </p>
+                <p>
+                    Los nodos en una expresión XPath se refieren a algo más que elementos. También se refieren a texto y atributos, 
+                    entre otras cosas. En realidad, la especificación XPath define un modelo de documento abstracto que define 
+                    siete clases de nodos:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Raiz
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Elemento
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Texto
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Atributo
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Comentario
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Instrucción de procesamiento
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Espacio de nombres
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    El elemento raíz de los datos XML es modelado por un nodo <b>elemento</b>. El nodo raíz de XPath contiene el 
+                    elemento raíz del documento, así como otra información relacionada con el documento.
+                </p>
+                <p>
+                    <a id="gchlm"></a>
+                </p>
+                <h2>
+                    Modelo de Datos XSLT/XPath
+                </h2>
+                <p>
+                    Como el Modelo de Objetos del Documento (DOM), el modelo de datos XSLT/XPath consiste de un árbol que contiene 
+                    una variedad de nodos. Bajo cualquier nodo elemento dado, hay nodos de texto, nodos de atributo, nodos 
+                    elemento, nodos comentario, y nodos de instrucciones de procesamiento.
+                </p>
+                <p>
+                    En este modelo abstracto, las distinciones sintácticas desaparecen, y se queda con una vista normalizada de los 
+                    datos. En un nodo de texto, por ejemplo, no importa si el texto se definió en una sección CDATA o si incluía 
+                    referencias a entidades. El nodo de texto consistirá de datos normalizados, ya que existe después de que se 
+                    completa todo el análisis. Así el texto contendrá un carácter <code>&lt;</code>, independientemente de que se 
+                    haya utilizado o no una referencia de entidad como <code>&lt;</code> o una sección CDATA para incluirlo. (Del 
+                    mismo modo, el texto contendrá un carácter <code>&amp;</code>, ya sea que se entregó usando <code>&amp;</code> 
+                    o si estaba en una sección CDATA).
+                </p>
+                <p>
+                    En esta sección, trataremos mayormente con nodos elemento y nodos texto. Para los otros mecanismos de 
+                    direccionamiento, vea la especificación de XPath.
+                </p>
+                <p>
+                    <a id="gchkv"></a>
+                </p>
+                <h2>
+                    Plantillas y Contextos
+                </h2>
+                <p>
+                    Uns plantilla XSLT es un conjunto de instrucciones de formateo que se aplican a los nodos seleccionados por una 
+                    expresión XPath. En una hoja de estilos, una plantila XSLT se parecería a algo como esto:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;xsl:template match="//LIST">
+    ...
+&lt;/xsl:template>
+                    </pre>
+                </div>
+                <p>
+                    La expresión <code>//LIST</code> selecciona el conjunto de los nodos <code>LIST</code> del flujo de entrada. 
+                    Instrucciones adicionales dentro de la plantilla le indican al sistema qué hacer con ellos.
+                </p>
+                <p>
+                    El conjunto de nodos seleccionados por dicha expresión define el contexto en el que se evalúan otras expresiones 
+                    en la plantilla. Ese contexto puede ser considerado como el conjunto completo &mdash; por ejemplo, cuando se 
+                    determina el número de nodos que contiene.
+                </p>
+                <p>
+                    El contexto puede ser también considerado como un sólo miembro del conjunto, ya que cada miembro se procesa uno 
+                    a uno. Por ejemplo, dentro de la plantilla que procesa <code>LIST</code>, la expresión <code>@type</code> se 
+                    refiere al tipo atributo del nodo actual <code>LIST</code>. (Del mismo modo, la expresión <code>@*</code> se 
+                    refiere a todos los atributos para el elemento LIST actual).
+                </p>
+                <p>
+                    <a id="gchlo"></a>
+                </p>
+                <h2>
+                    Direccionamiento Básico de XPath
+                </h2>
+                <p>
+                    Un documento XML es una colección estructurada en árbol (jerárquica) de nodos. Como con una estructura 
+                    jerárquica de directorio, es útil especificar una <i>ruta</i> que apunte a un nodo particular en la jerarquía 
+                    ( de ahí el nombre de la especificación: XPath). De hecho, gran parte de la notación de rutas de directorio se 
+                    mantiene intacta:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            La barra inclinada (/) se usa como separador de ruta.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Una ruta absoluta desde la raíz del documento empieza con un /.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Una ruta relativa desde una ubicación determinada empieza con cualquier otra cosa.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Un punto doble (..) indica el padre del nodo actual.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Un punto sólo (.) indica el nodo actual.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Por ejemplo, en un documento Extensible HTML (XHTML) (un documento XML que parace como HTML pero está bien 
+                    formado de acuerdo a las reglas XML), la ruta <code>/h1/h2/</code> indicaría un elemento <code>h2</code> bajo 
+                    un <code>h1</code>. (Recuerde que en XML, los nombres de elemento son sensibles a mayúsculas y minúsculas, así 
+                    que esta clase de especificación funciona mucho mejor en XHTML que lo haría en HTML plano, porque HTML no es 
+                    sensible a mayúsculas y minúsculas).
+                </p>
+                <p>
+                    En una especificación de coincidencia de patrones como XPath, la especificación <code>/h1/h2</code> selecciona 
+                    todos los elementos <code>h2</code> que se encuentran bajo un elemento <code>h1</code>. Para seleccionar un 
+                    elemento <code>h2</code> específico, use corchetes <code>[]</code> para indexar (como aquellos usados para las 
+                    matrices). La ruta <code>/h1[4]/h2[5]</code> por lo tanto seleccionaría el quinto elemento <code>h2</code> bajo 
+                    el cuarto elemento <code>h1</code>.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> En XHTML, todos los nombres de elementos están en minúsculas. Esa es una convención 
+                    bastante común para los documentos XML. Sin embargo, los nombres en mayúsculas son más fáciles de leer en un 
+                    tutorial como este. Entonces, durante el resto de la lección XSLT, todos los nombres de elementos XML estarán 
+                    en mayúsculas. (Los nombres de los atributos, por otro lado, permanecerán en minúsculas).
+                </p>
+                <hr />
+                <p>
+                    Un nombre especificado en una expresión XPath se refiere a un elemento. Por ejemplo, <code>h1</code> en 
+                    <code>/h1/h2</code> se refiere a un elemento <code>h1</code>. Para referirse a un atributo, prefije el nombre de 
+                    atributo con un signo <code>@</code>. Por ejemplo, <code>@type</code> se refierte al atributo type de un 
+                    elemento. Asumiendo que tiene un documento XL con elementos LIST, por ejemplo, la expresión 
+                    <code>LIST/@type</code> selecciona el atributo type del elemento <code>LIST</code>.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> Ya que la expresión no empieza con <code>/</code>, la referencia especifica un nodo de 
+                    lista relativo al contexto actual, cualquier posición en el documento en el que se encuentre.
+                </p>
+                <hr />
+                <p>
+                    <a id="gchly"></a>
+                </p>
+                <h2>
+                    Expresiones XPath Básicas
+                </h2>
+                <p>
+                    El rango completo de expresiones XPath se aprovecha de los comodines, operadores, y funciones que XPath define. 
+                    Aprenderá más sobre esos pronto. Aquí, vemos un par de las expresiones XPath más comunes simplemente para 
+                    presentarlas.
+                </p>
+                <p>
+                    La expresión <code>@type=&quot;unordered&quot;</code> especifica un atributo llamado <code>type</code> cuyo 
+                    valor es <code>unordered</code>. Una expresión como <code>LIST/@type</code> especifica el atributo type de un 
+                    elemento <code>LIST</code>.
+                </p>
+                <p>
+                    Puede combinar estas dos notaciones para obtener algo interesante. En XPath, la notación de corchete 
+                    (<code>[]</code>) normalmente asociada con la indexación se amplía para especificar los criterios de selección. 
+                    Así la expresión <code>LIST[@type=&quot;unordered&quot;]</code> selecciona todos los elementos 
+                    <code>LIST</code> cuyo valor en el atributo type es unordered.
+                </p>
+                <p>
+                    Expresiones similares existen para los elementos. Cada elemento tiene una cadena-valor asociada, que se forma 
+                    concatenado todos los segmentos de texto que se encuentran debajo del elemento. (Una explicación más detallada 
+                    de cómo funciona ese proceso se presenta en <a href="#gchmn">Cadena-Valor de un Elemento</a>).
+                </p>
+                <p>
+                    Suponga que modela lo que está sucediendo en su organización utilizando una estructura XML que consta de 
+                    elementos <code>PROJECT</code> y elementos <code>ACTIVITY</code> que tienen una cadena de texto con el nombre 
+                    del proyecto, varios elementos <code>PERSON</code> para listar las personas involucradas y, opcionalmente, un 
+                    elemento <code>STATUS</code> que registra el estado del proyecto. Aquí tiene otros ejemplos que usan la 
+                    notación extendida de corchetes:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>/PROJECT[.=&quot;MyProject&quot;]</code>: Selecciona un <code>PROJECT</code> llamado 
+                            <code>&quot;MyProject&quot;</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>/PROJECT[STATUS]</code>: Selecciona todos los proyectos que tienen un elemento hijo 
+                            <code>STATUS</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>/PROJECT[STATUS=&quot;Critical&quot;]</code>: Selecciona todos los proyectos que tiene un hijo 
+                            elemento <code>STATUS</code> con la cadena-valor <code>Critical</code>.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    <a id="gchml"></a>
+                </p>
+                <h2>
+                    Combinar Direcciones de Índice
+                </h2>
+                <p>
+                    La especificación XPath define bastantes mecanismos de direccionamiento y se pueden combinar de muchas formas 
+                    diferentes. Como resultado, XPath ofrece mucho poder expresivo para una especificación relativamente simple. 
+                    Esta sección ilustra otras combinaciones interesantes:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>LIST[@type=&quot;ordered&quot;][3]</code>: Selecciona todos los elementos <code>LIST</code> con 
+                            el atributo type con valor <code>ordered</code>, y devuelve el tercero.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>LIST[3][@type=&quot;ordered&quot;]</code>: Selecciona el tercer elemento <code>LIST</code>, pero 
+                            sólo si tiene el atributo type con el valor <code>ordered</code>.
+                        </p>
+                    </li>
+                </ul>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> Muchas más combinaciones de operadores de dirección se listan en la sección 2.5 de la 
+                    <a class="OutsideLink" target="_blank" href="http://www.w3.org/TR/xpath/">Especificación XPath</a>. Esta es 
+                    posiblemente la sección más útil de la especificación para definir una transformación XSLT.
+                </p>
+                <hr />
+                <p>
+                    <a id="gchlg"></a>
+                </p>
+                <h2>
+                    Comodines
+                </h2>
+                <p>
+                    Por definición, un expresión de XPath no cualificada selecciona un conjunto de nodos XML que coinciden con el 
+                    patrón especificado. Por ejemplo, <code>/HEAD</code> coincide con todas las entradas <code>HEAD</code> en el 
+                    nivel más alto, mientras que <code>/HEAD[1]</code> sólo coincide el primero. La 
+                    <a href="#gchlc">Tabla&nbsp;4-1</a> lista los comodines que pueden usarse en las expresiones XPath para ampliar 
+                    el alcance de la coincidencia de patrones.
+                </p>
+                <p>
+                    <a id="gchlc"></a>
+                </p>
+                <p>
+                    Tabla&nbsp;4-1 Comodines de XPath
+                </p>
+                <table>
+                    <col style="width:50%" />
+                    <col style="width:50%" />
+                    <tr>
+                        <th id="h1" style="text-align:left;vertical-align:top">
+                            <p>
+                                Comodín
+                            </p>
+                        </th>
+                        <th id="h2" style="text-align:left;vertical-align:top">
+                            <p>
+                                Significado
+                            </p>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>*</code>
+                            </p>
+                        </td>
+                        <td headers="h2" style="text-align:left;vertical-align:top">
+                            <p>
+                                Coincide con cualquier nodo de elemento (ni atributos ni texto).
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>node()</code>
+                            </p>
+                        </td>
+                        <td headers="h2" style="text-align:left;vertical-align:top">
+                            <p>
+                                Coincide con cualquier nodo de cualquier tipo: nodo de elemento, nodo de texto, nodo de atributo, 
+                                nodo de instrucción de procesamiento, nodo de espacio de nombres o nodo de comentario.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>@*</code>
+                            </p>
+                        </td>
+                        <td headers="h2" style="text-align:left;vertical-align:top">
+                            <p>
+                                Coincide con cualquier nodo de atributo.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    En el ejemplo de base de datos del proyecto, <code>/*/PERSON[.=&quot;Fred&quot;]</code> coincide con cualquier 
+                    elemento <code>PROJECT</code> o <code>ACTIVITY</code> que nombre a Fred.
+                </p>
+                <p>
+                    <a id="gchnx"></a>
+                </p>
+                <h2>
+                    Direccionamiento de Ruta Extendida
+                </h2>
+                <p>
+                    Hasta ahora, todos los patrones que ha visto especificaban un número exacto de niveles en la jerarquía. Por 
+                    ejemplo, <code>/HEAD</code> especifica cualquier elemento <code>HEAD</code> en el primer nivel en la jerarquía, 
+                    mientras que <code>/*/*</code> especifica cualquier elemento en el segundo nivel en la jerarquía. Para 
+                    especificar un nivel indeterminado en la jerarquía, use una barra inclinada doble (<code>//</code>). Por 
+                    ejemplo, la expresión XPath <code>//PARA</code> selecciona todos los elementos párrafo en un documento, 
+                    dondequiera que se encuentren.
+                </p>
+                <p>
+                    El patrón <code>//</code> puede también ser usado dentro de una ruta. Así la expresión 
+                    <code>/HEAD/LIST//PARA</code> indica todos los elementos párrafos en un subárbol que empieza desde 
+                    /<code>HEAD/LIST</code>.
+                </p>
+                <p>
+                    <a id="gchmu"></a>
+                </p>
+                <h2>
+                    Tipos de Datos y Operadores de XPath
+                </h2>
+                <p>
+                    Las expresiones XPath producen un conjunto de nodos, una cadena, un Booleano (un valor verdadero/falso), o un 
+                    número. La <a href="#gchmt">Tabla&nbsp;4-2</a> lista los operadores que pueden usarse en una expresión XPath:
+                </p>
+                <p>
+                    <a id="gchmt"></a>
+                </p>
+                <p>
+                    Tabla&nbsp;4-2 Operadores XPath
+                </p>
+                <table>
+                    <col style="width:50%" />
+                    <col style="width:50%" />
+                    <tr>
+                        <th id="h101" style="text-align:left;vertical-align:top">
+                            <p>
+                                Operador
+                            </p>
+                        </th>
+                        <th id="h102" style="text-align:left;vertical-align:top">
+                            <p>
+                                Significado
+                            </p>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td headers="h101" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>|</code>
+                            </p>
+                        </td>
+                        <td headers="h102" style="text-align:left;vertical-align:top">
+                            <p>
+                                Alternativo. Por ejemplo, <code>PARA|LIST</code> selecciona todos los elementos <code>PARA</code> y 
+                                <code>LIST</code>.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>or</code>, <code>and</code>
+                            </p>
+                        </td>
+                        <td headers="h102" style="text-align:left;vertical-align:top">
+                            <p>
+                                Devuelve el or/and de dos valores Booleanos.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>=</code>, <code>!=</code>
+                            </p>
+                        </td>
+                        <td headers="h102" style="text-align:left;vertical-align:top">
+                            <p>
+                                Igual o no igual, para Booleanos, cadenas, y números.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code>
+                            </p>
+                        </td>
+                        <td headers="h102" style="text-align:left;vertical-align:top">
+                            <p>
+                                Menos que, mayor que, menor que o igual a, mayor que o igual a, para números.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>+</code>, <code>-</code>, <code>*</code>, <code>div</code>, <code>mod</code>
+                            </p>
+                        </td>
+                        <td headers="h102" style="text-align:left;vertical-align:top">
+                            <p>
+                                Operaciones de agregar, substraer, multiplicar, dividir en punto flotante, y módulo (resto)
+                                (e.g., 6 mod 4 = 2).
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    Las expresiones pueden ser agrupadas en paréntesis, así que no tiene que preocuparse por la precedencia de los 
+                    operadores.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> La precedencia de operadores es un término que responde a la cuestión, &quot;Si usted 
+                    especifica a + b * c, ¿Eso significa (a+b) * c o a + (b*c)?&quot; (La precedencia de operadores es 
+                    aproximadamente la misma que la que se muestra en la tabla).
+                </p>
+                <hr />
+                <p>
+                    <a id="gchmn"></a>
+                </p>
+                <h2>
+                    Cadena-Valor de un Elemento
+                </h2>
+                <p>
+                    La cadena-valor de un elemento es la concatenación de todos los nodos descendientes, sin importar la 
+                    profundidad. Considere estos datos XML de contenido mezclado:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;PARA>This paragraph contains a &lt;b>bold&lt;/b> word&lt;/PARA>
+                    </pre>
+                </div>
+                <p>
+                    La cadena-valor del elemento <code>&lt;PARA&gt;</code> es <b>This paragraph contains a bold word</b>. En 
+                    particular, dese cuenta de que <code>&lt;B&gt;</code> es un hijo de <code>&lt;PARA&gt;</code> y que el texto 
+                    <code>bold</code> es un hijo de <code>&lt;B&gt;</code>.
+                </p>
+                <p>
+                    El punto es que todo el texto en todos los hijos de un nodo se une en la concatenación para formar la 
+                    cadena-valor.
+                </p>
+                <p>
+                    Además, vale la pena comprender que el texto en el modelo de datos abstracto definido por XPath está 
+                    completamente normalizado. Así si la estructura XML contiene la referencia de entidad <code>&amp;lt;</code> o 
+                    <code>&lt;</code> en una sección <code>CDATA</code>, los elementos de la cadena-valor contendrán el carácter 
+                    <code>&lt;</code>. Por lo tanto, cuando se genera HTML o XML con una hoja de estilos XSLT, debe convertir las 
+                    ocurrencias de <code>&lt;</code> a <code>&amp;lt;</code> o encerrarlas en una sección <code>CDATA</code>. Del 
+                    mismo modo, las ocurrencias de <code>&amp;</code> deben ser convertidas a <code>&amp;amp;</code>.
+                </p>
+                <p>
+                    <a id="gchnl"></a>
+                </p>
+                <h2>
+                    Funciones XPath
+                </h2>
+                <p>
+                    Esta sección termina con una introducción de las funciones XPath. Puede usar las funciones XPath para 
+                    seleccionar una colección de nodos de la misma forma que usaría una especificación de elemento como aquellas 
+                    que ya ha visto. Otras funciones devuelven una cadena, un número, o un valor Booleano. Por ejemplo, la 
+                    expresión <code>/PROJECT/text()</code> obtiene la cadena-valor de los nodos <code>PROJECT</code>.
+                </p>
+                <p>
+                    Muchas funciones dependen del contexto actual. En el ejemplo precedente, el contexto para cada invocación de la 
+                    función <code>text()</code> es el nodo <code>PROJECT</code> que está actualmente seleccionado.
+                </p>
+                <p>
+                    Hay muchas funciones XPath &mdash; demasiadas para describirlas en detalle aquí. Esta sección proporciona un 
+                    breve listado que muestra las funciones disponibles de XPath, junto con un sumario de lo que hacen. Para más 
+                    información sobre las funciones, vea la sección 4 de la 
+                    <a class="OutsideLink" target="_blank" href="http://www.w3.org/TR/xpath/">Especificación XPath</a>.
+                </p>
+                <p>
+                    <a id="gchoa"></a>
+                </p>
+                <h3>
+                    Funciones de Conjuntos de Nodos
+                </h3>
+                <p>
+                    Muchas expresiones XPath seleccionan un conjunto de nodos. En esencia, devuelven un conjunto de nodos, Una 
+                    función hace eso, también. La función <code>id(...)</code> devuelve el nodo con el ID especificado. (Los 
+                    elementos tienen un ID sólo cuando el documento tiene un DTD, que especifica qué atributo tiene el tipo ID).
+                </p>
+                <p>
+                    <a id="gchob"></a>
+                </p>
+                <h3>
+                    Funciones Posicionales
+                </h3>
+                <p>
+                    Estas funciones devuelven valores numéricos basados en la posición.
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>last()</code>: Devuelve el índice del último elemento. Por ejemplo, <code>/HEAD[last()]</code> 
+                            selecciona el último elemento <code>HEAD</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>position()</code>: Devuelve la posición del índice. Por ejemplo, 
+                            <code>/HEAD[position() &lt;= 5]</code> selecciona los primeros cinco elementos <code>HEAD</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>count(...)</code>: Devuelve el recuento de elementos. Por ejemplo, 
+                            <code>/HEAD[count(HEAD)=0]</code> selecciona todos los elementos <code>HEAD</code> que no tengan 
+                            subtítulos.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    <a id="gchmp"></a>
+                </p>
+                <h3>
+                    Funciones de Cadena
+                </h3>
+                <p>
+                    Estas funciones operan con o devuelven cadenas.
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>concat(string, string, ...)</code>: Concatenca los valores de cadena.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>starts-with(string1, string2)</code>: Devuelve verdadero si <code>string1</code> empieza con 
+                            <code>string2</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>contains(string1, string2)</code>: Devuelve verdadero si <code>string1</code> contiene a 
+                            <code>string2</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>substring-before(string1, string2)</code>: Devuelve el inicio de <code>string1</code> antes de 
+                            que aparezca <code>string2</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>substring-after(string1, string2)</code>: Devuelve el resto de <code>string1</code> después de 
+                            que <code>string2 </code> aparezca en él.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>substring(string, idx)</code>: Devuelve la subcadena desde la posición del índice al final, donde 
+                            el índice del primer <code>char</code> = 1.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>substring(string, idx, len)</code>: Devuelve la subcadena de la longitud especificad desde la 
+                            posición del índice.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>string-length()</code>: Devuelve el tamaño de la cadena-valor del nodo de contexto; el nodo de 
+                            contexto es el nodo seleccionado actualmente &mdash; el nodo que fue seleccionado por una expresión 
+                            XPath en la cual se aplicó una función tal como <code>string-length()</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>string-length(string)</code>: Devuelve el tamaño de la cadena especificada.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>normalize-space()</code>: Devuelve la cadena-valor normalizada del nodo actual (sin espacios en 
+                            blanco iniciales o finales, y secuencias de caracteres de espacios en blanco convertidos en un solo 
+                            espacio).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>normalize-space(string)</code>: Devuelve la cadena-valor normalizada de la cadena especificada.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>translate(string1, string2, string3)</code>: Convierte <code>string1</code>, reemplazando las 
+                            ocurrencia de los caracteres en <code>string2</code> con el carácter correspondiente de 
+                            <code>string3</code>.
+                        </p>
+                    </li>
+                </ul>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> XPath define tres formas de obtener el texto de un elemento: <code>text()</code>, 
+                    <code>string(object)</code>, y la cadena-valor implicada por un nombre de elemento en una expresión como esta:
+                    <code>/PROJECT[PERSON=&quot;Fred&quot;]</code>.
+                </p>
+                <hr />
+                <p>
+                    <a id="gchny"></a>
+                </p>
+                <h3>
+                    Funciones Booleanas
+                </h3>
+                <p>
+                    Esta funciones operan sobre o devuelven valores Booleanos.
+
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>not(...)</code>: Niega el valor Booleano especificado.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>true()</code>: Devuelve verdadero.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>false()</code>: Devuelve falso.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>lang(string)</code>: Devuelve verdadero si el lenguaje del nodo de contexto (especificado por los 
+                            atributos <code>xml:Lang</code>) es el mismo (o un sub-lenguaje de) que el lenguaje especificado; por 
+                            ejemplo, Lang(&quot;en&quot;)  es verdadero para 
+                            <code>&lt;PARA_xml:Lang=&quot;en&quot;&gt;...&lt;/PARA&gt;</code>.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    <a id="gchta"></a>
+                </p>
+                <h3>
+                    Funciones Numéricas
+                </h3>
+                <p>
+                    Estas funciones operan con o devuelven valores numéricos.
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>sum(...)</code>: Devuevle la suma de los valores numéricos de cada nodo en el conjunto de nodo 
+                            especifcado.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>floor(N)</code>: Devuelve el entero más grande que no es mayor que <i>N</i>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>ceiling(N)</code>: Devuelve el entero más pequeño qu no es menor que <i>N</i>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>round(N)</code>: Devuelve el entero que está más cerca a <i>N</i>.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    <a id="gchsp"></a>
+                </p>
+                <h3>
+                    Funciones de Conversión
+                </h3>
+                <p>
+                    Estas funciones convierten un tipo de datos a otro.
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>string(...)</code>: Devuelve el valor de cadena de un número, un Booleano, o un conjunto de nodos.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>boolean(...)</code>: Devuelve un valor Booleano para un nombre, cadena, o conjunto de nodos (un 
+                            número no cero, un conjunto de nodos no vacío, y una cadena no vacía son todas verdaderas).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>number(...)</code>: Devuelve el valor numérico de un Boolean, una cadena o un conjunto de nodos 
+                            (verdadero si 1, falso es 0, una cadena que contiene un número se convierte en ese número, la 
+                            cadena-valor de un conjunto de nodos se convierte en un número).
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    <a id="gchtb"></a>
+                </p>
+                <h3>
+                    Funciones de Espacio de Nombres
+                </h3>
+                <p>
+                    Estas funciones le permiten determinar las características de un nodo.
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>local-name()</code>: Devuelve el nombre del nodo actual, menos el prefijo del espacio de nombres.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>local-name(...)</code>: Devuelve el nombre del primer nodo del conjunto de nodos especificado, 
+                            menos el prefijo del espacio de nombres.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>namespace-uri()</code>: Devuelve el URI del espacio de nombres del nodo actual.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>namespace-uri(...)</code>: Devuelve el URI del espacio de nombres del primer nodo del conjunto de 
+                            nodos especificado.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>name()</code>: Devuelve el nombre expandido (URI más nombre local) del nodo actual.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>name(...)</code>: Devuelve el nombre expandido (URI más nombre local) del primer nodo en el 
+                            conjunto de nodos especificado.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    <a id="gchsu"></a>
+                </p>
+                <h2>
+                    Sumario
+                </h2>
+                <p>
+                    Los operadores, funciones, comodines, y mecanismos de direccionamiento de nodos de XPath pueden ser combinados 
+                    en una amplia variedad de formas. La introducción que ha tenido hasta ahora debería darle una buena ventaja al 
+                    especificar el patrón que necesita para cualquier propósito en particular.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="intro.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="writingDom.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Introduciendo XSL, XSLT, y XPath<br />
+            <b>Página siguiente:</b> Escribiendo un DOM como si fuera un archivo XML
+        </div>
+    </body>
+</html> 

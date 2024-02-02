@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            IPA de StAX (Los Tutoriales de Java&trade; &gt; IPA de Java para Procesado de XML (JAXP) &gt; 
+            IPA de Transmisión para XML)
+        </title>
+        <meta name="description" content="Este tutorial de Java JAXP describe la IPA de Java para el procesado de XML (jaxp), XSLT, 
+              SAX, y tópicos de XML relacionados" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jaxp, xml, xslt, sax" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">IPA de Transmisión para XML</a></div>
+                <div class="linkAHEAD"><a href="why.html">¿Porqué StAX?</a></div>
+                <div class="nolinkAHEAD">IPA de StAX</div>
+                <div class="linkAHEAD"><a href="using.html">Utilizando StAX</a></div>
+                <div class="linkAHEAD"><a href="parser.html">Implementación del Analizador de Flujos XML de Oracle</a></div>
+                <div class="linkAHEAD"><a href="example.html">Código de Ejemplo</a></div>
+                <div class="linkAHEAD"><a href="info.html">Información Adicional</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> IPA de Java para Procesado de XML (JAXP)<br />
+                <b>Lección:</b> IPA de Transmisión para XML
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">IPA de Java para Procesado de XML (JAXP)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">IPA de Transmisión para XML</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="why.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="using.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>IPA de StAX</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    <a id="indexterm-13"></a>
+                </p>
+                <p>
+                    La IPA de StAX expone métodos para el procesado iterativos, basado en eventos de documentos XML. Los documentos 
+                    XML son tratados como series filtradas de eventos, y los estados de los conjuntos de información pueden 
+                    almacenarse de forma procedimental. Es más, a diferencia de SAX, la IPA de StAX es bidireccional, lo que 
+                    permite tanto la lectura como la escritura de documentos XML.
+                </p>
+                <p>
+                    La IPA de StAX son realmente dos conjuntos de IPA distintas: una IPA de <b>cursor</b> y una IPA de 
+                    <b>iterador</b>. Estos dos conjuntos de IPA se explican en gran detalle más tarde en esta lección, pero sus 
+                    características principales se describen brevemente debajo.
+                </p>
+                <p>
+                    <a id="bnbed"></a>
+                </p>
+                <h2>
+                    IPA de Cursor
+                </h2>
+                <p>
+                    <a id="indexterm-14"></a><a id="indexterm-15"></a>
+                </p>
+                <p>
+                    Como el nombre implica, la IPA de StaX <b>cursor</b> representa un cursor con el cual puede recorrer un 
+                    documento XML, desde el principio hasta el final. Este cursor puede apuntar a una cosa a la vez, y siempre se 
+                    mueve hacia delante, nunca hacia atrás, habitualmente un elemento del conjunto de información a la vez.
+                </p>
+                <p>
+                    Las dos interfazes principales de cursor son <code>XMLStreamReader</code> y <code>XMLStreamWriter</code>. 
+                    <code>XMLStreamReader</code> incluye métodos de acceso para toda la posible información recuperable del modelo 
+                    de información XML, incluyendo la codificación del documento, nombres de elemento, atributos, espacios de 
+                    nombres, nodos de texto, etiquetas de inicio, comentarios, instrucciones de procesamiento, límites del 
+                    documento, etcétera; por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public interface XMLStreamReader {
+    public int next() throws XMLStreamException;
+    public boolean hasNext() throws XMLStreamException;
+
+    public String getText();
+    public String getLocalName();
+    public String getNamespaceURI();
+    // ... other methods not shown
+}
+                    </pre>
+                </div>
+                <p>
+                    Puede llamar a los métodos en <code>XMLStreamReader</code>, tales como <code>getText</code> y 
+                    <code>getName</code>, para obtener datos de la ubicación actual del cursor. <code>XMLStreamWriter</code> 
+                    proporciona métodos que corresponden a los tipos de evento <code>StartElement</code> y <code>EndElement</code>; 
+                    por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public interface XMLStreamWriter {
+    public void writeStartElement(String localName) throws XMLStreamException;
+    public void writeEndElement() throws XMLStreamException;
+    public void writeCharacters(String text) throws XMLStreamException;
+    // ... other methods not shown
+}
+                    </pre>
+                </div>
+                <p>
+                    La IPA de cursor refleja SAX de muchas formas. Por ejemplo, los métodos están disponibles para acceder 
+                    directamente a la información de cadena y caracteres, y los índices enteros pueden usarse para acceder a la 
+                    información de atributos y espacios de nombres. Como con SAX, los métodos de la IPA de cursor devuelven la 
+                    información XML como cadenas, lo que minimiza los requisitos de asignación de objetos.
+                </p>
+                <p>
+                    <a id="bnbee"></a>
+                </p>
+                <h2>
+                    IPA de Iterador
+                </h2>
+                <p>
+                    <a id="indexterm-16"></a><a id="indexterm-17"></a>
+                </p>
+                <p>
+                    La IPA <b>iterador</b> de StAX representa un flujo de un documento XML como un conjunto de objetos de eventos 
+                    discretos. La aplicación extrae estos eventos y el analizador los proporciona en el orden en que se leen en 
+                    documento XML de origen.
+                </p>
+                <p>
+                    La interfaz base del iterador se llama <code>XMLEvent</code>, y hay subinterfaces para cada tipo de evento 
+                    listado en la <a href="#indexterm-18">Tabla XMLEvent</a>. La interfaz del analizador primario para leer eventos 
+                    del iterador es <code>XMLEventReader</code>, y la interfaz primaria para escribir eventos del iterador es 
+                    <code>XMLEventWriter</code>. La interfaz <code>XMLEventReader</code> contiene cinco métodos, el más importante 
+                    de los cuales es <code>nextEvent</code>, que devuelve el siguiente evento en un flujo XML. 
+                    <code>XMLEventReader</code> implementa <code>java.util.Iterator</code>, lo que significa que lso retornos de 
+                    <code>XMLEventReader</code> se pueden almacenar en caché o pasar a rutinas que pueden funcionar con el iterador 
+                    de Java estándar; por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public interface XMLEventReader extends Iterator {
+    public XMLEvent nextEvent() throws XMLStreamException;
+    public boolean hasNext();
+    public XMLEvent peek() throws XMLStreamException;
+    // ...
+}
+                    </pre>
+                </div>
+                <p>
+                    Del mismo mod, en el lado de salida de la IPA del iterador, tiene:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public interface XMLEventWriter {
+    public void flush() throws XMLStreamException;
+    public void close() throws XMLStreamException;
+    public void add(XMLEvent e) throws XMLStreamException;
+    public void add(Attribute attribute) throws XMLStreamException;
+    // ...
+}
+                    </pre>
+                </div>
+                <p>
+                    <a id="bnbef"></a>
+                </p>
+                <h3>
+                    Tipos de Eventos de Iterador
+                </h3>
+                <p>
+                    <a id="indexterm-18"></a>
+                </p>
+                <table class="celda">
+                    <caption>
+                        <code>XMLEvent</code> Tipos Definidos en la IPA del Iterador de Eventos
+                    </caption>
+                    <col style="width:25%" />
+                    <col style="width:74%" />
+                    <tr>
+                        <th id="h1" class="celda" style="text-align:left;vertical-align:top" scope="col">
+                            <p>
+                                Tipo de Evento
+                            </p>
+                        </th>
+                        <th id="h2" class="celda" style="text-align:left;vertical-align:top" scope="col">
+                            <p>
+                                Descripción
+                            </p>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>StartDocument</code>
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Informa del principio de un conjunto de eventos XML, incluyendo la codificación, la versión de XML, 
+                                y propiedades independientes.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p><code>StartElement</code></p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Informa del inicio de un elemento, incluyendo cualquier atributo y declaraciones de espacios de 
+                                nombre; también proporciona acceso al prefijo, la URI del espacio de nombres, y el nombre local de 
+                                la etiqueta de inicio.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>EndElement</code>
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Informa de la etiqueta final de un elemento. Los espacios de nombres que han salido del alcance se 
+                                pueden recuperar aquí si se han establecido explícitamente en su <code>StartElement</code> 
+                                correspondiente.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>Characters</code>
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Corresponde a las secciones <code>CData</code> de XML y las entidades <code>CharacterData</code>. 
+                                Tenga en cuenta que los espacios en blanco ignorables y los espacios en blanco significativos son 
+                                también informados como eventos <code>Character</code>.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>EntityReference</code>
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Las entidades de carácter pueden ser informadas como eventos discretos, que un desarrollador de 
+                                aplicaciones puede optar por resolver o pasar sin resolver. Por defecto, las entidades se 
+                                resuelven. Alternativamente, si no quiere informar la entidad como un evento, el texto de reemplazo 
+                                puede ser sustituido e informado como <code>Characters</code>.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>ProcessingInstruction</code>
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Reporta el objetivo y los datos para una instrucción de procesamiento subyacente.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>Comment</code>
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Devuelve el texto de un comentario.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>EndDocument</code>
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Informa del final de un conjunto de eventos XML.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>DTD</code>
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Informa como <code>java.lang.String</code> información sobre la DTD, si la hay, asociada con el 
+                                flujo, y proporciona un método para devolver los objetos personalizados que se encuentran en la DTD.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>Attribute</code>
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Los atributos se informan generalmente como parte de un evento <code>StartElement</code>. Sin 
+                                embargo, hay veces cuando es deseable devolver un atributo como un evento <code>Attribute</code> 
+                                independiente; por ejemplo, cuando se devuelve un espacio de nombres como el resultado de una 
+                                expresión <code>XQuery</code> o <code>XPath</code>.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>Namespace</code>
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Como con los atributos, los espacios de nombre se informan usualmente como parte de un 
+                                <code>StartElement</code>, pero hay veces en las que es deseable informar un espacio de nombres 
+                                como un evento discreto <code>Namespace</code>.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    Tenga en cuenta que los eventos <code>DTD</code>, <code>EntityDeclaration</code>, <code>EntityReference</code>, 
+                    <code>NotationDeclaration</code>, y <code>ProcessingInstruction</code> se crean sólo si el documento que está 
+                    siendo procesado contiene una DTD.
+                </p>
+                <p>
+                    <a id="bnbeh"></a>
+                </p>
+                <h3>
+                    Ejemplo de Asignación de Eventos
+                </h3>
+                <p>
+                    <a id="indexterm-19"></a><a id="indexterm-20"></a>
+                </p>
+                <p>
+                    Como un ejemplo de cómo la IPA del iterador de eventos se asigna a un flujo XML, considere el siguiente 
+                    documento XML:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;?xml version="1.0"?>
+&lt;BookCatalogue xmlns="http://www.publishing.org">
+    &lt;Book>
+        &lt;Title>Yogasana Vijnana: the Science of Yoga&lt;/Title>
+        &lt;ISBN>81-40-34319-4&lt;/ISBN>
+        &lt;Cost currency="INR">11.50&lt;/Cost>
+    &lt;/Book>
+&lt;/BookCatalogue>
+                    </pre>
+                </div>
+                <p>
+                    Este documento sería analizado en dieciocho eventos principales y secundarios, como se muestra en la tabla 
+                    siguiente. Tenga en cuenta que los eventos secundarios, mostrados entre llaves (<code>{}</code>), normalmente 
+                    se acceden desde un evento principal en lugar de hacerlo directamente.
+                </p>
+                <p>
+                    <a id="bnbei"></a>
+                </p>
+                <table class="celda">
+                    <caption>
+                        Ejemplo de mapeo de eventos de la IPA de iterador
+                    </caption>
+                    <col style="width:6%" />
+                    <col style="width:72%" />
+                    <col style="width:21%" />
+                    <tr>
+                        <th id="h101" class="celda" style="text-align:left;vertical-align:top" scope="col">
+                            <p>
+                                #
+                            </p>
+                        </th>
+                        <th id="h102" class="celda" style="text-align:left;vertical-align:top" scope="col">
+                            <p>
+                                Elemento/Atributo
+                            </p>
+                        </th>
+                        <th id="h103" class="celda" style="text-align:left;vertical-align:top" scope="col">
+                            <p>
+                                Evento
+                            </p>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                1
+                            </p>
+                        </td>
+                        <td headers="h102" class="celda" style="text-align:left;vertical-align:top">
+                            <code>version=&quot;1.0&quot;</code>
+                        </td>
+                        <td headers="h103" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>StartDocument</code>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                2
+                            </p>
+                        </td>
+                        <td headers="h102" class="celda" style="text-align:left;vertical-align:top">
+                            <code>isCData = false data = &quot;\n&quot; IsWhiteSpace = true</code>
+                        </td>
+                        <td headers="h103" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>Characters</code>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                3
+                            </p>
+                        </td>
+                        <td headers="h102" class="celda" style="text-align:left;vertical-align:top">
+                            <code>qname = BookCatalogue:http://www.publishing.org attributes = null namespaces = 
+                                {BookCatalogue&quot; -&gt; http://www.publishing.org&quot;}</code>
+                        </td>
+                        <td headers="h103" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>StartElement</code>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                4
+                            </p>
+                        </td>
+                        <td headers="h102" class="celda" style="text-align:left;vertical-align:top">
+                            <code>qname = Book attributes = null namespaces = null</code>
+                        </td>
+                        <td headers="h103" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>StartElement</code>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                5
+                            </p>
+                        </td>
+                        <td headers="h102" class="celda" style="text-align:left;vertical-align:top">
+                            <code>qname = Title attributes = null namespaces = null</code>
+                        </td>
+                        <td headers="h103" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>StartElement</code>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                6
+                            </p>
+                        </td>
+                        <td headers="h102" class="celda" style="text-align:left;vertical-align:top">
+                            <code>
+                                isCData = false data = &quot;Yogasana Vijnana: the Science of Yoga\n\t&quot; IsWhiteSpace = false
+                            </code>
+                        </td>
+                        <td headers="h103" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>Characters</code>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                7
+                            </p>
+                        </td>
+                        <td headers="h102" class="celda" style="text-align:left;vertical-align:top">
+                            <code>qname = Title namespaces = null</code>
+                        </td>
+                        <td headers="h103" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>EndElement</code>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                8
+                            </p>
+                        </td>
+                        <td headers="h102" class="celda" style="text-align:left;vertical-align:top">
+                            <code>qname = ISBN attributes = null namespaces = null</code>
+                        </td>
+                        <td headers="h103" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>StartElement</code>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                9
+                            </p>
+                        </td>
+                        <td headers="h102" class="celda" style="text-align:left;vertical-align:top">
+                            <code>isCData = false data = &quot;81-40-34319-4\n\t&quot; IsWhiteSpace = false</code>
+                        </td>
+                        <td headers="h103" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>Characters</code>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                10
+                            </p>
+                        </td>
+                        <td headers="h102" class="celda" style="text-align:left;vertical-align:top">
+                            <code>qname = ISBN namespaces = null</code>
+                        </td>
+                        <td headers="h103" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>EndElement</code>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                11
+                            </p>
+                        </td>
+                        <td headers="h102" class="celda" style="text-align:left;vertical-align:top">
+                            <code>qname = Cost attributes = {&quot;currency&quot; -&gt; INR} namespaces = null</code>
+                        </td>
+                        <td headers="h103" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>StartElement</code>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                12
+                            </p>
+                        </td>
+                        <td headers="h102" class="celda" style="text-align:left;vertical-align:top">
+                            <code>isCData = false data = &quot;11.50\n\t&quot; IsWhiteSpace = false</code>
+                        </td>
+                        <td headers="h103" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>Characters</code>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                13
+                            </p>
+                        </td>
+                        <td headers="h102" class="celda" style="text-align:left;vertical-align:top">
+                            <code>qname = Cost namespaces = null</code>
+                        </td>
+                        <td headers="h103" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>EndElement</code>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                14
+                            </p>
+                        </td>
+                        <td headers="h102" class="celda" style="text-align:left;vertical-align:top">
+                            <code>isCData = false data = &quot;\n&quot; IsWhiteSpace = true</code>
+                        </td>
+                        <td headers="h103" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>Characters</code>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                15
+                            </p>
+                        </td>
+                        <td headers="h102" class="celda" style="text-align:left;vertical-align:top">
+                            <code>qname = Book namespaces = null</code>
+                        </td>
+                        <td headers="h103" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>EndElement</code>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                16
+                            </p>
+                        </td>
+                        <td headers="h102" class="celda" style="text-align:left;vertical-align:top">
+                            <code>isCData = false data = &quot;\n&quot; IsWhiteSpace = true</code>
+                        </td>
+                        <td headers="h103" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>Characters</code>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                17
+                            </p>
+                        </td>
+                        <td headers="h102" class="celda" style="text-align:left;vertical-align:top">
+                            <code>
+                                qname = BookCatalogue:http://www.publishing.org namespaces = 
+                                {BookCatalogue&quot; -&gt; http://www.publishing.org&quot;}
+                            </code>
+                        </td>
+                        <td headers="h103" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>EndElement</code>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                18
+                            </p>
+                        </td>
+                        <td headers="h102" class="celda" style="text-align:left;vertical-align:top"></td>
+                        <td headers="h103" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>EndDocument</code>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    Hay varias cosas importantes a tener en cuenta en este ejemplo:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Se crean los eventos en el orden en el cual se encuentran los elementos XML correspondientes en el 
+                            documento, incluyendo el anidado de los elementos, apertura y cierre de elementos, el orden de los 
+                            atributos, el inicio del documento y el final del documento, etcétera.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Al igual que con la sintaxis XML adecuada, todos los elementos del contenedor tienen eventos de inicio 
+                            y finalización correspondientes; por ejemplo, cada <code>StartElement</code> tiene un 
+                            <code>EndElement</code> correspondiente, incluso para elementos vacíos.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Los eventos <code>Attribute</code> se tratan como eventos secundarios, y se accede a ellos desde su 
+                            evento <code>StartElement</code> correspondiente.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            De forma similar a los eventos <code>Attribute</code>, los eventos <code>Namespace</code> se tratan 
+                            como secundarios, pero aparecen dos veces y son accesibles dos veces en el flujo de eventos, primero 
+                            desde su <code>StartElement</code> correspondiente y después desde su <code>EndElement</code> 
+                            correspondiente.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Los eventos <code>Character</code> se especifican para todos los elementos, incluso si esos elementos 
+                            no tienen datos de carácter. De manera similar, los eventos <code>Character</code> se pueden dividir 
+                            entre eventos.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            El analizador StAX mantiene una pila de espacios de nombres, que mantiene información sobre todos los 
+                            espacios de nombres XML definidos para el elemento actual y sus ancestros. La pila de espacios de 
+                            nombres, que se expone a través de la interfaz <code>javax.xml.namespace.NamespaceContext</code>, puede
+                            ser accedida por el prefijo del espacio de nombres o la URI.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    <a id="bnbej"></a>
+                </p>
+                <h2>
+                    Elegir entre las IPAs de Cursor e Iterator
+                </h2>
+                <p>
+                    <a id="indexterm-21"></a>
+                </p>
+                <p>
+                    Es razonables el preguntarse en este punto,&ldquo;¿Qué IPA debo elegir? ¿Debo crear instancias de 
+                    <code>XMLStreamReader</code> o <code>XMLEventReader</code>? De todos modos, ¿por qué hay dos tipos de IPA?
+                    &rdquo;
+                </p>
+                <p>
+                    <a id="bnbek"></a>
+                </p>
+                <h3>
+                    Objetivos de Desarrollo
+                </h3>
+                <p>
+                    Los autores de la especificación StAX se dirigieron a tres tipos de desarrolladores:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <b>Desarrolladores de librería e infraestructura</b>: Crean servidores de aplicaciones, JAXM, JAXB, 
+                            JAX-RPC e implementaciones similares; necesitan IPA de bajo nivel altamente eficientes con requisitos 
+                            mínimos de extensibilidad.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Desarrolladores Java ME</b>: Necesitan bibliotecas pequeñas, simples, de análisis de extracción, y 
+                            tienen necesidades mínimas de extensibilidad.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Desarrolladores de la Plataforma Java, Plataforma Java y Edición Empresarial (Java EE), Edición 
+                                Estándar (Java SE)</b>: Necesita bibliotecas de análisis de extracción limpias y eficientes, además 
+                            de la flexibilidad para leer y escribir secuencias XML, crear nuevos tipos de eventos y ampliar 
+                            atributos y elementos de documentos XML.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Dadas estas categorías de desarrollo de amplio alcance, los autores de StAX consideraron que era más útil 
+                    definir dos IPA pequeñas y eficientes en lugar de sobrecargar una IPA más grande y necesariamente más compleja.
+                </p>
+                <p>
+                    <a id="bnbel"></a>
+                </p>
+                <h3>
+                    Comparando las IPAs de Cursor e Iterator
+                </h3>
+                <p>
+                    Antes de elegir entre las IPAs de cursor e iterador, debe tener en cuenta algunas cosas que puede hacer con la 
+                    IPA del Iterador que no puede hacer con la IPA del cursor:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Los objetos creados desde las subclases <code>XMLEvent</code> son inmutables, y se pueden usar en 
+                            matrices, listas, y mapas, y se pueden pasar a través de su aplicaciones incluso después de que el 
+                            analizador se ha movido a los eventos siguientes.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Puede crear subtipos de <code>XMLEvent</code> que son elementos de información completamente nuevos o 
+                            extensiones de elementos existentes pero con métodos adicionales.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Puede agregar y eliminar eventos desde un flujo de eventos XML en formas mucho más simples que con la 
+                            IPA del cursor.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Del mismo modo, tenga en cuenta algunas recomendaciones generales al hacer su elección:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Si está programando para un entorno particularmente restringido de memoria, como Java ME, puede hacer 
+                            código más pequeño y más eficiente con la IPA de cursor.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Si el rendimiento es su más alta prioridad &mdash; por ejemplo, cuando se crean librerías de bajo 
+                            nivel o infraestructuras &mdash; la IPA del cursor es más eficiente.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Si quiere crear canalizaciones de procesamiento XML, use la IPA del iterador.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Si quiere modificar el flujo de eventos, use la IPA del iterador.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Si quiere que su aplicación sea capaz de manejar el procesamiento conectable del flujo de eventos, use 
+                            la IPA del iterador.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            En general, si no tiene una preferencia fuerte de una forma u otra, se recomienda usar la IPA del 
+                            iterador porque es más flexible y extensible, por lo que es una &ldquo;prueba de futuro&rdquo; para 
+                            sus aplicaciones.
+                        </p>
+                    </li>
+                </ul>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="why.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="using.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> ¿Porqué StAX?<br />
+            <b>Página siguiente:</b> Utilizando StAX
+        </div>
+    </body>
+</html> 

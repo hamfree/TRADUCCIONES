@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Tareas en Segundo Plano Simples (Los Tutoriales de Java&trade; &gt; Creando una IGU (Interfaz Gráfica de Usuario) con
+            JFC/Swing &gt; Concurrencia en Swing)
+        </title>
+        <meta name="description" content="Este tutorial de Swing Java describe el desarrollo de interfaces gráficas de usuario (GUI)
+              para aplicaciones y applets que utilizan componentes Swing" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java swing, java ui, java user interface,
+              swing components, swing events, swing layout  " />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">>Concurrencia in Swing</a></div>
+                <div class="linkAHEAD"><a href="initial.html">Hilos Iniciales</a></div>
+                <div class="linkAHEAD"><a href="dispatch.html">El Hilo Despachador de Eventos</a></div>
+                <div class="linkAHEAD"><a href="worker.html">Hilos Worker y el hilo SwingWorker</a></div>
+                <div class="nolinkBHEAD">Tareas en Segundo Plano Simples</div>
+                <div class="linkBHEAD"><a href="interim.html">Tareas que Tienen Resultados Provisionales</a></div>
+                <div class="linkBHEAD"><a href="cancel.html">Cancelando Tareas en Segundo Plano</a></div>
+                <div class="linkBHEAD"><a href="bound.html">Propiedades Ligadas y Métodos de Estado</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing<br />
+                <b>Lección:</b> Concurrencia en Swing<br />
+                <b>Sección:</b> Hilos Worker y el hilo SwingWorker
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Concurrencia en Swing</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="worker.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="interim.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Tareas en Segundo Plano Simples</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Empecemos con una tarea que es muy simple, pero potencialmente consumidora de tiempo. El applet
+                    <a class="SourceLink" target="_blank"
+                       href="../examples/components/TumbleItemProject/src/components/TumbleItem.java"
+                       onclick="showCode('../../displayCode.html',
+                                       '../examples/components/TumbleItemProject/src/components/TumbleItem.java');
+                               return false;"><code>TumbleItem</code></a> carga un conjunto de ficheros gráficos usados en la
+                    animación. Si los ficheros gráficos son cargados desde un hilo inicial, puede haber un retraso antes
+                    de que la IGU aparezca. Si los ficheros gráficos son cargados en el hilo despachador de eventos, el
+                    IGU puede volverse temporalmente no responsivo.
+                </p>
+                <p>
+                    Para evitar estos problemas, <code>TumbleItem</code> crea y ejecuta una instancia de <code>SwingWorker</code>
+                    desde sus hilos iniciales. Los objetos del método <code>doInBackground</code>, ejecutándose en un hilo de
+                    trabajo, cargan las imágenes en un vector de <code>ImageIcon</code>, y devuelve una referencia a ella. Aquí
+                    entonces el método <code>done</code>, ejecutándose en el hilo despachador de eventos, invoca <code>get</code>
+                    para recuperar su referencia, la cual se asigna al campo nombrado <code>imgs</code> de la clase applet. Esto 
+                    permite a <code>TumbleItem</code> construir el IGU inmediatamente, sin esperar a que las imágenes se terminen de
+                    cargar.
+                </p>
+                <p>
+                    Aquí está el código que defnie y ejecuta el objeto <code>SwingWorker</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+SwingWorker worker = new SwingWorker&lt;ImageIcon[], Void&gt;() {
+    @Override
+    public ImageIcon[] doInBackground() {
+        final ImageIcon[] innerImgs = new ImageIcon[nimgs];
+        for (int i = 0; i &lt; nimgs; i++) {
+            innerImgs[i] = loadImage(i+1);
+        }
+        return innerImgs;
+    }
+
+    @Override
+    public void done() {
+        //Elimina la etiqueta "Cargando imágenes".
+        animator.removeAll();
+        loopslot = -1;
+        try {
+            imgs = get();
+        } catch (InterruptedException ignore) {}
+        catch (java.util.concurrent.ExecutionException e) {
+            String why = null;
+            Throwable cause = e.getCause();
+            if (cause != null) {
+                why = cause.getMessage();
+            } else {
+                why = e.getMessage();
+            }
+            System.err.println("Error recuperando fichero: " + why);
+        }
+    }
+};
+
+                    </pre>
+                </div>
+                <p>
+                    Todas las subclases concretas de <code>SwingWorker</code> implementan <code>doInBackground</code>; la
+                    implementación de <code>done</code> es opcional.
+                </p>
+                <p>
+                    Note que <code>SwingWorker</code> es una clase genérica, con dos tipos de parámetros. El primer tipo de
+                    parámetro especifica un tipo de retorno para <code>doInBackground</code>, y también para el método
+                    <code>get</code>, el cual es invocado por otros hilos para recuperar el objeto devuelto por
+                    <code>doInBackground</code>. El segundo tipo de parámetro de <code>SwingWorker</code> especifica un tipo para
+                    los resultados interinos devueltos mientras las tarea en segundo plano está aun activa. Ya que este ejemplo no
+                    devuelve resultados provisionales, <a class="APILink" target="_blank"
+                                                          href="https://docs.oracle.com/javase/8/docs/api/java/lang/Void.html"><code>Void</code> </a> es usado como un
+                    marcador de posición.
+                </p>
+                <p>
+                    Puede preguntarse si el código que establece las <code>imgs</code> es innecesariamente complicado. ¿Porqué hacer
+                    que <code>doInBackground</code> devuelva un objeto y use <code>done</code> para recuperarlo? ¿Porqué no
+                    <code>doInBackground</code> establece las <code>imgs</code> directamente? El problema es que el objeto
+                    <code>imgs</code> al que se refiere es creado en el hilo de trabajo y usado en el hilo despachador de eventos.
+                    Cuando los objetos están compartidos entre hilos de esta forma, debe asegurarse de que los cambios hechos en un 
+                    hilo sean visibles al otro. Usar <code>get</code> garantiza estos, porque usar <code>get</code> crea una
+                    relación <i>ocurre antes</i> entre el código que crea <code>imgs</code> y el código que lo usa. Para más
+                    información sobre lo que ocurre en una relación que ocurre antes, consulte
+                    <a class="TutorialLink" target="_top" href="../../essential/concurrency/memconsist.html">
+                        Errores de Consistencia en Memoria</a> en la lección de
+                    <a class="TutorialLink" target="_top" href="../../essential/concurrency/index.html">Concurrencia</a>.
+                </p>
+                <p>
+                    Hay en realidad dos formas de devolver el objeto devuelto por <code>doInBackground</code>.
+                </p>
+                <ul>
+                    <li>
+                        Invocar
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/swing/SwingWorker.html#get--">
+                            <code>SwingWorker.get</code> sin argumentos</a>. Si la tarea de fondo no ha terminado, <code>get</code>
+                        lo bloquea hasta que termine.
+                    </li>
+                    <li>
+                        Invocar
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/swing/SwingWorker.html#get-long-java.util.concurrent.TimeUnit-">
+                            <code>SwingWorker.get</code> con argumentos indica un tiempo de espera</a>. Si la tarea en segundo plano
+                        no está terminada, <code>get</code> la bloquea hasta que lo esté &mdash; a menos que el tiempo de
+                        espera  expire primero, en cuyo caso <code>get</code> lanza
+                        <code>java.util.concurrent.TimeoutException</code>.
+                    </li>
+                </ul>
+                <p>
+                    Sea cuidadoso cuando invoque o sobrecarge a <code>get</code> desde el evento despachador de eventos; hasta que
+                    <code>get</code> vuelve, ningún evento del IGU está siendo procesado, y el IGU se "congela". No invoque
+                    <code>get</code> sin argumentos a menos que esté seguro de que la tarea en segundo plano está completa o
+                    próxima a completarse.
+                </p>
+                <p>
+                    Para más información sobre el ejemplo <code>TumbleItem</code>, consulte
+                    <a class="TutorialLink" target="_top" href="../misc/timer.html">Cómo Usar Temporizadores de Swing</a> en la
+                    lección <a class="TutorialLink" target="_top" href="../misc/index.html">Usar Otras Características de Swing</a>.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="worker.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="interim.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio &quot;
+                            Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos legales</a>.
+                        </p>
+                        <p class="footertext">Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.</p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página Anterior:</b> Hilos Worker y el hilo SwingWorker<br />
+            <b>Página Siguiente:</b> Tareas que Tienen Resultados Provisionales
+        </div>
+    </body>
+</html>

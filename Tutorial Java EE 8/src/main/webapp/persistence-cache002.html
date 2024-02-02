@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Especificación de la Configuración del Modo de Caché para Mejorar el Rendimiento</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="persistence-cache001.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="partmessaging.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GKJJJ">
+      <h2 id="specifying-the-cache-mode-settings-to-improve-performance">
+        Especificación de la Configuración del Modo de Caché para Mejorar el Rendimiento
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Para ajustar la configuración del modo de caché para una unidad de persistencia, especifique uno 
+            de los modos de caché como el valor del elemento <code>shared-cache-mode</code> en el descriptor 
+            de implementación <code>persistence.xml</code> (se muestra en negrita):
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;persistence-unit name="examplePU" transaction-type="JTA"&gt;
+    &lt;provider&gt;org.eclipse.persistence.jpa.PersistenceProvider&lt;/provider&gt;
+    &lt;jta-data-source&gt;java:comp/DefaultDataSource&lt;/jta-data-source&gt;
+    &lt;shared-cache-mode&gt;<b>DISABLE_SELECTIVE</b>&lt;/shared-cache-mode&gt;
+&lt;/persistence-unit&gt;
+              </code>
+            </pre>
+          </div>
+        </div>
+        <table class="tableblock frame-all grid-all spread">
+          <colgroup>
+            <col style="width: 100%;">
+          </colgroup>
+          <tbody>
+            <tr>
+              <td class="tableblock halign-left valign-top">
+                <div>
+                  <div class="paragraph">
+                    <p>Nota:</p>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      Debido a que la Especificación de la IPA de Persistencia de Java no requiere soporte 
+                      para un caché de segundo nivel, establecer el modo de caché de segundo nivel en 
+                      <code>persistence.xml</code> no tendrá ningún efecto cuando utilice un proveedor de 
+                      persistencia que no implemente una caché de segundo nivel.
+                    </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="paragraph">
+          <p>
+            Como alternativa, puede especificar el modo de caché compartida configurando la propiedad 
+            <code>javax.persistence.sharedCache.mode</code> en una de las configuraciones del modo de caché 
+            compartida: 
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+EntityManagerFactory emf =
+    Persistence.createEntityManagerFactory(
+        "myExamplePU", new Properties().add(
+            "javax.persistence.sharedCache.mode", "ENABLE_SELECTIVE"));
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="sect2" id="GKJDK">
+          <h3 id="setting-the-cache-retrieval-and-store-modes">
+            Configuración de los Modos de Almacenamiento y Recuperación de Caché
+          </h3>
+          <div class="paragraph">
+            <p>
+              Si ha habilitado el caché de segundo nivel para una unidad de persistencia configurando el modo 
+              de caché compartido, puede modificar aún más el comportamiento del caché de segundo nivel 
+              configurando <code>javax.persistence.cache.retrieveMode</code> y 
+              <code>javax.persistence.cache.storeMode</code> propiedades. Puede establecer estas propiedades 
+              en el nivel de contexto de persistencia pasando el nombre y el valor de la propiedad al método 
+              <code>EntityManager.setProperty</code>, o puede establecerlas en una operación por 
+              <code>EntityManager</code> ( <code>EntityManager.find</code> o 
+              <code>EntityManager.refresh</code>) o en un nivel por consulta.
+            </p>
+          </div>
+          <div class="sect3" id="GKJDR">
+            <h4 id="cache-retrieval-mode">Modo de Recuperación de Caché</h4>
+            <div class="paragraph">
+              <p>
+                El modo de recuperación de caché, establecido por la propiedad 
+                <code>javax.persistence.retrieveMode</code>, controla cómo se leen los datos del caché para 
+                las llamadas al método <code>EntityManager.find</code> y desde las consultas.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Puede establecer la propiedad <code>retrieveMode</code> en una de las constantes definidas por 
+                el tipo enumerado <code>javax.persistence.CacheRetrieveMode</code>, ya sea <code>USE</code> 
+                (el valor predeterminado) o <code>BYPASS</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Cuando la propiedad se establece en <code>USE</code>, los datos se recuperan de la memoria 
+                caché de segundo nivel, si está disponible. Si los datos no están en la memoria caché, el 
+                proveedor de persistencia los leerá de la base de datos.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Cuando la propiedad se establece en <code>BYPASS</code>, se omite la memoria caché de segundo 
+                nivel y se realiza una llamada a la base de datos para recuperar los datos.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="GKJDD">
+            <h4 id="cache-store-mode">Modo de Almacenamiento en Caché</h4>
+            <div class="paragraph">
+              <p>
+                El modo de almacenamiento en caché, establecido por la propiedad 
+                <code>javax.persistence.storeMode</code>, controla cómo se almacenan los datos en el caché.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                La propiedad <code>storeMode</code> se puede establecer en una de las constantes definidas por 
+                el tipo enumerado <code>javax.persistence.CacheStoreMode</code>: ya sea <code>USE</code> (el 
+                valor predeterminado), <code>BYPASS</code>, o <code>REFRESH</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Cuando la propiedad se establece en <code>USE</code>, los datos de caché se crean o actualizan 
+                cuando los datos se leen o confirman en la base de datos. Si los datos ya están en la memoria 
+                caché, establecer el modo de almacenamiento en <code>USE</code> no forzará una actualización 
+                cuando se lean los datos de la base de datos.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Cuando la propiedad se establece en <code>BYPASS</code>, los datos leídos o confirmados en la 
+                base de datos no se insertan ni actualizan en la memoria caché. Es decir, el caché no cambia.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Cuando la propiedad se establece en <code>REFRESH</code>, los datos de caché se crean o 
+                actualizan cuando los datos se leen o confirman en la base de datos, y se fuerza una 
+                actualización de los datos en el caché cuando se lee la base de datos.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="GKJDS">
+            <h4 id="setting-the-cache-retrieval-or-store-mode">
+              Establecer la Recuperación de Caché o el Modo de Almacenamiento
+            </h4>
+            <div class="paragraph">
+              <p>
+                Para configurar el modo de almacenamiento o recuperación de caché para el contexto de 
+                persistencia, llame al método <code>EntityManager.setProperty</code> con el nombre de 
+                propiedad y el par de valor:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+EntityManager em = ...;
+em.setProperty("javax.persistence.cache.storeMode", "BYPASS");
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                Para configurar el modo de almacenamiento o recuperación de caché al llamar a los métodos 
+                <code>EntityManager.find</code> o <code>EntityManager.refresh</code>, primero cree un 
+                <code>Map&lt;String, Object&gt;</code> instancia y agregue un par de nombre/valor de la 
+                siguiente manera:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+EntityManager em = ...;
+Map&lt;String, Object&gt; props = new HashMap&lt;String, Object&gt;();
+props.put("javax.persistence.cache.retrieveMode", "BYPASS");
+String personPK = ...;
+Person person = em.find(Person.class, personPK, props);
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <table class="tableblock frame-all grid-all spread">
+              <colgroup>
+                <col style="width: 100%;">
+              </colgroup>
+              <tbody>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <div>
+                      <div class="paragraph">
+                        <p>Nota:</p>
+                      </div>
+                      <div class="paragraph">
+                        <p>
+                          El modo de recuperación de caché se ignora cuando se llama al método 
+                          <code>EntityManager.refresh</code>, ya que las llamadas a <code>refresh</code> 
+                          siempre dan como resultado que los datos se lean de la base de datos, no del caché.
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="paragraph">
+              <p>
+                Para configurar el modo de recuperación o almacenamiento al usar consultas, llame a los 
+                métodos <code>Query.setHint</code> o <code>TypedQuery.setHint</code>, según el tipo de 
+                consulta:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+EntityManager em = ...;
+CriteriaQuery&lt;Person&gt; cq = ...;
+TypedQuery&lt;Person&gt; q = em.createQuery(cq);
+q.setHint("javax.persistence.cache.storeMode", "REFRESH");
+...
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                Configurar el modo de almacenamiento o recuperación en una consulta o al llamar al método 
+                <code>EntityManager.find</code> o <code>EntityManager.refresh</code> anula la configuración 
+                del administrador de entidades.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GKJEB">
+          <h3 id="controlling-the-second-level-cache-programmatically">
+            Controlar la Caché de Segundo Nivel Mediante Programación
+          </h3>
+          <div class="paragraph">
+            <p>
+              La interfaz <code>javax.persistence.Cache</code> define métodos para interactuar con el caché de 
+              segundo nivel mediante programación.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Aquí se tratan los siguientes temas:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p><a href="#CHDEECCF">Descripción General de la Interfaz javax.persistence.Cache</a></p>
+              </li>
+              <li>
+                <p><a href="#GKJDZ">Comprobación de si los Datos de una Entidad están Almacenados en Caché</a></p>
+              </li>
+              <li>
+                <p><a href="#GKJDQ">Eliminar una Entidad desde la Caché</a></p>
+              </li>
+              <li>
+                <p><a href="#GKJDA">Eliminar Todos los Datos desde la Caché</a></p>
+              </li>
+            </ul>
+          </div>
+          <div class="sect3" id="CHDEECCF">
+            <h4 id="overview-of-the-javax.persistence.cache-interface">
+              Descripción General de la Interfaz javax.persistence.Cache
+            </h4>
+            <div class="paragraph">
+              <p>
+                La interfaz <code>Cache</code> define métodos para hacer lo siguiente
+              </p>
+            </div>
+            <div class="ulist">
+              <ul>
+                <li>
+                  <p>
+                    Comprobar si una entidad en particular tiene datos almacenados en caché
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Eliminar una entidad en particular del caché
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Eliminar todas las instancias (e instancias de subclases) de una clase de entidad del 
+                    caché
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Borrar el caché de todos los datos de la entidad
+                  </p>
+                </li>
+              </ul>
+            </div>
+            <table class="tableblock frame-all grid-all spread">
+              <colgroup>
+                <col style="width: 100%;">
+              </colgroup>
+              <tbody>
+                <tr>
+                  <td class="tableblock halign-left valign-top">
+                    <div>
+                      <div class="paragraph">
+                        <p>Nota:</p>
+                      </div>
+                      <div class="paragraph">
+                        <p>
+                          Si el caché de segundo nivel se ha deshabilitado, las llamadas a los métodos de la 
+                          interfaz <code>Cache</code> no tienen efecto, excepto <code>contains</code>, que 
+                          siempre devolverá <code>false</code>.
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="sect3" id="GKJDZ">
+            <h4 id="checking-whether-an-entitys-data-is-cached">
+              Comprobación de si los Datos de una Entidad están Almacenados en Caché
+            </h4>
+            <div class="paragraph">
+                <p>
+                  Para averiguar si una determinada entidad se encuentra actualmente en la memoria caché de 
+                  segundo nivel:
+                </p>
+            </div>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Llame al método <code>Cache.contains</code> . El método <code>contains</code> devuelve 
+                    <code>true</code> si los datos de la entidad están en caché y <code>false</code> si los 
+                    datos no están en caché:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+EntityManager em = ...;
+Cache cache = em.getEntityManagerFactory().getCache();
+String personPK = ...;
+if (cache.contains(Person.class, personPK)) {
+  // los datos se almacenan en caché
+} else {
+  // los datos NO se almacenan en caché
+}
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+          <div class="sect3" id="GKJDQ">
+            <h4 id="removing-an-entity-from-the-cache">Eliminar una Entidad desde la Caché</h4>
+            <div class="paragraph">
+              <p>
+                Para eliminar una entidad en particular o todas las entidades de un tipo dado del segundo 
+                nivel de caché:
+              </p>
+            </div>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>Llame a uno de los métodos <code>Cache.evict</code>.</p>
+                </li>
+                <li>
+                  <p>
+                    Para eliminar una entidad en particular del caché, llame al método <code>evict</code> y 
+                    pase la clase de entidad y la clave principal de la entidad:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+EntityManager em = ...;
+Cache cache = em.getEntityManagerFactory().getCache();
+String personPK = ...;
+cache.evict(Person.class, personPK);
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    Para eliminar todas las instancias de una clase de entidad en particular, incluidas las 
+                    subclases, llame al método <code>evict</code> y especifique la clase de entidad:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+EntityManager em = ...;
+Cache cache = em.getEntityManagerFactory().getCache();
+cache.evict(Person.class);
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+              </ol>
+            </div>
+            <div class="paragraph">
+              <p>
+                Todas las instancias de la clase de entidad <code>Person</code> se eliminarán del caché. Si la 
+                entidad <code>Person</code> tiene una subclase, <code>Student</code>, las llamadas al método 
+                anterior también eliminarán todas las instancias de <code>Student</code> del caché.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="GKJDA">
+            <h4 id="removing-all-data-from-the-cache">Eliminar Todos los Datos desde la Caché</h4>
+            <div class="paragraph">
+              <p>
+                Para borrar completamente el caché de segundo nivel, llama al método 
+                <code>Cache.evictAll</code>:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+EntityManager em = ...;
+Cache cache = em.getEntityManagerFactory().getCache();
+cache.evictAll();
+                  </code>
+                </pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="persistence-cache001.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="partmessaging.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

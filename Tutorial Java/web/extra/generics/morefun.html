@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Más Diversión con Comodines (Los Tutoriales de Java&trade; &gt; Extras &gt; Genéricos)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe los genéricos, la IPA del modo de pantalla completo, y 
+              los recursos relacionados con la certificación de Java" />
+        <meta name="keywords" content="programación en java, aprender java, ejemplos de código java, genéricos de java, IPA del 
+              modo de pantalla completa, certificación" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Genéricos</a></div>
+                <div class="linkAHEAD"><a href="intro.html">Introducción</a></div>
+                <div class="linkAHEAD"><a href="simple.html">Definiendo Genéricos Simples</a></div>
+                <div class="linkAHEAD"><a href="subtype.html">Genéricos y Subtipado</a></div>
+                <div class="linkAHEAD"><a href="wildcards.html">Los Comodines</a></div>
+                <div class="linkAHEAD"><a href="methods.html">Métodos Genéricos</a></div>
+                <div class="linkAHEAD"><a href="legacy.html">Interoperando con Código Heredado</a></div>
+                <div class="linkAHEAD"><a href="fineprint.html">La Letra Pequeña</a></div>
+                <div class="linkAHEAD"><a href="literals.html">Clases Literales como Objetos de Tipo en Tiempo de Ejecución</a></div>
+                <div class="nolinkAHEAD">Más Diversión con Comodines</div>
+                <div class="linkAHEAD"><a href="convert.html">Convirtiendo Código Heredado para Usar Genéricos</a></div>
+                <div class="linkAHEAD"><a href="acknowledgements.html">Agradecimientos</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Extras<br />
+                <b>Lección:</b> Genéricos
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Extras</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Genéricos</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="literals.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="convert.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Más Diversión con Comodines</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    En esta sección, consideraremos algunos de los más avanzados casos de uso de los comodines. Hemos visto varios ejemplos 
+                    donde los comodines acotados fueron útiles cuando leíamos una estructura de datos. Ahora considere la inversa, una 
+                    estructura de datos de sólo escritura. La interfaz <code>Sink</code> es un ejemplo simple de este tipo.
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>interface</b> Sink&lt;T&gt; {
+    flush(T t);
+}
+                    </pre>
+                </div>
+                <p>
+                    Podemos imaginar usarlo como se demuestra en el código de abajo. El método <code>writeAll()</code> se diseña para vaciar 
+                    todos los elementos de la colección <code>coll</code> al sumidero <code>snk</code> y devolver el último elemento vaciado.
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>public static</b> &lt;T&gt; T writeAll(Collection&lt;T&gt; coll, Sink&lt;T&gt; snk) {
+    T last;
+    <b>for</b> (T t : coll) {
+        last = t;
+        snk.flush(last);
+    }
+    <b>return</b> last;
+}
+...
+Sink&lt;Object&gt; s;
+Collection&lt;String&gt; cs;
+String str = writeAll(cs, s); // <i>Llamada ilegal.</i>
+                    </pre>
+                </div>
+                <p>
+                    Como se ha escrito, la llamada a <code>writeAll()</code> es ilegal, ya que no se puede inferir ningún argumento de tipo 
+                    válido; ni <code>String</code> ni <code>Object</code> son tipos apropiados para <code>T</code>, porque el elemento de la 
+                    <code>Collection</code> y el elemento <code>Sink</code> deben ser del mismo tipo.
+                </p>
+                <p>
+                    Podemos arreglar este error modificando la firma de <code>writeAll()</code> como se muestra abajo, usando un comodín.
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>public static</b> &lt;T&gt; T writeAll(Collection&lt;? <b>extends</b> T&gt;, Sink&lt;T&gt;) {...}
+...
+// <i>La llamada es correcta, pero el tipo devuelto es incorrecto.</i> 
+String str = writeAll(cs, s);
+                    </pre>
+                </div>
+                <p>
+                    La llamada es ahora legal, pero la asignación es errónea, ya que el tipo devuelto inferido es <code>Object</code> porque 
+                    <code>T</code> coincide con el tipo del elemento <code>s</code>, el cual es <code>Object</code>.
+                </p>
+                <p>
+                    La solución es usar una forma de comodín acotado que no hemos visto aún: comodines con una <i>acotación inferior</i>. 
+                    La sintaxis <code>? <b>super</b> T</code> denota un tipo desconocido que es un supertipo de <code>T</code> (o 
+                    <code>T</code> en sí mismo; recuerde que la relación de supertipo es reflexiva). Es el doble de los comodines acotados 
+                    que hemos estado usando, dónde usamos <code>? <b>extends</b> T</code> para denotar un tipo desconocido que es un subtipo 
+                    de <code>T</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>public static</b> &lt;T&gt; T writeAll(Collection&lt;T&gt; coll, Sink&lt;? <b>super</b> T&gt; snk) {
+    ...
+}
+String str = writeAll(cs, s); // <i>¡Sí!</i> 
+                    </pre>
+                </div>
+                <p>
+                    Usando esta sintaxis, la llamada es legal, y el tipo inferido es <code>String</code>, como se desea.
+                </p>
+                <p>
+                    Ahora pasemos a un ejemplo más realista. Un <code>java.util.TreeSet&lt;E&gt;</code> representa un árbol de elementos del 
+                    tipo <code>E</code> que están ordenados. Una forma de construir un <code>TreeSet</code> es pasar un objeto 
+                    <code>Comparator</code> al constructor. Ese comparador será usado para ordenar los elementos del <code>TreeSet</code> de 
+                    acuerdo al orden deseado.
+                </p>
+                <div class="codeblock">
+                    <pre>
+TreeSet(Comparator&lt;E&gt; c) 
+                    </pre>
+                </div>
+                <p>
+                    El interfaz de <code>Comparator</code> es esencialmente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>interface</b> Comparator&lt;T&gt; {
+    <b>int</b> compare(T fst, T snd);
+}
+                    </pre>
+                </div>
+                <p>
+                    Suponga que queremos crear un <code>TreeSet&lt;String&gt;</code> y pasarlo en un comparador adecuado, necesitamos pasarle 
+                    un <code>Comparator</code> que pueda comparar <code>String</code>s. Esto puede ser hecho por un 
+                    <code>Comparator&lt;String&gt;</code>, pero un <code>Comparator&lt;Object&gt;</code> funcionará igual de bien. Sin 
+                    embargo, no seremos capaces de invocar al constructor dado arriba sobre un <code>Comparator&lt;Object&gt;</code>. Podemos 
+                    usar un comodín acotado con límite inferior para obtener la flexibilidad que queremos:
+                </p>
+                <div class="codeblock">
+                    <pre>
+TreeSet(Comparator&lt;? <b>super</b> E&gt; c) 
+                    </pre>
+                </div>
+                <p>
+                    Este código permite que cualquier comparador aplicable sea usado.
+                </p>
+                <p>Como ejemplo final del uso de comodines acotados con límites inferiores, veamos el método <code>Collections.max()</code>, 
+                    el cual devuelve el elemento máximo en una colección que se le pasa como argumento. Ahora, para que <code>max()</code> 
+                    funcione, todos los elementos de la colección que se están pasando deben implementar <code>Comparable</code>. Además, 
+                    todos deben ser comparables <i>entre sí</i>.
+                </p>
+                <p>
+                    Un primer intento de generar la firma de este método produce:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>public static</b> &lt;T <b>extends</b> Comparable&lt;T&gt;&gt; T max(Collection&lt;T&gt; coll)
+                    </pre>
+                </div>
+                <p>
+                    Es decir, el método toma una colección de algún tipo <code>T</code> que es comparable a sí mismo, y devuelve un elemento 
+                    de ese tipo. Sin embargo, este código resulta ser demasiado restrictivo. Para ver por qué, considere un tipo que sea 
+                    comparable a los objetos arbitrarios:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>class</b> Foo <b>implements</b> Comparable&lt;Object&gt; {
+    ...
+}
+Collection&lt;Foo&gt; cf = ... ;
+Collections.max(cf); // <i>Debería funcionar.</i>
+                    </pre>
+                </div>
+                <p>
+                    Cada elemento de <code>cf</code> es comparable con todos los otros elementos en <code>cf</code>, dado que cada elemento 
+                    es un <code>Foo</code>, el cual es comparable a cualquier objeto, y en particular a otro <code>Foo</code>. Sin embargo, 
+                    usando la firma de arriba, encontramos que la llamada es rechazada. El tipo inferido debe ser <code>Foo</code>, pero 
+                    <code>Foo</code> no implementa <code>Comparable&lt;Foo&gt;</code>.
+                </p>
+                <p>
+                    No es necesario que <code>T</code> sea comparable a sí mismo <b>exactamente</b>. Todo lo que se requiere es que 
+                    <code>T</code> sea comparable a uno de sus supertipos. Esto nos da:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>public static</b> &lt;T <b>extends</b> Comparable&lt;? <b>super</b> T&gt;&gt; 
+        T max(Collection&lt;T&gt; coll)
+                    </pre>
+                </div>
+                <p>
+                    Tenga en cuenta que la firma real de <code>Collections.max()</code> está más involucrada. Volveremos a ello en la 
+                    siguiente sección, <a class="TutorialLink" target="_top" href="convert.html">Convirtiendo Código Heredado para Usar 
+                        Genéricos</a>. Este razonamiento se aplica a casi cualquier uso de <code>Comparable</code> que esté destinado a 
+                    funcionar para tipos arbitrarios: siempre quiere usar <code>Comparable&lt;? <b>super</b> T&gt;</code>.
+                </p>
+                <p>
+                    En general, si tiene una IPA que sólo usa un parámetro de tipo <code>T</code> como argumento, sus usos deberían 
+                    aprovechar los comodines con limitación inferior (<code>? <b>super</b> T</code>). Por el contrario, si la IPA sólo 
+                    devuelve <code>T</code>, le dará a sus clientes más flexibilidad usando comodines con límite superior 
+                    (<code>? <b>extends</b> T</code>).
+                </p>
+                <h2>
+                    Captura de comodines
+                </h2>
+                <p>
+                    Ya debería estar bastante claro que dado:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Set&lt;?&gt; unknownSet = new HashSet&lt;String&gt;();
+...
+/* Agrega un elemento t a un Set s. */ 
+<b>public static</b> &lt;T&gt; <b>void</b> addToSet(Set&lt;T&gt; s, T t) {
+    ...
+}
+                    </pre>
+                </div>
+                <p>
+                    La llamada de abajo es ilegal.
+                </p>
+                <div class="codeblock">
+                    <pre>
+addToSet(unknownSet, "abc"); // <i>Ilegal.</i>
+                    </pre>
+                </div>
+                <p>
+                    No importa que el conjunto actual que se pasa sea un conjunto de cadenas; lo que importa es que la expresión que se pasa 
+                    como argumento es un conjunto de un tipo desconocido, que no puede garantizarse como un conjunto de cadenas, o de 
+                    cualquier tipo en particular.
+                </p>
+                <p>
+                    Ahora, considere el código siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>class</b> Collections {
+    ...
+    &lt;T&gt; <b>public static</b> Set&lt;T&gt; unmodifiableSet(Set&lt;T&gt; set) {
+        ...
+    }
+}
+...
+Set&lt;?&gt; s = Collections.unmodifiableSet(unknownSet); // <i>¡Esto funciona! ¿Porqué?</i>
+                    </pre>
+                </div>
+                <p>
+                    Parece que esto no debería permitirse; sin embargo, al observar esta llamada específica, es perfectamente seguro 
+                    permitirla. Después de todo, <code>unmodifiableSet()</code> funciona para cualquier clase de <code>Set</code>, 
+                    independientemente de su tipo de elemento.
+                </p>
+                <p>
+                    Ya que esta situación surge con relativa frecuencia, hay una regla especial que permite dicho código bajo circunstancias 
+                    muy específicas en las cuales se puede demostrar que el código es seguro. Esta regla, conocida como 
+                    <i>captura de comodín</i>, permite al compilador inferir el tipo desconocido de un comodín como un argumento de tipo para 
+                    un método genérico.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="literals.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="convert.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos
+                            <a href="../../information/cpyr.html">avisos legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Clases Literales como Objetos de Tipo en Tiempo de Ejecución<br />
+            <b>Página siguiente:</b> Convirtiendo Código Heredado para Usar Genéricos
+        </div>
+    </body>
+</html> 

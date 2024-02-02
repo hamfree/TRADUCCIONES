@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Recuperando y Analizando Modificadores del Constructor (Los Tutoriales de Java&trade; &gt; La IPA de Reflexión &gt; 
+            Miembros)
+        </title>
+        <meta name="description" content="Este tutorial de reflexión de Java describe el uso de la reflexión para acceder y 
+              manipular clases, campos, métodos y constructores" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java reflection" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Miembros</a></div>
+                <div class="linkAHEAD"><a href="field.html">Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldTypes.html">Obteniendo los Tipos de los Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldModifiers.html">Recuperando y Analizando Modificadores de los Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldValues.html">Obteniendo y Estableciendo los Valores de los Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldTrouble.html">Solución de Problemas</a></div>
+                <div class="linkAHEAD"><a href="method.html">Métodos</a></div>
+                <div class="linkBHEAD"><a href="methodType.html">Obteniendo Información del Tipo del Método</a></div>
+                <div class="linkBHEAD"><a href="methodparameterreflection.html">Obteniendo los Nombre de los Parámetros del Método</a></div>
+                <div class="linkBHEAD"><a href="methodModifiers.html">Recuperando y Analizando Modificadores del Método</a></div>
+                <div class="linkBHEAD"><a href="methodInvocation.html">Invocando Métodos</a></div>
+                <div class="linkBHEAD"><a href="methodTrouble.html">Solución de Problemas</a></div>
+                <div class="linkAHEAD"><a href="ctor.html">Constructores</a></div>
+                <div class="linkBHEAD"><a href="ctorLocation.html">Finding Constructores</a></div>
+                <div class="nolinkBHEAD">Recuperando y Analizando Modificadores del Constructor</div>
+                <div class="linkBHEAD"><a href="ctorInstance.html">Creando Nuevas Instancias de Clase</a></div>
+                <div class="linkBHEAD"><a href="ctorTrouble.html">Solución de Problemas</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> La IPA de Reflexión<br />
+                <b>Lección:</b> Miembros<br />
+                <b>Sección:</b> Constructores
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">La IPA de Reflexión</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Miembros</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="ctorLocation.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="ctorInstance.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Recuperando y Analizando Modificadores del Constructor</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Debido al rol de los constructores en el lenguaje, son menos los modificadores significativos que para los 
+                    métodos:
+                </p>
+                <ul>
+                    <li>
+                        Modificadores de acceso: <code>public</code>, <code>protected</code>, y <code>private</code>
+                    </li>
+                    <li>
+                        Anotaciones
+                    </li>
+                </ul>
+                <p>
+                    El ejemplo 
+                    <a class="SourceLink" target="_blank" href="example/ConstructorAccess.java" 
+                       onclick="showCode('../../displayCode.html', 'example/ConstructorAccess.java'); return false;">
+                        <code>ConstructorAccess</code></a> busca constructores en una clase dada con el modificador de acceso 
+                    especificado. También visualiza si el constructor es sintético (generado por el compilador) o de aridad 
+                    variable.
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
+import static java.lang.System.out;
+
+public class ConstructorAccess {
+    public static void main(String... args) {
+	try {
+	    Class&lt;?&gt; c = Class.forName(args[0]);
+	    Constructor[] allConstructors = c.getDeclaredConstructors();
+	    for (Constructor ctor : allConstructors) {
+		int searchMod = modifierFromString(args[1]);
+		int mods = accessModifiers(ctor.getModifiers());
+		if (searchMod == mods) {
+		    out.format(&quot;%s%n&quot;, ctor.toGenericString());
+		    out.format(&quot;  [ synthetic=%-5b var_args=%-5b ]%n&quot;,
+			       ctor.isSynthetic(), ctor.isVarArgs());
+		}
+	    }
+
+        // production code should handle this exception more gracefully
+	} catch (ClassNotFoundException x) {
+	    x.printStackTrace();
+	}
+    }
+
+    private static int accessModifiers(int m) {
+	return m &amp; (Modifier.PUBLIC | Modifier.PRIVATE | Modifier.PROTECTED);
+    }
+
+    private static int modifierFromString(String s) {
+	if (&quot;public&quot;.equals(s))               return Modifier.PUBLIC;
+	else if (&quot;protected&quot;.equals(s))       return Modifier.PROTECTED;
+	else if (&quot;private&quot;.equals(s))         return Modifier.PRIVATE;
+	else if (&quot;package-private&quot;.equals(s)) return 0;
+	else return -1;
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    No hay una constante explícita de 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Modifier.html"><code>Modifier</code></a> 
+                    que corresponda al acceso &quot;package-private&quot;, así que es necesario comprobar la ausencia de los tres 
+                    modificadores de acceso para identificar un constructor con modificador package-private.
+                </p>
+                <p>
+                    Esta salida muestra los constructores privados en 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/io/File.html">
+                        <code>java.io.File</code></a>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java ConstructorAccess java.io.File private</em>
+private java.io.File(java.lang.String,int)
+  [ synthetic=false var_args=false ]
+private java.io.File(java.lang.String,java.io.File)
+  [ synthetic=false var_args=false ]
+                    </pre>
+                </div>
+                <p>
+                    Los constructores sintéticos son raros; sin embargo el ejemplo 
+                    Synthetic constructors are rare; however the
+                    <a class="SourceLink" target="_blank" href="example/SyntheticConstructor.java" 
+                       onclick="showCode('../../displayCode.html', 'example/SyntheticConstructor.java'); return false;">
+                        <code>SyntheticConstructor</code></a> ilustra una situación típica donde esto puede ocurrir:
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+public class SyntheticConstructor {
+    private SyntheticConstructor() {}
+    class Inner {
+	// Compiler will generate a synthetic constructor since
+	// SyntheticConstructor() is private.
+	Inner() { new SyntheticConstructor(); }
+    }
+}
+                    </pre>
+                </div>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java ConstructorAccess SyntheticConstructor package-private</em>
+SyntheticConstructor(SyntheticConstructor&#36;1)
+  [ synthetic=true  var_args=false ]
+                    </pre>
+                </div>
+                <p>
+                    Ya que el constructor de la clase anidad hace referencia al constructor privadao de la clase que la envuelve, 
+                    el compilador debe generar un constructor de tipo package-private. El tipo de parámetro 
+                    <code>SyntheticConstructor&#36;1</code> es arbitrario y dependiente de la implementación del compilador. El 
+                    código que depende de la presencia de cualquier miembro de clase sintético o no público puede no ser portable.
+                </p>
+                <p>
+                    Los constructores implementan 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/AnnotatedElement.html">
+                        <code>java.lang.reflect.AnnotatedElement</code></a>, que proporciona métodos para recuperar anotaciones de 
+                        tiempo de ejecución con 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/annotation/RetentionPolicy.html#RUNTIME">
+                        <code>java.lang.annotation.RetentionPolicy.RUNTIME</code></a>. Para un ejemplo de obtención de anotaciones 
+                        vea la sección <a href="../class/classModifiers.html">Examinando Modificadores de Clases y Tipos</a>.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="ctorLocation.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="ctorInstance.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Encontrando Constructores<br />
+            <b>Página siguiente:</b> Creando Nuevas Instancias de Clase
+        </div>
+    </body>
+</html> 

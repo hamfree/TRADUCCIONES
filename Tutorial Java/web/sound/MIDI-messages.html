@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Transmitiendo y Recibiendo Mensajes MIDI (Los Tutoriales de Java&trade; &gt; Sonido)
+        </title>
+        <meta name="description" content="" />
+        <meta name="keywords" content="java programming, learn java, java sample code, " />
+        <link rel="stylesheet" href="../indice.css" type="text/css"/>
+        <script src="../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkAHEAD"><a href="sampled-overview.html">Descripción del Paquete Sampled</a></div>
+                <div class="linkAHEAD"><a href="accessing.html">Accediendo a los Recursos del Sistema de Audio</a></div>
+                <div class="linkAHEAD"><a href="playing.html">Reproducción de Audio</a></div>
+                <div class="linkAHEAD"><a href="capturing.html">Grabando Audio</a></div>
+                <div class="linkAHEAD"><a href="controls.html">Procesando Audio con Controles</a></div>
+                <div class="linkAHEAD"><a href="converters.html">Usando Ficheros y Convertidores de Formato</a></div>
+                <div class="linkAHEAD"><a href="overview-MIDI.html">Descripción del Paquete MIDI</a></div>
+                <div class="linkAHEAD"><a href="accessing-MIDI.html">Accediendo a los Recursos del Sistema MIDI</a></div>
+                <div class="nolinkAHEAD">Transmitiendo y Recibiendo Mensajes MIDI</div>
+                <div class="linkAHEAD"><a href="MIDI-seq-intro.html">Introducción a los Secuenciadores</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-methods.html">Utilizando Métodos del Secuenciador</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-adv.html">Usando Características Avanzadas del Secuenciador</a></div>
+                <div class="linkAHEAD"><a href="MIDI-synth.html">Sintetizando Sonido</a></div>
+                <div class="linkAHEAD"><a href="SPI-intro.html">Introducción a los Interfaces de los Proveedores de Servicio</a></div>
+                <div class="linkAHEAD"><a href="SPI-providing-sampled.html">Proporcionando Servicios de Audio Sampleado</a></div>
+                <div class="linkAHEAD"><a href="SPI-providing-MIDI.html">Proporcionando Servicios MIDI</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Sonido
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="./index.html" target="_top">Sonido</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="accessing-MIDI.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="MIDI-seq-intro.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Transmitiendo y Recibiendo Mensajes MIDI</h1>
+            </div>
+            <div id="PageContent">
+                <p></p>
+                <h2>
+                    Entender Dispositivos, Transmisores, y Receptores
+                </h2>
+                <p>
+
+                    La IPA de Sonido de Java especifica una arquitectura de enrutamiento de mensajes para datos MIDI que es 
+                    flexible y fácil de usar, una vez entiende como trabaja. El sistema está basado en un diseño de conexión de 
+                    módulos: distintos módulos, cada uno de los cuales realiza una tarea específica, pueden ser interconectados 
+                    (en red), habilitando que los datos fluyan de un módulo a otro.
+                </p>
+                <p>
+                    El módulo base en el sistema de mensajes de la IPA de Sonido de Java es la interfaz 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/midi/MidiDevice.html"><code>MidiDevice</code></a>
+                    . Los <code>MidiDevices</code> incluídos los secuenciadores (que graban, reproducen, cargan, y editan secuencias 
+                    de mensajes MIDI con marca de tiempo), sintetizadores (que generan sonidos cuando son activados por mensajes 
+                    MIDI), y los puertos de entrada y salida MIDI, a través de los cuales los datos viene y van a dispositivos MIDI 
+                    externos. La funcionalidad habitualmente requerida de los puertos MIDI se describe por la interfaz base 
+                    <code>MidiDevice</code>. Las interfaces 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/midi/Sequencer.html"><code>Sequencer</code></a>
+                    y 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/midi/Synthesizer.html"><code>Synthesizer</code>
+                    </a> extienden la interfaz <code>MidiDevice</code> para describir la característica funcionalidad adicional de 
+                    los sintetizados y secuenciadores MIDI, respectivamente. Las clases concretas que funcionan como secuenciadores 
+                    o sintetizadores deben implementar estas interfaces.
+                </p>
+                <p>
+                    Un <code>MidiDevice</code> por lo general posee uno o más objetos auxiliares que implementan las interfaces 
+                    <code>Receiver</code> o <code>Transmitter</code>. Estas interfaces representan los "enchufes" o 
+                    "portales" que conectan dispositivos entre sí, permitiendo que los datos fluyan dentro y fuera de 
+                    ellos. Conectando un <code>Transmitter</code> de un <code>MidiDevice</code> al <code>Receiver</code> de otro, 
+                    puede crear una red de módulos en la cual los datos fluyen de uno a otro.
+                </p>
+                <p>
+                    La interfaz <code>MidiDevice</code> incluye métodos para determinar cuantos objetos transmisores y receptores 
+                    puede soportar el dispositivo de manera concurrente, y otros métodos para acceder a estos objetos. Un puerto de 
+                    salida MIDI normalmente tiene al menos un <code>Receiver</code> a través del cual se pueden recibir los mensajes 
+                    salientes; del mismo modo, un sintetizador normalmente responde a mensajes enviados a su <code>Receiver</code> o 
+                    <code>Receivers</code>. Un puerto de entrada MIDI normalmente tiene al menos un <code>Transmitter</code>, que 
+                    propaga los mensajes entrantes. Un secuenciador con todas las funciones admite tanto <code>Receivers</code>, 
+                    que reciben mensajes durante la grabación, como <code>Transmitters</code>, que envían mensajes durante la 
+                    reproducción.
+                </p>
+                <p>
+                    La interfaz <code>Transmitter</code> incluye métodos para estabiecer y consultar los receptores a los cuales el 
+                    transmisor envia sus <code>MidiMessages</code>. Configure el receptor para establecer la conexión entre los 
+                    dos. La interfaz <code>Receiver</code> contiene un método que envia un <code>MidiMessage</code> al receptor. Por 
+                    lo general, este método es invocado por un <code>Transmitter</code>. Tanto las interfaces de 
+                    <code>Transmitter</code> como la del <code>Receiver</code> incluyen un método <code>close</code> que libera un 
+                    transmisor o receptor previamente conectado, dejándolo disponible para una conexión diferente.
+                </p>
+                <p>
+                    Examinaremos ahora cómo usar transmisores y receptores. Antes de pasar al caso típico de conectar dos 
+                    dispositivos (como conectar un secuenciador a un sintetizador), examinaremos el caso más simple donde envía un 
+                    mensaje MIDI directamente desde su programa de aplicación a un dispositivo. Estudiando este escenario simple 
+                    hará más fácil de entender cómo la IPA de Sonido de Java organiza el envío de mensajes MIDI entre dispositivos.
+                </p>
+                <p>
+                    <a id="sending"></a>
+                </p>
+                <h2>
+                    Enviar un Mensaje a un Receptor sin Usar un Transmisor
+                </h2>
+                <p>
+                    Digamos que quiere crear un mensajes MIDI desde cero y después enviarlo a algún receptor. Puede crear un 
+                    <code>ShortMessage</code> nuevo, en blanco, y después rellenarlo con datos MIDI usando el siguiente método de 
+                    <code>ShortMessage</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+void setMessage(int command, int channel, int data1,
+         int data2) 
+                    </pre>
+                </div>
+                <p>
+                    Una vez tiene listo el mensaje para enviar, puede enviarlo a un objeto <code>Receiver</code>, usando este 
+                    método de <code>Receiver</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+void send(MidiMessage message, long timeStamp)
+                    </pre>
+                </div>
+                <p>
+                    El argumento de marca de tiempo se explicará momentáneamente. Por ahora, simplemente mencionaremos que su valor 
+                    pues ser establecido a -1 si no le importa especificar un tiempo preciso. En este caso, el dispositivo que 
+                    recibe el mensaje intentará responder al mensaje tan pronto como sea posible.
+                </p>
+                <p>
+                    Un programa de aplicación puede obtener un receptor para un <code>MidiDevice</code> invocando el método 
+                    <code>getReceiver</code> del dispositivo. Si el dispositivo no puede proporcionar un receptor al programa 
+                    (habitualmente porque todos los receptores del dispositivo ya están en uso), se lanza una 
+                    <code>MidiUnavailableException</code>. De lo contrario, el receptor devuelto desde este método está disponible 
+                    para uso inmediato por el programa. Cuando el programa ha terminado de usar el receptor, debe llamar al método 
+                    <code>close</code> del receptor. Si el programa intenta invocar métodos en un receptor después de llamar a 
+                    <code>close</code>, se puede lanzar una <code>IllegalStateException</code>.
+                </p>
+                <p>
+                    Como un ejemplo simple y concreto de enviar un mensaje sin usar un transmisor, envíe un mensaje Note On al 
+                    receptor predeterminado, que está habitualmente asociado con un dispositivo como el puerto de salida MIDI o un 
+                    sintetizador. Hacemos esto creando un <code>ShortMessage</code> adecuado y pasándolo como un argumento al 
+                    método <code>send</code> de <code>Receiver</code>:
+                    As a concrete simple example of sending a message without using a transmitter, let's send a Note On message
+                    to the default receiver, which is typically associated with a device such as the MIDI output port or a
+                    synthesizer. We do this by creating a suitable <code>ShortMessage</code> and passing it as an argument to
+                    <code>Receiver's</code> <code>send</code> method:
+                </p>
+                <div class="codeblock">
+                    <pre>
+  ShortMessage myMsg = new ShortMessage();
+  // Empieza a tocar la nota Middle C (60), 
+  // moderamente alto (velocidad = 93).
+  myMsg.setMessage(ShortMessage.NOTE_ON, 0, 60, 93);
+  long timeStamp = -1;
+  Receiver       rcvr = MidiSystem.getReceiver();
+  rcvr.send(myMsg, timeStamp);
+                    </pre>
+                </div>
+                <p>
+                    Este código usa un campo entero estático de <code>ShortMessage</code>, a saber, <code>NOTE_ON</code>, para 
+                    usarse como el byte de estado del mensaje MIDI. Las otras partes del mensaje MIDI reciben valores numéricos 
+                    explícitos como argumentos para el método <code>setMessage</code>. El cero indica que la nota va a ser tocada 
+                    usando el canal MIDI número 1; el 60 indica la nota Middle C; y el 93 es un valor de tecla pulsada arbitrario, 
+                    que habitualmente indica que el sintetizador que eventualmente toque la nota debe tocarla algo alta. (La 
+                    especificación MIDI deja la interpretación exacta de la velocidad a la implementación del sintetizador de su 
+                    instrumento actual). Este mensaje MIDI es después enviado al receptor con una marca de tiempo de -1. Ahora 
+                    necesitamos examinar exactamente qué significa el parámetro de marca de tiempo, lo que es el tema de la sección 
+                    siguiente.
+                    <a id="understanding_time"></a>
+                </p>
+                <h2>
+                    Comprensión de las Marcas de Tiempo
+                </h2>
+                <p>
+                    Como ya sabe, la especificación MIDI tiene diferentes partes. Una parte describe el protocolo de 
+                    "cable" MIDI (mensajes enviados entre dispositivos en tiempo real), y otra parte describe los 
+                    Archivos MIDI Estándar (mensajes almacenados como eventos en "secuencias"). En la última parte de la 
+                    especificación, cada evento almacenado en un fichero MIDI estándar está etiquetado con un valor de tiempo que 
+                    indica cuándo ese evento debe ser reproducido. Por contraste, los mensajes en el protocolo de cable de MIDI se 
+                    supone que son siempre procesados inmediatamente, tan pronto como son recibidos por un dispositivo, así que no 
+                    tienen valores de tiempo acompañantes.
+                </p>
+                <p>
+                    La IPA de Sonido de Java agrega un toque adicional. No es de extrañar que los valores de tiempo estén presentes 
+                    en los objetos <code>MidiEvent</code> que se almacenan en secuencias (como podría leerse desde un archivo MIDI), 
+                    al igual que en la especificación de archivos MIDI estándar. Pero en la IPA de Sonido de Java, incluso los 
+                    mensajes enviados entre dispositivos &mdash; en otras palabras, los mensajes que corresponden al protocolo de 
+                    cable MIDI &mdash; pueden tener valors de tiempo, conocidos como <em>marcas de tiempo</em>. Son estas marcas de
+                    tiempo las que nos conciernen aquí.
+                </p>
+                <h3>
+                    Marcas de Tiempo en los Mensajes Enviados a los Dispositivos
+                </h3>
+                <p>
+                    La marca de tiempo que puede opcionalmente acompañar a los mensajes enviados entre dispositivos en la IPA de 
+                    Sonido de Java es bastante diferentes de los valores de tiempo en un archivo MIDI estándar. Los valores de 
+                    tiempo en un archivo MIDI están a menudo basados en conceptos musicales tales como ritmos y tempo, y el 
+                    cronometraje de cada evento mide el tiempo transcurrido desde el evento anterior. En contraste, la marca de 
+                    tiempo de un mensaje enviado al objeto <code>Receiver</code> del dispositivo siempre mide el tiempo absoluto 
+                    en microsegundos. Específicamente, mide el número de microsegundos transcurridos desde que se abrió el 
+                    dispositivo propietario del receptor.
+                </p>
+                <p>
+                    Esta clase de marca de tiempo se diseñó para ayudar a compensar las latencias introducidas por el sistema 
+                    operativo o por el programa de aplicación. Es importante darse cuenta de que estas marcas de tiempo se utilizan 
+                    para pequeños ajustes en la sincronización, no para implementar colas complejas que puedan programar eventos en 
+                    momentos completamente arbitrarios (como hacen los valores de tiempo de <code>MidiEvent</code>).
+                </p>
+                <p>
+                    La marca de tiempo en un mensaje enviado a un dispositivo (a través de un <code>Receiver</code>) puede 
+                    proporcionar información de tiempo precisa a un dispositivo. El dispositivo puede usar esta información cuando 
+                    procesa el mensaje. Por ejemplo, puede ajustar el tiempo del evento por unos pocos milisegundos para que 
+                    coincida con la información en la marca de tiempo. Por otro lado, no todos los dispositivos admiten marcas de 
+                    tiempo, así que el dispositivo puede ignorar completamente la marca de tiempo del mensaje.
+                </p>
+                <p>
+                    Incluso si un dispositivo admite marcas de tiempo, puede no programar el evento exactamente para el momento que 
+                    ha solicitado. No puede esperar enviar un mensaje cuya marca de tiempo está muy lejana en el futuro y hacer que 
+                    el dispositivo lo maneje como lo desea, ¡Y ciertamente no puede esperar que un dispositivo programe 
+                    correctamente un mensaje cuya marca de tiempo está en el pasado! Depende del dispositivo decidir cómo manejar 
+                    las marcas de tiempo que están demasiado lejos en el futuro o en el pasado. El remitente no sabe qué considera 
+                    el dispositivo estar demasiado lejos, o si el dispositivo tiene cualquier problema con la marca de tiempo. Esta 
+                    ignorancia imita el comportamiento de los dispositivos hardware MIDI externos, que envían mensajes sin incluso 
+                    saber si estos fueron recibidos correctamente. (El protocolo de cable MIDI es unidireccional).
+                </p>
+                <p>
+                    Algunos dispositivos envían mensajes con marca de tiempo (a través de un <code>Transmitter</code>). Por ejemplo, 
+                    los mensajes enviados por un puerto de entrada MIDI pueden estar marcados con la hora a la que el mensaje 
+                    entrante llegó al puerto. En algunos sistemas, los mecanismos de manejo de eventos causan un cierta cantidad de 
+                    pérdida de precisión durante el procesamiento posterior del mensaje. La marca de tiempo del mensaje permite que 
+                    la información original de tiempo sea preservada.
+                </p>
+                <p>
+                    Para saber si un dispositivo soporta marcas de tiempo, invoque el siguiente método de <code>MidiDevice</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+    long getMicrosecondPosition()
+                    </pre>
+                </div>
+                <p>
+                    Este método devuelve -1 si el dispositivo ignora las marcas de tiempo. De otra forma, devuelve la noción del 
+                    tiempo actual del dispositivo, al que usted como remitente puede usar como desplazamiento cuando determine las 
+                    marcas de tiempo para los mensajes que le envíe posteriormente. Por ejemplo, si quiere enviar un mensaje con una 
+                    marca de tiempo de cinco milisegundos en el futuro, puede obtener la posición actual del dispositivo en 
+                    microsegundos, agregar 5000 microsegundos, y usar eso como la marca de tiempo. Tenga en cuenta que la noción de 
+                    tiempo de <code>MidiDevice</code> siempre coloca el tiempo cero en el momento en que se abrió el dispositivo.
+                </p>
+                <p>
+                    Ahora, con toda esa explicación de las marcas de tiempo como trasfondo, volvamos al método <code>send</code> de 
+                    <code>Receiver</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+void send(MidiMessage message, long timeStamp)
+                    </pre>
+                </div>
+                <p>
+                    El argumento <code>timeStamp</code> se expresa en microsegundos, de acuerdo a la noción de tiempo del 
+                    dispositivo receptor. Si el dispositivo no admite marcas de tiempo, este simplemente ignora el argumento 
+                    <code>timeStamp</code>. No se le obliga a indicar marcas de tiempo a los mensajes que envía a un receptor. 
+                    Puede usar -1 para el argumento <code>timeStamp</code> para indicar que no le importa ajustar el tiempo exacto; 
+                    simplemente deja que el dispositivo receptor procese el mensaje tan pronto como sea posible. Sin embargo, no es 
+                    recomendable enviar -1 con algunos mensajes y marcas de tiempo explícitas con otros mensajes enviados al mismo 
+                    receptor. Si lo hace, es probable que se produzcan irregularidades en la sincronización resultante.
+                </p>
+                <h2>
+                    Conectar Transmisores a Receptores
+                </h2>
+                <p>
+                    Hemos visto cómo puede enviar un mensaje MIDI directamente a un receptor, sin usar un transmisor. Ahora veamos
+                    el caso más común, donde usted no crea los mensajes MIDI desde cero, sino que simplemente conecta dispositivos 
+                    juntos de forma que uno de ellos puede enviar mensajes MIDI al otro.
+                </p>
+                <p></p>
+                <h3>
+                    Conectar a un Solo Dispositivo
+                </h3>
+                <p>
+                    El caso específico que tomaremos como nuestro primer ejemplo es conectar un secuenciador a un sintetizador. 
+                    Después de hacer esta conexión, el inicio del secuenciador en funcionamiento hará que el sintetizador genere 
+                    audio a partir de los eventos en la secuencia actual del secuenciador. Por ahora, ignoraremos el proceso de 
+                    cargar una secuencia desde un archivo MID al secuenciador. Además, no entraremos en el mecanismo de reproducción 
+                    de la secuencia. Cargar y reproducir secuencias se describen en detalle en 
+                    <a class="TutorialLink" target="_top" href="MIDI-seq-intro.html">Introducción a los Secuenciadores</a>. La carga 
+                    de instrumentos en el sintetizador se describe en 
+                    <a class="TutorialLink" target="_top" href="MIDI-synth.html">Sintetizando Sonido</a>. Por ahora, estamos 
+                    interesados en cómo hacer la conexión entre el secuenciador y el sintetizador. Esto servirá como una ilustración 
+                    del proceso más general de conectar el transmisor de un dispositivo al receptor de otro dispositivo.
+                </p>
+                <p>
+                    Por simplicidad, usaremos el secuenciador predeterminado y el sintetizador predeterminado.
+                </p>
+                <div class="codeblock">
+                    <pre>
+    Sequencer           seq;
+    Transmitter         seqTrans;
+    Synthesizer         synth;
+    Receiver         synthRcvr;
+    try {
+          seq     = MidiSystem.getSequencer();
+          seqTrans = seq.getTransmitter();
+          synth   = MidiSystem.getSynthesizer();
+          synthRcvr = synth.getReceiver(); 
+          seqTrans.setReceiver(synthRcvr);      
+    } catch (MidiUnavailableException e) {
+          // maneja o lanza excepción
+    }
+                    </pre>
+                </div>
+                <p>
+                    Una implementación puede en realidad tener un único objeto que sirve tanto como secuenciador predeterminado como 
+                    sintetizador predeterminado. En otras palabras, la implementación puede usar una clase que implementa tanto la 
+                    interfaz <code>Sequencer</code> como la interfaz <code>Synthesizer</code>. En ese caso, probablemente no sería 
+                    necesario hacer la conexión explícita que hicimos en el código de arriba. Por portabilidad, sin embargo, es más 
+                    seguro no asumir tal configuración. Si lo desea, puede probar esta condición, por supuesto:
+                </p>
+                <div class="codeblock">
+                    <pre>
+if (seq instanceof Synthesizer)
+                    </pre>
+                </div>
+                <p>
+                    aunque la conexión explícita de arriba debería funcionar en cualquier caso.
+                </p>
+                <p></p>
+                <h3>
+                    Conectar a Más de Un Dispositivo
+                </h3>
+                <p>
+                    El código de ejemplo previo ilustró una conexión uno a uno entre un transmisor y un receptor. Pero, ¿qué sucede 
+                    si necesita enviar el mismo mensaje MIDI a varios receptores? Por ejemplo, suponga que quiere capturar datos 
+                    MIDI desde un dispositivo externo para controlar el sintetizador interno mientras simultáneamente graba los 
+                    datos a una secuencia. Esta forma de conexión, algunas veces denominada como "abanico" o como "divisor", es 
+                    simple. Las siguientes sentencias muestran como crear una conexión abanico, a través de la cual los mensajes 
+                    MIDI llegan al puerto de entrada MIDI y son enviados tanto al objeto <code>Synthesizer</code> como al objeto 
+                    <code>Sequencer</code>. Asumimos que ya ha obtenido y abierto los tres dispositivos: el puerto de entrada, el 
+                    secuenciador, y el sintetizador. (Para obtener el puerto de entrada, necesitará iterar sobre todos los elementos 
+                    devueltos por <code>MidiSystem.getMidiDeviceInfo</code>).
+                </p>
+                <div class="codeblock">
+                    <pre>
+    Synthesizer  synth;
+    Sequencer    seq;
+    MidiDevice   inputPort;
+    // [obtiene y abre los tres dispositivos...]
+    Transmitter   inPortTrans1, inPortTrans2;
+    Receiver            synthRcvr;
+    Receiver            seqRcvr;
+    try {
+          inPortTrans1 = inputPort.getTransmitter();
+          synthRcvr = synth.getReceiver(); 
+          inPortTrans1.setReceiver(synthRcvr);
+          inPortTrans2 = inputPort.getTransmitter();
+          seqRcvr = seq.getReceiver(); 
+          inPortTrans2.setReceiver(seqRcvr);
+    } catch (MidiUnavailableException e) {
+          // maneja o lanza una excepción
+    }
+                    </pre>
+                </div>
+                <p>
+                    Este código introduce una invocación dual del método <code>MidiDevice.getTransmitter</code>, asignando los 
+                    resultados a <code>inPortTrans1</code> y <code>inPortTrans2</code>. Como se mencionó anteriormente, un 
+                    dispositivo puede poseer varios transmisores y receptores. Cada vez que se invoca 
+                    <code>MidiDevice.getTransmitter()</code> para un dispositivo dado, se devuelve otro transmisor, hasta que no 
+                    haya más disponibles, momento en el que se lanzará una excepción.
+                </p>
+                <p>
+                    Para saber cuantos transmisores y receptores admite un dispositivo, puede usar el siguiente método de 
+                    <code>MidiDevice</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+    int getMaxTransmitters()
+    int <code>getMaxReceivers</code>()
+                    </pre>
+                </div>
+                <p>
+                    Estos métodos devuelven el número total que posee el dispositivo, no el número disponible actualmente.
+                </p>
+                <p>
+                    Un transmisor puede transmitir mensajes MIDI a solo un receptor a la vez. (Cada vez que llama al método 
+                    <code>Transmitter's setReceiver</code>, el <code>Receiver</code> existente, si lo hay , es reemplazado por el 
+                    nuevo especificado. Puede indicar si el transmisor actualmente tiene un receptor invocando 
+                    <code>Transmitter.getReceiver</code>). Sin embargo, si un dispositivo tiene varios transmisores, puede enviar 
+                    datos a más de un dispositivo a la vez, conectando cada transmisor a un receptor diferente, como vimos en el 
+                    caso del puerto de entrada de arriba.
+                </p>
+                <p>
+                    Del mismo modo, un dispositivo puede usar sus varios receptores para recibir desde más de un dispositivo a la 
+                    vez. El código del receptor múltiple que se requiere es simple, siendo directamente análogo al código del 
+                    múltiple transmisor de arriba. Es también posible que un único receptor reciba mensajes de más de un transmisor 
+                    a la vez.
+                </p>
+                <p></p>
+                <h3>
+                    Cerrar Conexiones
+                </h3>
+                <p>
+                    Una vez ha terminado con una conexión, puede liberar sus recursos invocando el método <code>close</code> para 
+                    cada transmisor y receptor que ha obtenido. Las interfaces <code>Transmitter</code> y <code>Receiver</code> 
+                    tienen cada una un método <code>close</code>. Tenga en cuenta que invocar 
+                    <code>Transmitter.setReceiver</code> no cierra el receptor actual del transmisor. El receptor se queda abierto, 
+                    y puede aún recibir mensajes de cualquier otro transmisor que esté conectado a este.
+                </p>
+                <p>
+                    Si ya ha terminado también con los dispositivos, puede del mismo modo dejarlos disponibles para otros programas 
+                    de aplicación invocando <code>MidiDevice.close()</code>. Cerrar un dispositivo cierra automáticamente todos sus 
+                    transmisores y receptores.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="accessing-MIDI.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="MIDI-seq-intro.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            "Los Tutoriales de Java" está sujeto a estos <a href="../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Accediendo a los Recursos del Sistema MIDI<br />
+            <b>Página siguiente:</b> Introducción a los Secuenciadores
+        </div>
+    </body>
+</html> 

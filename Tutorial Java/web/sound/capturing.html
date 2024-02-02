@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Grabando Audio (Los Tutoriales de Java&trade; &gt; Sonido)
+        </title>
+        <meta name="description" content="" />
+        <meta name="keywords" content="java programming, learn java, java sample code, " />
+        <link rel="stylesheet" href="../indice.css" type="text/css"/>
+        <script src="../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkAHEAD"><a href="sampled-overview.html">Descripción del Paquete Sampled</a></div>
+                <div class="linkAHEAD"><a href="accessing.html">Accediendo a los Recursos del Sistema de Audio</a></div>
+                <div class="linkAHEAD"><a href="playing.html">Reproducción de Audio</a></div>
+                <div class="nolinkAHEAD">Grabando Audio</div>
+                <div class="linkAHEAD"><a href="controls.html">Procesando Audio con Controles</a></div>
+                <div class="linkAHEAD"><a href="converters.html">Usando Ficheros y Convertidores de Formato</a></div>
+                <div class="linkAHEAD"><a href="overview-MIDI.html">Descripción del Paquete MIDI</a></div>
+                <div class="linkAHEAD"><a href="accessing-MIDI.html">Accediendo a los Recursos del Sistema MIDI</a></div>
+                <div class="linkAHEAD"><a href="MIDI-messages.html">Transmitiendo y Recibiendo Mensajes MIDI</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-intro.html">Introducción a los Secuenciadores</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-methods.html">Utilizando Métodos del Secuenciador</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-adv.html">Usando Características Avanzadas del Secuenciador</a></div>
+                <div class="linkAHEAD"><a href="MIDI-synth.html">Sintetizando Sonido</a></div>
+                <div class="linkAHEAD"><a href="SPI-intro.html">Introducción a los Interfaces de los Proveedores de Servicio</a></div>
+                <div class="linkAHEAD"><a href="SPI-providing-sampled.html">Proporcionando Servicios de Audio Sampleado</a></div>
+                <div class="linkAHEAD"><a href="SPI-providing-MIDI.html">Proporcionando Servicios MIDI</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Sonido
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="./index.html" target="_top">Sonido</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="playing.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="controls.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Grabando Audio</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    <em>Capturar</em> se refiere a los procesos de obtener una señal de fuera del computador. Una aplicación común 
+                    de captura de audio graba, tal como grabar la entrada de micrófono a un archivo de sonido. Sin embargo, 
+                    capturar no es sinónimo de grabar, porque grabar implica que la aplicación siempre salva los datos de sonido 
+                    que están entrando. Una aplicación que captura audio no almacena necesariamente el audio. En su lugar podría 
+                    hacer algo con los datos según estos entran &mdash; como transcribir la voz a texto &mdash; pero después 
+                    descartar cada bufer de audio tan pronto como ha terminado con ese búfer.
+                </p>
+                <p>
+                    Como se describió en 
+                    <a class="TutorialLink" target="_top" href="sampled-overview.html">Descripción del Paquete Sampled</a>, un 
+                    sistema de entrada de audio típico en una implementación de la IPA de Sonido de Java consiste de:
+                </p>
+                <ol>
+                    <li>
+                        Un puerto de entrada, tal como un puerto de micrófono o un puerto de entrada de línea, los cuales alimentan 
+                        los datos de audio dentro:
+                    </li>
+                    <li>Un mezclador, que coloca los datos de entrada en:</li>
+                    <li>Una o más líneas de datos destino, desde los cuales una aplicación pueden recuperar los datos.</li>
+                </ol>
+                <p>
+                    Comúnmente, solo un puerto de entrada puede ser abierto a la vez, pero un mezclador de entrada de audio que 
+                    mezcla audio desde varios puertos es tambíen posible. Otro escenario consiste de un mezclador que no tiene 
+                    puertos pero en su lugar obtiene su entrada de audio a través de la red.
+                </p>
+                <p>
+                    La interfaz <code>TargetDataLine</code> fue introducida brevemente bajo 
+                    <a class="TutorialLink" target="_top" 
+                       href="sampled-overview.html#lineHierarchy">La Jerarquía de la Interfaz Line</a>. <code>TargetDataLine</code> 
+                       es directamente análoga a la interfaz <code>SourceDataLine</code>, que fue descrita extensivamente en 
+                    <a class="TutorialLink" target="_top" href="playing.html">Reproducción de Audio</a>. Recuerde que la interfaz de 
+                    <code>SourceDataLine</code> consiste de:
+                </p>
+                <ul>
+                    <li>Un método <code>write</code> para enviar audio al mezclador</li>
+                    <li>
+                        Un método <code>available</code> que determina cuantos datos pueden ser escritos en el búfer sin bloquear 
+                    </li>
+                </ul>
+                <p>
+                    De manera similar, <code>TargetDataLine</code> consiste de:
+                </p>
+                <ul>
+                    <li>Un método <code>read</code> para obtener audio desde el mezclador</li>
+                    <li>
+                        Un método <code>available</code> para determinar cuantos datos pueden ser leídos del búfer sin bloquear
+                    </li>
+                </ul>
+                <h2>
+                    Configurar una TargetDataLine
+                </h2>
+                <p>
+                    El proceso de obtener una línea de datos de destino se describe en 
+                    <a class="TutorialLink" target="_top" href="accessing.html">Accediendo a los Recursos del Sistema de Audio</a> 
+                    pero lo repetimos aquí por convenencia:
+                </p>
+                <div class="codeblock">
+                    <pre>
+TargetDataLine line;
+DataLine.Info info = new DataLine.Info(TargetDataLine.class, 
+    format); // format es un objeto AudioFormat
+if (!AudioSystem.isLineSupported(info)) {
+    // Maneja el error ... 
+
+}
+// Obtiene y abre la línea.
+try {
+    line = (TargetDataLine) AudioSystem.getLine(info);
+    line.open(format);
+} catch (LineUnavailableException ex) {
+    // Maneja el error ... 
+}
+                    </pre>
+                </div>
+                <p>
+                    Podría en su lugar invocar el método <code>getLine</code> de <code>Mixer</code>, en vez del de 
+                    <code>AudioSystem</code>.
+                </p>
+                <p>
+                    Como se muestra en este ejemplo, una vez ha obtenido una línea de datos destino, la reserva para el uso de su
+                    aplicacion invocando el método <code>open</code> de <code>SourceDataLine</code>, exactamente como fue descrita 
+                    en el caso de una línea de datos de origen en 
+                    <a class="TutorialLink" target="_top" href="playing.html">Reproducción de Audio</a>. La versión de un parámetro 
+                    único del método <code>open</code> causa que el búfer de la línea tenga el tamaño predeterminado. Puede en su 
+                    lugar establecer el tamaño del búfer de acuerdo a las necesidades de su aplicación invocando la versión con 
+                    dos parámetros:
+                </p>
+                <div class="codeblock">
+                    <pre>
+void open(AudioFormat format, int bufferSize)
+                    </pre>
+                </div>
+                <p></p>
+                <h2>
+                    Leer los Datos desde la TargetDataLine
+                </h2>
+                <p>
+                    Una vez se abre la línea, está lista para iniciar la captura de datos, pero no está activa aún. Para comenzar 
+                    realmente la captura de audio, use el método <code>start</code> de <code>DataLine</code>. Esto empieza a enviar 
+                    el audio de entrada al búfer de la línea para que su aplicación los lea. Su aplicación debe invocar start solo 
+                    cuando esté lista para empezar a leer desde la línea; de otra forma se pierde un montón de procesamiento en 
+                    llenar el búfer de captura, solo para que se desborde (es decir, descarte datos).
+                </p>
+                <p>
+                    Para empezar a recuperar datos desde el búfer, invoque el método read de <code>TargetDataLine</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+int read(byte[] b, int offset, int length)
+                    </pre>
+                </div>
+                <p>
+                    Este método intenta leer una <code>length</code> (longitud) de bytes de datos dentro de una matriz 
+                    <code>b</code>, empezando en la posición del byte <code>offset</code> (desplazamiento) en la matriz. El método 
+                    devuelve el número de bytes que realmente leyó.
+                </p>
+                <p>
+                    Como con el método <code>write</code> de <code>SourceDataLine</code>, puede solicitar más datos de los que en 
+                    realidad caben en el búfer, porque el método bloquea hasta que la cantidad solicitada de datos ha sido enviada, 
+                    incluso si solicita muchos búferes de datos.
+                </p>
+                <p>
+                    Para evitar que su aplicación se cuelgue durante la grabación, puede invocar el método read dentro de un bucle, 
+                    hasta que haya recuperado toda la entrada de audio, como en este ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+// Asume que TargetDataLine, line, han sido ya 
+// obtenidos y abiertos.
+ByteArrayOutputStream out  = new ByteArrayOutputStream();
+int numBytesRead;
+byte[] data = new byte[line.getBufferSize() / 5];
+
+// Empieza la captura de audio.
+line.start();
+
+// Aquí, stopped es un booleano global establecido por otro subproceso.
+while (!stopped) {
+   // Lee el siguiente fragmento de datos desde TargetDataLine.
+   numBytesRead =  line.read(data, 0, data.length);
+   // Salvar este fragemento de datos.
+   out.write(data, 0, numBytesRead);
+}     
+                    </pre>
+                </div>
+                <p>
+                    Tenga en cuenta que en este ejemplo, el tamaño de la matriz de bytes en la cual los datos se leen es establecida 
+                    a ser un quinto del tamaño del búfer de línea. Si usted en su lugar la hace tan grande como el búfer de línea 
+                    e intenta leer el búfer entero, necesita ser muy exacto en su tiempo, porque los datos serán volcados si el 
+                    mezclador necesita enviar datos a la línea mientras que está leyéndolos de esta. Al usar alguna fracción del 
+                    tamaño del búfer de la línea, como se muestra aquí, su aplicación tendrá más éxito en compartir el acceso al 
+                    búfer de la línea con el mezclador.
+                </p>
+                <p>
+                    El método <code>read</code> de <code>TargetDataLine</code> toma tres argumentos: una matriz de bytes, un 
+                    desplazamiento dentro de la matriz, y el número de bytes de datos de entrada que le gustaría leer. En este 
+                    ejemplo, el tercer argumento es simplemente la longitud de su matriz de bytes. El método <code>read</code> 
+                    devuelve el número de bytes que ha leído en realidad en su matriz.
+                </p>
+                <p>
+                    Normalmente, lee datos de la línea en un bucle, como en este ejemplo. Dentro del bucle <code>while</code>, cada 
+                    fragmento de datos recuperados son procesados de cualquier forma que sea apropiada para la aplicación &mdash; 
+                    aquí, se escriben en un <code>ByteArrayOutputStream</code>. Aquí no se muestra el uso de un hilo separado para 
+                    establecer el booleano <code>stopped</code>, que termina el bucle. Este valor booleano podría ser establecido a 
+                    <code>true</code> cuando el usuario pulsa un botón Parar, y también cuando un listener recibe un evento 
+                    <code>CLOSE</code> o <code>STOP</code> desde la línea. El listener es necesario para los eventos 
+                    <code>CLOSE</code> y recomendado para los eventos <code>STOP</code>. De lo contrario, si la línea se detiene de 
+                    alguna manera sin que se fije stopped a <code>true</code>, el bucle <code>while</code> capturará cero bytes en 
+                    cada iteración ejecutándose rápido y gastando ciclos de la UCP. Un ejemplo de código más completo mostraría que 
+                    el bucle se vuelve a ingresar si la captura se vuelve a activar.
+                </p>
+                <p>
+                    Como con la línea de datos origen, es posible drenar o vaciar una línea de datos destino. Por ejemplo, si está 
+                    grabando la entrada a un archivo, probablemente querrá invocar el método <code>drain</code> cuando el usuario 
+                    pulsa un botón Parar. El método <code>drain</code> causará que los datos restantes del mezclador se envíen al 
+                    búfer de la línea de datos de destino. Si no drena los datos, el sonido capturado podría parecer que se trunca 
+                    prematuramente al final.
+                </p>
+                <p>
+                    Puede haber algunos casos en los que, en su lugar, desee vaciar los datos. En cualquier caso, si no vacía ni 
+                    drena los datos, se dejarán en el mezclador. Esto significa que cuando recomience la captura, habrá algo de 
+                    sonido sobrante al comienzo de la nueva grabación, lo que podría ser indeseable. Puede ser útil, entonces, 
+                    vaciar la línea de datos destino antes de reiniciar la captura.
+                </p>
+                <p></p>
+                <h2>
+                    Monitorizar el Estado de la Línea
+                </h2>
+                <p>
+                    Ya que la interfaz <code>TargetDataLine</code> extiende <code>DataLine</code>, las líneas de datos destino 
+                    generan eventos de la misma forma que lo hacen las líneas de datos origen. Puede registrar un objeto para que 
+                    reciba eventos cada vez que la línea de datos destino abre, cierra, se inicia, o se para. Para más información, 
+                    vea la descripción previa de 
+                    <a class="TutorialLink" target="_top" href="playing.html#113711">Monitorizar un Estado de Línea</a>.
+                </p>
+                <p></p>
+                <h2>
+                    Procesar el Audio Entrante
+                </h2>
+                <p>
+                    Como algunas líneas de datos origen, algunas líneas de datos destino del mezclador tienen controles de procesado 
+                    de señal, tales como controles de ganancia, balance, reverberación o frecuencia de muestreo. Los puertos de 
+                    entrada podrían tener controles similares, especialmente controles de ganancia. En la siguiente sección, 
+                    aprenderá cómo determinar si una línea tiene dichos controles, y cómo usarlos si los tiene.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="playing.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="controls.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Reproducción de Audio<br />
+            <b>Página siguiente:</b> Procesando Audio con Controles
+        </div>
+    </body>
+</html> 

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            La Sentencia try-with-resources (Los Tutoriales de Java&trade; &gt; Clases Esenciales &gt; Excepciones)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe las excepciones, la entrada/salida básica, concurrencia,
+              expresiones regulares, y el entorno de la plataforma" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java exception, java input output, java
+              threads, java regex, regular expressions, path, classpath, environment variable" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper  clearfix">       
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div> 
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr"> 
+                <div id="TopBar_tl"> 
+                    <div id="TopBar_br"> 
+                        <div id="TopBar_bl"> 
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Excepciones</a></div>
+                <div class="linkAHEAD"><a href="definition.html">¿Qué es una Excepción?</a></div>
+                <div class="linkAHEAD"><a href="catchOrDeclare.html">La Captura o la Especificación del Requisito</a></div>
+                <div class="linkAHEAD"><a href="handling.html">Capturando y Manejando Excepciones</a></div>
+                <div class="linkBHEAD"><a href="try.html">El Bloque try</a></div>
+                <div class="linkBHEAD"><a href="catch.html">Los Bloques catch</a></div>
+                <div class="linkBHEAD"><a href="finally.html">El Bloque finally</a></div>
+                <div class="nolinkBHEAD">La Sentencia try-with-resources</div>
+                <div class="linkBHEAD"><a href="putItTogether.html">Poniéndolo Todo Junto</a></div>
+                <div class="linkAHEAD"><a href="declaring.html">Especificando las Excepciones Lanzadas por un Método</a></div>
+                <div class="linkAHEAD"><a href="throwing.html">Cómo Lanzar Excepciones</a></div>
+                <div class="linkBHEAD"><a href="chained.html">Excepciones Encadenadas</a></div>
+                <div class="linkBHEAD"><a href="creating.html">Creando Clases Exception</a></div>
+                <div class="linkAHEAD"><a href="runtime.html">Excepciones No Comprobadas &mdash; La Controversia</a></div>
+                <div class="linkAHEAD"><a href="advantages.html">Ventajas de las Excepciones</a></div>
+                <div class="linkAHEAD"><a href="summary.html">Sumario</a></div>
+                <div class="linkQUESTIONS"><a href="QandE/questions.html">Preguntas y Ejercicios</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Clases Esenciales<br />
+                <b>Lección:</b> Excepciones<br />
+                <b>Sección:</b> Capturando y Manejando Excepciones
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Clases Esenciales</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Excepciones</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="finally.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="putItTogether.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>La Sentencia try-with-resources</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    La sentencia <code>try</code>-with-resources es una sentecia <code>try</code> que declara uno o más recursos.
+                    Un <em>recurso</em> es un objeto que debe ser cerrado después de que el programa haya terminado con él. La 
+                    sentencia <code>try</code>-with-resources asegura que cada recurso es cerrado al final de la sentencia. 
+                    Cualquier objeto que implementa <code>java.lang.AutoCloseable</code>, lo cual incluye todos los objetos que
+                    implementan <code>java.io.Closeable</code>, pueden ser usados como un recurso.
+                </p>
+                <p>
+                    El siguiente ejemplo lee la primera línea de un fichero. Usa una instancia de <code>BufferedReader</code> para 
+                    leer datos desde el fichero. <code>BufferedReader</code> es un recurso que debe ser cerrado después de que el
+                    programa ha terminado con él:
+                </p>
+                <div class="codeblock">
+                    <pre>
+static String readFirstLineFromFile(String path) throws IOException {
+    <strong>try (BufferedReader br =
+                   new BufferedReader(new FileReader(path)))</strong> {
+        return br.readLine();
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    En este ejemplo, el recurso declarado en la sentencia <code>try</code>-with-resources  es un 
+                    <code>BufferedReader</code>. La declaración de la sentencia aparece entre paréntesis inmediatamente después de
+                    la palabra clave <code>try</code>. La clase <code>BufferedReader</code>, en Java SE 7 y posteriores, implementan
+                    la interfaz <code>java.lang.AutoCloseable</code>. Ya que la instancia <code>BufferedReader</code> es declarada
+                    en una sentencia <code>try</code>-with-resource, será cerrado independientemente de si la sentencia 
+                    <code>try</code> se completa normalmente o abruptamente (como resultado del método 
+                    <code>BufferedReader.readLine</code> lanzando una <code>IOException</code>).
+                </p>
+                <p>
+                    Anteriormente a Java SE 7, podía usar un bloque <code>finally</code> para asegurar que un recurso está cerrado
+                    independientemente de si la sentencia <code>try</code> se completa normalmente o abruptamente. El siguiente
+                    ejemplo usa un bloque <code>finally</code> en vez de una sentencia <code>try</code>-with-resources:
+                </p>
+                <div class="codeblock">
+                    <pre>
+static String readFirstLineFromFileWithFinallyBlock(String path)
+                                                     throws IOException {
+    BufferedReader br = new BufferedReader(new FileReader(path));
+    try {
+        return br.readLine();
+    } finally {
+        if (br != null) br.close();
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Sin embargo, en este ejemplo, si ambos métodos <code>readLine</code> y <code>close</code> lanzan excepciones, 
+                    entonces el método <code>readFirstLineFromFileWithFinallyBlock</code> lanza la excepción lanzada desde el bloque 
+                    <code>finally</code>; la excepción lanzada desde el bloque <code>try</code> se suprime. En contraste, en el 
+                    ejemplo <code>readFirstLineFromFile</code>, si las excepciones son lanzadas desde ambos el bloque 
+                    <code>try</code> y la sentencia <code>try</code>-with-resources, entonces el método 
+                    <code>readFirstLineFromFile</code> lanza la excepción lanzada desde el bloque <code>try</code>; la excepción
+                    lanzada desde el bloque <code>try</code>-with-resources es suprimida. En Java SE 7 y posteriores, puede 
+                    recuperar excepciones suprimidas; vea la sección 
+                    <a href="#suppressed-exceptions">Excepciones Suprimidas</a> para obtener más información.
+                </p>
+                <p>
+                    Puede declarar uno o más recursos en una sentencia <code>try</code>-with-resources. El siguiente ejemplo 
+                    recupera los nombres de los ficheros empaquetados en el fichero zip <code>zipFileName</code> y crea un fichero 
+                    de texto que contiene los nombres de estos ficheros:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public static void writeToFileZipFileContents(String zipFileName,
+                                           String outputFileName)
+                                           throws java.io.IOException {
+
+    java.nio.charset.Charset charset =
+         java.nio.charset.StandardCharsets.US_ASCII;
+    java.nio.file.Path outputFilePath =
+         java.nio.file.Paths.get(outputFileName);
+
+    // Abre el fichero zip y crea el fichero de salida con
+    // la sentencia try-with-resources
+
+    <strong>try (
+        java.util.zip.ZipFile zf =
+             new java.util.zip.ZipFile(zipFileName);
+        java.io.BufferedWriter writer = 
+            java.nio.file.Files.newBufferedWriter(outputFilePath, charset)
+    )</strong> {
+        // Enumeramos cada entrada
+        for (java.util.Enumeration entries =
+                                zf.entries(); entries.hasMoreElements();) {
+            // Obtenemos el nombre de la entrada y lo escribimos en el fichero de salida
+            String newLine = System.getProperty("line.separator");
+            String zipEntryName =
+                 ((java.util.zip.ZipEntry)entries.nextElement()).getName() +
+                 newLine;
+            writer.write(zipEntryName, 0, zipEntryName.length());
+        }
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    En este ejemplo, la sentencia <code>try</code>-with-resources contiene dos declaraciones que están separadas por
+                    un punto y coma: <code>ZipFile</code> y <code>BufferedWriter</code>. Cuando el bloque de código que directamente
+                    lo sigue termina, o normalmente o debido a una excepción, los métodos <code>close</code> de  los objetos 
+                    <code>BufferedWriter</code> y <code>ZipFile</code> son automáticamente llamados en este orden. Note que los
+                    métodos <code>close</code> de los recursos son llamados en el orden <em>opuesto</em> de su creación.
+                </p>
+                <p>
+                    El siguiente ejemplo usa una sentencia <code>try</code>-with-resources para automáticamente cerrar un objeto
+                    <code>java.sql.Statement</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public static void viewTable(Connection con) throws SQLException {
+
+    String query = "select COF_NAME, SUP_ID, PRICE, SALES, TOTAL from COFFEES";
+
+    <strong>try (Statement stmt = con.createStatement())</strong> {
+        ResultSet rs = stmt.executeQuery(query);
+
+        while (rs.next()) {
+            String coffeeName = rs.getString("COF_NAME");
+            int supplierID = rs.getInt("SUP_ID");
+            float price = rs.getFloat("PRICE");
+            int sales = rs.getInt("SALES");
+            int total = rs.getInt("TOTAL");
+
+            System.out.println(coffeeName + ", " + supplierID + ", " + 
+                               price + ", " + sales + ", " + total);
+        }
+    } catch (SQLException e) {
+        JDBCTutorialUtilities.printSQLException(e);
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    El recurso <code>java.sql.Statement</code> usado en este ejemplo es parte de JDBC 4.1 y IPA posteriores.
+                </p>
+                <p>
+                    <strong>Nota</strong>: Una sentencia <code>try</code>-with-resources puede tener bloques <code>catch</code> y
+                    <code>finally</code> justo como una ordinaria sentencia <code>try</code>. En una sentencia  
+                    <code>try</code>-with-resources, cualquier bloque <code>catch</code> o <code>finally</code> es ejecutado después 
+                    de que los recursos declarados han sido cerrados.
+                </p>
+                <h2><a id="suppressed-exceptions">Excepciones Suprimidas</a></h2>
+                <p>
+                    Una excepción puede ser lanzada desde el bloque de código asociado con la sentencia 
+                    <code>try</code>-with-resources. 
+                    En el ejemplo <code>writeToFileZipFileContents</code>, una excepción puede ser lanzada desde el bloque 
+                    <code>try</code>, y hasta dos excepciones pueden ser lanzadas desde la sentencia <code>try</code>-with-resources 
+                    cuando intenta cerrar los objetos <code>ZipFile</code> y <code>BufferedWriter</code>. Si una excepción es 
+                    lanzada desde el bloque <code>try</code> y una o más excepciones son lanzadas desde la sentencia 
+                    <code>try</code>-with-resources, entonces esas excepciones lanzadas desde la sentencia 
+                    <code>try</code>-with-resources son suprimidas, y la excepción lanzada por el bloque es la que es lanzada por
+                    el método <code>writeToFileZipFileContents</code>. 
+                    Puede recuperar esas excepciones suprimidas llamando al método <code>Throwable.getSuppressed</code> desde la
+                    excepción lanzada por el bloque <code>try</code>.
+                </p>
+                <h2>Clases Que Implementan la Interfaz AutoCloseable o Closeable</h2>
+                <p>
+                    Vea el Javadoc de las interfaces
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/AutoCloseable.html">
+                        <code>AutoCloseable</code>
+                    </a> y
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/io/Closeable.html">
+                        <code>Closeable</code>
+                    </a> para una lista de clases que implementan una u otra de estas interfaces. El interfaz <code>Closeable</code> 
+                    extiende el interfaz <code>AutoCloseable</code>. El método <code>close</code> de la interfaz 
+                    <code>Closeable</code> lanza excepciones del tipo <code>IOException</code> mientras el método 
+                    <code>close</code> de la interfaz <code>AutoCloseable</code> lanza excepciones del tipo <code>Exception</code>. 
+                    Consecuentemente, las subclases de la interfaz <code>AutoCloseable</code> pueden sobreescribir este 
+                    comportamiento del método <code>close</code> par lanzar excepciones especializadas, como una 
+                    <code>IOException</code>, o ninguna excepción en absoluto.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="finally.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="putItTogether.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">
+                                Su uso de ésta
+                            </a>
+                            página y todo el material en las páginas bajo el anuncio &quot;Los Tutoriales de Java&quot; está sujeto
+                            a estos
+                            <a href="../../information/cpyr.html">
+                                avisos legales
+                            </a>
+                            .
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs
+                            </a>
+                            .
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión
+                            </a>
+                            .
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> El Bloque finally<br />
+            <b>Página siguiente:</b> Poniéndolo Todo Junto
+        </div>
+    </body>
+</html>

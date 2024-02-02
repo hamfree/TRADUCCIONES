@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Obteniendo Información del Tipo del Método (Los Tutoriales de Java&trade; &gt; La IPA de Reflexión &gt; Miembros)
+        </title>
+        <meta name="description" content="Este tutorial de reflexión de Java describe el uso de la reflexión para acceder y 
+              manipular clases, campos, métodos y constructores" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java reflection" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Miembros</a></div>
+                <div class="linkAHEAD"><a href="field.html">Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldTypes.html">Obteniendo los Tipos de los Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldModifiers.html">Recuperando y Analizando Modificadores de los Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldValues.html">Obteniendo y Estableciendo los Valores de los Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldTrouble.html">Solución de Problemas</a></div>
+                <div class="linkAHEAD"><a href="method.html">Métodos</a></div>
+                <div class="nolinkBHEAD">Obteniendo Información del Tipo del Método</div>
+                <div class="linkBHEAD"><a href="methodparameterreflection.html">Obteniendo los Nombre de los Parámetros del Método</a></div>
+                <div class="linkBHEAD"><a href="methodModifiers.html">Recuperando y Analizando Modificadores del Método</a></div>
+                <div class="linkBHEAD"><a href="methodInvocation.html">Invoking Métodos</a></div>
+                <div class="linkBHEAD"><a href="methodTrouble.html">Solución de Problemas</a></div>
+                <div class="linkAHEAD"><a href="ctor.html">Constructores</a></div>
+                <div class="linkBHEAD"><a href="ctorLocation.html">Encontrando Constructores</a></div>
+                <div class="linkBHEAD"><a href="ctorModifiers.html">Recuperando y Analizando Modificadores del Constructor</a></div>
+                <div class="linkBHEAD"><a href="ctorInstance.html">Creando Nuevas Instancias de Clase</a></div>
+                <div class="linkBHEAD"><a href="ctorTrouble.html">Solución de Problemas</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> La IPA de Reflexión<br />
+                <b>Lección:</b> Miembros<br />
+                <b>Sección:</b> Métodos
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">La IPA de Reflexión</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Miembros</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="method.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="methodparameterreflection.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Obteniendo Información del Tipo del Método</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Una declaración de método incluye el nombre, modificadores, parámetros, tipo de retorno, y la lista de 
+                    excepciones que se pueden lanzar.
+                    La clase 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html">
+                        <code>java.lang.reflect.Method</code></a> proporciona una forma de obtener esta información.
+                </p>
+                <p>
+                    El ejemplo 
+                    <a class="SourceLink" target="_blank" href="example/MethodSpy.java" 
+                       onclick="showCode('../../displayCode.html', 'example/MethodSpy.java'); return false;">
+                        <code>MethodSpy</code></a> ilustra cómo enumerar todos los métodos declarados en una clase dada y recuperar 
+                    los tipos de retorno, de parámetros y excepciones para todos los métodos del nombre dado.
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import static java.lang.System.out;
+
+public class MethodSpy {
+    private static final String  fmt = &quot;%24s: %s%n&quot;;
+
+    // for the morbidly curious
+    &lt;E extends RuntimeException&gt; void genericThrow() throws E {}
+
+    public static void main(String... args) {
+	try {
+	    Class&lt;?&gt; c = Class.forName(args[0]);
+	    Method[] allMethods = c.getDeclaredMethods();
+	    for (Method m : allMethods) {
+		if (!m.getName().equals(args[1])) {
+		    continue;
+		}
+		out.format(&quot;%s%n&quot;, m.toGenericString());
+
+		out.format(fmt, &quot;ReturnType&quot;, m.getReturnType());
+		out.format(fmt, &quot;GenericReturnType&quot;, m.getGenericReturnType());
+
+		Class&lt;?&gt;[] pType  = m.getParameterTypes();
+		Type[] gpType = m.getGenericParameterTypes();
+		for (int i = 0; i &lt; pType.length; i++) {
+		    out.format(fmt,&quot;ParameterType&quot;, pType[i]);
+		    out.format(fmt,&quot;GenericParameterType&quot;, gpType[i]);
+		}
+
+		Class&lt;?&gt;[] xType  = m.getExceptionTypes();
+		Type[] gxType = m.getGenericExceptionTypes();
+		for (int i = 0; i &lt; xType.length; i++) {
+		    out.format(fmt,&quot;ExceptionType&quot;, xType[i]);
+		    out.format(fmt,&quot;GenericExceptionType&quot;, gxType[i]);
+		}
+	    }
+
+        // production code should handle these exceptions more gracefully
+	} catch (ClassNotFoundException x) {
+	    x.printStackTrace();
+	}
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Aquí está la salida para 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getConstructor-java.lang.Class...-">
+                        <code>Class.getConstructor()</code></a> que es un ejemplo de un método con tipos parametrizados y un número 
+                    variable de parámetros.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java MethodSpy java.lang.Class getConstructor</em>
+public java.lang.reflect.Constructor&lt;T&gt; java.lang.Class.getConstructor
+  (java.lang.Class&lt;?&gt;[]) throws java.lang.NoSuchMethodException,
+  java.lang.SecurityException
+              ReturnType: class java.lang.reflect.Constructor
+       GenericReturnType: java.lang.reflect.Constructor&lt;T&gt;
+           ParameterType: class [Ljava.lang.Class;
+    GenericParameterType: java.lang.Class&lt;?&gt;[]
+           ExceptionType: class java.lang.NoSuchMethodException
+    GenericExceptionType: class java.lang.NoSuchMethodException
+           ExceptionType: class java.lang.SecurityException
+    GenericExceptionType: class java.lang.SecurityException
+                    </pre>
+                </div>
+                <p>
+                    Esta es la declaración real del método en el código fuente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public Constructor&lt;T&gt; getConstructor(Class&lt;?&gt;... parameterTypes)
+                    </pre>
+                </div>
+                <p>
+                    En primer lugar, tenga en cuenta que los tipos de retorno y parámetros son genéricos. 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html#getGenericReturnType--">
+                        <code>Method.getGenericReturnType()</code></a> consultará el Atributo de Firma en el fichero de clase si 
+                    este está presente. Si el atributo no está disponible, recurre a 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html#getReturnType--">
+                        <code>Method.getReturnType()</code></a> que no fue cambiada por la introducción de los genéricos. Los otros 
+                    métodos con nombre <code>getGeneric<em>Foo</em>()</code> para algún valor de <em>Foo</em> en reflexión están 
+                    implementados de forma similar.
+                </p>
+                <p>
+                    A continuación, observe que el último (y único) parámetro, <code>parameterType</code>, es de aridad variable 
+                    (tiene un número variable de parámetros) del tipo <code>java.lang.Class</code>. Se representa como una matriz 
+                    de una única dimensión del tipo <code>java.lang.Class</code>. Esta puede ser distinguida de un parámetro que 
+                    es explícitamente una matriz de <code>java.lang.Class</code> invocando a 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html#isVarArgs--">
+                        <code>Method.isVarArgs()</code></a>. La sintaxis para los valores devueltos de 
+                    <code>Method.get*Types()</code> están descritos en 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getName--">
+                        <code>Class.getName()</code></a>.
+                </p>
+                <p>
+                    El ejemplo siguiente ilustra un método con un tipo de retorno genérico.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java MethodSpy java.lang.Class cast</em>
+public T java.lang.Class.cast(java.lang.Object)
+              ReturnType: class java.lang.Object
+       GenericReturnType: T
+           ParameterType: class java.lang.Object
+    GenericParameterType: class java.lang.Object
+                    </pre>
+                </div>
+                <p>
+                    El tipo de retorno genérico para el método 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#cast-java.lang.Object-">
+                        <code>Class.cast()</code></a> se informa como <code>java.lang.Object</code> porque los genéricos se 
+                    implementan vía <em>borrado de tipo</em> que elimina toda la información relacionada con los tipos 
+                    genéricos durante la compilación. El borrado de <code>T</code> se define por la declaración de 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html">
+                        <code>Class</code></a>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public final class Class&lt;T&gt; implements ...
+                    </pre>
+                </div>
+                <p>
+                    Así <code>T</code> se reemplaza por el límite superior de la variable tipo, en este caso, 
+                    <code>java.lang.Object</code>.
+                </p>
+                <p>
+                    El último ejemplo ilustra la salida para un método con anulaciones (sobreescrituras) múltiples.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java MethodSpy java.io.PrintStream format</em>
+public java.io.PrintStream java.io.PrintStream.format
+  (java.util.Locale,java.lang.String,java.lang.Object[])
+              ReturnType: class java.io.PrintStream
+       GenericReturnType: class java.io.PrintStream
+           ParameterType: class java.util.Locale
+    GenericParameterType: class java.util.Locale
+           ParameterType: class java.lang.String
+    GenericParameterType: class java.lang.String
+           ParameterType: class [Ljava.lang.Object;
+    GenericParameterType: class [Ljava.lang.Object;
+public java.io.PrintStream java.io.PrintStream.format
+  (java.lang.String,java.lang.Object[])
+              ReturnType: class java.io.PrintStream
+       GenericReturnType: class java.io.PrintStream
+           ParameterType: class java.lang.String
+    GenericParameterType: class java.lang.String
+           ParameterType: class [Ljava.lang.Object;
+    GenericParameterType: class [Ljava.lang.Object;
+                    </pre>
+                </div>
+                <p>
+                    Si múltiples anulaciones del mismo nombre de método se descubren, todas ellas son devueltas por 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getDeclaredMethods--">
+                        <code>Class.getDeclaredMethods()</code></a>. Ya que <code>format()</code> tiene dos anulaciones (una con un
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Locale.html">
+                        <code>Locale</code></a> y una sin este), se muestran ambos por <code>MethodSpy</code>.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Nota:</strong>&nbsp;
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html#getGenericExceptionTypes--">
+                        <code>Method.getGenericExceptionTypes()</code></a> existe porque es realmente posible declarar un método 
+                    con un tipo de excepción genérico. Sin embargo esto se usa raramente ya que no es posible capturar un tipo 
+                    de excepción genérica.
+                    <hr />
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="method.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="methodparameterreflection.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Métodos<br />
+            <b>Página siguiente:</b> Obteniendo los Nombre de los Parámetros del Método
+        </div>
+    </body>
+</html> 

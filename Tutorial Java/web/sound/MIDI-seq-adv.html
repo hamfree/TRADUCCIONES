@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Usando Características Avanzadas del Secuenciador (Los Tutoriales de Java&trade; &gt; Sonido)
+        </title>
+        <meta name="description" content="" />
+        <meta name="keywords" content="java programming, learn java, java sample code, " />
+        <link rel="stylesheet" href="../indice.css" type="text/css"/>
+        <script src="../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkAHEAD"><a href="sampled-overview.html">Descripción del Paquete Sampled</a></div>
+                <div class="linkAHEAD"><a href="accessing.html">Accediendo a los Recursos del Sistema de Audio</a></div>
+                <div class="linkAHEAD"><a href="playing.html">Reproducción de Audio</a></div>
+                <div class="linkAHEAD"><a href="capturing.html">Grabando Audio</a></div>
+                <div class="linkAHEAD"><a href="controls.html">Procesando Audio con Controles</a></div>
+                <div class="linkAHEAD"><a href="converters.html">Usando Ficheros y Convertidores de Formato</a></div>
+                <div class="linkAHEAD"><a href="overview-MIDI.html">Descripción del Paquete MIDI</a></div>
+                <div class="linkAHEAD"><a href="accessing-MIDI.html">Accediendo a los Recursos del Sistema MIDI</a></div>
+                <div class="linkAHEAD"><a href="MIDI-messages.html">Transmitiendo y Recibiendo Mensajes MIDI</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-intro.html">Introducción a los Secuenciadores</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-methods.html">Utilizando Métodos del Secuenciador</a></div>
+                <div class="nolinkAHEAD">Usando Características Avanzadas del Secuenciador</div>
+                <div class="linkAHEAD"><a href="MIDI-synth.html">Sintetizando Sonido</a></div>
+                <div class="linkAHEAD"><a href="SPI-intro.html">Introducción a los Interfaces de los Proveedores de Servicio</a></div>
+                <div class="linkAHEAD"><a href="SPI-providing-sampled.html">Proporcionando Servicios de Audio Sampleado</a></div>
+                <div class="linkAHEAD"><a href="SPI-providing-MIDI.html">Proporcionando Servicios MIDI</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Sonido
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="./index.html" target="_top">Sonido</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="MIDI-seq-methods.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="MIDI-synth.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Usando Características Avanzadas del Secuenciador</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Hasta ahora, nos hemos centrado en la reproducción y grabación sencillas de datos MIDI. Esta sección describirá 
+                    brevemente algunas de las funciones más avanzadas disponibles a través de los métodos de la interfaz 
+                    <code>Sequencer</code> y la clase <code>Sequence</code>.
+                </p>
+                <p></p>
+                <h2>
+                    Moverse a una Posición Arbitraria en la Secuencia
+                </h2>
+                <p>
+                    Hay dos métodos de <code>Sequencer</code> que obtienen la posición actual del secuenciador en la secuencia. El 
+                    primero de estos:
+                </p>
+                <div class="codeblock">
+                    <pre>
+long getTickPosition()
+                    </pre>
+                </div>
+                <p>
+                    devuelve la posición medida en tics MIDI desde el principio de la secuencia. El segundo método:
+                </p>
+                <div class="codeblock">
+                    <pre>
+long getMicrosecondPosition()
+                    </pre>
+                </div>
+                <p>
+                    devuelve la posición actual en microsegundos. Este método asume que la secuencia se está reproduciendo a la 
+                    velocidad predeterminada almacenada en el archivo MIDI o en la <code>Sequence</code>. <em>No</em> devuelve un 
+                    valor diferente si ha cambiado la velocidad de reproducción como se describe a continuación.
+                </p>
+                <p>
+                    De manera similar, puede configurar la posición actual del secuenciador de acuerdo con una unidad u otra:
+                </p>
+                <div class="codeblock">
+                    <pre>
+void setTickPosition(long tick)
+                    </pre>
+                </div>
+                <p>o</p>
+                <div class="codeblock">
+                    <pre>
+void setMicrosecondPosition(long microsecond)
+                    </pre>
+                </div>
+                <p></p>
+                <h2>
+                    Cambiar la Velocidad de Reproducción
+                </h2>
+                <p>
+                    Como se indicó anteriormente, la velocidad de una secuencia viene indicada por su tempo, que puede variar a lo 
+                    largo de la secuencia. Una secuencia puede contener eventos que encapsulan mensajes de cambio de tempo MIDI 
+                    estándar. Cuando el secuenciador procesa tal evento, cambia la velocidad de reproducción para reflejar el tempo 
+                    indicado. Además, puede cambiar el tempo mediante programación invocando cualquiera de estos métodos de 
+                    <code>Sequencer</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+    public void setTempoInBPM(float bpm)
+    public void setTempoInMPQ(float mpq)
+    public void setTempoFactor(float factor)
+                    </pre>
+                </div>
+                <p>
+                    Los dos primeros de estos métodos establecen el tempo en pulsaciones por minuto o microsegundos por negra, 
+                    respectivamente. El tempo permanecerá en el valor especificado hasta que uno de estos métodos sea invocado 
+                    nuevamente, o hasta que se encuentre un evento de cambio de tempo en la secuencia, momento en el cual el tempo 
+                    actual es reemplazado por el nuevo especificado.
+                </p>
+                <p>
+                    El tercer método, <code>setTempoFactor</code>, es de naturaleza diferente. Escala cualquier tempo establecido 
+                    para el secuenciador (ya sea mediante eventos de cambio de tempo o mediante uno de los dos primeros métodos 
+                    anteriores). El escalar predeterminado es 1.0 (sin cambios). Aunque este método hace que la reproducción o 
+                    grabación sea más rápida o más lenta que el tempo nominal (a menos que el factor sea 1.0), no altera el tempo 
+                    nominal. En otras palabras, los valores de tempo devueltos por <code>getTempoInBPM</code> y 
+                    <code>getTempoInMPQ</code> no se ven afectados por el factor de tempo, aunque el factor de tempo sí afecta la 
+                    velocidad real de reproducción o grabación. Además, si el tempo se cambia por un evento de cambio de tempo o por 
+                    uno de los dos primeros métodos, aún se escala por el último factor de tempo que se configuró. Sin embargo, si 
+                    carga una nueva secuencia, el factor de tempo se restablece a 1.0.
+                </p>
+                <p>
+                    Tenga en cuenta que todas estas directivas de cambio de tempo son ineficaces cuando el tipo de división de la 
+                    secuencia es uno de los tipos SMPTE, en lugar de PPQ.
+                </p>
+                <p></p>
+                <h2>
+                    Silenciar o Aplicar un Solo a Pistas Individuales en la Secuencia
+                </h2>
+                <p>
+                    A menudo, es conveniente para los usuarios de secuenciadores poder apagar ciertas pistas, para escuchar con más 
+                    claridad exactamente lo que está sucediendo en la música. Un programa secuenciador con todas las funciones le 
+                    permite al usuario elegir qué pistas deben sonar durante la reproducción. (Hablando más precisamente, dado que 
+                    los secuenciadores en realidad no crean sonido por sí mismos, el usuario elige qué pistas contribuirán al flujo 
+                    de mensajes MIDI que produce el secuenciador). Por lo general, hay dos tipos de controles gráficos en cada 
+                    pista: un botón de <em>silencio</em> y un botón de <em>solo</em>. Si el botón de silencio está activado, esa 
+                    pista no sonará bajo ninguna circunstancia, hasta que se desactive el botón de silencio. Hacer solos es una 
+                    característica menos conocida. Es más o menos lo opuesto a silenciar. Si el botón de solo en cualquier pista 
+                    está activado, solo sonarán las pistas cuyos botones de solo estén activados. Esta función permite al usuario 
+                    escuchar rápidamente una pequeña cantidad de pistas sin tener que silenciar todas las demás pistas. El botón de 
+                    silencio generalmente tiene prioridad sobre el botón de solo: si ambos están activados, la pista no suena.
+                </p>
+                <p>
+                    El uso de métodos de <code>Sequencer</code>, silenciar o poner en solo pistas (así como consultar el estado 
+                    actual de silenciamiento o solo de una pista) se logra fácilmente. Supongamos que hemos obtenido el 
+                    <code>Sequencer</code> predeterminado y que hemos cargado datos de secuencia en él. Silenciar la quinta pista de 
+                    la secuencia se lograría de la siguiente manera:
+                </p>
+                <div class="codeblock">
+                    <pre>
+    sequencer.setTrackMute(4, true);
+    boolean muted = sequencer.getTrackMute(4);
+    if (!muted) { 
+        return;         // silenciar falló
+    }
+                    </pre>
+                </div>
+                <p>
+                    Hay un par de cosas a tener en cuenta sobre el fragmento de código anterior. Primero, las pistas de una 
+                    secuencia se numeran comenzando con 0 y terminando con el número total de pistas menos 1. Además, el segundo 
+                    argumento de <code>setTrackMute</code> es un booleano. Si es cierto, la solicitud es silenciar la pista; de lo 
+                    contrario, la solicitud es activar el sonido de la pista especificada. Por último, para probar que el 
+                    silenciamiento tuvo efecto, invocamos el método <code>getTrackMute</code> del <code>Sequencer</code>, pasándole 
+                    el número de pista que estamos consultando. Si devuelve <code>true</code>, como esperaríamos en este caso, 
+                    entonces la solicitud de silencio funcionó. Si devuelve <code>false</code>, entonces falló.
+                </p>
+                <p>
+                    Las solicitudes de silencio pueden fallar por varias razones. Por ejemplo, el número de pista especificado en la 
+                    llamada <code>setTrackMute</code> podría exceder el número total de pistas o el secuenciador podría no admitir 
+                    el silenciamiento. Al llamar a <code>getTrackMute</code>, podemos determinar si nuestra solicitud tuvo éxito o 
+                    no.
+                </p>
+                <p>
+                    Además, el booleano que devuelve <code>getTrackMute</code> puede, de hecho, decirnos si ocurrió una falla, pero 
+                    no puede decirnos por qué ocurrió. Podríamos probar para ver si una falla fue causada al pasar un número de 
+                    pista no válido al método <code>setTrackMute</code>. Para hacer esto, llamaríamos al método 
+                    <code>getTracks</code> de <code>Sequence</code>, que devuelve una matriz que contiene todas las pistas de la 
+                    secuencia. Si el número de pista especificado en la llamada a <code>setTrackMute</code> excede la longitud de 
+                    esta matriz, entonces sabemos que especificamos un número de pista no válido.
+                </p>
+                <p>
+                    Si la solicitud de silencio tuvo éxito, entonces, en nuestro ejemplo, la quinta pista no sonará cuando se esté 
+                    reproduciendo la secuencia, ni tampoco cualquier otra pista que esté silenciada actualmente.
+                </p>
+                <p>
+                    El método y las técnicas para aplicar un solo a una pista son muy similares a los de silenciar. Para realizar 
+                    un solo en una pista, invoque el método <code>setTrackSolo</code> de <code>Sequence</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+void setTrackSolo(int track, boolean bSolo)
+                    </pre>
+                </div>
+                <p>
+                    Como en <code>setTrackMute</code>, el primer argumento especifica el número de pista basado en cero, y el 
+                    segundo argumento, si es <code>true</code>, especifica que la pista debe estar en modo solo; de lo contrario, la 
+                    pista no debería ser solista.
+                </p>
+                <p>
+                    De forma predeterminada, una pista no está silenciada ni es solista.
+                </p>
+                <p></p>
+                <h2>
+                    Sincronizar con Otros Dispositivos MIDI
+                </h2>
+                <p>
+                    <code>Sequencer</code> tiene una clase interna llamada <code>Sequencer.SyncMode</code>. Un objeto 
+                    <code>SyncMode</code> representa una de las formas en que la noción de tiempo de un secuenciador MIDI puede 
+                    sincronizarse con un dispositivo maestro o esclavo. Si el secuenciador se está sincronizando con un maestro, el 
+                    secuenciador revisa su tiempo actual en respuesta a ciertos mensajes MIDI del maestro. Si el secuenciador tiene 
+                    un esclavo, el secuenciador envía mensajes MIDI de manera similar para controlar la sincronización del esclavo.
+                </p>
+                <p>
+                    Hay tres modos predefinidos que especifican posibles maestros para un secuenciador: 
+                    <code>INTERNAL_CLOCK</code>, <code>MIDI_SYNC</code> y <code>MIDI_TIME_CODE</code>. Los dos últimos funcionan si 
+                    el secuenciador recibe mensajes MIDI de otro dispositivo. En estos dos modos, el tiempo del secuenciador se 
+                    restablece en función de los mensajes del reloj de temporización en tiempo real del sistema o los mensajes de 
+                    código de tiempo MIDI (MTC), respectivamente. (Consulte la especificación MIDI para obtener más información 
+                    sobre estos tipos de mensajes). Estos dos modos también se pueden utilizar como modos esclavos, en cuyo caso el 
+                    secuenciador envía los tipos correspondientes de mensajes MIDI a su receptor. Un cuarto modo, 
+                    <code>NO_SYNC</code>, se utiliza para indicar que el secuenciador no debe enviar información de temporización a 
+                    sus receptores.
+                </p>
+                <p>
+                    Al llamar al método <code>setMasterSyncMode</code> con un objeto <code>SyncMode</code> compatible como 
+                    argumento, puede especificar cómo se controla la sincronización del secuenciador. Asimismo, el método 
+                    <code>setSlaveSyncMode</code> determina qué información de tiempo enviará el secuenciador a sus receptores. Esta 
+                    información controla la sincronización de los dispositivos que utilizan el secuenciador como fuente de 
+                    sincronización maestra.
+                </p>
+                <p></p>
+                <h2>
+                    Especificar Listeners de Eventos Especiales
+                </h2>
+                <p>
+                    Cada pista de una secuencia puede contener muchos tipos diferentes de <code>MidiEvents</code>. Dichos eventos 
+                    incluyen mensajes Note On y Note Off, cambios de programa, cambios de control y metaeventos. La IPA de Sonido de 
+                    Java especifica interfaces de "escucha" para los dos últimos de estos tipos de eventos (eventos de cambio de 
+                    control y metaeventos). Puede utilizar estas interfaces para recibir notificaciones cuando se produzcan tales 
+                    eventos durante la reproducción de una secuencia.
+                </p>
+                <p>
+                    Los objetos que admiten la interfaz <code>ControllerEventListener</code> pueden recibir notificaciones cuando un 
+                    <code>Sequencer</code> procesa mensajes de cambio de control en particular. Un mensaje de cambio de control es 
+                    un tipo estándar de mensaje MIDI que representa un cambio en el valor de un controlador MIDI, como una rueda de 
+                    inflexión de tono o un control deslizante de datos. (Consulte la especificación MIDI para obtener la lista 
+                    completa de mensajes de cambio de control). Cuando un mensaje de este tipo se procesa durante la reproducción de 
+                    una secuencia, el mensaje indica a cualquier dispositivo (probablemente un sintetizador) que esté recibiendo los 
+                    datos del secuenciador que actualice el valor de algún parámetro. El parámetro generalmente controla algún 
+                    aspecto de la síntesis de sonido, como el tono de las notas que suenan actualmente si el controlador es la rueda 
+                    de inflexión de tono. Cuando se está grabando una secuencia, el mensaje de cambio de control significa que se ha 
+                    movido un controlador en el dispositivo físico externo que creó el mensaje, o que dicho movimiento se ha 
+                    simulado en el software.
+                </p>
+                <p>
+                    Así es como se usa la interfaz <code>ControllerEventListener</code>. Supongamos que ha desarrollado una clase 
+                    que implementa la interfaz <code>ControllerEventListener</code>, lo que significa que su clase contiene el 
+                    siguiente método:
+                </p>
+                <div class="codeblock">
+                    <pre>
+    void controlChange(ShortMessage msg)
+                    </pre>
+                </div>
+                <p>
+                    Supongamos también que ha creado una instancia de su clase y la ha asignado a una variable llamada 
+                    <code>myListener</code>. Si incluye las siguientes declaraciones en algún lugar de su programa:
+                </p>
+                <div class="codeblock">
+                    <pre>
+    int[] controllersOfInterest = { 1, 2, 4 };
+    sequencer.addControllerEventListener(myListener,
+        controllersOfInterest);
+                    </pre>
+                </div>
+                <p>
+                    entonces el método <code>controlChange</code> de su clase se invocará cada vez que el secuenciador procese un 
+                    mensaje de cambio de control para los números de controlador MIDI 1, 2 o 4. En otras palabras, cuando el 
+                    <code>Sequencer</code> procese una solicitud para establecer el valor de cualquiera de los controladores 
+                    registrados, el <code>Sequencer</code> invocará el método <code>controlChange</code> de su clase. (Tenga en 
+                    cuenta que las asignaciones de números de controlador MIDI a dispositivos de control específicos se detallan en 
+                    la Especificación MIDI 1.0).
+                </p>
+                <p>
+                    Al método <code>controlChange</code> se le pasa un <code>ShortMessage</code> que contiene el número de 
+                    controlador afectado y el nuevo valor al que se configuró el controlador. Puede obtener el número de controlador 
+                    mediante el método <code>ShortMessage.getData1</code> y la nueva configuración del valor del controlador 
+                    mediante el método <code>ShortMessage.getData2</code>.
+                </p>
+                <p>
+                    El otro tipo de detector de eventos especiales lo define la interfaz <code>MetaEventListener</code>. Los 
+                    metamensajes, de acuerdo con la especificación Standard MIDI Files 1.0, son mensajes que no están presentes en 
+                    el protocolo de cable MIDI pero que se pueden incrustar en un archivo MIDI. No son significativos para un 
+                    sintetizador, pero pueden ser interpretados por un secuenciador. Los metamensajes incluyen instrucciones (como 
+                    comandos de cambio de tempo), letras u otro texto y otros indicadores (como el final de la pista).
+                </p>
+                <p>
+                    El mecanismo <code>MetaEventListener</code> es análogo a <code>ControllerEventListener</code>. Implemente la 
+                    interfaz <code>MetaEventListener</code> en cualquier clase cuyas instancias deban ser notificadas cuando el 
+                    secuenciador procesa un <code>MetaMessage</code>. Esto implica agregar el siguiente método a la clase:
+                </p>
+                <div class="codeblock">
+                    <pre>
+void meta(MetaMessage msg)
+                    </pre>
+                </div>
+                <p>
+                    Registra una instancia de esta clase pasándola como argumento al método <code>addMetaEventListener</code> de 
+                    <code>Sequencer</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+boolean b = sequencer.addMetaEventListener
+        (myMetaListener);
+                    </pre>
+                </div>
+                <p>
+                    Esto es ligeramente diferente del enfoque adoptado por la interfaz <code>ControllerEventListener</code>, porque 
+                    debe registrarse para recibir todos los <code>MetaMessages</code>, no solo los seleccionados de interés. Si el 
+                    secuenciador encuentra un <code>MetaMessage</code> en su secuencia, invocará <code>myMetaListener.meta</code>, 
+                    pasándole el <code>MetaMessage</code> encontrado. El método <code>meta</code> puede invocar <code>getType</code> 
+                    en su argumento <code>MetaMessage</code> para obtener un número entero de 0 a 127 que indica el tipo de mensaje, 
+                    según lo definido por la especificación Standard MIDI Files 1.0.
+                </p>
+                <p>&nbsp;</p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="MIDI-seq-methods.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="MIDI-synth.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            "Los Tutoriales de Java" está sujeto a estos <a href="../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Utilizando Métodos del Secuenciador<br />
+            <b>Página siguiente:</b> Sintetizando Sonido
+        </div>
+    </body>
+</html> 

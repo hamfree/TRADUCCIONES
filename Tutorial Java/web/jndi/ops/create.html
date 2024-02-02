@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Crear y Destruir Subcontextos (Los Tutoriales de Java&trade; &gt; Nombrado en Java e Interfaz de Directorio &gt;
+            Operaciones de Nombrado y Directorio)
+        </title>
+        <meta name="description" content="Este tutorial de Java JNDI describe la tecnología de Nombrado en Java e Interfaz de 
+              Directorio (JNDI), operaciones de nombre y directorio, y LDAP" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jndi, ldap, jndi service provider" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Operaciones de Nombrado y Directorio</a></div>
+                <div class="linkAHEAD"><a href="exception.html">Excepciones de Nombrado</a></div>
+                <div class="linkAHEAD"><a href="lookup.html">Buscando un Objeto</a></div>
+                <div class="linkAHEAD"><a href="list.html">Listar el Contexto</a></div>
+                <div class="linkAHEAD"><a href="bind.html">Añadir, reemplazar o eliminar un vínculo (Binding)</a></div>
+                <div class="linkAHEAD"><a href="rename.html">Renombrar</a></div>
+                <div class="nolinkAHEAD">Crear y Destruir Subcontextos</div>
+                <div class="linkAHEAD"><a href="attrnames.html">Nombres de Atributos</a></div>
+                <div class="linkAHEAD"><a href="getattrs.html">Leer Atributos</a></div>
+                <div class="linkAHEAD"><a href="modattrs.html">Modificar Atributos</a></div>
+                <div class="linkAHEAD"><a href="bindattr.html">Añadir y Reemplazar Vínculos con Atributos</a></div>
+                <div class="linkAHEAD"><a href="search.html">Búsqueda</a></div>
+                <div class="linkBHEAD"><a href="basicsearch.html">Búsqueda Básica</a></div>
+                <div class="linkBHEAD"><a href="filter.html">Filtros</a></div>
+                <div class="linkBHEAD"><a href="scope.html">Alcance</a></div>
+                <div class="linkBHEAD"><a href="countlimit.html">Recuento de Resultados</a></div>
+                <div class="linkBHEAD"><a href="timelimit.html">Límite de Tiempo</a></div>
+                <div class="linkAHEAD"><a href="faq.html">Consejos para Solucionar Problemas</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Nombrado en Java e Interfaz de Directorio<br />
+                <b>Lección:</b> Operaciones de Nombrado y Directorio
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Nombrado en Java e Interfaz de Directorio</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Operaciones de Nombrado y Directorio</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="rename.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="attrnames.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Crear y Destruir Subcontextos</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    La interfaz de <code>Context</code> contiene métodos para <a href="#CREATE">crear</a> y 
+                    <a href="#DESTROY">destruir</a> un <em>subcontexto</em>, un contexto que está vinculado a otro contexto del 
+                    mismo tipo.
+                </p>
+                <p>
+                    El ejemplo descrito aquí usa un objeto que tiene <em>atributos</em> y crea un subcontexto en el directorio. 
+                    Puede usar estos métodos de <code>DirContext</code> para asociar atributos con el objeto en el momento que la 
+                    vinculación o el subcontexto se agrega al espacio de nombres. Por ejemplo, podría crear un objeto 
+                    <code>Person</code> y vincularlo al espacio de nombres y al mismo tiempo asociar atributos sobre ese objeto 
+                    <code>Person</code>. El equivalente de nombrado no tendrá atributos.
+                </p>
+                <p>
+                    El método createSubcontext() difiere de bind() en que crea un Objeto nuevo p.e un nuevo Contexto a ser vinculado 
+                    al directorio mientras que bind() vincula el Objeto dado en el directorio.
+                </p>
+                <h2>
+                    <a id="CREATE">Crear un Contexto</a>
+                </h2>
+                <p>
+                    Para crear un contexto de nombrado, proporciona a 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html#createSubcontext-javax.naming.Name-">
+                        <code>createSubcontext()</code></a> el nombre del contexto que quiere crear. Para crear un contexto que 
+                    tiene atributos, proporciona a 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/directory/DirContext.html#createSubcontext-javax.naming.Name-javax.naming.directory.Attributes-">
+                        <code>DirContext.createSubcontext()</code></a> el nombre del contexto que quiere crear y sus atributos.
+                </p>
+                <hr />
+                <p>
+                    <strong>Antes de continuar:</strong> Los ejemplos en esta lección requieren que haga adiciones al esquema. Debe 
+                    deshabilitar la comprobación de esquemas en el servidor LDAP o agregar 
+                    <a class="SourceLink" target="_blank" href="../software/config/java.schema" 
+                       onclick="showCode('../../displayCode.html', '../software/config/java.schema'); return false;">
+                        <code>el esquema</code></a> que acompaña este tutorial al servidor. Ambas tareas son típicamente realizadas 
+                    por el administrador del servidor de directorio. Vea la lección 
+                    <a class="TutorialLink" target="_top" href="../software/content.html">Configuración LDAP</a>.
+                </p>
+                <hr />
+                <div class="codeblock">
+                    <pre>
+// Create attributes to be associated with the new context
+Attributes attrs = new BasicAttributes(true); // case-ignore
+Attribute objclass = new BasicAttribute("objectclass");
+objclass.add("top");
+objclass.add("organizationalUnit");
+attrs.put(objclass);
+
+// Create the context
+Context result = ctx.createSubcontext("NewOu", attrs);
+                    </pre>
+                </div>
+                <p>
+                    <a class="SourceLink" target="_blank" href="examples/Create.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/Create.java'); return false;">
+                        <code>Este ejemplo</code></a> crea un nuevo contexto llamado <code>&quot;ou=NewOu&quot;</code> que tiene un 
+                    atributo <code>&quot;objectclass&quot;</code> con dos valores, <code>&quot;top&quot;</code> y 
+                    <code>&quot;organizationalUnit&quot;</code>, en el contexto <code>ctx</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+# java Create
+ou=Groups: javax.naming.directory.DirContext
+ou=People: javax.naming.directory.DirContext
+ou=NewOu: javax.naming.directory.DirContext
+                    </pre>
+                </div>
+                <p>
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/Create.java"
+                       onclick="showCode('../../displayCode.html', 'examples/Create.java'); return false;">
+                        <code>Este ejemplo</code></a> crea un nuevo contexto, llamado <code>&quot;NewOu&quot;</code>, que es un 
+                    hijo de <code>ctx</code>.
+                </p>
+                <p class="centrado">
+                    <img src="../../figures/jndi/create.gif" width="456" height="368" 
+                         alt="Diagrama que muestra el nuevo subcontexto." />
+                </p>
+                <h2>
+                    <a id="DESTROY">Destruir un Subcontexto</a>
+                </h2>
+                <p>
+                    Para destruir un contexto, proporcione a 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html#destroySubcontext-javax.naming.Name-">
+                        <code>destroySubcontext()</code></a> el nombre del contexto a destruir.
+                </p>
+                <div class="codeblock">
+                    <pre>
+// Destroy the context
+ctx.destroySubcontext("NewOu");
+                    </pre>
+                </div>
+                <p>
+                    <a class="SourceLink" target="_blank" href="examples/Destroy.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/Destroy.java'); return false;">
+                        <code>Este ejemplo</code></a> destruye el contexto <code>&quot;NewOu&quot;</code> en el contexto 
+                    <code>ctx</code>.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="rename.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="attrnames.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Renombrar<br />
+            <b>Página siguiente:</b> Nombres de Atributos
+        </div>
+    </body>
+</html> 

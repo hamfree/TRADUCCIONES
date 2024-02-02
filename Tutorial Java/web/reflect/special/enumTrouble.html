@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Solución de Problemas (Los Tutoriales de Java&trade; &gt; La IPA de Reflexión &gt; Matrices y Tipos Enumerados)
+        </title>
+        <meta name="description" content="Este tutorial de reflexión de Java describe el uso de la reflexión para acceder y 
+              manipular clases, campos, métodos y constructores" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java reflection" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Matrices y Tipos Enumerados</a></div>
+                <div class="linkAHEAD"><a href="array.html">Matrices</a></div>
+                <div class="linkBHEAD"><a href="arrayComponents.html">Identificando los Tipos del Matriz</a></div>
+                <div class="linkBHEAD"><a href="arrayInstance.html">Creando Nuevas Matrices</a></div>
+                <div class="linkBHEAD"><a href="arraySetGet.html">Obteniendo y estableciendo Matrices y sus Componentes</a></div>
+                <div class="linkBHEAD"><a href="arrayTrouble.html">Solución de Problemas</a></div>
+                <div class="linkAHEAD"><a href="enum.html">Tipos Enumerados</a></div>
+                <div class="linkBHEAD"><a href="enumMembers.html">Examinando las Enumeraciones</a></div>
+                <div class="linkBHEAD"><a href="enumSetGet.html">Obteniendo y Estableciendo Campos en los Tipos Enumerados</a></div>
+                <div class="nolinkBHEAD">Solución de Problemas</div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> La IPA de Reflexión<br />
+                <b>Lección:</b> Matrices y Tipos Enumerados<br />
+                <b>Sección:</b> Tipos Enumerados
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">La IPA de Reflexión</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Matrices y Tipos Enumerados</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="enumSetGet.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../end.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Solución de Problemas</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Los ejemplos siguientes muestran problemas que se pueden encontrar cuando se usan tipos enumerados.
+                </p>
+                <h2>
+                    IllegalArgumentException Cuando Intenta Instanciar un Tipo Enumerado
+                </h2>
+                <p>
+                    Como ha sido mencionado, la instanciación de tipos enumerados está prohibida. El ejemplo 
+                    <a class="SourceLink" target="_blank" href="example/EnumTrouble.java"
+                       onclick="showCode('../../displayCode.html', 'example/EnumTrouble.java'); return false;">
+                        <code>EnumTrouble</code></a> intenta esto.
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import static java.lang.System.out;
+
+enum Charge {
+    POSITIVE, NEGATIVE, NEUTRAL;
+    Charge() {
+	out.format(&quot;under construction%n&quot;);
+    }
+}
+
+public class EnumTrouble {
+
+    public static void main(String... args) {
+	try {
+	    Class&lt;?&gt; c = Charge.class;
+
+ 	    Constructor[] ctors = c.getDeclaredConstructors();
+ 	    for (Constructor ctor : ctors) {
+		out.format(&quot;Constructor: %s%n&quot;,  ctor.toGenericString());
+ 		ctor.setAccessible(true);
+ 		ctor.newInstance();
+ 	    }
+
+        // production code should handle these exceptions more gracefully
+	} catch (InstantiationException x) {
+	    x.printStackTrace();
+	} catch (IllegalAccessException x) {
+	    x.printStackTrace();
+	} catch (InvocationTargetException x) {
+	    x.printStackTrace();
+	}
+    }
+}
+                    </pre>
+                </div>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java EnumTrouble</em>
+Constructor: private Charge()
+Exception in thread "main" java.lang.IllegalArgumentException: Cannot
+  reflectively create enum objects
+        at java.lang.reflect.Constructor.newInstance(Constructor.java:511)
+        at EnumTrouble.main(EnumTrouble.java:22)
+                    </pre>
+                </div>
+                <div class="note">
+                    <hr />
+                    <strong>Consejo:</strong>&nbsp;Es un error en tiempo de compilación intentar instanciar explícitamente una 
+                    enumeración porque eso evitaría que las constantes de enumeración definidas sean únicas. Esta restricción 
+                    también es obligatoria en código reflexivo. El código que intenta instanciar clases usando sus constructores 
+                    predetermiandos debe invocar 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#isEnum--">
+                        <code>Class.isEnum()</code></a> primero para determinar si la clase es una enumeración.
+                    <hr />
+                </div>
+                <h2>
+                    IllegalArgumentException cuando Establece un Campo con Un Tipo Enumerado Incompatible
+                </h2>
+                <p>
+                    Los campos almacenan enumeraciones establecidas con el tipo de enumeración apropiado. (En realidad, los campos 
+                    de <em>cualquier</em> tipo deben ser configurados con tipos compatibles). El ejemplo 
+                    <a class="SourceLink" target="_blank" href="example/EnumTroubleToo.java" 
+                       onclick="showCode('../../displayCode.html', 'example/EnumTroubleToo.java'); return false;">
+                        <code>EnumTroubleToo</code></a> produce el error esperado.
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+import java.lang.reflect.Field;
+
+enum E0 { A, B }
+enum E1 { A, B }
+
+class ETest {
+    private E0 fld = E0.A;
+}
+
+public class EnumTroubleToo {
+    public static void main(String... args) {
+	try {
+	    ETest test = new ETest();
+	    Field f = test.getClass().getDeclaredField(&quot;fld&quot;);
+	    f.setAccessible(true);
+ 	    f.set(test, E1.A);  // IllegalArgumentException
+
+        // el código de producción debería manejar esta excepción con más gracia
+	} catch (NoSuchFieldException x) {
+	    x.printStackTrace();
+	} catch (IllegalAccessException x) {
+	    x.printStackTrace();
+	}
+    }
+}
+                    </pre>
+                </div>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java EnumTroubleToo</em>
+Exception in thread "main" java.lang.IllegalArgumentException: Can not set E0
+  field ETest.fld to E1
+        at sun.reflect.UnsafeFieldAccessorImpl.throwSetIllegalArgumentException
+          (UnsafeFieldAccessorImpl.java:146)
+        at sun.reflect.UnsafeFieldAccessorImpl.throwSetIllegalArgumentException
+          (UnsafeFieldAccessorImpl.java:150)
+        at sun.reflect.UnsafeObjectFieldAccessorImpl.set
+          (UnsafeObjectFieldAccessorImpl.java:63)
+        at java.lang.reflect.Field.set(Field.java:657)
+        at EnumTroubleToo.main(EnumTroubleToo.java:16)
+                    </pre>
+                </div>
+                <div class="note">
+                    <hr />
+                    <strong>Consejo:</strong>&nbsp;Estrictamente hablando, cualquier intento de establecer un campo de tipo 
+                    <code>X</code> a un valor de tipo <code>Y</code> solo puede tener éxito si se cumple la siguiente declaración:
+                    <div class="codeblock">
+                        <pre>
+X.class.isAssignableFrom(Y.class) == true
+                        </pre>
+                    </div>
+                    El código podría ser modificado para realizar la siguiente prueba para verificar si los tipos son compatibles:
+                    <div class="codeblock">
+                        <pre>
+if (f.getType().isAssignableFrom(E0.class))
+    // compatible
+else
+    // esperar IllegalArgumentException
+                        </pre>
+                    </div>
+                    <hr />
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="enumSetGet.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../end.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Obteniendo y Estableciendo Campos en los Tipos Enumerados<br />
+            <b>Página siguiente:</b> Final de la Lección
+        </div>
+    </body>
+</html> 

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Validando Constructores y Métodos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="bean-validation003.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="bean-validation005.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="CACJIBEJ">
+      <h2 id="validating-constructors-and-methods">Validando Constructores y Métodos</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Las restricciones de Validación de Beans se pueden colocar en los parámetros de los 
+            métodos y constructores no estáticos y en los valores de retorno de los métodos no 
+            estáticos. Los métodos y constructores estáticos no serán validados.
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public class Employee {
+...
+  public Employee (@NotNull String name) { ... }
+  public void setSalary(
+      @NotNull
+      @Digits(integer=6, fraction=2) BigDecimal salary,
+      @NotNull
+      @ValidCurrency
+      String currencyType) {
+    ...
+  }
+...
+}
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            En este ejemplo, la clase <code>Employee</code> tiene una restricción de constructor que 
+            requiere un nombre y tiene dos conjuntos de restricciones de parámetros de método. El 
+            monto del salario del empleado no debe ser nulo, no puede ser mayor de seis dígitos a la 
+            izquierda del punto decimal, y no puede tener más de dos dígitos a la derecha del punto 
+            decimal. El tipo de moneda no debe ser nulo y se valida mediante una restricción 
+            personalizada.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Si agrega restricciones de método a las clases en una jerarquía de objetos, se debe 
+            tener especial cuidado para evitar el comportamiento no deseado de los subtipos. Ver 
+            <a href="bean-validation-advanced004.html#CIHGJBGI">
+              Usando Restricciones de Método en las Jerarquías de Tipos
+            </a> para más información.
+          </p>
+        </div>
+        <div class="sect2" id="sthref122">
+          <h3 id="cross-parameter-constraints">Restricciones de Parámetros Cruzados</h3>
+          <div class="paragraph">
+            <p>
+              Las restricciones que se aplican a varios parámetros se denominan restricciones 
+              cruzadas de parámetros y se pueden aplicar a nivel de método o de constructor.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@ConsistentPhoneParameters
+@NotNull
+public Employee (String name, String officePhone, String mobilePhone) {
+  ...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              En este ejemplo, una restricción personalizada de parámetros cruzados, 
+              <code>@ConsistentPhoneParameters</code>, valida que el formato de los números de 
+              teléfono pasados al constructor coincidan. La restricción <code>@NotNull</code> se 
+              aplica a todos los parámetros del constructor.
+            </p>
+          </div>
+          <table class="tableblock frame-all grid-all spread">
+            <colgroup>
+              <col style="width: 100%;">
+            </colgroup>
+            <tbody>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <div>
+                    <div class="paragraph">
+                      <p>Consejo:</p>
+                    </div>
+                    <div class="paragraph">
+                      <p>
+                        Las anotaciones de restricciones de parámetros cruzados se aplican 
+                        directamente al método o al constructor. Las restricciones de valor devuelto 
+                        también se aplican directamente al método o al constructor. Para evitar 
+                        confusiones sobre dónde se aplica la restricción, el parámetro o el valor de 
+                        retorno, elija un nombre para cualquier restricción personalizada que 
+                        identifique dónde se aplica la restricción. Por ejemplo, el ejemplo anterior 
+                        aplica una restricción personalizada, 
+                        <code>@ConsistentPhoneParameters</code>, que indica que se aplica a los 
+                        parámetros del método o constructor.
+                      </p>
+                    </div>
+                    <div class="paragraph">
+                      <p>
+                        Cuando crea una restricción personalizada que se aplica tanto a los 
+                        parámetros del método como a los valores devueltos, el elemento 
+                        <code>validationAppliesTo</code> de la anotación de la restricción se puede 
+                        establecer en <code>ConstraintTarget.RETURN_VALUE</code> o 
+                        <code>ConstraintTarget. PARAMETERS</code> para establecer explícitamente el 
+                        objetivo de la restricción de validación.
+                      </p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="sect3">
+            <h4 id="_validating_type_arguments_of_parameterized_types">
+              Validación de Argumentos de Tipo de Tipos Parametrizados
+            </h4>
+            <div id="validating_type_arguments_of_parameterized_types" class="paragraph">
+              <p>
+                En Validación de Beans 2.0, puede aplicar restricciones a los argumentos de tipo de 
+                tipos parametrizados. Por ejemplo: <code>List&lt;@NotNull Long&gt; números;</code>
+                Las restricciones se pueden aplicar a elementos de tipos de contenedores como 
+                <code>List</code>, <code>Map</code>, <code>Optional</code> y otros.
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+List&lt;@Email String&gt; emails;
+public Map&lt;@NotNull String, @USPhoneNumber String&gt; getAddressesByType() { }
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                En este ejemplo, <code>@Email</code> es una restricción incorporada compatible con 
+                Validación de Beans, y <code>@USPhoneNumber</code> es una restricción definida por 
+                el usuario. Ver 
+                <a href="bean-validation-advanced001.html#GKAIA">
+                  Uso de las Restricciones Integradas para Crear una Nueva Restricción
+                </a>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                <code>@USPhoneNumber</code> tiene <code>ElementType.TYPE_USE</code> como uno de sus 
+                <code>@Target</code> y, por lo tanto, es posible usar la restricción 
+                <code>@USPhoneNumber</code> para validar argumentos de tipo de tipos parametrizados.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="sthref123">
+          <h3 id="identifying-parameter-constraint-violations">
+            Identificación de Violaciones de Restricciones de Parámetros
+          </h3>
+          <div class="paragraph">
+            <p>
+              Si ocurre una <code>ConstraintViolationException</code> durante una llamada a un 
+              método, el tiempo de ejecución de Validación de Beans devuelve un índice de parámetros 
+              para identificar qué parámetro causó la violación de la restricción. El índice del 
+              parámetro tiene la forma `arg`PARAMETER_INDEX, donde PARAMETER_INDEX es un número 
+              entero que comienza en 0 para el primer parámetro del método o constructor.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="sthref124">
+          <h3 id="adding-constraints-to-method-return-values">
+            Adición de Restricciones a los Valores de Retorno de Métodos
+          </h3>
+          <div class="paragraph">
+            <p>
+              Para validar el valor de retorno de un método, puede aplicar restricciones 
+              directamente al método o declaración del constructor.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@NotNull
+public Employee getEmployee() { ... }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las restricciones de parámetros cruzados también se aplican a nivel de método. Las 
+              restricciones personalizadas que podrían aplicarse tanto al valor de retorno como a 
+              los parámetros del método tienen un objetivo de restricción ambiguo. Para evitar esta 
+              ambigüedad, agregue un elemento <code>validationAppliesTo</code> a la definición de 
+              anotación de restricción con el valor predeterminado establecido en 
+              <code>ConstraintTarget.RETURN_VALUE</code> o <code>ConstraintTarget.PARAMETERS</code> 
+              para explícitamente establecer el destino de la restricción de validación.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Manager(validationAppliesTo=ConstraintTarget.RETURN_VALUE)
+public Employee getManager(Employee employee) { ... }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Vea 
+              <a href="bean-validation-advanced001.html#CIHCICAI">
+                Eliminar la Ambigüedad en los Objetivos de Restricción
+              </a> para más información.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="bean-validation003.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="bean-validation005.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

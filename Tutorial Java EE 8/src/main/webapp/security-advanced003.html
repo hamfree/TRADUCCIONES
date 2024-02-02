@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Uso del Dominio JDBC para la Autenticación de Usuarios</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="security-advanced002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="security-advanced004.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BABEJJDE">
+      <h2 id="using-the-jdbc-realm-for-user-authentication">
+        Uso del Dominio JDBC para la Autenticación de Usuarios
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Un dominio de autenticación, a veces llamado dominio de política de seguridad o dominio de 
+            seguridad, es un ámbito sobre el cual un servidor de aplicaciones define y aplica una política de 
+            seguridad común. Un reino contiene una colección de usuarios, que pueden o no estar asignados a un 
+            grupo. El servidor GlassFish viene preconfigurado con los dominios 'file', 'certificate' y 
+            'administration'. Un administrador también puede configurar dominios LDAP, JDBC, de resumen 
+            (digest, en inglés) o personalizados.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Una aplicación puede especificar en su descriptor de implementación qué dominio usar. Si la 
+            aplicación no especifica un dominio, el servidor GlassFish usa su dominio predeterminado, el 
+            dominio <code>file</code>. Si una aplicación especifica que se utilizará un dominio JDBC para la 
+            autenticación de usuarios, el servidor GlassFish recuperará las credenciales de usuario de una 
+            base de datos. El servidor de aplicaciones utiliza la información de la base de datos y la opción 
+            de reino JDBC habilitada en el archivo de configuración.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Una base de datos proporciona una manera fácil de agregar, editar o eliminar usuarios en tiempo de 
+            ejecución y permite a los usuarios crear sus propias cuentas sin asistencia administrativa. El uso 
+            de una base de datos tiene un beneficio adicional: proporciona un lugar para almacenar de forma 
+            segura cualquier información adicional del usuario. Se puede pensar en un reino como una base de 
+            datos de nombres de usuario y contraseñas que identifican a los usuarios válidos de una aplicación 
+            web o un conjunto de aplicaciones web con una enumeración de la lista de roles asociados con cada 
+            usuario válido. El acceso a recursos de aplicaciones web específicos se otorga a todos los 
+            usuarios en un rol particular, en lugar de enumerar una lista de usuarios asociados. Un nombre de 
+            usuario puede tener cualquier número de roles asociados.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Dos de los casos de estudios del tutorial, 
+            <a href="dukes-tutoring.html#GKAEE">
+              Capítulo 61, "Ejemplo de Caso de Estudio de Tutoría de Duke,"
+            </a> y 
+            <a href="dukes-forest. html#GLNPW">
+              Capítulo 62, "Ejemplo de Caso de Estudio del Bosque de Duke,"
+            </a> utilice un dominio JDBC para la autenticación de usuarios.
+          </p>
+        </div>
+        <div class="sect2" id="sthref233">
+          <h3 id="to-configure-a-jdbc-authentication-realm">
+            Cómo Configurar un Dominio de Autenticación JDBC
+          </h3>
+          <div class="paragraph">
+            <p>
+              El servidor GlassFish permite a los administradores especificar las credenciales de un usuario 
+              (nombre de usuario y contraseña) en el dominio JDBC en lugar de en el conjunto de conexiones. 
+              Esto evita que otras aplicaciones exploren las tablas de la base de datos en busca de 
+              credenciales de usuario. De forma predeterminada, no se admite el almacenamiento de contraseñas 
+              en texto claro en el dominio JDBC. En circunstancias normales, las contraseñas no deben 
+              almacenarse en texto claro.
+            </p>
+          </div>
+          <div class="olist arabic">
+            <ol class="arabic">
+              <li>
+                <p>
+                  Cree las tablas de la base de datos en las que se almacenarán las credenciales de usuario 
+                  para el reino.
+                </p>
+              </li>
+              <li>
+                <p>Agregue credenciales de usuario a las tablas de la base de datos que creó.</p>
+              </li>
+              <li>
+                <p>Cree un grupo de conexiones JDBC para la base de datos.</p>
+                <div class="paragraph">
+                  <p>
+                    Puede utilizar la Consola de administración o la línea de comandos para crear un grupo de 
+                    conexiones.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <p>Cree un recurso JDBC para la base de datos.</p>
+                <div class="paragraph">
+                  <p>
+                    Puede utilizar la Consola de administración o la línea de comandos para crear un recurso 
+                    JDBC.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <p>Cree un reino.</p>
+                <div class="paragraph">
+                  <p>
+                    Este paso necesita asociar el recurso con el reino, definir las tablas y columnas para 
+                    usuarios y grupos utilizados para la autenticación y definir el algoritmo de resumen 
+                    (digest, en inglés) que se utilizará para almacenar contraseñas en la base de datos.
+                  </p>
+                </div>
+                <div class="paragraph">
+                  <p>
+                    Puede utilizar la Consola de administración o la línea de comandos para crear un reino.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <p>
+                  Modifique el descriptor de implementación de su aplicación para especificar el dominio JDBC.
+                </p>
+                <div class="ulist">
+                  <ul>
+                    <li>
+                      <p>
+                        Para una aplicación empresarial en un archivo EAR, modifique el archivo 
+                        <code>glassfish-application.xml</code>.
+                      </p>
+                    </li>
+                    <li>
+                      <p>
+                        Para una aplicación web en un archivo WAR, modifique el archivo <code>web.xml</code>.
+                      </p>
+                    </li>
+                    <li>
+                      <p>
+                        Para un enterprise bean en un archivo JAR EJB, modifique el archivo 
+                        <code>glassfish-ejb-jar.xml</code>.
+                      </p>
+                      <div class="paragraph">
+                        <p>
+                          Por ejemplo, para una aplicación hipotética, el archivo <code>web.xml</code> podría 
+                          especificar el reino <code>jdbcRealm</code>, de la siguiente manera:
+                        </p>
+                      </div>
+                      <div class="listingblock">
+                        <div class="content">
+                          <pre class="prettyprint highlight">
+                            <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;login-config&gt;
+    &lt;auth-method&gt;FORM&lt;/auth-method&gt;
+    &lt;realm-name&gt;jdbcRealm&lt;/realm-name&gt;
+    &lt;form-login-config&gt;
+        &lt;form-login-page&gt;/login.xhtml&lt;/form-login-page&gt;
+        &lt;form-error-page&gt;/login.xhtml&lt;/form-error-page&gt;
+    &lt;/form-login-config&gt;
+&lt;/login-config&gt;
+&lt;security-constraint&gt;
+    &lt;web-resource-collection&gt;
+        &lt;web-resource-name&gt;Secure Pages&lt;/web-resource-name&gt;
+        &lt;description/&gt;
+        &lt;url-pattern&gt;/admin/*&lt;/url-pattern&gt;
+    &lt;/web-resource-collection&gt;
+    &lt;auth-constraint&gt;
+        &lt;role-name&gt;ADMINS&lt;/role-name&gt;
+    &lt;/auth-constraint&gt;
+&lt;/security-constraint&gt;
+                            </code>
+                          </pre>
+                        </div>
+                      </div>
+                      <div class="paragraph">
+                        <p>
+                          El inicio de sesión basado en formularios se especifica para todas las páginas web 
+                          en <code>/admin</code>. El acceso a esas páginas solo se permitirá a los usuarios 
+                          con el rol <code>ADMINS</code>.
+                        </p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <p>Asigne roles de seguridad a usuarios o grupos de usuarios en el reino.</p>
+                <div class="paragraph">
+                  <p>
+                    Para asignar un rol de seguridad a un grupo o a un usuario, agregue un elemento de 
+                    asignación de roles de seguridad al descriptor de implementación específico del servidor 
+                    de aplicaciones, en este caso <code>glassfish-web.xml</code>:
+                  </p>
+                </div>
+                <div class="listingblock">
+                  <div class="content">
+                    <pre class="prettyprint highlight">
+                      <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;security-role-mapping&gt;
+    &lt;role-name&gt;USERS&lt;/role-name&gt;
+    &lt;group-name&gt;USERS&lt;/group-name&gt;
+&lt;/security-role-mapping&gt;
+&lt;security-role-mapping&gt;
+    &lt;role-name&gt;ADMINS&lt;/role-name&gt;
+    &lt;group-name&gt;ADMINS&lt;/group-name&gt;
+&lt;/security-role-mapping&gt;
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+                <div class="paragraph">
+                  <p>
+                    Dado que los usuarios del servidor GlassFish se asignan a grupos durante el proceso de 
+                    creación de usuarios, esto es más eficiente que asignar roles de seguridad a usuarios 
+                    individuales.
+                  </p>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="security-advanced002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="security-advanced004.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

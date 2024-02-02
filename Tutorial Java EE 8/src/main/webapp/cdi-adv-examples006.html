@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>El Ejemplo decorators: Decorando un Bean</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="cdi-adv-examples005.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="partwebsvcs.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GKPAX">
+      <h2 id="the-decorators-example-decorating-a-bean">El Ejemplo decorators: Decorando un Bean</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            El ejemplo de <code>decorators</code>, que es otra variación del ejemplo de <code>encoder</code>, 
+            muestra cómo usar un decorador para implementar una lógica comercial adicional para un bean.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Los archivos fuente se encuentran en el directorio 
+            <code>_tut-install_/examples/cdi/decorators/src/main/java/javaeetutorial/decorators/</code>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p><a href="#CHDDDFCI">Descripción General del Ejemplo decorators</a></p>
+            </li>
+            <li>
+              <p><a href="#GKPAQ">Componentes del Ejemplo decorators</a></p>
+            </li>
+            <li>
+              <p><a href="#GKPBK">Ejecutando el Ejemplo decorators</a></p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="CHDDDFCI">
+          <h3 id="overview-of-the-decorators-example">Descripción General del Ejemplo decorators</h3>
+          <div class="paragraph">
+            <p>
+              En lugar de que el usuario elija entre dos implementaciones alternativas de una interfaz en el 
+              momento de la implementación o en el tiempo de ejecución, un decorador agrega lógica adicional 
+              a una sola implementación de la interfaz.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El ejemplo incluye una interfaz, una implementación de la misma, un decorador, un interceptor, 
+              un bean administrado, una página Facelets y archivos de configuración.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="GKPAQ">
+          <h3 id="components-of-the-decorators-example">Componentes del Ejemplo decorators</h3>
+          <div class="paragraph">
+            <p>
+              El ejemplo de <code>decorators</code> es muy similar al ejemplo de <code>encoder</code> descrito 
+              en <a href="cdi-adv-examples002.html#GKHPU">El Ejemplo de codificador: uso de Alternativas</a>. 
+              Sin embargo, en lugar de proporcionar dos implementaciones de la interfaz <code>Coder</code>, 
+              este ejemplo solo proporciona la clase <code>CoderImpl</code>. La clase decoradora, 
+              <code>CoderDecorator</code>, en lugar de simplemente devolver la cadena codificada, muestra los 
+              valores y la longitud de las cadenas de entrada y salida.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La clase <code>CoderDecorator</code>, como <code>CoderImpl</code>, implementa el método 
+              comercial de la interfaz <code>Coder</code>, <code>codeString</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Decorator
+public abstract class CoderDecorator implements Coder {
+    @Inject
+    @Delegate
+    @Any
+    Coder coder;
+    public String codeString(String s, int tval) {
+        int len = s.length();
+        return "\"" + s + "\" se convierte " + "\"" + coder.codeString(s, tval)
+                + "\", " + len + " caracteres de longitud";
+    }
+}
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El método <code>codeString</code> del decorador llama al método <code>codeString</code> del 
+              objeto delegado para realizar la codificación real.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El ejemplo <code>decorators</code> incluye el enlace del interceptor <code>Logged</code> y la 
+              clase <code>LoggedInterceptor</code> del ejemplo <code>billpayment</code>. Para este ejemplo, el 
+              interceptor se establece en el método <code>CoderBean.encodeString</code> y el método 
+              <code>CoderImpl.codeString</code>. El código del interceptor no ha cambiado; Los interceptores 
+              suelen ser reutilizables para diferentes aplicaciones.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Excepto por las anotaciones del interceptor, las clases <code>CoderBean</code> y 
+              <code>CoderImpl</code> son idénticas a las versiones del ejemplo de <code>encoder</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>El archivo <code>beans.xml</code> especifica tanto el decorador como el interceptor:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+    &lt;decorators&gt;
+        &lt;class&gt;javaeetutorial.decorators.CoderDecorator&lt;/class&gt;
+    &lt;/decorators&gt;
+    &lt;interceptors&gt;
+        &lt;class&gt;javaeetutorial.decorators.LoggedInterceptor&lt;/class&gt;
+    &lt;/interceptors&gt;
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GKPBK">
+          <h3 id="running-the-decorators-example">Ejecutando el Ejemplo decorators</h3>
+          <div class="paragraph">
+            <p>
+              Puede usar el EID de NetBeans o Maven para compilar, empaquetar, implementar y ejecutar la 
+              aplicación <code>decorators</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Aquí se tratan los siguientes temas:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  <a href="#GKPAG">
+                    Para Construir, Empaquetar, y Desplegar el Ejemplo decorators Usando el EID de NetBeans</a>
+                </p>
+              </li>
+              <li>
+                <p>
+                  <a href="#GKPAJ">
+                    Para Construir, Empaquetar, y Desplegar el Ejemplo decorators Usando Maven
+                  </a>
+                </p>
+              </li>
+              <li>
+                <p><a href="#GKPAN">Para Ejecutar el Ejemplo decorators</a></p>
+              </li>
+            </ul>
+          </div>
+          <div class="sect3" id="GKPAG">
+            <h4 id="to-build-package-and-deploy-the-decorators-example-using-netbeans-ide">
+              Para Construir, Empaquetar, y Desplegar el Ejemplo decorators Usando el EID de NetBeans
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Asegúrese de que el Servidor GlassFish se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                  </p>
+                </li>
+                <li>
+                  <p>En el menú Archivo, elija Abrir proyecto.</p>
+                </li>
+                <li>
+                  <p>En el cuadro de diálogo Abrir proyecto, vaya a:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/cdi
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Seleccione la carpeta <code>decorators</code>.</p>
+                </li>
+                <li>
+                  <p>Haga clic en Abrir proyecto.</p>
+                </li>
+                <li>
+                  <p>
+                    En la pestaña Proyectos, haga clic con el botón derecho en el proyecto 
+                    <code>decorators</code> y seleccione Build.
+                  </p>
+                  <div class="paragraph">
+                    <p>
+                      Este comando construye y empaqueta la aplicación en un archivo WAR, 
+                      <code>decorators.war</code>, ubicado en el directorio <code>target</code>, y luego lo 
+                      implementa en el Servidor GlassFish.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+          <div class="sect3" id="GKPAJ">
+            <h4 id="to-build-package-and-deploy-the-decorators-example-using-maven">
+              Para Construir, Empaquetar, y Desplegar el Ejemplo decorators Usando Maven
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Asegúrese de que el Servidor GlassFish se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                  </p>
+                </li>
+                <li>
+                  <p>En una ventana de terminal, vaya a:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/cdi/decorators/
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Ingrese el siguiente comando para implementar la aplicación:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+mvn install
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      Este comando construye y empaqueta la aplicación en un archivo WAR, 
+                      <code>decorators.war</code>, ubicado en el directorio <code>target</code>, y luego lo 
+                      implementa en el Servidor GlassFish.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+          <div class="sect3" id="GKPAN">
+            <h4 id="to-run-the-decorators-example">Para Ejecutar el Ejemplo decorators</h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>En un navegador web, ingrese la siguiente URL:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+http://localhost:8080/decorators
+                      </code></pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    En la página Codificador de Cadenas Decoradas, ingrese una cadena y el número de letras 
+                    para cambiar y luego haga clic en Codificar.
+                  </p>
+                  <div class="paragraph">
+                    <p>
+                      El resultado del método decorador aparece en azul en la línea de resultados. Por 
+                      ejemplo, si ingresó <code>Java</code> y <code>4</code>, verá lo siguiente:
+                    </p>
+                  </div>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+"Java" se convierte "Neze", 4 caracteres en longitud
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Examine la salida del registro del servidor.</p>
+                  <div class="paragraph">
+                    <p>
+                      En el EID de de de de NetBeans, la salida es visible en la pestaña Salida del servidor 
+                      GlassFish. De lo contrario, vea domain-dir`/logs/server.log`.
+                    </p>
+                  </div>
+                  <div class="paragraph">
+                    <p>Aparece la salida de los interceptores:</p>
+                  </div>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+INFO: Método de entrada: encodeString en la clase javaeetutorial.decorators.CoderBean
+INFO: Método de entrada: codeString en la clase javaeetutorial.decorators.CoderImpl
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="cdi-adv-examples005.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="partwebsvcs.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

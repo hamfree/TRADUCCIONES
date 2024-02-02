@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Un Ejemplo del Fichero de Políticas (Los Tutoriales de Java&trade; &gt; Características de Seguridad en Java SE &gt; 
+            Implementando su Propio Permiso)
+        </title>
+        <meta name="description" content="Este tutorial de seguridad de Java describe el uso de firmas digitales, claves y servicios 
+              de criptografía" />
+        <meta name="keywords" content="programación java, aprender java, código ejemplo java, seguridad java, criptografía, firma 
+              digital, verificación firma, código de firma" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Implementando su Propio Permiso</a></div>
+                <div class="linkAHEAD"><a href="game.html">ExampleGame</a></div>
+                <div class="linkAHEAD"><a href="highscore.html">La Clase HighScore</a></div>
+                <div class="linkAHEAD"><a href="perm.html">La Clase HighScorePermission</a></div>
+                <div class="nolinkAHEAD">Un Ejemplo del Fichero de Políticas</div>
+                <div class="linkAHEAD"><a href="together.html">Poniéndolo Todo Junto</a></div>
+                <div class="linkBHEAD"><a href="chris.html">Pasos para el Desarrollador de HighScore (Chris)</a></div>
+                <div class="linkBHEAD"><a href="terry.html">Pasos para el Desarrollador de ExampleGame (Terry)</a></div>
+                <div class="linkBHEAD"><a href="kim.html">Pasos para un Usuario Ejecutando ExampleGame (Kim)</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Características de Seguridad en Java SE<br />
+                <b>Lección:</b> Implementando su Propio Permiso
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Características de Seguridad en Java SE</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Implementando su Propio Permiso</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="perm.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="together.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Un Ejemplo del Fichero de Políticas</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Debajo hay un archivo completo de políticas para un usuario que quiere ejecutar <code>ExampleGame</code>.
+                </p>
+                <p>
+                    La sintaxis del archivo de políticas no se describe aquí; si está interesado, vea la página 
+                    <a class="OutsideLink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/PolicyFiles.html">
+                        Sintaxis del Archivo de Política e Implementación de Políticas Predeterminadas</a>.
+                </p>
+                <p>
+                    No necesita saber la sintaxis; puede siempre usar la Herramienta de Políticas para crear archivos de políticas, 
+                    como se mostró en  las lecciones
+                    <a class="TutorialLink" target="_top" href="../tour1/index.html">Crear un Archivo de Políticas</a>,
+                    <a class="TutorialLink" target="_top" href="../tour2/index.html">Visita Rápida para Controlar Aplicaciones</a>, y
+                    <a class="TutorialLink" target="_top" href="../toolsign/index.html">Firmando Código y Dándole Permisos</a>.
+                </p>
+                <p>
+                    Debajo está el archivo políticas de ejemplo, seguido por una descripción de las entradas individuales. Asuma que 
+                </p>
+                <ul>
+                    <li>
+                        El archivo de políticas están en la computadora de Kim, y que el almacén de claves de Kin se llama 
+                        <code>kim.keystore</code>.
+                    </li>
+                    <li>
+                        <code>ExampleGame</code> ha sido firmado con la clave privada de Terry, el creador del juego, y la 
+                        correspondiente clave pública está en la entrada del almacén de claves con el alias 
+                        <code>&quot;terry&quot;</code>.
+                    </li>
+                    <li>
+                        Las clases <code>HighScore</code> y <code>HighScorePermissions</code> fueron firmadas por la clave privada 
+                        de la persona que las implementó (Chris), y la correspondiente clave pública está en la entrada del almacén 
+                        de claves con el alias <code>&quot;chris&quot;</code>.
+                    </li>
+                </ul>
+                <p>
+                    Aquí está el archivo de políticas:
+                    <a class="SourceLink" target="_blank" href="examples/kim.policy" 
+                       onclick="showCode('../../displayCode.html', 'examples/kim.policy'); return false;">
+                        <code>kim.policy</code></a>
+                </p>
+                <div class="codeblock">
+                    <pre>
+keystore &quot;kim.keystore&quot;;
+
+// Aquí está el permiso que ExampleGame necesita.
+// Otorga al código firmado por &quot;terry&quot; el 
+// HighScorePermission, si el 
+// HighScorePermission fue firmado por &quot;chris&quot;
+grant SignedBy &quot;terry&quot; {
+  permission
+    com.scoredev.scores.HighScorePermission
+      &quot;ExampleGame&quot;, signedBy &quot;chris&quot;;
+};
+
+// Aquí está el conjunto de permisos que la clase HighScore
+// necesita:
+grant SignedBy &quot;chris&quot; {
+  // La clase HighScore necesita permiso para leer 
+  // &quot;user.home&quot; para encontrar la ubicación del archivo 
+  // de puntuaciones altas
+
+  permission java.util.PropertyPermission
+    &quot;user.home&quot;, &quot;read&quot;;
+
+  // Necesita permiso para leer y escribir el 
+  // archivo de puntuaciones altas en sí mismo
+
+  permission java.io.FilePermission
+      &quot;${user.home}${/}.highscore&quot;, &quot;read,write&quot;;
+
+  // Necesita que se le otorgue su propio permiso, 
+  // de forma que pueda llamar a checkPermission
+  // para ver si su llamante tiene permiso.
+  // Solo le otorga el permiso
+  // si el mismo permiso fue firmado por 
+  // &quot;chris&quot;
+
+  permission
+    com.scoredev.scores.HighScorePermission 
+      &quot;*&quot;, signedBy &quot;chris&quot;;
+};
+
+
+                    </pre>
+                </div>
+                <h2>
+                    La Entrada del Almacén de Claves
+                </h2>
+                <p>
+                    Un <i>almacén de claves</i> es un repositorio de claves y certificados, y se usa para buscar las claves públicas 
+                    de los firmantes especificados en el archivo de poíticas (<code>&quot;terry&quot;</code> y 
+                    <code>&quot;chris&quot;</code> en este ejemplo).
+                </p>
+                <p>
+                    La utilidad <code>keytool</code> se usa para crear y administrar almacenes de clave.
+                </p>
+                <p>
+                    Para esta lección, asuma que a Kim le gustaría jugar con <code>ExampleGame</code>. Si el almacén de claves de 
+                    Kin se llama <code>kim.keystore</code>, el archivo de políticas de Kin necesita la siguiente línea al principio:
+                </p>
+                <div class="codeblock">
+                    <pre>
+keystore "kim.keystore";
+                    </pre>
+                </div>
+                <h2>
+                    La Entrada ExampleGame
+                </h2>
+                <p>
+                    Una entrada del archivo de políticas especifica uno o más permisos para código de un <i>código fuente</i> 
+                    particular - o código de una ubicación particular (URL), o código firmado por una entidad particular, o ambas.
+                </p>
+                <p>
+                    Nuestro archivo de políticas necesita una entrada para cada juego, otorgando al código frimado por una clave del 
+                    creador del juego un <code>HighScorePermission</code> cuyo nombre es el nombre del juego. Ese permiso permite 
+                    al juego llamar a los métodos de <code>HighScore</code> para obtener o actualizar el valor de la puntuación más 
+                    alta del usuario para ese juego particular.
+                </p>
+                <p>
+                    La entrada requerida para <code>ExampleGame</code> es:
+                </p>
+                <div class="codeblock">
+                    <pre>
+grant SignedBy "terry" {
+    permission
+        com.scoredev.scores.HighScorePermission 
+            "ExampleGame", signedBy "chris";
+};
+                    </pre>
+                </div>
+                <p>
+                    Exigiendo que <code>ExampleGame</code> esté firmada por <code>&quot;terry&quot;</code> habilita a Kim a saber 
+                    que el juego es el juego real que Terry desarrolló. Para que esto funcione, Kim debe tener ya almacenado el 
+                    certificado y la clave pública de Terry dentro de <code>kim.keystore</code> usando el alias 
+                    <code>&quot;terry&quot;</code>.
+                </p>
+                <p>
+                    Tenga en cuenta que el <code>HighScorePermission</code> necesita estar firmado por 
+                    <code>&quot;chris&quot;</code>, la persona que en realidad implementó ese permiso. Esto asegura que se otorga a 
+                    <code>ExampleGame</code> el permiso real implementado por <code>&quot;chris&quot;</code>,  y no cualquier otro. 
+                    Como antes, para que esto funcione Kim debe tener ya almacenado el certificado de clave pública de Chris dentro 
+                    de <code>kim.keystore</code> usando el alias <code>&quot;chris&quot;</code>.
+                </p>
+                <h2>
+                    La Entrada HighScore
+                </h2>
+                <p>
+                    La entrada final en el archivo de políticas otorga permisos a la clase <code>HighScore</code>. Mas 
+                    específicamente, otorga permisos al código firmado por <code>&quot;chris&quot;</code>, que creó y firmó la 
+                    clase. Requerir que la clase esté firmada por <code>&quot;chris&quot;</code> asegura que cuando 
+                    <code>ExampleGame</code> llama a esta clase para actualizar la puntuación más alta del usuario, 
+                    <code>ExampleGame</code> sepa de forma segura que está usando la clase original implementada por 
+                    <code>&quot;chris&quot;</code>.
+                </p>
+                <p>
+                    Para actualizar el valor de puntuación más alta del usuario y que cualquier juego que la llame haga eso, la 
+                    clase <code>HighScore</code> requiere tres permisos:
+                </p>
+                <h3>
+                    1. Permiso para leer el valor de la propiedad <code>&quot;user.home&quot;</code>.
+                </h3>
+                <p>
+                    La clase <code>HighScore</code> almacena los valores de puntuación más alta del usuario en un archivo 
+                    <code>.highscore</code> en el directorio de inicio del usuario. Por lo tanto esta clase necesita un 
+                    <code>java.util.PropertyPermission</code> que le permita leer el valor de la propiedad 
+                    <code>&quot;user.home&quot;</code> para encontrar exactamente dónde reside el directorio de inicio del usuario:
+                </p>
+                <div class="codeblock">
+                    <pre>
+permission java.util.PropertyPermission 
+    "user.home", "read";
+                    </pre>
+                </div>
+                <h3>
+                    2. Permiso para leer y escribe en el mismo archivo de puntuaciones más altas.
+                </h3>
+                <p>
+                    Este permiso se necesita de forma que los métodos <code>getHighScore</code> y <code>setHighScore</code> de 
+                    <code>HighScore</code> puedan acceder al archivo <code>.highscore</code> del usuario para obtener o establecer, 
+                    respectivamente, la puntuación más alta actual para el juego actual.
+                </p>
+                <p>
+                    Aquí está el permiso requerido:
+                </p>
+                <div class="codeblock">
+                    <pre>
+permission java.io.FilePermission
+    "${user.home}${/}.highscore", "read,write";
+                    </pre>
+                </div>
+                <p>
+                    Nota: La notación <code>${propName}</code> especifica el valor de una propiedad. Por lo tanto, 
+                    <code>${user.home}</code> será reemplazado por el valor de la propiedad <code>&quot;user.home&quot;</code>. La 
+                    notación <code>${/}</code>  es una forma independiente de la plataforma de especificar un separador de ficheros.
+                </p>
+                <h3>
+                    3. Todos los HighScorePermissions (p.e, HighScorePermissions de cualquier nombre).
+                </h3>
+                <p>
+                    Este permiso es necesario para que el <code>HighScore</code> verifique que el juego que llama ha recibido un 
+                    <code>HighScorePermission</code> cuyo nombre es el nombre del juego que funcionará. Es decir, a la clase 
+                    <code>HighScore</code> debe <i>también</i> serle otorgado el permiso, ya que una comprobación de permiso 
+                    requiere que todo el código actualmente en la pila tenga el permiso especificado.
+                </p>
+                <p>
+                    Aquí está el permiso requerido:
+                </p>
+                <div class="codeblock">
+                    <pre>
+permission com.scoredev.scores.HighScorePermission
+    "*", signedBy "chris";
+                    </pre>
+                </div>
+                <p>
+                    Como antes, el mismo <code>HighScorePermission</code> necesita ser firmado por <code>&quot;chris&quot;</code>,
+                    la persona que en realidad implementó el permiso.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="perm.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="together.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> La Clase HighScorePermission<br />
+            <b>Página siguiente:</b> Poniéndolo Todo Junto
+        </div>
+    </body>
+</html> 

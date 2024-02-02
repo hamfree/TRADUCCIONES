@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Usando Grafos de Entidad con Nombre</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="persistence-entitygraphs002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="persistence-entitygraphs004.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BABFIGEI">
+      <h2 id="using-named-entity-graphs">Usando Grafos de Entidad con Nombre</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Los grafos de entidades con nombre se crean usando anotaciones aplicadas a las clases de entidad o 
+            el elemento <code>named-entity-graph</code> y sus subelementos en el descriptor de implementación 
+            de la aplicación. El proveedor de persistencia buscará todos los grafos de entidades con nombre, 
+            definidos tanto en anotaciones como en XML, dentro de una aplicación. Un conjunto de grafos de 
+            entidades con nombre que usa una anotación se puede anular usando <code>named-entity-graph</code>.
+          </p>
+        </div>
+        <div class="sect2" id="sthref186">
+          <h3 id="applying-named-entity-graph-annotations-to-entity-classes">
+            Aplicar Anotaciones de Grafos de Entidad Nombrados a Clases Entidad
+          </h3>
+          <div class="paragraph">
+            <p>
+              La anotación <code>javax.persistence.NamedEntityGraph</code> define un único grafo de entidad 
+              con nombre y se aplica a nivel de clase. Se pueden definir múltiples anotaciones 
+              <code>@NamedEntityGraph</code> para una clase añadiéndolas dentro de una anotación de nivel de 
+              clase <code>javax.persistence.NamedEntityGraphs</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La anotación <code>@NamedEntityGraph</code> debe aplicarse en la raíz del grafo de entidades. Es 
+              decir, si la operación de consulta o <code>EntityManager.find</code> tiene como entidad raíz la 
+              clase <code>EmailMessage</code>, el grafo de entidad con nombre utilizado en la operación debe 
+              definirse en la clase <code>EmailMessage</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@NamedEntityGraph
+@Entity
+public class EmailMessage {
+    @Id
+    String messageId;
+    String subject;
+    String body;
+    String sender;
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              En este ejemplo, la clase <code>EmailMessage</code> tiene una anotación 
+              <code>@NamedEntityGraph</code> para definir un grafo de entidad con nombre cuyo nombre 
+              predeterminado es el de la clase, <code>EmailMessage</code>. No se incluyen campos en la 
+              anotación <code>@NamedEntityGraph</code> como nodos de atributos, y los campos no se anotan con 
+              metadatos para establecer el tipo de recuperación, por lo que el único campo que se 
+              recuperará con anticipación en un grafo de carga o recuperación es <code>messageId</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los atributos de un grafo de entidad con nombre son los campos de la entidad que deben incluirse 
+              en el grafo de entidad. Agregue los campos al grafo de entidades especificándolos en el elemento 
+              <code>attributeNodes</code> de <code>@NamedEntityGraph</code> con una anotación 
+              <code>javax.persistence.NamedAttributeNode</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@NamedEntityGraph(name="emailEntityGraph", attributeNodes={
+    @NamedAttributeNode("subject"),
+    @NamedAttributeNode("sender")
+})
+@Entity
+public class EmailMessage { ... }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              En este ejemplo, el nombre del grafo de entidad nombrado es <code>emailEntityGraph</code> e 
+              incluye los campos <code>asunto</code> y <code>sender</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Se pueden aplicar múltiples definiciones de <code>@NamedEntityGraph</code> a una clase 
+              agrupándolas dentro de una anotación <code>@NamedEntityGraphs</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              En el siguiente ejemplo, se definen dos grafos de entidades en la clase 
+              <code>EmailMessage</code>. Uno es para un panel de vista previa, que obtiene solo el remitente, 
+              el asunto y el cuerpo del mensaje. El otro es para una vista completa del mensaje, incluidos los 
+              archivos adjuntos del mensaje:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@NamedEntityGraphs({
+    @NamedEntityGraph(name="previewEmailEntityGraph", attributeNodes={
+        @NamedAttributeNode("subject"),
+        @NamedAttributeNode("sender"),
+        @NamedAttributeNode("body")
+    }),
+    @NamedEntityGraph(name="fullEmailEntityGraph", attributeNodes={
+        @NamedAttributeNode("sender"),
+        @NamedAttributeNode("subject"),
+        @NamedAttributeNode("body"),
+        @NamedAttributeNode("attachments")
+    })
+})
+@Entity
+public class EmailMessage { ... }
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="sthref187">
+          <h3 id="obtaining-entitygraph-instances-from-named-entity-graphs">
+            Obtener Instancias EntityGraph desde Grafos de Entidad Nombrados
+          </h3>
+          <div class="paragraph">
+            <p>
+              Use el método <code>EntityManager.getEntityGraph</code>, pasando el nombre del grafo de entidad 
+              con nombre, para obtener instancias de <code>EntityGraph</code> para un grafo de entidad con 
+              nombre:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+EntityGraph&lt;EmailMessage&gt; eg = em.getEntityGraph("emailEntityGraph");
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="persistence-entitygraphs002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="persistence-entitygraphs004.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

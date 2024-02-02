@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Solución de Problemas (Los Tutoriales de Java&trade; &gt; La IPA de Reflexión &gt; Matrices y Tipos Enumerados)
+        </title>
+        <meta name="description" content="Este tutorial de reflexión de Java describe el uso de la reflexión para acceder y 
+              manipular clases, campos, métodos y constructores" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java reflection" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Matrices y Tipos Enumerados</a></div>
+                <div class="linkAHEAD"><a href="array.html">Matrices</a></div>
+                <div class="linkBHEAD"><a href="arrayComponents.html">Identificando los Tipos del Matriz</a></div>
+                <div class="linkBHEAD"><a href="arrayInstance.html">Creando Nuevas Matrices</a></div>
+                <div class="linkBHEAD"><a href="arraySetGet.html">Obteniendo y estableciendo Matrices y sus Componentes</a></div>
+                <div class="nolinkBHEAD">Solución de Problemas</div>
+                <div class="linkAHEAD"><a href="enum.html">Tipos Enumerados</a></div>
+                <div class="linkBHEAD"><a href="enumMembers.html">Examinando las Enumeraciones</a></div>
+                <div class="linkBHEAD"><a href="enumSetGet.html">Obteniendo y Estableciendo Campos en los Tipos Enumerados</a></div>
+                <div class="linkBHEAD"><a href="enumTrouble.html">Solución de Problemas</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> La IPA de Reflexión<br />
+                <b>Lección:</b> Matrices y Tipos Enumerados<br />
+                <b>Sección:</b> Matrices
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">La IPA de Reflexión</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Matrices y Tipos Enumerados</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="arraySetGet.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="enum.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Solución de Problemas</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Los ejemplos siguientes muestran los errores típicos que pueden ocurrir cuando se opera con matrices.
+                </p>
+                <h2>
+                    IllegalArgumentException debido a Tipos Inconvertibles
+                </h2>
+                <p>
+                    El ejemplo 
+                    <a class="SourceLink" target="_blank" href="example/ArrayTroubleAgain.java" 
+                       onclick="showCode('../../displayCode.html', 'example/ArrayTroubleAgain.java'); return false;">
+                        <code>ArrayTroubleAgain</code></a> generará una 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/IllegalArgumentException.html">
+                        <code>IllegalArgumentException</code></a>.
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Array.html#setInt-java.lang.Object-int-int-">
+                        <code>Array.setInt()</code></a> se invoca para establecer un componente que es de tipo referencia a 
+                    <code>Integer</code> con un valor de tipo primitivo <code>int</code>. En el equivalente que no es de 
+                    reflexión <code>ary[0] = 1</code>, el compilador convertiría (o <em>encajaría</em>, <b>nota del traductor:</b> 
+                    <i>box</i> en inglés) el valor <code>1</code> a un tipo referencia como <code>new Integer(1)</code> así que su 
+                    comprobación de tipo aceptará la sentencia. Cuando se usa reflexión, la comprobación de tipos solo ocurre en 
+                    tiempo de ejecución así que no hay oportunidad de 'encajar' el valor.
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+import java.lang.reflect.Array;
+import static java.lang.System.err;
+
+public class ArrayTroubleAgain {
+    public static void main(String... args) {
+	Integer[] ary = new Integer[2];
+	try {
+	    Array.setInt(ary, 0, 1);  // IllegalArgumentException
+
+        // el código en producción debe manejar estas excepciones con más habilidad.
+	} catch (IllegalArgumentException x) {
+	    err.format(&quot;Unable to box%n&quot;);
+	} catch (ArrayIndexOutOfBoundsException x) {
+	    x.printStackTrace();
+	}
+    }
+}
+                    </pre>
+                </div>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java ArrayTroubleAgain</em>
+Unable to box
+                    </pre>
+                </div>
+                <p>
+                    Para eliminar esta excepción, la línea problemática debe ser reemplazada por la siguiente invocación de 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Array.html#set-java.lang.Object-int-java.lang.Object-">
+                        <code>Array.set(Object array, int index, Object value)</code></a>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Array.set(ary, 0, new Integer(1));
+                    </pre>
+                </div>
+                <div class="note">
+                    <hr />
+                    <strong>Tip:</strong>&nbsp;Cuando usa reflexión para establecer u obtener un componente de matriz, el 
+                    compilador no tiene ninguna oportunidad de realizar el encaje (<b>nota del traductor:</b> <i>boxing</i> en inglés). 
+                    Solo puede convertir tipos que son relacionados como se describe por la especificación para 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#isAssignableFrom-java.lang.Class-">
+                        <code>Class.isAssignableFrom()</code></a>. El ejemplo se espera que falle porque 
+                    <code>isAssignableFrom()</code> devolverá <code>false</code> en esta prueba que se puede usar de forma 
+                    programable para verificar si una conversión particular es posible:
+                    <div class="codeblock">
+                        <pre>
+Integer.class.isAssignableFrom(int.class) == false 
+                        </pre>
+                    </div>
+                    <p>
+                        De forma similar, la conversión automática de tipo primitivo a tipo referencia es también imposible en 
+                        reflexión.
+                    </p>
+                    <div class="codeblock">
+                        <pre>
+int.class.isAssignableFrom(Integer.class) == false
+                        </pre>
+                    </div>
+                    <hr />
+                </div>
+                <h2>
+                    ArrayIndexOutOfBoundsException para Matrices Vacías
+                </h2>
+                <p>
+                    El ejemplo 
+                    <a class="SourceLink" target="_blank" href="example/ArrayTrouble.java" 
+                       onclick="showCode('../../displayCode.html', 'example/ArrayTrouble.java'); return false;">
+                        <code>ArrayTrouble</code></a> ilustra un error que ocurrirá si se hace un intento de acceder a los 
+                    elementos de una matriz de longitud cero:
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+import java.lang.reflect.Array;
+import static java.lang.System.out;
+
+public class ArrayTrouble {
+    public static void main(String... args) {
+        Object o = Array.newInstance(int.class, 0);
+        int[] i = (int[])o;
+        int[] j = new int[0];
+        out.format(&quot;i.length = %d, j.length = %d, args.length = %d%n&quot;,
+                   i.length, j.length, args.length);
+        Array.getInt(o, 0);  // ArrayIndexOutOfBoundsException
+    }
+}
+                    </pre>
+                </div>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java ArrayTrouble</em>
+i.length = 0, j.length = 0, args.length = 0
+Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException
+        at java.lang.reflect.Array.getInt(Native Method)
+        at ArrayTrouble.main(ArrayTrouble.java:11)
+                    </pre>
+                </div>
+                <div class="note">
+                    <hr />
+                    <strong>Consejo:</strong>&nbsp;Es posible tener matrices sin elementos (matrices vacías). Hay solo unos pocos 
+                    casos en el código común donde se ven, pero puede ocurrir en reflexión sin darse cuenta. Por supuesto, no es 
+                    posible establecer/obtener valores de una matriz vacía porque se lanzará una 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/ArrayIndexOutOfBoundsException.html">
+                        <code>ArrayIndexOutOfBoundsException</code></a>.
+                    <hr />
+                </div>
+                <h2>
+                    IllegalArgumentException si se Intenta Delimitar
+                </h2>
+                <p>
+                    El ejemplo 
+                    <a class="SourceLink" target="_blank" href="example/ArrayTroubleToo.java" 
+                       onclick="showCode('../../displayCode.html', 'example/ArrayTroubleToo.java'); return false;">
+                        <code>ArrayTroubleToo</code></a> contiene código que falla porque intenta realizar una operación que 
+                    podría potencialmente perder datos:
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+import java.lang.reflect.Array;
+import static java.lang.System.out;
+
+public class ArrayTroubleToo {
+    public static void main(String... args) {
+        Object o = new int[2];
+        Array.setShort(o, 0, (short)2);  // ensanchando, se logra
+        Array.setLong(o, 1, 2L);         // estrechando, falla
+    }
+}
+                    </pre>
+                </div>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java ArrayTroubleToo</em>
+Exception in thread "main" java.lang.IllegalArgumentException: argument type
+  mismatch
+        at java.lang.reflect.Array.setLong(Native Method)
+        at ArrayTroubleToo.main(ArrayTroubleToo.java:9)
+                    </pre>
+                </div>
+                <div class="note">
+                    <hr />
+                    <strong>Consejo:</strong>&nbsp;Los métodos <code>Array.set*()</code> y <code>Array.get*()</code> realizarán una 
+                    conversión de ampliación automática pero lanzarán una 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/IllegalArgumentException.html">
+                        <code>IllegalArgumentException</code></a> si se intenta una conversión de restricción. Para una descripción 
+                    completa de las conversiones de ampliación y restricción, vea 
+                    <a href="https://docs.oracle.com/javase/specs/jls/se7/html/index.html">
+                        <em>La Especificación del Lenguaje Java, Java SE 7 Edición</em></a>, secciones 
+                    <a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.2">
+                        Ampliación de la Conversión de Primitivas</a> y 
+                    <a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.3">
+                        Reducción de la Conversión de Primitivas </a> respectivamente.
+                    <hr />
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="arraySetGet.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="enum.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Obteniendo y estableciendo Matrices y sus Componentes<br />
+            <b>Página siguiente:</b> Tipos Enumerados
+        </div>
+    </body>
+</html> 

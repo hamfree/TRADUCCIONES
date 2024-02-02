@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Creando un Servicio Web Simple y Clientes con JAX-WS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jaxws001.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jaxws003.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BNAYN">
+      <h2 id="creating-a-simple-web-service-and-clients-with-jax-ws">
+        Creando un Servicio Web Simple y Clientes con JAX-WS
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Esta sección muestra cómo crear e implementar un servicio web simple y dos clientes: un cliente de 
+            aplicación y un cliente web. El código fuente del servicio está en el directorio 
+            <code><em>tut-install</em>/examples/jaxws/helloservice-war/</code>, y los clientes están en los
+            directorios <code><em>tut-install</em>/examples/jaxws/hello-appclient/</code> y 
+            <code><em>tut-install</em>/examples/jaxws/hello-webclient/</code>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            <a href="#BNAYO">Figura 31-1</a> ilustra cómo la tecnología JAX-WS administra la comunicación 
+            entre un servicio web y un cliente.
+          </p>
+        </div>
+        <div id="BNAYO" class="paragraph">
+          <div class="title">
+            <strong>Figura 31-1 Comunicación entre un servicio web JAX-WS y un cliente</strong>
+          </div>
+          <p>
+            <span class="image">
+              <img src="img/javaeett_dt_019.png" 
+                   alt="Diagrama que muestra un cliente y un servicio web comunicándose a través de un mensaje 
+                   SOAP.">
+            </span>
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            El punto de partida para desarrollar un servicio web JAX-WS es una clase Java anotada con la 
+            anotación <code>javax.jws.WebService</code>. La anotación <code>@WebService</code> define la clase 
+            como un punto final de servicio web.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Una interfaz de punto final de servicio o una implementación de punto final de servicio (SEI, en 
+            inglés) es una interfaz o clase Java, respectivamente, que declara los métodos que un cliente 
+            puede invocar en el servicio. No se requiere una interfaz al construir un punto final JAX-WS. La 
+            clase de implementación del servicio web define implícitamente un SEI.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Puede especificar una interfaz explícita agregando el elemento <code>endpointInterface</code> a la 
+            anotación <code>@WebService</code> en la clase de implementación. A continuación, debe 
+            proporcionar una interfaz que defina los métodos públicos disponibles en la clase de 
+            implementación del punto final.
+          </p>
+        </div>
+        <div class="sect2" id="sthref133">
+          <h3 id="basic-steps-for-creating-a-web-service-and-client">
+            Pasos Básicos para Crear un Servicio Web y Cliente
+          </h3>
+          <div class="paragraph">
+            <p>Los pasos básicos para crear un servicio web y un cliente son los siguientes.</p>
+          </div>
+          <div class="olist arabic">
+            <ol class="arabic">
+              <li>
+                <p>Codifique la clase de implementación.</p>
+              </li>
+              <li>
+                <p>Compile la clase de implementación.</p>
+              </li>
+              <li>
+                <p>Empaquete los archivos en un archivo WAR.</p>
+              </li>
+              <li>
+                <p>
+                  Implemente el archivo WAR. El Servidor GlassFish genera los artefactos del servicio web, que 
+                  se utilizan para comunicarse con los clientes, durante la implementación.
+                </p>
+              </li>
+              <li>
+                <p>Codifique la clase de cliente.</p>
+              </li>
+              <li>
+                <p>
+                  Utilice el objetivo de Maven <code>wsimport</code> para generar y compilar los artefactos 
+                  del servicio web necesarios para conectarse al servicio.
+                </p>
+              </li>
+              <li>
+                <p>Compile la clase de cliente.</p>
+              </li>
+              <li>
+                <p>Ejecutar el cliente.</p>
+              </li>
+            </ol>
+          </div>
+          <div class="paragraph">
+            <p>
+              Si usa el EID NetBeans para crear un servicio y un cliente, el IDE realiza la tarea 
+              <code>wsimport</code> por usted.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Las secciones que siguen cubren estos pasos en mayor detalle.</p>
+          </div>
+        </div>
+        <div class="sect2" id="BNAYP">
+          <h3 id="requirements-of-a-jax-ws-endpoint">Requisitos de un Endpoint JAX-WS</h3>
+          <div class="paragraph">
+            <p>Los puntos finales JAX-WS deben cumplir estos requisitos.</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  La clase de implementación debe anotarse con la anotación <code>javax.jws.WebService</code> 
+                  o <code>javax.jws.WebServiceProvider</code>.
+                </p>
+              </li>
+              <li>
+                <p>
+                  La clase de implementación puede hacer referencia explícita a una SEI a través del elemento 
+                  <code>endpointInterface</code> de la anotación <code>@WebService</code>, pero no está 
+                  obligada a hacerlo. Si no se especifica <code>endpointInterface</code> en 
+                  <code>@WebService</code>, se define implícitamente un SEI para la clase de implementación.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Los métodos comerciales de la clase de implementación deben ser públicos y no deben 
+                  declararse <code>static</code> o <code>final</code>.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Los métodos comerciales que se exponen a los clientes de servicios web se deben anotar con 
+                  <code>javax.jws.WebMethod</code>.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Los métodos comerciales que se exponen a los clientes de servicios web deben tener 
+                  parámetros y tipos de retorno compatibles con JAXB. Consulte la lista de enlaces de tipos de 
+                  datos predeterminados de JAXB en <a href="jaxws003.html#BNAZC">Tipos Admitidos por 
+                    JAX-WS</a>.
+                </p>
+              </li>
+              <li>
+                <p>
+                  La clase de implementación no debe declararse <code>final</code> y no debe ser 
+                  <code>abstract</code>.
+                </p>
+              </li>
+              <li>
+                <p>La clase de implementación debe tener un constructor público predeterminado.</p>
+              </li>
+              <li>
+                <p>La clase de implementación no debe definir el método <code>finalize</code>.</p>
+              </li>
+              <li>
+                <p>
+                  La clase de implementación puede usar las anotaciones 
+                  <code>javax.annotation.PostConstruct</code> o <code>javax.annotation.PreDestroy</code> en 
+                  sus métodos para las devoluciones de llamadas de eventos del ciclo de vida.
+                </p>
+                <div class="paragraph">
+                  <p>
+                    El contenedor llama al método <code>@PostConstruct</code> antes de que la clase de 
+                    implementación comience a responder a los clientes del servicio web.
+                  </p>
+                </div>
+                <div class="paragraph">
+                  <p>
+                    El contenedor llama al método <code>@PreDestroy</code> antes de que el punto final se 
+                    elimine de la operación.
+                  </p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="sect2" id="BNAYQ">
+          <h3 id="coding-the-service-endpoint-implementation-class">
+            Codificar la Clase de Implementación del Servicio del Endpoint
+          </h3>
+          <div class="paragraph">
+            <p>
+              En este ejemplo, la clase de implementación, <code>Hello</code>, se anota como un punto final de 
+              servicio web mediante la anotación <code>@WebService</code>. <code>Hello</code> declara un único 
+              método llamado <code>sayHello</code>, anotado con la anotación <code>@WebMethod</code>, que 
+              expone el método anotado a los clientes del servicio web. El método <code>sayHello</code> 
+              devuelve un saludo al cliente, utilizando el nombre que se le pasó para redactar el saludo. La 
+              clase de implementación también debe definir un constructor predeterminado, público y sin 
+              argumentos.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+package javaeetutorial.helloservice;
+import javax.jws.WebService;
+import javax.jws.WebMethod;
+@WebService
+public class Hello {
+    private final String message = "Hola, ";
+    public Hello() {
+    }
+    @WebMethod
+    public String sayHello(String name) {
+        return message + name + ".";
+    }
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="BNAYR">
+          <h3 id="building-packaging-and-deploying-the-service">
+            Construyendo, Empaquetando, y Desplegando el Servicio
+          </h3>
+          <div class="paragraph">
+            <p>
+              Puede usar el EID NetBeans o Maven para compilar, empaquetar e implementar la aplicación 
+              <code>helloservice-war</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Aquí se tratan los siguientes temas:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  <a href="#BNAYS">
+                    Para Construir, Empaquetar, y Desplegar el Servicio Usando el EID NetBeans
+                  </a>
+                </p>
+              </li>
+              <li>
+                <p><a href="#BNAYT">Para Construir, Empaquetar, y Desplegar el Servicio Usando Maven</a></p>
+              </li>
+            </ul>
+          </div>
+          <div class="sect3" id="BNAYS">
+            <h4 id="to-build-package-and-deploy-the-service-using-netbeans-ide">
+              Para Construir, Empaquetar, y Desplegar el Servicio Usando el EID NetBeans
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Asegúrese de que el Servidor GlassFish se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                  </p>
+                </li>
+                <li>
+                  <p>En el menú Archivo, elija Abrir proyecto.</p>
+                </li>
+                <li>
+                  <p>En el cuadro de diálogo Abrir proyecto, vaya a:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/jaxws
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Seleccione la carpeta <code>helloservice-war</code>.</p>
+                </li>
+                <li>
+                  <p>Haga clic en Abrir proyecto.</p>
+                </li>
+                <li>
+                  <p>
+                    En la pestaña Proyectos, haga clic con el botón derecho en el proyecto 
+                    <code>helloservice-war</code> y seleccione Ejecutar.
+                  </p>
+                  <div class="paragraph">
+                    <p>
+                      Este comando construye y empaqueta la aplicación en un archivo WAR, 
+                      <code>helloservice-war.war</code>, ubicado en 
+                      <code><em>tut-install</em>/examples/jaxws/helloservice-war/target</code>, e implementa 
+                      este archivo WAR en su instancia de el Servidor GlassFish. También abre la interfaz de prueba 
+                      del servicio web en la URL que se muestra en 
+                      <a href="#BNAYW">Para Probar el Servicio sin un Cliente</a>.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+            <div class="paragraph">
+              <p>Siguiente Paso</p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Puede ver el archivo WSDL del servicio implementado solicitando la URL
+                <code>
+                  <a href="http://localhost:8080/helloservice-war/HelloService?wsdl" class="bare">
+                    http://localhost:8080/helloservice-war/HelloService?wsdl
+                  </a>
+                </code> en un navegador web. Ahora está listo para crear un cliente que acceda a este 
+                servicio.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="BNAYT">
+            <h4 id="to-build-package-and-deploy-the-service-using-maven">
+              Para Construir, Empaquetar, y Desplegar el Servicio Usando Maven
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Asegúrese de que se haya iniciado el Servidor GlassFish 
+                    (consulte <a href="usingexamples002.html#BNADI">
+                      Arrancando y Parando el Servidor GlassFish</a>).
+                  </p>
+                </li>
+                <li>
+                  <p>En una ventana de terminal, vaya a:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/jaxws/helloservice-war/
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Introduzca el siguiente comando:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+mvn install
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      Este comando construye y empaqueta la aplicación en un archivo WAR, 
+                      <code>helloservice-war.war</code>, ubicado en el directorio <code>target</code>, y luego 
+                      implementa el WAR en el Servidor GlassFish.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+            <div class="paragraph">
+              <p>Siguiente Paso</p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Puede ver el archivo WSDL del servicio implementado solicitando la URL
+                <code>
+                  <a href="http://localhost:8080/helloservice-war/HelloService?wsdl" class="bare">
+                    http://localhost:8080/helloservice-war/HelloService?wsdl
+                  </a>
+                </code> en un navegador web. Ahora está listo para crear un cliente que acceda a este 
+                servicio.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GKAJL">
+          <h3 id="testing-the-methods-of-a-web-service-endpoint">
+            Probando los Métodos de un Endpoint de Servicio Web
+          </h3>
+          <div class="paragraph">
+            <p>
+              El Servidor GlassFish le permite probar los métodos de un punto final de servicio web.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Aquí se tratan los siguientes temas:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p><a href="#BNAYW">Para Probar el Servicio sin un Cliente</a></p>
+              </li>
+            </ul>
+          </div>
+          <div class="sect3" id="BNAYW">
+            <h4 id="to-test-the-service-without-a-client">Para Probar el Servicio sin un Cliente</h4>
+            <div class="paragraph">
+              <p>
+                Para probar el método <code>sayHello</code> de <code>HelloService</code>, sigue estos pasos.
+              </p>
+            </div>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Abra la interfaz de prueba del servicio web ingresando la siguiente URL en un navegador 
+                    web:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+http://localhost:8080/helloservice-war/HelloService?Tester
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    En Métodos, ingrese un nombre como parámetro para el método <code>sayHello</code>.
+                  </p>
+                </li>
+                <li>
+                  <p>Haz clic en saludar.</p>
+                  <div class="paragraph">
+                    <p>Esto lo lleva a la página de invocación del método <code>sayHello</code>.</p>
+                  </div>
+                  <div class="paragraph">
+                    <p>En Método devuelto, verá la respuesta del extremo.</p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="BNAYX">
+          <h3 id="a-simple-jax-ws-application-client">Una Aplicación Cliente JAX-WS Simple</h3>
+          <div class="paragraph">
+            <p>
+              La clase <code>HelloAppClient</code> es un cliente de aplicación independiente que accede al 
+              método <code>sayHello</code> de <code>HelloService</code>. Esta llamada se realiza a través de 
+              un puerto, un objeto local que actúa como proxy del servicio remoto. El puerto se crea en el 
+              momento del desarrollo mediante el objetivo de Maven <code>wsimport</code>, que genera 
+              artefactos portátiles JAX-WS basados en un archivo WSDL.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Aquí se tratan los siguientes temas:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p><a href="#BNAYY">Codificando la Aplicación Cliente</a></p>
+              </li>
+              <li>
+                <p><a href="#BNAYZ">Ejecutando la Aplicación Cliente</a></p>
+              </li>
+            </ul>
+          </div>
+          <div class="sect3" id="BNAYY">
+            <h4 id="coding-the-application-client">Codificando la Aplicación Cliente</h4>
+            <div class="paragraph">
+              <p>
+                Al invocar los métodos remotos en el puerto, el cliente realiza estos pasos.
+              </p>
+            </div>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Utiliza la clase <code>helloservice.endpoint.HelloService</code> generada, que representa 
+                    el servicio en el URI del archivo WSDL del servicio implementado:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+import javaeetutorial.helloservice.endpoint.HelloService;
+import javax.xml.ws.WebServiceRef;
+public class HelloAppClient {
+    @WebServiceRef(wsdlLocation =
+      "http://localhost:8080/helloservice-war/HelloService?WSDL")
+    private static HelloService service;
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    Recupera un proxy para el servicio, también conocido como puerto, invocando 
+                    <code>getHelloPort</code> en el servicio:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+javaeetutorial.helloservice.endpoint.Hello port = service.getHelloPort();
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>El puerto implementa el SEI definido por el servicio.</p>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    Invoca el método <code>sayHello</code> del puerto, pasando una cadena al servicio:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+return port.sayHello(arg0);
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+              </ol>
+            </div>
+            <div class="paragraph">
+              <p>
+                Aquí está la fuente completa de <code>HelloAppClient.java</code>, que se encuentra en el 
+                directorio
+                <code>
+                  <em>tut-install</em>/examples/jaxws/hello-appclient/src/main/java/javaeetutorial/
+                  hello/appclient/
+                </code>:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+package javaeetutorial.hello.appclient;
+import javaeetutorial.helloservice.endpoint.HelloService;
+import javax.xml.ws.WebServiceRef;
+public class HelloAppClient {
+    @WebServiceRef(wsdlLocation =
+      "http://localhost:8080/helloservice-war/HelloService?WSDL")
+    private static HelloService service;
+    /**
+     * @param args los argumentos de la línea de comando
+     */
+    public static void main(String[] args) {
+       System.out.println(sayHello("mundo"));
+    }
+    private static String sayHello(java.lang.String arg0) {
+        javaeetutorial.helloservice.endpoint.Hello port =
+                service.getHelloPort();
+        return port.sayHello(arg0);
+    }
+}
+                </code></pre>
+              </div>
+            </div>
+          </div>
+          <div class="sect3" id="BNAYZ">
+            <h4 id="running-the-application-client">Ejecutando la Aplicación Cliente</h4>
+            <div class="paragraph">
+              <p>
+                Puede usar el EID NetBeans o Maven para compilar, empaquetar, implementar y ejecutar la 
+                aplicación <code>hello-appclient</code>. Para compilar el cliente, primero debe haber 
+                implementado <code>helloservice-war</code>, como se describe en 
+                <a href="#BNAYR">Construyendo, Empaquetando y Desplegando el Servicio</a>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>Aquí se tratan los siguientes temas:</p>
+            </div>
+            <div class="ulist">
+              <ul>
+                <li>
+                  <p>
+                    <a href="#CIHBGFGA">Para ejecutar el cliente de la aplicación usando el EID NetBeans</a>
+                  </p>
+                </li>
+              </ul>
+            </div>
+            <div class="sect4">
+              <h5 id="to-run-the-application-client-using-netbeans-ide">
+                Para ejecutar el cliente de la aplicación usando el EID NetBeans
+              </h5>
+              <div class="olist arabic">
+                <ol class="arabic">
+                  <li>
+                    <p>En el menú Archivo, elija Abrir proyecto.</p>
+                  </li>
+                  <li>
+                    <p>En el cuadro de diálogo Abrir proyecto, vaya a:</p>
+                    <div class="listingblock">
+                      <div class="content">
+                        <pre class="prettyprint highlight">
+                          <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/jaxws
+                          </code>
+                        </pre>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <p>Seleccione la carpeta <code>hello-appclient</code>.</p>
+                  </li>
+                  <li>
+                    <p>Haga clic en Abrir proyecto.</p>
+                  </li>
+                  <li>
+                    <p>
+                      En la pestaña Proyectos, haga clic con el botón derecho en el proyecto 
+                      <code>hello-appclient</code> y seleccione Generar.
+                    </p>
+                    <div class="paragraph">
+                      <p>
+                        Este comando ejecuta el objetivo <code>wsimport</code>, luego compila, empaqueta y 
+                        ejecuta el cliente. Verá la salida del cliente de la aplicación en la pestaña de 
+                        salida hello-appclient:
+                      </p>
+                    </div>
+                    <div class="listingblock">
+                      <div class="content">
+                        <pre class="prettyprint highlight">
+                          <code class="language-oac_no_warn" data-lang="oac_no_warn">
+--- exec-maven-plugin:1.2.1:exec (run-appclient) @ hello-appclient ---
+Hola, mundo.
+                          </code>
+                        </pre>
+                      </div>
+                    </div>
+                  </li>
+                </ol>
+              </div>
+            </div>
+            <div class="sect4">
+              <h5 id="to-run-the-application-client-using-maven">
+                Para ejecutar el cliente de la aplicación usando Maven
+              </h5>
+              <div class="olist arabic">
+                <ol class="arabic">
+                  <li>
+                    <p>En una ventana de terminal, vaya a:</p>
+                    <div class="listingblock">
+                      <div class="content">
+                        <pre class="prettyprint highlight">
+                          <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/jaxws/hello-appclient/
+                          </code>
+                        </pre>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <p>Introduzca el siguiente comando:</p>
+                    <div class="listingblock">
+                      <div class="content">
+                        <pre class="prettyprint highlight">
+                          <code class="language-oac_no_warn" data-lang="oac_no_warn">
+mvn install
+                          </code>
+                        </pre>
+                      </div>
+                    </div>
+                    <div class="paragraph">
+                      <p>
+                        Este comando ejecuta el objetivo <code>wsimport</code>, luego compila, empaqueta y 
+                        ejecuta el cliente. La salida del cliente de la aplicación se ve así:
+                      </p>
+                    </div>
+                    <div class="listingblock">
+                      <div class="content">
+                        <pre class="prettyprint highlight">
+                          <code class="language-oac_no_warn" data-lang="oac_no_warn">
+--- exec-maven-plugin:1.2.1:exec (run-appclient) @ hello-appclient ---
+Hola, mundo.
+                        </code></pre>
+                      </div>
+                    </div>
+                  </li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GJYGB">
+          <h3 id="a-simple-jax-ws-web-client">Un cliente web JAX-WS Simple</h3>
+          <div class="paragraph">
+            <p>
+              <code>HelloServlet</code> es un servlet que, como el cliente Java, llama al método 
+              <code>sayHello</code> del servicio web. Al igual que el cliente de la aplicación, realiza esta 
+              llamada a través de un puerto.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Aquí se tratan los siguientes temas:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p><a href="#GJYFL">Codificando el Servlet</a></p>
+              </li>
+              <li>
+                <p><a href="#GJYGE">Ejecutando el Cliente Web</a></p>
+              </li>
+            </ul>
+          </div>
+          <div class="sect3" id="GJYFL">
+            <h4 id="coding-the-servlet">Codificando el Servlet</h4>
+            <div class="paragraph">
+              <p>Para invocar el método en el puerto, el cliente realiza estos pasos.</p>
+            </div>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Importa el punto final <code>HelloService</code> y la anotación 
+                    <code>WebServiceRef</code>:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+import javaeetutorial.helloservice.endpoint.HelloService;
+...
+import javax.xml.ws.WebServiceRef;
+                      </code></pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    It defines a reference to the web service by specifying the WSDL location:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@WebServiceRef(wsdlLocation =
+  "http://localhost:8080/helloservice-war/HelloService?WSDL")
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    Declara el servicio web, luego define un método privado que llama al método 
+                    <code>sayHello</code> en el puerto:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+private HelloService service;
+...
+private String sayHello(java.lang.String arg0) {
+    javaeetutorial.helloservice.endpoint.Hello port =
+            service.getHelloPort();
+    return port.sayHello(arg0);
+}
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>En el servlet, llama a este método privado:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+out.println("&lt;p&gt;" + sayHello("mundo") + "&lt;/p&gt;");
+                      </code></pre>
+                    </div>
+                  </div>
+                </li>
+              </ol>
+            </div>
+            <div class="paragraph">
+              <p>
+                Las partes significativas del código <code>HelloServlet</code> siguen. El código se encuentra 
+                en el directorio <code><em>tut-install</em>/examples/jaxws/hello-webclient/src/java/
+                  javaeetutorial/hello/webclient/</code>.
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+package javaeetutorial.hello.webclient;
+import javaeetutorial.helloservice.endpoint.HelloService;
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.ws.WebServiceRef;
+@WebServlet(name="HelloServlet", urlPatterns={"/HelloServlet"})
+public class HelloServlet extends HttpServlet {
+    @WebServiceRef(wsdlLocation =
+      "http://localhost:8080/helloservice-war/HelloService?WSDL")
+    private HelloService service;
+    /**
+     * Procesa solicitudes tanto para los metodos HTTP &lt;code&gt;GET&lt;/code&gt;
+     *   &lt;code&gt;POST&lt;/code&gt;.
+     * @param request solicitud de servlet
+     * @param response respuesta de servlet
+     * @throws ServletException si se produce un error específico del servlet
+     * @throws IOException si se produce un error de E/S
+     */
+    protected void processRequest(HttpServletRequest request,
+            HttpServletResponse response)
+    throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        try (PrintWriter out = response.getWriter()) {
+            out.println("&lt;html lang=\"en\"&gt;");
+            out.println("&lt;head&gt;");
+            out.println("&lt;title&gt;Servlet HelloServlet&lt;/title&gt;");
+            out.println("&lt;/head&gt;");
+            out.println("&lt;body&gt;");
+            out.println("&lt;h1&gt;Servlet HelloServlet en " +
+                request.getContextPath () + "&lt;/h1&gt;");
+            out.println("&lt;p&gt;" + sayHello("mundo") + "&lt;/p&gt;");
+            out.println("&lt;/body&gt;");
+            out.println("&lt;/html&gt;");
+        }
+    }
+    // métodos doGet y doPost, que llaman a processRequest, y 
+    //   método getServletInfo
+    private String sayHello(java.lang.String arg0) {
+        javaeetutorial.helloservice.endpoint.Hello port =
+                service.getHelloPort();
+        return port.sayHello(arg0);
+    }
+}
+                </code></pre>
+              </div>
+            </div>
+          </div>
+          <div class="sect3" id="GJYGE">
+            <h4 id="running-the-web-client">Ejecutando el Cliente Web</h4>
+            <div class="paragraph">
+              <p>
+                Puede usar el EID NetBeans o Maven para compilar, empaquetar, implementar y ejecutar la 
+                aplicación <code>hello-webclient</code>. Para compilar el cliente, primero debe haber 
+                implementado <code>helloservice-war</code>, como se describe en 
+                <a href="#BNAYR">Construyendo, Empaquetando y Desplegando el Servicio</a>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>Aquí se tratan los siguientes temas:</p>
+            </div>
+            <div class="ulist">
+              <ul>
+                <li>
+                  <p><a href="#CIHHFFEC">Para ejecutar el cliente web usando el EID NetBeans</a></p>
+                </li>
+                <li>
+                  <p><a href="#CIHHDCEH">Para ejecutar el cliente web usando Maven</a></p>
+                </li>
+              </ul>
+            </div>
+            <div class="sect4">
+              <h5 id="to-run-the-web-client-using-netbeans-ide">
+                Para ejecutar el cliente web usando el EID NetBeans
+              </h5>
+              <div class="olist arabic">
+                <ol class="arabic">
+                  <li>
+                    <p>En el menú Archivo, elija Abrir proyecto.</p>
+                  </li>
+                  <li>
+                    <p>En el cuadro de diálogo Abrir proyecto, vaya a:</p>
+                    <div class="listingblock">
+                      <div class="content">
+                        <pre class="prettyprint highlight">
+                          <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/jaxws
+                          </code>
+                        </pre>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <p>Seleccione la carpeta <code>hello-webclient</code>.</p>
+                  </li>
+                  <li>
+                    <p>Haga clic en Abrir proyecto.</p>
+                  </li>
+                  <li>
+                    <p>
+                      En la pestaña Proyectos, haga clic con el botón derecho en el proyecto 
+                      <code>hello-webclient</code> y seleccione Generar.
+                    </p>
+                    <div class="paragraph">
+                      <p>
+                        Esta tarea ejecuta el objetivo <code>wsimport</code>, crea y empaqueta la aplicación 
+                        en un archivo WAR, <code>hello-webclient.war</code>, ubicado en el directorio 
+                        <code>target</code>, y lo implementa en el Servidor GlassFish.
+                      </p>
+                    </div>
+                  </li>
+                  <li>
+                    <p>En un navegador web, ingrese la siguiente URL:</p>
+                    <div class="listingblock">
+                      <div class="content">
+                        <pre class="prettyprint highlight">
+                          <code class="language-oac_no_warn" data-lang="oac_no_warn">
+http://localhost:8080/hello-webclient/HelloServlet
+                          </code>
+                        </pre>
+                      </div>
+                    </div>
+                    <div class="paragraph">
+                      <p>La salida del método <code>sayHello</code> aparece en la ventana.</p>
+                    </div>
+                  </li>
+                </ol>
+              </div>
+            </div>
+            <div class="sect4">
+              <h5 id="to-run-the-web-client-using-maven">Para ejecutar el cliente web usando Maven</h5>
+              <div class="olist arabic">
+                <ol class="arabic">
+                  <li>
+                    <p>En una ventana de terminal, vaya a:</p>
+                    <div class="listingblock">
+                      <div class="content">
+                        <pre class="prettyprint highlight">
+                          <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/jaxws/hello-webclient/
+                          </code>
+                        </pre>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <p>Introduzca el siguiente comando:</p>
+                    <div class="listingblock">
+                      <div class="content">
+                        <pre class="prettyprint highlight">
+                          <code class="language-oac_no_warn" data-lang="oac_no_warn">
+mvn install
+                          </code>
+                        </pre>
+                      </div>
+                    </div>
+                    <div class="paragraph">
+                      <p>
+                        Este comando ejecuta el objetivo <code>wsimport</code>, luego crea y empaqueta la 
+                        aplicación en un archivo WAR, <code>hello-webclient.war</code>, ubicado en el 
+                        directorio <code>target</code> . Luego, el archivo WAR se implementa en el Servidor 
+                        GlassFish.
+                      </p>
+                    </div>
+                  </li>
+                  <li>
+                    <p>En un navegador web, ingrese la siguiente URL:</p>
+                    <div class="listingblock">
+                      <div class="content">
+                        <pre class="prettyprint highlight">
+                          <code class="language-oac_no_warn" data-lang="oac_no_warn">
+http://localhost:8080/hello-webclient/HelloServlet
+                        </code></pre>
+                      </div>
+                    </div>
+                    <div class="paragraph">
+                      <p>La salida del método <code>sayHello</code> aparece en la ventana.</p>
+                    </div>
+                  </li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jaxws001.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jaxws003.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

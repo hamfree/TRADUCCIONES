@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Entendiendo la Carga de Clases de Extensión (Los Tutoriales de Java&trade; &gt; El Mecanismo de Extensión &gt; 
+            Creando y Usando Extensiones)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe cómo crear y usar extensiones o paquetes opcionales  y 
+              hacerlos seguros" />
+        <meta name="keywords" content="programar java, aprender java, código ejemplo java, extensiones de java, paquetes opcionales 
+              java" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Creando y Usando Extensiones</a></div>
+                <div class="linkAHEAD"><a href="install.html">Extensiones Instaladas</a></div>
+                <div class="linkAHEAD"><a href="download.html">Descargar Extensiones</a></div>
+                <div class="nolinkAHEAD">Entendiendo la Carga de Clases de Extensión</div>
+                <div class="linkAHEAD"><a href="spi.html">Creando Aplicaciones Extensibles</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> El Mecanismo de Extensión<br />
+                <b>Lección:</b> Creando y Usando Extensiones
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">El Mecanismo de Extensión</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Creando y Usando Extensiones</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="download.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="spi.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Entendiendo la Carga de Clases de Extensión</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    El marco de trabajo de extensión hace uso del mecanismo de delegación de carga de clases. Cuando el entorno de 
+                    ejecución necesita cargar una clase nueva para una aplicación, busca la clase en las siguientes ubicaciones, en 
+                    orden:
+                </p>
+                <ol>
+                    <li>
+                        <b>Clases de bootstrap</b>: las clases del entorno de ejecución en <code>rt.jar</code>, las clases de 
+                        internacionalización en <code>i18n.jar</code>, y otras.
+                    </li>
+                    <li>
+                        <b>Extensiones instaladas</b>: las clases en los ficheros JAR en el directorio <code>lib/ext</code> del 
+                        EEJ, y en el directorio de extensiones específico para la plataforma y para todo el sistema (tal como 
+                        <code>/usr/jdk/packages/lib/ext</code> en el Sistema Operativo Solaris&trade;, pero note que el uso de este 
+                        directorio se aplica sólo a Java&trade; 6 y posteriores).
+                    </li>
+                    <li>
+                        <b>La ruta de clases</b>: clases, incluyendo clases en ficheros JAR, en las rutas indicadas por la 
+                        propiedad del sistema <code>java.class.path</code>. Si un fichero JAR en la ruta de clases tiene un 
+                        manifiesto con el atributo <code>Class-Path</code>, los ficheros JAR especificados por el atributo 
+                        <code>Class-Path</code> serán buscados también. Por defecto, el valor de la propiedad 
+                        <code>java.class.path</code> es <code>.</code>, el directorio actual. Puede cambiar el valor usando las 
+                        opciones de línea de comandos <code>-classpath</code> o <code>-cp</code>, o establecer la variable de 
+                        entorno <code>CLASSPATH</code>. Las opciones de la línea de comando sobreescriben el establecimiento de la 
+                        variable de entorno <code>CLASSPATH</code>.
+                    </li>
+                </ol>
+                <p>
+                    La lista precedente le indica, por ejemplo, que la ruta de clases se busca sólo si una clases a ser cargada 
+                    no ha sido encontrada entre las clases en <code>rt.jar</code>, <code>i18n.jar</code> o las extensiones 
+                    instaladas.
+                </p>
+                <p>
+                    A menos que su software instancie sus propios cargadores de clases para propósitos especiales, no necesita 
+                    realmente saber mucho más que tener en mente esta lista de precedencia. En particular, debería estar prevenido 
+                    de cualquier conflicto de nombres de clase que podrían presentarse. Por ejemplo, si enumera una clase en la 
+                    ruta de clases, obtendrá resultados inesperados si el entorno de ejecución carga otra clase con el mismo nombre 
+                    que encontró en una extensión instalada.
+                </p>
+                <h2>
+                    El Mecanismo de Carga de Clases de Java
+                </h2>
+                <p>
+                    La plataforma Java usa un modelo de delegación para cargar clases. La idea básica es que cada cargador de 
+                    clases tiene un cargador de clases &quot;padre&quot;. Cuando carga una clase, un cargador de clase primero 
+                    &quot;delega&quot; la búsqueda de la clase en su cargador de clases padre antes de intentar encontrar la clase 
+                    por sí mismo.
+                </p>
+                <p>
+                    A continuación, se muestran algunos aspectos destacados de la IPA de carga de clases:
+                </p>
+                <ul>
+                    <li>
+                        Los constructores en <code>java.lang.ClassLoader</code> y sus subclases le permiten especificar un padre 
+                        cuando instancia un nuevo cargador de clases. Si no especifica explícitamente un padre, se asignará el 
+                        cargador de clases del sistema de la máquina virtual como padre por defecto.
+                    </li>
+                    <li>
+                        El método <code>loadClass</code> en <code>ClassLoader</code> realiza estas tareas, en orden, cuando se 
+                        llama a una clase:
+                        <ol>
+                            <li>
+                                Si una clase ha sido ya cargada, la devuelve.
+                            </li>
+                            <li>
+                                De otra forma, delega la búsqueda para la nueva clase al cargador de clases padre.
+                            </li>
+                            <li>
+                                Si el cargador de clases padre no encuentra la clase, <code>loadClass</code> llama al método 
+                                <code>findClass</code> para bsucar y cargar la clase.
+                            </li>
+                        </ol>
+                    </li>
+                    <li>
+                        El método <code>findClass</code> de <code>ClassLoader</code> busca por la clase en el cargador de clases 
+                        actual si la clase no fue encontrada por el cargador de clases padre. Probablemente desee sobreescribir 
+                        este método cuando cree una instancia de una subclase del cargador de clases en su aplicación.
+                    </li>
+                    <li>
+                        La clase <code>java.net.URLClassLoader</code> sirve como el cargador de clases básico para las extensiones 
+                        y otros ficheros JAR, sobreescribiendo el método <code>findClass</code> de 
+                        <code>java.lang.ClassLoader</code> para buscar una o más URLs especificadas por clases y recursos.
+                    </li>
+                </ul>
+                <p>
+                    Para ver una aplicación de muestra que utiliza algunas de las IPA en lo que respecta a los archivos JAR, 
+                    consulte la lección 
+                    <a class="TutorialLink" target="_top" href="../../deployment/jar/apiindex.html">Usando IPAs relacionadas con el 
+                        formato JAR</a> en este tutorial.
+                </p>
+                <h2>
+                    Carga de Clases y el Comando <code>java</code>
+                </h2>
+                <p>
+                    El mecanismo de carga de clases de la plataforma Java se refleja en el comando <code>java</code>.
+                </p>
+                <ul>
+                    <li>
+                        En la herramienta <code>java</code>, la opción <code>-classpath</code> es un forma corta de establecer la 
+                        propiedad <code>java.class.path</code>.
+                    </li>
+                    <li>
+                        Las opciones <code>-cp</code> y <code>-classpath</code> son equivalentes.
+                    </li>
+                    <li>
+                        La opción <code>-jar</code> ejecuta aplicaciones que están empaquetadas en ficheros JAR. Para una 
+                        descripción y ejemplos de esta opción, vea la lección 
+                        <a class="TutorialLink" target="_top"
+                           href="../../deployment/jar/run.html">Ejecutando Software Empaquetado en Ficheros JAR</a> en este 
+                           tutorial.
+                    </li>
+                </ul>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="download.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="spi.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Descargar Extensiones<br />
+            <b>Página siguiente:</b> Creando Aplicaciones Extensibles
+        </div>
+    </body>
+</html> 

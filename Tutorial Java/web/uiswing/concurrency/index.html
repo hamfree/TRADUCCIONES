@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Lección: Concurrencia en Swing (Los Tutoriales de Java&trade; &gt; Creando una IGU (Interfaz Gráfica de Usuario) con
+            JFC/Swing)
+        </title>
+        <meta name="description" content="Este tutorial de Swing Java describe el desarrollo de interfaces gráficas de usuario (GUI)
+              para aplicaciones y applets que utilizan componentes Swing" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java swing, java ui, java user interface,
+              swing components, swing events, swing layout  " />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="nolinkLESSON">Concurrencia in Swing</div>
+                <div class="linkAHEAD"><a href="initial.html">Hilos Iniciales</a></div>
+                <div class="linkAHEAD"><a href="dispatch.html">El Hilo Despachador de Eventos</a></div>
+                <div class="linkAHEAD"><a href="worker.html">Hilos Worker y el hilo SwingWorker</a></div>
+                <div class="linkBHEAD"><a href="simple.html">Tareas en Segundo Plano Simples</a></div>
+                <div class="linkBHEAD"><a href="interim.html">Tareas que Tienen Resultados Provisionales</a></div>
+                <div class="linkBHEAD"><a href="cancel.html">Cancelando Tareas en Segundo Plano</a></div>
+                <div class="linkBHEAD"><a href="bound.html">Propiedades Ligadas y Métodos de Estado</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="../components/index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="initial.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Lección: Concurrencia en Swing</h1>
+            </div>
+            <div id="PageContent">
+                <a href="../examples/concurrency/index.html">Índice de Ejemplos</a>
+                <br />
+                <p>
+                    Esta lección describe la concurrencia tal como se aplica a la programación de Swing. Se asume que ya está
+                    familiarizado con el contenido de la lección de
+                    <a class="TutorialLink" target="_top" href="../../essential/concurrency/index.html">Concurrencia</a> en el
+                    recorrido <a class="TutorialLink" target="_top" href="../../essential/index.html">Clases Esenciales</a>.
+                </p>
+                <p>
+                    El uso cuidadoso de la concurrencia es particularmente importante para el programador Swing. Un programa de 
+                    Swing bien escrito usa la concurrencia para crear un interfaz de usuario que nunca se &quot;congela&quot;
+                    &mdash; el programa siempre responde a la interacción del usuario , sin importar lo que éste esté haciendo.
+                    Para crear un programa receptivo, el programador debe aprender cómo el marco de trabajo de Swing emplea los
+                    hilos.
+                </p>
+                <p>
+                    Un programador de Swing trata con las clases siguientes de hilos:
+                </p>
+                <ul>
+                    <li>
+                        <i>Hilos iniciales</i>, los hilos que ejecutan el código inicial de la aplicación.
+                    </li>
+                    <li>
+                        El <i>hilo de envío de eventos</i>, donde todo el código de manejo-de-eventos se ejecuta. La mayoría del
+                        código que interactúa con el marco de trabajo de Swing debe también ejecutarse en este hilo.
+                    </li>
+                    <li>
+                        <i>Hilos de trabajo</i>, también conocidos como <i>hilos en segundo plano</i>, donde las tareas de fondo que
+                        consumen mucho tiempo son ejecutadas.
+                    </li>
+                </ul>
+                <p>
+                    El programador no necesita suministrar código que cree explícitamente estos hilos: estos son establecidos por el
+                    sistema en ejecución o el marco de trabajo de Swing. El trabajo del programador es utilizar estos hilos para
+                    crear un programa responsivo y mantenible de Swing.
+                </p>
+                <p>
+                    Como cualquier otro programa ejecutándose en la plataforma Java, un programa de Swing puede crear hilos 
+                    adicionales y grupos de hilos, usando las herramientas descritas en la lección de Concurrencia. Pero para los
+                    programa básicos de Swing los hilos descritos aquí serán suficiente.
+                </p>
+                <p>
+                    Esta lección describe cada una de las tres clases de hilos a su vez. Los hilos de trabajo requieren el mayor 
+                    análisis porque las tareas que se ejecutan sobre ellos son creadas usando <code>javax.swing.SwingWorker</code>.
+                    Esta clase tiene muchas características útiles, incluida la comunicación y coordinación entre las tareas del
+                    hilo de trabajo y las tareas en otros hilos.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="../components/index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="initial.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">
+                                Su uso de ésta
+                            </a>
+                            página y todo el material en las páginas bajo el anuncio &quot;Los Tutoriales de Java&quot; está sujeto
+                            a estos
+                            <a href="../../information/cpyr.html">
+                                avisos legales
+                            </a>
+                            .
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs
+                            </a>
+                            .
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión
+                            </a>
+                            .
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página Anterior:</b> Lección Anterior<br />
+            <b>Página Siguiente:</b> Hilos Iniciales
+        </div>
+    </body>
+</html>

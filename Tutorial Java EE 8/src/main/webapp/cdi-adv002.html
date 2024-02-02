@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Usando Alternativas en Aplicaciones CDI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="cdi-adv001.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="cdi-adv003.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GJSDF">
+      <h2 id="using-alternatives-in-cdi-applications">Usando Alternativas en Aplicaciones CDI</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Cuando tiene más de una versión de un bean que usa para diferentes propósitos, puede elegir entre 
+            ellas durante la fase de desarrollo inyectando un calificador u otro, como se muestra en 
+            <a href="cdi-basicexamples002.html#GJBJU">El Ejemplo de CDI saludo simple</a>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Sin embargo, en lugar de tener que cambiar el código fuente de su aplicación, puede elegir en el 
+            momento de la implementación mediante el uso de alternativas.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Las alternativas se usan comúnmente para propósitos como los siguientes:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>
+                Para manejar la lógica empresarial específica del cliente que se determina en tiempo de 
+                ejecución
+              </p>
+            </li>
+            <li>
+              <p>
+                Para especificar beans que son válidos para un escenario de implementación en particular (por 
+                ejemplo, cuando las leyes de impuestos sobre las ventas específicas de un país requieren una 
+                lógica comercial de impuestos sobre las ventas específica del país)
+              </p>
+            </li>
+            <li>
+              <p>Para crear versiones ficticias (simuladas) de beans que se utilizarán para las pruebas</p>
+            </li>
+          </ul>
+        </div>
+        <div class="paragraph">
+          <p>
+            Para hacer que un bean esté disponible para búsqueda, inyección o resolución EL usando este 
+            mecanismo, asígnele una anotación <code>javax.enterprise.inject.Alternative</code> y luego use el 
+            elemento <code>alternatives</code> para especificar en el archivo <code>beans.xml</code>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Por ejemplo, es posible que desee crear una versión completa de un bean y también una versión más 
+            simple que use solo para ciertos tipos de pruebas. El ejemplo descrito en 
+            <a href="cdi-adv-examples002.html#GKHPU">El Ejemplo encoder: Usando Alternativas</a> contiene dos 
+            beans de este tipo, <code>CoderImpl</code> y <code>TestCoderImpl</code>. El bean de prueba se 
+            anota de la siguiente manera:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Alternative
+public class TestCoderImpl implements Coder { ... }
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>La versión completa no está anotada:</p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public class CoderImpl implements Coder { ... }
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>El bean gestionado inyecta una instancia de la interfaz <code>Coder</code>:</p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Inject
+Coder coder;
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            La aplicación utiliza la versión alternativa del bean solo si esa versión se declara de la 
+            siguiente manera en el archivo <code>beans.xml</code>:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;beans ...&gt;
+    &lt;alternatives&gt;
+        &lt;class&gt;javaeetutorial.encoder.TestCoderImpl&lt;/class&gt;
+    &lt;/alternatives&gt;
+&lt;/beans&gt;
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Si el elemento <code>alternatives</code> está comentado en el archivo <code>beans.xml</code>, se 
+            utiliza la clase <code>CoderImpl</code>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            También puede tener varios beans que implementen la misma interfaz, todos anotados 
+            <code>@Alternative</code>. En este caso, debe especificar en el archivo <code>beans.xml</code> 
+            cuál de estos beans alternativos desea utilizar. Si <code>CoderImpl</code> también estuviera 
+            anotado como <code>@Alternative</code>, uno de los dos beans siempre tendría que especificarse en 
+            el archivo <code>beans.xml</code>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Las alternativas que especifique en el archivo <code>beans.xml</code> se aplican solo a las clases 
+            en el mismo archivo. Utilice la anotación <code>@Priority</code> para especificar alternativas 
+            globalmente para una aplicación que consta de varios módulos, como en el siguiente ejemplo:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Alternative
+@Priority(Interceptor.Priority.APPLICATION+10)
+public class TestCoderImpl implements Coder { ... }
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            La alternativa con mayor valor de prioridad se selecciona si varios beans alternativos que 
+            implementan la misma interfaz se anotan con <code>@Priority</code>. No necesita especificar la 
+            alternativa en el archivo <code>beans.xml</code> cuando usa la anotación <code>@Priority</code>.
+          </p> 
+        </div>
+        <div class="sect2" id="GKHPO">
+          <h3 id="using-specialization">Usando Especialización</h3>
+          <div class="paragraph">
+            <p>
+              La especialización tiene una función similar a la de las alternativas en que te permite 
+              sustituir un bean por otro. Sin embargo, es posible que desee hacer que un bean anule al otro en 
+              todos los casos. Supongamos que definió los dos beans siguientes:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Default @Asynchronous
+public class AsynchronousService implements Service { ... }
+@Alternative
+public class MockAsynchronousService extends AsynchronousService { ... }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Si luego declaró <code>MockAsynchronousService</code> como una alternativa en su archivo 
+              <code>beans.xml</code>, el siguiente punto de inyección se resolvería en 
+              <code>MockAsynchronousService</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Inject Service service;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Sin embargo, lo siguiente se resolvería en <code>AsynchronousService</code> en lugar de 
+              <code>MockAsynchronousService</code>, porque <code>MockAsynchronousService</code> no tiene el 
+              calificador <code>@Asynchronous</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Inject @Asynchronous Service service;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para asegurarse de que siempre se inyectó <code>MockAsynchronousService</code>, tendría que 
+              implementar todos los tipos de bean y los calificadores de bean de 
+              <code>AsynchronousService</code>. Sin embargo, si <code>AsynchronousService</code> declarara un 
+              método productor o un método observador, incluso este engorroso mecanismo no garantizaría que el 
+              otro bean nunca fuera invocado. La especialización proporciona un mecanismo más simple.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La especialización ocurre tanto en tiempo de desarrollo como en tiempo de ejecución. Si declara 
+              que un bean especializa a otro, extiende la otra clase de bean y, en tiempo de ejecución, el 
+              bean especializado reemplaza completamente al otro bean. Si el primer bean se produce mediante 
+              un método de productor, también debe anular el método de productor.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Usted especializa un bean dándole la anotación <code>javax.enterprise.inject.Specializes</code>. 
+              Por ejemplo, podría declarar un bean de la siguiente manera:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Specializes
+public class MockAsynchronousService extends AsynchronousService { ... }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              En este caso, la clase <code>MockAsynchronousService</code> siempre se invocará en lugar de la 
+              clase <code>AsynchronousService</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Por lo general, un bean marcado con la anotación <code>@Specializes</code> también es una 
+              alternativa y se declara como alternativa en el archivo <code>beans.xml</code>. Dicho bean está 
+              destinado a reemplazar la implementación predeterminada, y la implementación alternativa hereda 
+              automáticamente todos los calificadores de la implementación predeterminada, así como su nombre 
+              EL, si lo tiene.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="cdi-adv001.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="cdi-adv003.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

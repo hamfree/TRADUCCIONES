@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Monitorizando un Directorio en busca de Cambios (Los Tutoriales de Java&trade; &gt; Clases Esenciales &gt; E/S Básica)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe las excepciones, la entrada/salida básica, concurrencia,
+              expresiones regulares, y el entorno de la plataforma" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java exception, java input output, java
+              threads, java regex, regular expressions, path, classpath, environment variable" />
+        <link type="text/css" rel="stylesheet" href="../../indice.css" />
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper  clearfix">       
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div> 
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">E/S Básica</a></div>
+                <div class="linkAHEAD"><a href="streams.html">Flujos E/S</a></div>
+                <div class="linkBHEAD"><a href="bytestreams.html">Flujos de Bytes</a></div>
+                <div class="linkBHEAD"><a href="charstreams.html">Flujos de Caracteres</a></div>
+                <div class="linkBHEAD"><a href="buffers.html">Flujos Cacheados</a></div>
+                <div class="linkBHEAD"><a href="scanfor.html">Escaneando y Formateando</a></div>
+                <div class="linkCHEAD"><a href="scanning.html">Escaneando</a></div>
+                <div class="linkCHEAD"><a href="formatting.html">Formateando</a></div>
+                <div class="linkBHEAD"><a href="cl.html">E/S desde la Línea de Comandos</a></div>
+                <div class="linkBHEAD"><a href="datastreams.html">Flujos de Datos</a></div>
+                <div class="linkBHEAD"><a href="objectstreams.html">Flujos de Objetos</a></div>
+                <div class="linkAHEAD"><a href="fileio.html">E/S de Ficheros (caracterizando NIO.2)</a></div>
+                <div class="linkBHEAD"><a href="path.html">¿Qué es un Path? (Y Otros Hechos del Sistema del Ficheros)</a></div>
+                <div class="linkBHEAD"><a href="pathClass.html">La Clase Path</a></div>
+                <div class="linkCHEAD"><a href="pathOps.html">Operaciones con Path</a></div>
+                <div class="linkBHEAD"><a href="fileOps.html">Operaciones con Ficheros</a></div>
+                <div class="linkBHEAD"><a href="check.html">Comprobando un Fichero o Directorio</a></div>
+                <div class="linkBHEAD"><a href="delete.html">Borrando un Fichero o Directorio</a></div>
+                <div class="linkBHEAD"><a href="copy.html">Copiando un Fichero o Directorio</a></div>
+                <div class="linkBHEAD"><a href="move.html">Moviendo un Fichero o Directorio</a></div>
+                <div class="linkBHEAD"><a href="fileAttr.html">Gestionando Metadatos (Fichero y Almacenamiento de Atributos del Fichero)</a></div>
+                <div class="linkBHEAD"><a href="file.html">Leyendo, Escribiendo y Creando Ficheros</a></div>
+                <div class="linkBHEAD"><a href="rafs.html">Acceso Aleatorio a Ficheros</a></div>
+                <div class="linkBHEAD"><a href="dirs.html">Creando y Leyendo Directorios</a></div>
+                <div class="linkBHEAD"><a href="links.html">Enlaces, Simbólicos o Inversos</a></div>
+                <div class="linkBHEAD"><a href="walk.html">Recorriendo el Árbol de Ficheros</a></div>
+                <div class="linkBHEAD"><a href="find.html">Encontrando Ficheros</a></div>
+                <div class="nolinkBHEAD">Monitorizando un Directorio en busca de Cambios</div>
+                <div class="linkBHEAD"><a href="misc.html">Otros Métodos Útiles</a></div>
+                <div class="linkBHEAD"><a href="legacy.html">Código de E/S de Ficheros Heredado</a></div>
+                <div class="linkAHEAD"><a href="summary.html">Sumario</a></div>
+                <div class="linkQUESTIONS"><a href="QandE/questions.html">Preguntas y Ejercicios</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Clases Esenciales<br />
+                <b>Lección:</b> E/S Básica<br />
+                <b>Sección:</b> E/S de Ficheros (caracterizando NIO.2)
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Clases Esenciales</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">E/S Básica</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="find.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="misc.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Monitorizando un Directorio en busca de Cambios</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    ¿Se ha encontrado alguna vez editando un fichero, usando un EID u otro editor, y aparece una caja de diálogo
+                    que le informa que uno de los ficheros abiertos ha cambiado en el sistema de ficheros y necesita ser recargado?
+                    O quizás, como el EID NetBeans, la aplicación sólo actualiza silenciosamente el fichero sin notificárselo. El
+                    siguiente ejemplo de cuadro de diálogo muestra como se ve esta notificación en el editor gratuito,
+                    <a class="OutsideLink" target="_blank" href="http://sourceforge.net/projects/jedit/">jEdit</a>:
+                </p>
+                <p style="text-align: center">
+                    <img src="../../figures/essential/io-jEditDialog.png" width="542" height="325"
+                         alt="Ejemplo de diálogo jEdit: Los siguientes archivos fueron cambiados en disco por otro programa." />
+                </p>
+                <p class="FigureCaption">
+                    Caja de Diálog de jEdit Mostrando que un Fichero Modificado Fue Detectado
+                </p>
+                <p>
+                    Para implementar esta funcionalidad, llamaada <em>Notificación de cambios en ficheros</em>, un programa debe ser
+                    capaza de detectar qué está ocurriendo en el directorio relevante del sistema de ficheros. Una forma de hacer
+                    esto es examinar el sistema de archivos busando cambios, pero este enfoque es ineficiente. No escala para
+                    aplicaciones que tienen cientos de archivos o directorios abiertos que monitorizar.
+                </p>
+                <p>
+                    El paquete <code>java.nio.file</code> ofrece un IPA de notificación de cambios de ficheros, llamada Servicio de 
+                    Vigilancia IPA. Esta IPA le capacita para registrar un directorio (o directorios) con el servicio de vigilancia
+                    Cuando está registrando, le indica al servicio en qué tipos de eventos está interesado: creación de ficheros,
+                    borrado de ficheros, o modificación de ficheros. Cuando el servicio detecta un evento de interés, éste es
+                    enviado al proceso registrado. Cuando llega un evento, se maneja según sea necesario.
+                </p>
+                <p>
+                    Esta sección cubre lo siguiente:
+                </p>
+                <ul>
+                    <li>
+                        <a href="#overview">Descripción del Servicio de vigilancia</a>
+                    </li>
+                    <li>
+                        <a href="#try">Pruébelo</a>
+                    </li>
+                    <li>
+                        <a href="#register">Creación de un Servicio de Vigilancia y Registro de Eventos</a>
+                    </li>
+                    <li>
+                        <a href="#process">Procesar Eventos</a>
+                    </li>
+                    <li>
+                        <a href="#name">Recuperar el Nombre del Archivo</a>
+                    </li>
+                    <li>
+                        <a href="#concerns">Cuando Usar y Cuando No Esta IPA</a>
+                    </li>
+                </ul>
+                <h2>
+                    <a id="overview">Descripción del Servicio de vigilancia</a>
+                </h2>
+                <p>
+                    La IPA <code>WatchService</code> es de bastante bajo nivel, permitiéndole personalizarla. Puede usarla tal como
+                    es, o puede elegir crear una IPA de alto-nivel encima de este mecanismos de forma que se ajuste a sus
+                    necesidades particulares.
+                </p>
+                <p>
+                    Aquí tiene los pasos básicos requeridos para implementar un servicio de vigilancia:
+                </p>
+                <ul>
+                    <li>
+                        Cree un &quot;vigilante&quot; de <code>WatchService</code>  para el sistema de ficheros.
+                    </li>
+                    <li>
+                        Por cada directorios que quiera monitorizar, regístrelo con el vigilante. Cuando está registrando un 
+                        directorio, especifique los tipos de eventos para los cuales usted quiere notificación. Usted recibe una 
+                        instancia <code>WatchKey</code> por cada directorio que registra.
+                    </li>
+                    <li>
+                        Implemente un bucle infinito que espera por eventos entrantes. Cuando un evento ocurre, la clave es señalada
+                        y colocada en la cola del vigilante.
+                    </li>
+                    <li>
+                        Recupere la clave de la cola del vigilente. Puede obtener el nombre del fichero desde la clave.
+                    </li>
+                    <li>
+                        Recupera cada evento pendiente para la clave ( podrían ser múltiples eventos= y procéselos como necesite.
+                    </li>
+                    <li>
+                        Restablezca la clave, y reanude la espera de eventos.
+                    </li>
+                    <li>
+                        Cierre el servicio: El servicio de vigilancia termina cuando el hilo termina o cuando es cerrado (invocando
+                        su método <code>closed</code>).
+                    </li>
+                </ul>
+                <p>
+                    <code>WatchKeys</code> es seguro-para-multitarea y puede ser usado con el paqute 
+                    <code>java.nio.concurrent</code>. Puede dedicar una
+                    <a class="TutorialLink" target="_top" href="../concurrency/pools.html">agrupación de hilos</a> a este esfuerzo.
+                </p>
+                <h2>
+                    <a id="try">Pruébelo</a>
+                </h2>
+                <p>
+                    Ya que este IPA es más avanzada, pruébela antes de continuar. Salve el ejemplo
+                    <a class="SourceLink" target="_blank" href="examples/MonitorizaDir.java"
+                       onclick="showCode('../../displayCode.html', 'examples/MonitorizaDir.java'); return false;">
+                        <code>MonitorizaDir</code></a> en su computadora, y compílelo. Cree un directorio <code>pruebas</code> que
+                    será pasado al ejemplo. <code>MonitorizaDir</code> usa un único hilo para procesar todos los eventos, de
+                    formsa que bloque la entrada de teclado mientras espera eventos. Ejecute el programa en una ventana
+                    separada, o en segundo plano, como sigue:
+                </p>
+                <div class="codeblock">
+                    <pre>
+java MonitorizaDir pruebas &amp;
+                    </pre>
+                </div>
+                <p>
+                    Juegue creando, borrando, y editando ficheros en el directorio <code>pruebas</code>. Cuando cualquiera de estos
+                    eventos ocurre, se imprime un mensaje en la consola. Cuando haya terminado, borre el directorio 
+                    <code>pruebas</code> y <code>MonitorizaDir</code> terminará. O, si lo prefiere, puede matar manualmente el
+                    proceso.
+                </p>
+                <p>
+                    Puede tambien vigilar un árbol de ficheros entero especificando la opción <code>-r</code>. Cuando especifica
+                    <code>-r</code>, <code>MonitorizaDir</code>
+                    <a class="TutorialLink" target="_top" href="walk.html">recorre el árbol de ficheros</a>, registrando cada
+                    directorio con el servicio de vigilancia.
+                </p>
+                <h2>
+                    <a id="register">Creación de un Servicio de Vigilancia y Registro de Eventos</a>
+                </h2>
+                <p>
+                    El primer paso es crear un nuevo
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/WatchService.html">
+                        <code>WatchService</code></a> usando el método
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html#newWatchService--">
+                        <code>newWatchService</code></a> en la clase <code>FileSystem</code>, como sigue:
+                </p>
+                <div class="codeblock">
+                    <pre>
+WatchService watcher = FileSystems.getDefault().newWatchService();
+                    </pre>
+                </div>
+                <p>
+                    Ahora, registre uno o más objetos con el servicio de vigilancia. Cualquier objeto que impelemente el interfaz
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/Watchable.html">
+                        <code>Watchable</code></a> puede ser registrado. La clase <code>Path</code> implementa el interfaz
+                    <code>Watchable</code>, así que cada directorio a ser monitorizado es registrado como un objeto
+                    <code>Path</code>.
+                </p>
+                <p>
+                    Como con cualquier <code>Watchable</code>, la clase <code>Path</code> implementa dos métodos
+                    <code>register</code>. Esta página usa la versión de dos-argumentos,
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html#register-java.nio.file.WatchService-java.nio.file.WatchEvent.Kind...-">
+                        <code>register(WatchService, WatchEvent.Kind&lt;?&gt;...)</code></a>. (La versión de tres-argumentos toma un
+                    <code>WatchEvent.Modifier</code>, que no está implementadao actualmente).
+                </p>
+                <p>
+                    Cuando está registrando un objeto con el servicio de vigilancia, usted especifica los tipos de eventos que
+                    quiere monitorizar. Los tips de eventos
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/StandardWatchEventKinds.html">
+                        <code>StandardWatchEventKinds</code></a> soportados a continuación:
+                </p>
+                <ul>
+                    <li><code>ENTRY_CREATE</code> &ndash; Una entrada de directorio es creada.</li>
+                    <li><code>ENTRY_DELETE</code> &ndash; Una entrada de directorio es borrada.</li>
+                    <li><code>ENTRY_MODIFY</code> &ndash; Una entrada de directorio es modificada.</li>
+                    <li>
+                        <code>OVERFLOW</code> &ndash; Indica que hay eventos que podrían haber sido perdidos o descartados. No tiene
+                        que registrar el evento <code>OVERFLOW</code> para recibirlo.
+                    </li>
+                </ul>
+                <p>
+                    El trozo de código siguiente muestra cómo registrar una instancia <code>Path</code> para los tres tipos de
+                    eventos:
+                </p>
+                <div class="codeblock">
+                    <pre>
+import static java.nio.file.StandardWatchEventKinds.*;
+
+Path dir = ...;
+try {
+    WatchKey key = dir.register(watcher,
+                           ENTRY_CREATE,
+                           ENTRY_DELETE,
+                           ENTRY_MODIFY);
+} catch (IOException x) {
+    System.err.println(x);
+}
+                    </pre>
+                </div>
+                <h2>
+                    <a id="process">Procesar Eventos</a>
+                </h2>
+                <p>
+                    El orden de los eventos en un bucle de procesado de eventos a continuación
+                </p>
+                <ol>
+                    <li>
+                        Obtenga una clave de vigilancia. Existen tres métodos:
+                        <ul>
+                            <li>
+                                <a class="APILink" target="_blank" 
+                                   href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/WatchService.html#poll--">
+                                    <code>poll</code></a> &ndash; Devuelve una clave encolada, si está disponible. Vuelve 
+                                inmediatamente con un valor <code>null</code>, si no está disponible.
+                            </li>
+                            <li>
+                                <a class="APILink" target="_blank" 
+                                   href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/WatchService.html#poll-long-java.util.concurrent.TimeUnit-">
+                                    <code>poll(long, TimeUnit)</code></a> &ndash; Devuelve una clave encolada, si alguan está 
+                                disponible- Si una clave encolada no está inmediatamente disponble, el programa espera hasta el 
+                                tiempo especificado. El argumento <code>TimeUnit</code> determina si el tiempo especificado son
+                                nanosegundos, mmilisegundos, o alguna otra unidad de tiempo.
+                            </li>
+                            <li>
+                                <a class="APILink" target="_blank" 
+                                   href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/WatchService.html#take--">
+                                    <code>take</code></a> &ndash; Devuelve una clave encolada. Si la clave encolada no está 
+                                disponible, este método espera.
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        Procese los eventos pendientes para la clave. Usted recuperar la <code>Lista</code> de
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/WatchEvent.html">
+                            <code>WatchEvents</code></a> desde el método
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/WatchKey.html#pollEvents--">
+                            <code>pollEvents</code></a> .
+                    </li>
+                    <li>
+                        Recupera el tipo de evento usando el método
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/WatchEvent.html#kind--">
+                            <code>kind</code></a> . No importando para qué eventos la clave fue regsitrada, es posible recibir un 
+                        evento <code>OVERFLOW</code>. Puede elegir manejar el overflow o ignorarlo, pero debe comprobarlo.
+                    </li>
+                    <li>
+                        Recupere el nombre del fichero asociado con el evento. El nombre del fichero es almacenado como el contexto
+                        del evento, de forma que el método
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/WatchEvent.html#context--">
+                            <code>context</code></a> es usado para recuperarlo.
+                    </li>
+                    <li>
+                        Después de que los eventos para una clave han sido procesados, necesita devolver a la clave el estado 
+                        <code>ready</code> invocando
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/WatchEvent.html#reset--">
+                            <code>reset</code></a>. Si este método devuelve <code>false</code>, la clave ya no es válida y el
+                        bucle puede salir. Este paso es muy <strong>importante</strong>. Si falla al invocar <code>reset</code>,
+                        esta llave no recibierá más eventos.
+                    </li>
+                </ol>
+                <p>
+                    Una clave de vigilancia tiene un estado. En cualquier momento dado, su estado podría ser uno de los siguientes:
+                </p>
+                <ul>
+                    <li>
+                        <code>Ready</code> indica que la clave está lista para aceptar eventos. Cuando se crea por primera vez, una
+                        clave está en estado listo.
+                    </li>
+                    <li>
+                        <code>Signaled</code> indica que uno o más eventos están encolados. Una vez la clave ha sido señalada, no
+                        está más tiempo en el estado ready hasta que el método
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/WatchKey.html#reset--">
+                            <code>reset</code></a> es invocado.
+                    </li>
+                    <li>
+                        <code>Invalid</code> indica que la clave ya no está activa. Este estado ocurre cuando uno de los siguientes
+                        eventos ocurre:
+                        <ul>
+                            <li>
+                                El proceso explícitamente cancela la clave usando el método
+                                <a class="APILink" target="_blank"
+                                   href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/WatchKey.html#cancel--">
+                                    <code>cancel</code></a> .
+                            </li>
+                            <li>
+                                El directorio se vuelve inacessible.
+                            </li>
+                            <li>
+                                El servicio de vigilancia es
+                                <a class="APILink" target="_blank" 
+                                   href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/WatchService.html#close--">
+                                    cerrado
+                                </a>.
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <p>
+                    Aquí tiene un ejemplo de bucle de procesado de eventos. Está tomado del ejemplo
+                    <a class="SourceLink" target="_blank" href="examples/Email.java"
+                       onclick="showCode('../../displayCode.html', 'examples/Email.java'); return false;">
+                        <code>Email</code></a> , el cual vigila un directorio, esperando que aparezcan nuevos archivos. Cuando un 
+                    fichero nuevo se hace disponible, es examinado para determinar si es un fichero de <code>text/plain</code>
+                    usando el método
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html#probeContentType-java.nio.file.Path-">
+                        <code>probeContentType(Path)</code></a> . La intención es que los ficheros <code>text/plain</code> serán
+                    enviados por correo a un alias, pero ese detalle de implementación es dejado al lector.
+                </p>
+                <p>
+                    Los métodos específicos del IPA del servicio de vigilancioa están mostrados en negrita:
+                </p>
+                <div class="codeblock">
+                    <pre>
+for (;;) {
+
+    // espera que la clave sea señalizada
+    WatchKey key;
+    try {
+        <strong>key = watcher.take()</strong>;
+    } catch (InterruptedException x) {
+        return;
+    }
+
+    for (WatchEvent&lt;?&gt; event: <strong>key.pollEvents()</strong>) {
+        WatchEvent.Kind&lt;?&gt; <strong>kind = event.kind()</strong>;
+
+        // Esta clave está registrada sólo
+        // pra eventos ENTRY_CREATE,
+        // pero un evento OVERFLOW puede
+        // ocurrir independientemente si los evntos
+        // se pierden o son descartados.
+        <strong>if (kind == OVERFLOW)</strong> {
+            continue;
+        }
+
+        // El nombre del fichero es el
+        // contexto del evento.
+        <strong>WatchEvent&lt;Path&gt; ev = (WatchEvent&lt;Path&gt;)event;
+        Path filename = ev.context();</strong>
+
+        // Verifica que el fichero
+        // nuevo es un fichero de texto.
+        try {
+            // Resuelve el nombre del fichero contra el directorio.
+            // Si el nombre de fichero es "test" y el directorio es "foo",
+            // el nombre resuelto es "test/foo".
+            Path child = dir.resolve(filename);
+            if (!Files.probeContentType(child).equals("text/plain")) {
+                System.err.format("El nuevo fichero '%s'" +
+                    " no es un fichero de texto plano.%n", filename);
+                continue;
+            }
+        } catch (IOException x) {
+            System.err.println(x);
+            continue;
+        }
+
+        // Envía por correo el fichero al
+        // alias de correo especificado.
+        System.out.format("Emailing file %s%n", filename);
+        // Detalles dejados al lector...
+    }
+
+    // Restablecemos la clave -- este paso es crítico si quiere
+    // recibir más eventos de vigilancia. Si la clave ya no es válida,
+    // el directorio es inaccesible así que se sale del bucle.
+    boolean <strong>valid = key.reset()</strong>;
+    if (!valid) {
+        break;
+    }
+}
+                    </pre>
+                </div>
+                <h2>
+                    <a id="name">Recuperar el Nombre del Archivo</a>
+                </h2>
+                <p>
+                    El nombre del fichero es recuperado del contexto del evento. El ejemplo
+                    <a class="SourceLink" target="_blank" href="examples/Email.java"
+                       onclick="showCode('../../displayCode.html', 'examples/Email.java'); return false;">
+                        <code>Email</code></a> recupera el nombre del fichero con éste código:
+                </p>
+                <div class="codeblock">
+                    <pre>
+WatchEvent&lt;Path&gt; ev = (WatchEvent&lt;Path&gt;)event;
+Path filename = ev.context();
+                    </pre>
+                </div>
+                <p>
+                    Cuando compila el ejemplo <code>Email</code>, genera el siguiente error:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Note: Email.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+                    </pre>
+                </div>
+                <p>
+                    Este error es un resultado de la línea de código que moldea el <code>WatchEvent&lt;T&gt;</code> a un
+                    <code>WatchEvent&lt;Path&gt;</code>. El ejemplo
+                    <a class="SourceLink" target="_blank" href="examples/MonitorizaDir.java"
+                       onclick="showCode('../../displayCode.html', 'examples/MonitorizaDir.java'); return false;">
+                        <code>MonitorizaDir</code></a> evita éste error creando un método de utilidad <code>cast</code> que suprime el
+                    aviso de no comprobación, como sigue:
+                </p>
+                <div class="codeblock">
+                    <pre>
+@SuppressWarnings("unchecked")
+static &lt;T&gt; WatchEvent&lt;T&gt; cast(WatchEvent&lt;?&gt; event) {
+    return (WatchEvent&lt;Path&gt;)event;
+}
+                    </pre>
+                </div>
+                <p>
+                    Si no está familiarizado con la sintaxis <code>@SuppressWarnings</code>, vea 
+                    <a class="TutorialLink" target="_top" href="../../java/annotations/index.html">Anotaciones</a>.
+                </p>
+                <h2>
+                    <a id="concerns">Cuando Usar y Cuando No Esta IPA</a>
+                </h2>
+                <p>
+                    La IPA del Servicio de Vigilancia está diseñada para apliaciones que necesitan ser notificadas sobre eventos
+                    de cambios del fichero. Está bien adecuada para cualquier aplicación, como un editor o EID, que potencialmente
+                    tiene muchos ficheros abiertos y necesita asegurarse de que los ficheros están sincronizados con el sistema de
+                    ficheros. Está también adecuada convenientemente para un servidor de aplicaciones que vigila un directorio, 
+                    quizás esperando por ficheros <code>.jsp</code> o <code>.jar</code> a eliminar, en orden a desplegarlos.
+                </p>
+                <p>
+                    Esta IPA <em>no</em> está diseñada para indexar un disco duro. La mayoría de las implementaciones de sistemas
+                    de fichers tienen soporte nativo para la notificación de cambios a archivos. La IPA de Servicio de Vigilancia
+                    se aprovecha de este soporte cuando está disponible. Sin embargo, cuando un sistema de ficheros no soporta
+                    este mecanismos, el Servicio de Vigilancia examinará el sistema de ficheros, esperando los eventos.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="find.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="misc.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">
+                                Su uso de ésta
+                            </a>
+                            página y todo el material en las páginas bajo el anuncio &quot;Los Tutoriales de Java&quot; está sujeto
+                            a estos
+                            <a href="../../information/cpyr.html">
+                                avisos legales
+                            </a>
+                            .
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs
+                            </a>
+                            .
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión
+                            </a>
+                            .
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página Anterior:</b> Encontrando Ficheros<br />
+            <b>Página Siguiente:</b> Otros Métodos Útiles
+        </div>
+    </body>
+</html>

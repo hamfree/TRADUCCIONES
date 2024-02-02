@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            BufferStrategy y BufferCapabilities (Los Tutoriales de Java&trade; &gt; Extras &gt; IPA del Modo Exclusivo de
+            Pantalla-Completa)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe los genéricos, la IPA del modo de pantalla completo, y 
+              los recursos relacionados con la certificación de Java" />
+        <meta name="keywords" content="programación en java, aprender java, ejemplos de código java, genéricos de java, IPA del 
+              modo de pantalla completa, certificación" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">IPA del Modo Exclusivo de Pantalla-Completa</a></div>
+                <div class="linkAHEAD"><a href="exclusivemode.html">Modo Exclusivo de Pantalla-Completa</a></div>
+                <div class="linkAHEAD"><a href="displaymode.html">Modo de Pantalla</a></div>
+                <div class="linkAHEAD"><a href="rendering.html">Renderizado Pasivo versus Activo</a></div>
+                <div class="linkAHEAD"><a href="doublebuf.html">Búfer Doble e Intercambio de Páginas</a></div>
+                <div class="nolinkAHEAD">BufferStrategy y BufferCapabilities</div>
+                <div class="linkAHEAD"><a href="example.html">Ejemplos</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Extras<br />
+                <b>Lección:</b> IPA del Modo Exclusivo de Pantalla-Completa
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Extras</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">IPA del Modo Exclusivo de Pantalla-Completa</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="doublebuf.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="example.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>BufferStrategy y BufferCapabilities</h1>
+            </div>
+            <div id="PageContent">
+                <h2>
+                    <code>BufferStrategy</code>
+                </h2>
+                <p>
+                    En la Edición Estándar de Java 2, no tiene que preocuparse sobre los punteros de vídeo o la memoria de vídeo a la hora 
+                    de aprovecharse del doble búfer o el intercambio de páginas. La clase nueva <code>java.awt.image.BufferStrategy</code> se 
+                    ha agregado para manejar de forma conveniente el dibujado de superficies y componentes de manera general, 
+                    independientemente del número de búferes utilizados o la técnica utilizada para mostrarlos.
+                </p>
+                <p>
+                    Una estrategia de búfer le proporciona dos métodos de dibujo para todo uso: <code>getDrawGraphics</code> y 
+                    <code>show</code>. Cuando quiere empezar a dibujar, obtenga un gráfico de dibujo y úselo. Cuando ha terminado de dibujar 
+                    y quiere presentar su información en la pantalla, llame a <code>show</code>. Estos dos métodos están diseñados para 
+                    encajar adecuadamente en un bucle de representación:
+                </p>
+                <div class="codeblock">
+                    <pre>
+BufferStrategy myStrategy;
+
+while (!done) {
+    Graphics g = myStrategy.getDrawGraphics();
+    render(g);
+    g.dispose();
+    myStrategy.show();
+}
+                    </pre>
+                </div>
+                <p>
+                    Las estrategias de buffer han sido también configuradas para ayudarle a monitorizar los problemas con 
+                    <code>VolatileImage</code>. Cuando está en el modo exclusivo de pantalla completa, los problemas con 
+                    <code>VolatileImage</code> son importantes especialmente porque el sistema de ventanas puede a veces recuperar la memoria 
+                    de video que le ha proporcionado. Un ejemplo importante es cuando el usuario presiona la combinación de teclas 
+                    <code>ALT+TAB</code> en Windows -- de repente su programa de pantalla completa se ejecuta en segundo plano y se pierde su 
+                    memoria de vídeo. Puede llamar al método <code>contentsLost</code> para averiguar si esto ha sucedido. Del mismo modo, 
+                    cuando el sistema de ventanas le devuelve la memoria, puede averiguarlo usando el método <code>contentsRestored</code>.
+                </p>
+                <h2>
+                    <code>BufferCapabilities</code>
+                </h2>
+                <p>
+                    Como se mencionó antes, sistemas operativos diferentes, o incluso tarjetas gráficas diferentes en el mismo sistema 
+                    operativo, tienen técnicas diferentes disponibles a su disposición. Estas <i>capacidades</i> son expuestas para usted de 
+                    forma que pueda elegir la mejor técnica para su aplicación.
+                </p>
+                <p>
+                    La clase <code>java.awt.BufferCapabilities</code> encapsula estas capacidades. Cada estrategia de búfer es controlada por 
+                    las capacidades de su búfer, por lo que elegir las correctas para su aplicación es crucial. Para averiguar qué 
+                    capacidades se encuentran disponibles, llame al método <code>getBufferCapabilities</code> de los objetos 
+                    <code>GraphicsConfiguration</code> disponibles en su dispositivo gráfico.
+                </p>
+                <p>
+                    Las capacidades disponibles en la Edición Estándar de Java 2 versión 1.4 son:
+                </p>
+                <ul>
+                    <li>
+                        <code>isPageFlipping</code><br/>
+                        Esta capacidad devuelve si está disponible o no el intercambio de páginas por hardware en esta configuración gráfica.
+                    </li>
+                    <li>
+                        <code>isFullScreenRequired</code><br/>
+                        Esta capacidad devuelve si se requiere o no el modo exclusivo de pantalla completa antes de usar el intercambio de 
+                        páginas por hardware.
+                    </li>
+                    <li>
+                        <code>isMultiBufferAvailable</code><br/>
+                        Esta capacidad devuelve si está disponible o no el almacenamiento en búfer múltiple por hardware (dos o más búferes 
+                        de respaldo mas la superficie primaria).
+                    </li>
+                    <li>
+                        <code>getFlipContents</code><br/>
+                        Esta capacidad devuelve un consejo de la técnica usada para realizar un intercambio de páginas por hardware. Esto es 
+                        importante porque los contenidos del búfer de respaldo después de un <code>show</code> son diferentes dependiendo de 
+                        la técnica usada. El valor devuelto puede ser nulo (si <code>isPageFlipping</code> devuelve <code>false</code>) o uno 
+                        de los siguientes valores. Cualquier valor se puede especificar para una estrategia de búfer siempre que el método 
+                        <code>isPageFlipping</code> devuelva verdadero, aunque el rendimiento variará dependiendo de las capacidades 
+                        disponibles.
+                    </li>
+                    <li>
+                        <code>FlipContents.COPIED</code><br/>
+                        Esta valor significa que los contenidos del búfer de respaldo son copiados a la superficie primaria. Un 
+                        &quot;volteado&quot; es realizado probablemente como un blt de hardware, lo que significa que el doble búfer por 
+                        hardware se ha hecho probablemente usando blitting en vez del intercambio de páginas verdadero. Esto debería (en 
+                        teoría) ser más rápido, o al menos igual de rápido, como pasar de <code>VolatileImage</code> a la superficie 
+                        primaria, aunque su experiencia puede variar. Los contenidos del búfer de respaldo son los mismos que los de la 
+                        superficie primaria después de un volteo.
+                    </li>
+                    <li>
+                        <code>FlipContents.BACKGROUND</code><br/>
+                        Este valor significa que los contenidos del búfer de respaldo han sido limpiados con el color de fondo. Se ha 
+                        producido un intercambio de página real o un blt.
+                    </li>
+                    <li>
+                        <code>FlipContents.PRIOR</code><br/>
+                        Este valor significa que los contenidos del búfer de respaldo son ahora los contenidos de la vieja superficie 
+                        primaria, y viceversa. Generalmente este valor indica que ha ocurrido un intercambio de páginas verdadero, aunque 
+                        esto no está garantizado, y una vez de nuevo, su experiencia en esta operación puede variar.
+                    </li>
+                    <li>
+                        <code>FlipContents.UNKNOWN</code><br/>
+                        Este valor significa que los contenidos del búfer de respaldo no están definidos después de un volteado. Puede tener 
+                        que experimentar para encontrar qué técnica funciona mejor para usted (o puede que no le importe), y tendrá que 
+                        configurar definitivamente los contenidos del búfer de respaldo por sí mismo cada vez que dibuje.
+                    </li>
+                </ul>
+                <p>
+                    Para crear una estrategia de búfer para un componente, llame al método <code>createBufferStrategy</code>, proporcionando 
+                    el número de búferes deseados (este número incluye la superficie primaria). Si se desea cualquier técnica de búfer en 
+                    particular, proporcione un objeto <code>BufferCapabilities</code> apropiado. Tenga en cuenta de que cuando usa esta 
+                    versión del método, debe capturar una <code>AWTException</code> en el caso de que su elección no esté disponible. Tenga 
+                    en cuenta además que estos métodos están disponibles sólo en <code>Canvas</code> y <code>Window</code>.
+                </p>
+                <p>
+                    Una vez se ha creado una estrategia de búfer particular para un componente, puede manipularlo usando el método 
+                    <code>getBufferStrategy</code>. Tenga en cuenta que este método está también sólo disponible para lienzos y ventanas.
+                </p>
+                <h2>
+                    Consejos de programación
+                </h2>
+                <p>
+                    Algunos consejos sobre el uso de las capacidades de búfer y estrategias de búfer:
+                </p>
+                <ul>
+                    <li>
+                        Obtener, usar, y eliminar un objeto gráfico es más robusto en una cláusula <code>try...finally</code>:
+                        <div class="codeblock">
+                            <pre>
+BufferStrategy myStrategy;
+
+while (!done) {
+    Graphics g;
+    try {
+        g = myStrategy.getDrawGraphics();
+        render(g);
+    } finally {
+        g.dispose();
+    }
+    myStrategy.show();
+}
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        Compruebe las capacidades disponibles antes de usar una estrategia de búfer.
+                    </li>
+                    <li>
+                        Para obtener mejores resultados, cree su estrategia de búfer en una ventana exclusiva de pantalla completa. 
+                        Asegúrese de verificar las capacidades <code>isFullScreenRequired</code> y <code>isPageFlipping</code> antes de usar 
+                        el intercambio de páginas.
+                    </li>
+                    <li>
+                        No haga suposiciones sobre el rendimiento. Ajuste su código según sea necesario, pero recuerde que diferentes 
+                        sistemas operativos y tarjetas gráficas tienen capacidades diferentes. ¡Perfile su aplicación!
+                    </li>
+                    <li>
+                        Puede querer subclasificar su componente para sobreescribir el método <code>createBufferStrategy</code>. Use un 
+                        algoritmo para elegir una estrategia que se adapte mejor a su aplicación. Las clases internas 
+                        <code>FlipBufferStrategy</code> y <code>BltBufferStrategy</code> están protegidas y pueden ser subclasificadas.
+                    </li>
+                    <li>
+                        ¡No olvide que puede perder sus superficies de dibujo! Asegúrese de verificar <code>contentsLost</code> y 
+                        <code>contentsRestored</code> antes de dibujar. Todos los búferes que se hayan perdido deben volver a dibujarse
+                        cuando se restauren.
+                    </li>
+                    <li>
+                        Si usa una estrategia de búfer para el doble búfer en una aplicación Swing, probablemente desee desactivar el doble 
+                        búfer para sus componentes Swing, ya que estos ya usan el doble búfer. La memoria de vídeo es algo valiosa y 
+                        solo debe usarse cuando sea absolutamente necesario.
+                    </li>
+                    <li>
+                        Puede terminar siendo un desperdicio usar más de un búfer de respaldo. El almacenamiento en búfer múltiple solo es 
+                        útil cuando el tiempo de dibujo excede el tiempo dedicado a hacer un <code> show </code>. ¡Perfile su aplicación!
+                    </li>
+                </ul>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="doublebuf.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="example.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos
+                            <a href="../../information/cpyr.html">avisos legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Bufer Doble e Intercambio de Páginas<br />
+            <b>Página siguiente:</b> Ejemplos
+        </div>
+    </body>
+</html> 

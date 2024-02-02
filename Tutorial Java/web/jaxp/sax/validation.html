@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Implementando la Validación en SAX (Los Tutoriales de Java&trade; &gt; IPA de Java para Procesado de XML (JAXP) &gt; 
+            IPA Simple para XML)
+        </title>
+        <meta name="description" content="Este tutorial de Java JAXP describe la IPA de Java para el procesado de XML (jaxp), XSLT, 
+              SAX, y tópicos de XML relacionados" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jaxp, xml, xslt, sax" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">IPA Simple para XML</a></div>
+                <div class="linkAHEAD"><a href="when.html">Cuando usar SAX</a></div>
+                <div class="linkAHEAD"><a href="parsing.html">Analizar un archivo XML Mediante SAX</a></div>
+                <div class="nolinkAHEAD">Implementando la Validación en SAX</div>
+                <div class="linkAHEAD"><a href="events.html">Manejando Eventos Léxicos</a></div>
+                <div class="linkAHEAD"><a href="using.html">Utilizando <code>DTDHandler</code> y <code>EntityResolver</code></a></div>
+                <div class="linkAHEAD"><a href="info.html">Información Adicional</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> IPA de Java para Procesado de XML (JAXP)<br />
+                <b>Lección:</b> IPA Simple para XML
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">IPA de Java para Procesado de XML (JAXP)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">IPA Simple para XML</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="parsing.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="events.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Implementando la Validación en SAX</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    El programa de ejemplo <code>SAXLocalNameCount</code> usa el analizador no validante de forma predeterminada, 
+                    pero también puede activar la validación. Activar la validación permite a la aplicación a indicar si el 
+                    documento XML contiene las etiquetas correctas o si esas etiquetas están en la secuencia correcta. En otras 
+                    palabras, puede indicarle si el documento es <i>válido</i>. Si la validación no se activa, sin embargo, sólo 
+                    puede decir si el documento está o no bien formado, como se mostró en la sección previa cuando borró la 
+                    etiqueta de cierre de un elemento XML. Para que la validación sea posible, el documento XML necesita estar 
+                    asociado a un DTD o un esquema de XML. Ambas opciones son posibles con el programa 
+                    <code>SAXLocalNameCount</code>.
+                </p>
+                <p>
+                    <a id="gcwuk"></a>
+                </p>
+                <h2>
+                    Elegir la Implementación del Analizador
+                </h2>
+                <p>
+                    Si se especifica otra clase factoría, se usa la clase predeterminada <code>SAXParserFactory</code>. Para usar 
+                    un analizador de un manufacturador diferente, puede cambiar el valor de la variable de entorno que apunta a 
+                    este. Puede hacer eso desde la línea de comandos:
+                </p>
+                <p>
+                    <code>java -Djavax.xml.parsers.SAXParserFactory=<i>yourFactoryHere</i> [...]</code>
+                </p>
+                <p>
+                    El nombre de factoría que especifique debe ser el nombre de clase completamente cualificado (todos los prefijos 
+                    de paquetes incluidos). Para más información, vea la documentación en el método <code>newInstance()</code> de 
+                    la clase <code>SAXParserFactory</code>.
+                </p>
+                <p>
+                    <a id="gcwub"></a>
+                </p>
+                <h2>
+                    Usar el Analizador Validante
+                </h2>
+                <p>
+                    Hasta este momento, esta lección se ha concentrado en el analizador no validado. Esta sección examina el 
+                    analizador de validación para encontrar qué ocurre cuando lo usa para analizar el programa de ejemplo.
+                </p>
+                <p>
+                    Dos cosas deben ser entendidas sobre el analizador validante:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Se requiere un esquema o DTD.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Debido a que el esquema o DTD está presente, el método 
+                            <code>ContentHandler.</code><code>ignorableWhitespace()</code> se invoca siempre que sea posible.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    <a id="gcwth"></a>
+                </p>
+                <h2>
+                    Espacio en Blanco Ignorable
+                </h2>
+                <p>
+                    Cuando está presenta un DTD, el analizador ya no llamará más al método <code>characters()</code> en los 
+                    espacios en blanco que sabe que son irrelevantes. Desde el punto de vista de una aplicación que está interesada 
+                    en procesar solo los datos XML, eso es algo bueno porque a la aplicación nunca le molestan los espacios en 
+                    blanco que existen únicamente para hacer que el archivo XML sea legible.
+                </p>
+                <p>
+                    Por otra parte, si está escribiendo una aplicación que filtra un fichero de datos XML y si quiere que la salida 
+                    sea una versión igualmente legible del fichero, entonces ese espacio en blanco ya no sería irrelevante: sería 
+                    esencial. Para obtener esos caracteres, debe agregar el método <code>ignorableWhitespace</code> a su 
+                    aplicación. Para procedar cualquier (generalmente) espacio en blanco que el analizador ve, necesitaría agregar 
+                    algo como el siguiente código para implementar el controlador de eventos de <code>ignorableWhitespace</code>.
+                </p>
+                <p>
+                    <code>public void ignorableWhitespace (char buf[], int start, int length) throws SAXException { emit
+                        (&quot;IGNORABLE&quot;); }</code>
+                </p>
+                <p>
+                    Este código simplemente genera un mensaje que le permite saber que espacio en blanco ignorable se estaba 
+                    viendo. Sin embargo, no todos los analizadores se crean igual. La especificación SAX no requiere que este 
+                    método sea invocado. La implementación XML de Java lo hace siempre que la DTD lo permite.
+                </p>
+                <p>
+                    <a id="gcwtg"></a>
+                </p>
+                <h2>
+                    Configurar la Factoría
+                </h2>
+                <p>
+                    La <code>SAXParserFactory</code> necesita ser configurada de manera que utilize un analizador de validación en 
+                    lugar del analizador de no validación predeterminado. El código siguiente del método <code>main()</code> del 
+                    ejemplo <code>SAXLocalNameCount</code> muestra cómo configurar la factoría para que implemente el analizador de 
+                    validación.
+                </p>
+                <div class="codeblock">
+                    <pre>
+static public void main(String[] args) throws Exception {
+
+    String filename = null;
+    boolean dtdValidate = false;
+    boolean xsdValidate = false;
+    String schemaSource = null;
+
+    for (int i = 0; i &lt; args.length; i++) {
+
+        if (args[i].equals("-dtd")) {
+            dtdValidate = true;
+        }
+        else if (args[i].equals("-xsd")) {
+            xsdValidate = true;
+        } 
+        else if (args[i].equals("-xsdss")) {
+            if (i == args.length - 1) {
+               usage();
+            }
+            xsdValidate = true;
+            schemaSource = args[++i];
+        } 
+        else if (args[i].equals("-usage")) {
+            usage();
+        }
+        else if (args[i].equals("-help")) {
+            usage();
+        }
+        else {
+            filename = args[i];
+            if (i != args.length - 1) {
+                usage();
+            }
+        }
+    }
+
+    if (filename == null) {
+        usage();
+    }
+
+    SAXParserFactory spf = SAXParserFactory.newInstance();
+    spf.setNamespaceAware(true);
+    spf.setValidating(dtdValidate || xsdValidate);
+    SAXParser saxParser = spf.newSAXParser();
+
+    // ... 
+}
+                    </pre>
+                </div>
+                <p>
+                    Aquí, el programa <code>SAXLocalNameCount</code> se configura para tomar argumentos adicionales cuando se 
+                    inicia, que le indica a implementar la no validación, la validación por DTD, la validación con Definición de 
+                    Esquema XML (XSD), o la validación XSD contra un fichero fuente de esquema específico. (Las descripciones de 
+                    estas opciones, <code>-dtd</code>, <code>-xsd</code>, y <code>-xsdss</code> son también agregadas al método 
+                    <code>usage()</code>, pero no se muestran aquí). Después, la factoría se configura de forma que producirá el 
+                    analizador de validación apropiado cuando se invoque <code>newSAXParser</code>. Como se vió en 
+                    <a class="TutorialLink" target="_top" href="parsing.html#gclmt">Configurar el Analizador</a>, pueede también 
+                    usar <code>setNamespaceAware(true)</code> para configurar que la factoría devuelva un analizador compatible con 
+                    el espacio de nombres. La implementación de Sun admite cualquier combinación de opciones de configuración. (Si 
+                    una combinación no es admitida por una implementación particular, se requiere genear un error de configuración 
+                    de factoría).
+                </p>
+                <p>
+                    <a id="gcwtl"></a>
+                </p>
+                <h2>
+                    Validar con Esquema XML
+                </h2>
+                <p>
+                    Aunque un tratamiento completo del Esquema XML está más allá del alcance de este tutorial, esta sección le 
+                    muestra los pasos a tomar para validar un documento XML usando un esquema existente escrito en el lenguaje de 
+                    Esquema XML. Para aprender más sobre el Esquema XML, puede revisar el tutorial en línea, 
+                    <i>XML Schema Part 0: Primer</i>, en 
+                    <a class="OutsideLink" target="_blank" href="http://www.w3.org/TR/xmlschema-0/">
+                        http://www.w3.org/TR/xmlschema-0/</a>.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota</b> &mdash; Hay múltiples lenguajes de definición-de-esquema, incluyendo RELAX NG, Schematron y el 
+                    estándar del W3C &quot;Esquema XML&quot;. (Incluso un DTD cualifica como un &quot;esquema,&quot; aunque es el 
+                    único que no usa una sintaxis XML para describir las restricciones de esquema). Sin embargo, el 
+                    &quot;Esquema XML&quot; nos presenta un desafío terminológico. Aunque la frase 
+                    &quot;esquema de Esquema XML&quot; sería precisa, usaremos la frase &quot;definición de Esquema XML&quot; para 
+                    evitar la apariencia de redundancia.
+                </p>
+                <hr />
+                <p>
+                    Para recibir notificaciones de errores de validación en un documento XML, la factoría de analizadores debe 
+                    configurarse para crear un analizador de validación, como se mostró en la sección anterior. Además, debe 
+                    cumplirse lo siguiente:
+                </p>
+                <ul>
+                    <li>
+                        Las propiedades adecuadas deben establecerse en el analizador SAX.
+                    </li>
+                    <li>
+                        Se debe establecer el controlador de errores apropiado.
+                    </li>
+                    <li>
+                        El documento debe estar asociado a un esquema.
+                    </li>
+                </ul>
+                <p>
+                    <a id="gcwtd"></a>
+                </p>
+                <h2>
+                    Configurar las Propiedades del Analizador SAX
+                </h2>
+                <p>
+                    Es útil comenzar por definir las constantes que usará al configurar las propiedades. El ejemplo 
+                    <code>SAXLocalNameCount</code> establece las siguientes constantes.
+                </p>
+                <div class="codeblock">
+                    <pre>
+public class SAXLocalNameCount extends DefaultHandler {
+
+    static final String JAXP_SCHEMA_LANGUAGE =
+        "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+    
+    static final String W3C_XML_SCHEMA =
+        "http://www.w3.org/2001/XMLSchema";
+
+    static final String JAXP_SCHEMA_SOURCE =
+        "http://java.sun.com/xml/jaxp/properties/schemaSource";
+}
+                    </pre>
+                </div>
+                <hr />
+                <p>
+                    <b>Nota</b> &mdash; La factoría de analizadores debe configurarse para generar un analizador que sea 
+                    compatible con el espacio de nombres y sea validado. Esto fue mostrado en 
+                    <a href="#gcwtg">Configurar la Factoría</a>. Se proporciona más información sobre los espacios de nombres en 
+                    <a class="TutorialLink" target="_top" 
+                       href="../dom/index.html">Modelo de Objeto de Documento</a> pero por ahora, entienda que la validación del 
+                    esquema es un proceso orientado al espacio de nombres. Ya que los analizadores compatibles con JAXP no son 
+                    reconocen el espacio de nombres de forma predeterminada, es necesario establecer la propiedad para que 
+                    funcione la validación del esquema.
+                </p>
+                <hr />
+                <p>
+                    Luego, debe configurar el analizador para indicarle qué lenguaje de esquema utilizar. En 
+                    <code>SAXLocalNameCount</code>, la validación puede ser realizada contra un DTD o contra un Esquema XML. El 
+                    código siguiente usa las constantes definidas arriba para especificar el lenguaje de Esquema XML del W3C como 
+                    el que utilizar si se especificó la opción <code>-xsd</code> al iniciar el programa.
+                </p>
+                <div class="codeblock">
+                    <pre>
+// ...
+if (xsdValidate) {
+    saxParser.setProperty(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
+    // ...
+}
+                    </pre>
+                </div>
+                <p>
+                    Además del manejo de errores descrito en 
+                    <a class="TutorialLink" target="_top" href="parsing.html#gcnsr">Configurar el Manejo de Errores</a>, hay un 
+                    error que puede ocurrir cuando configura el analizador para validación basada en esquema. Si el analizador no 
+                    cumple con la especificación JAXP y, por lo tanto, no admite el Esquema XML, puede generar una 
+                    <code>SAXNotRecognizedException</code>. Para manejar ese caso, la sentencia <code>setProperty()</code> se 
+                    envuelve en un bloque try/catch, como se muestra en el código de abajo.
+                </p>
+                <div class="codeblock">
+                    <pre>
+// ...
+if (xsdValidate) {
+    try {
+        saxParser.setProperty(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
+    }
+    catch (SAXNotRecognizedException x){
+        System.err.println("Error: JAXP SAXParser property not recognized: "
+                           + JAXP_SCHEMA_LANGUAGE);
+
+        System.err.println( "Check to see if parser conforms to the JAXP spec.");
+        System.exit(1);
+    }
+}
+// ...
+                    </pre>
+                </div>
+                <p>
+                    <a id="gcwus"></a>
+                </p>
+                <h2>
+                    Asociar un Documento con un Esquema
+                </h2>
+                <p>
+                    Para validar los datos usando una definición de Esquema XML, es necesario asegurarse que el documento XML está 
+                    asociado con uno. Hay dos formas de hacer eso.
+                </p>
+                <ul>
+                    <li>
+                        Incluyendo una declaración de esquema en el documento XML.
+                    </li>
+                    <li>
+                        Especificando el esquema a usar en la aplicación.
+                    </li>
+                </ul>
+                <hr />
+                <p>
+                    <b>Nota</b> &mdash; Cuando la aplicación especifica el esquema a usar, sobreescribe cualquier declaración de 
+                    esquema en el documento.
+                </p>
+                <hr />
+                <p>
+                    Para especificar la definición de esquema en el documento, debe crear un XML tal como este:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;<i>documentRoot</i>
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation='<i>YourSchemaDefinition</i>.xsd'>
+                    </pre>
+                </div>
+                <p>
+                    El primer atributo define el prefijo del espacio de nombres XML (<code>xmlns</code>), <code>xsi</code>, que 
+                    significa instancia de Esquema XML. La segunda línea especifica el esquema a usar para los elementos en el 
+                    documento que no tienen un prefijo de espacio de nombre, es decir, para los elementos que se definen 
+                    normalmente en cualquier documento XML simple y sin complicaciones.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota</b> &mdash; Se incluye más información sobre los espacios de nombres en Validar con Esquema XML en 
+                    <a class="TutorialLink" target="_top" href="../dom/index.html">Modelo de Objeto de Documento</a>. Por ahora, 
+                    piense de estos atributos como el &quot;encantamiento mágico&quot; que usa para validar un fichero simple XML 
+                    que los usa. Una vez que haya aprendido más sobre los espacios de nombres, verá cómo usar el esquema XML para 
+                    validar documentos complejos que los usan. Esas ideas se describen en Validar con Múltiples Espacios de Nombres 
+                    en <a class="TutorialLink" target="_top" href="../dom/index.html">Modelo de Objeto de Documento</a>.
+                </p>
+                <hr />
+                <p>
+                    Puede también especificar el fichero de esquema en la aplicación, como es el caso en 
+                    <code>SAXLocalNameCount</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+// ...
+if (schemaSource != null) {
+    saxParser.setProperty(JAXP_SCHEMA_SOURCE, new File(schemaSource));
+}
+
+// ...
+                    </pre>
+                </div>
+                <p>
+                    En el código de arriba, la variable <code>schemaSource</code> se relaciona con un archivo fuente de esquema al 
+                    que puede apuntar la aplicación <code>SAXLocalNameCount</code> comenzando con la opción <code>-xsdss</code> y 
+                    proporcionando el nombre del archivo de origen del esquema que se utilizará.
+                </p>
+                <p>
+                    <a id="gcxhv"></a>
+                </p>
+                <h2>
+                    Manejo de Errores en el Analizador de Validación
+                </h2>
+                <p>
+                    Es importante reconocer que la única razón de que se lance una excepción cuando un fichero falla la validación 
+                    es como el resultado del código de gestión de errores mostrado en 
+                    <a class="TutorialLink" target="_top" href="parsing.html#gcnsr">Configurar la Gestión de Errores</a>. Ese 
+                    código se reproduce aquí como un recordatorio:
+                </p>
+                <div class="codeblock">
+                    <pre>
+// ...
+
+public void warning(SAXParseException spe) throws SAXException {
+    out.println("Warning: " + getParseExceptionInfo(spe));
+}
+        
+public void error(SAXParseException spe) throws SAXException {
+    String message = "Error: " + getParseExceptionInfo(spe);
+    throw new SAXException(message);
+}
+
+public void fatalError(SAXParseException spe) throws SAXException {
+    String message = "Fatal Error: " + getParseExceptionInfo(spe);
+    throw new SAXException(message);
+}
+
+// ...
+                    </pre>
+                </div>
+                <p>
+                    Se no se lanzan estas excepciones, los errores de validación son simplemente ignorados. En general un error 
+                    de análisis SAX es un error de validación, aunque puede también ser generado si el fichero especifica una 
+                    versión de XML que el analizador no está preparado para manejar. Recuerde que su aplicación no generará una 
+                    excepción de validación a menos que usted proporcione un manejador de errores como el que se muestra aquí.
+                </p>
+                <p>
+                    <a id="gcxhr"></a>
+                </p>
+                <h2>
+                    Advertencias DTD
+                </h2>
+                <p>
+                    Como se mención anteriormente, las advertencias se generan sólo cuando el analizador SAX está procesando un 
+                    DTD. Algunas advertencias son generadas sólo por el analizador de validación. El objetivo principal de un 
+                    analizador que no valida es operar tan rápidamente como es posible, pero también genera algunas advertencias.
+                </p>
+                <p>
+                    La especificación XML sugiere que las advertencias deben ser generadas como resultado de lo siguiente:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Proporcionar declaraciones adicionales para entidades, atributos o notaciones. (Tales declaraciones 
+                            son ignoradas. Sólo la primera se usa. Además, tenga en cuenta que las definiciones duplicadas de 
+                            elementos siempre producen un error fatal al validar, como vio anteriormente).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Hacer referencia a un tipo de elemento no declarado. (Un error de validación ocurre sólo si el tipo no 
+                            declarado es realmente usado en el documento XML. Se produce una advertencia cuando se hace referencia 
+                            al elemento no declarado en la DTD).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Declarar atributos para tipos de elementos no declarados.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    El analizador de XML SAX de Java también emite advertencias en otros casos:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            No hay <code>&lt;!DOCTYPE ...&gt;</code> cuando se valida.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Referencias a una entidad de parámetro indefinida cuando no se valida. (Al validar, se produce un 
+                            error. Aunque no se requiere que los analizadores que no validan lean las entidades de parámetro, el 
+                            analizador XML de Java lo hace. Ya que esto no es un requerimiento, el analizador XML de Java genera 
+                            una advertencia, en vez de un error).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Ciertos casos en los que la declaración de codificación de caracteres no parece correcta.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    <a id="gcwvc"></a>
+                </p>
+                <h2>
+                    Ejecutar los Ejemplos de Analizador SAX con Validación
+                </h2>
+                <p>
+                    En esta sección, el programa de ejemplo <code>SAXLocalNameCount</code> usando anteriormente será usado de 
+                    nuevo, excepto que esta vez será ejecutado con validación contra un Esquema XML o un DTD. La mejor forma de 
+                    demostrar los diferentes tipos de validación es modificar el código del fichero XML que está siendo analizado, 
+                    así como el esquema asociado y las DTD, para interrumpir el procesamiento y hacer que la aplicación genere 
+                    excepciones.
+                </p>
+                <p>
+                    <a id="gcxic"></a>
+                </p>
+                <h2>
+                    Experimentar con Errores de Validación DTD
+                </h2>
+                <p>
+                    Como se mencionó arriba, estos ejemplos reutilizan el programa <code>SAXLocalNameCount</code>. Las ubicaciones 
+                    donde encontrará el ejemplo y sus ficheros asociados se dieron en 
+                    <a class="TutorialLink" target="_top" href="parsing.html#gcnrx">Ejecutar el Ejemplo del Analizador SAX sin 
+                        Validación</a>.
+                </p>
+                <ol>
+                    <li>
+                        <b>Si aún no lo ha hecho, navegue al directorio <code>samples</code>.</b> <code>% cd 
+                            <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code></code>
+                    </li>
+                    <li>
+                        <b>Si aún no lo ha hecho, compile la clase del ejemplo.</b><code>% javac sax/*</code>
+                    </li>
+                    <li>
+                        <b>Abra el fichero <code>data/rich_iii.xml</code> en un editor de texto.</b>
+                        <p>
+                            Este es el mismo fichero XML que fue procesado sin validación en 
+                            <a class="TutorialLink" target="_top" href="parsing.html#gcvwx">Para Ejecutar el Ejemplo 
+                                <code>SAXLocalNameCount</code> sin Validación</a>. Al principio de <code>data/rich_iii.xml</code>, 
+                            verá que la declaración de <code>DOCTYPE</code> dirige a un analizador de validación a un fichero 
+                            DTD llamado <code>play.dtd</code>. Si la validación DTD se activó, la estructura del fichero XML 
+                            que está siendo analizado será comprobado contra la estructura proporcionada en 
+                            <code>play.dtd</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <b>Borre la declaración <code>&lt;!DOCTYPE PLAY SYSTEM &quot;play.dtd&quot;&gt;</code> del principio del 
+                            fichero.</b>
+                        <p>
+                            No olvide salvar la modificación, pero deje el fichero abierto, ya que será necesario nuevamente más 
+                            adelante.
+                        </p>
+                    </li>
+                    <li>
+                        <b>Ejecute el programa <code>SAXLocalNameCount</code>,con la validación DTD activada.</b>
+                        <p>
+                            Para hacer esto, debe especificar la opción <code>-dtd</code> cuando ejecute el programa.
+                        </p>
+                        <code>% java sax/SAXLocalNameCount -dtd data/rich_iii.xml</code>
+                        <p>
+                            El resultado que ve se parecerá a algo como esto:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+Exception in thread "main" org.xml.sax.SAXException:
+Error: URI=file:<i>install-dir</i>/JAXP_sources/jaxp-1_4_2-<i>release-date</i>
+/samples/data/rich_iii.xml 
+Line=12: Document is invalid: no grammar found.
+                            </pre>
+                        </div>
+                        <hr />
+                        <p>
+                            <b>Nota</b> &mdash; Este mensaje fue generado por las librerías JAXP 1.4.2. Si está usando un 
+                            analizador diferente, es probable que el mensaje de error sea algo diferente.
+                        </p>
+                        <hr />
+                        <p>
+                            Este mensaje dice que no hay gramáticia contra la que el documento <code>rich_iii.txt</code> pueda ser 
+                            validado, por lo tanto, es automáticamente inválido. En otras palabras, el mensaje está diciendo que 
+                            usted está intentando validar el documento, pero no ha sido declarado un DTD, porque no existe una 
+                            declaración <code>DOCTYPE</code>. Entonces, ahora sabe que un DTD es un requisito para un documento 
+                            válido. Eso tiene sentido.
+                        </p>
+                    </li>
+                    <li>
+                        <b>Restaure la declaración <code>&lt;!DOCTYPE PLAY SYSTEM &quot;play.dtd&quot;&gt;</code> en 
+                            <code>data/rich_iii.xml</code>.</b>
+                        <p>
+                            De nuevo, no olvide salvar el fichero, pero déjelo abierto.
+                        </p>
+                    </li>
+                    <li>
+                        <b>Vuelva a <code>data/rich_iii.xml</code> y modifica las etiquetas para el carácter &quot;KING EDWARD The 
+                            Fourth&quot; en la línea 26.</b>
+                        <p>
+                            Cambien las etiquetas de inicio y final de <code>&lt;PERSONA&gt;</code> y 
+                            <code>&lt;/PERSONA&gt;</code> a 
+                            <code>&lt;PERSON&gt;</code> y <code>&lt;/PERSON&gt;</code>. La línea 26 debe verse como esto:
+                        </p>
+                        <code>26:&lt;PERSON&gt;KING EDWARD The Fourth&lt;/PERSON&gt;</code>
+                        <p>
+                            De nuevo, no olvide salvar la modificación, y deje el fichero abierto.
+                        </p>
+                    </li>
+                    <li>
+                        <b>Ejecute el programa <code>SAXLocalNameCount</code>, con la validación DTD activada.</b>
+                        <p>
+                            Esta vez, verá un error diferente cuando ejecute el programa:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+% java sax/SAXLocalNameCount -dtd data/rich_iii.xml
+Exception in thread "main" org.xml.sax.SAXException: 
+Error: URI=file:<i>install-dir</i>/JAXP_sources/jaxp-1_4_2-<i>release-date</i>
+/samples/data/rich_iii.xml 
+Line=26: Element type "PERSON" must be declared.
+                            </pre>
+                        </div>
+                        <p>
+                            Aquí puede ver que el analizador se ha opuesto a un elemento que no está incluído en la DTD 
+                            <code>data/play.dtd</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <b>En <code>data/rich_iii.xml</code> corrija las etiquetas para &quot;KING EDWARD The Fourth&quot;.</b>
+                        <p>
+                            Devuelva las etiquetas de inicio y final a sus versiones originales, <code>&lt;PERSONA&gt;</code> y 
+                            <code>&lt;/PERSONA&gt;</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <b>En <code>data/rich_iii.xml</code>, elimine <code>&lt;TITLE&gt;Dramatis Personae&lt;/TITLE&gt;</code> 
+                            de la línea 24.</b>
+                        <p>
+                            Una vez más, no olvide salvar la modificación.
+                        </p>
+                    </li>
+                    <li>
+                        <b>Ejecute el programa <code>SAXLocalNameCount</code>, con la validación DTD activada.</b>
+                        <p>
+                            Como antes, verá otro error de validación:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+java sax/SAXLocalNameCount -dtd data/rich_iii.xml
+Exception in thread "main" org.xml.sax.SAXException: 
+Error: URI=file:<i>install-dir</i>/JAXP_sources/jaxp-1_4_2-<i>release-date</i>
+/samples/data/rich_iii.xml 
+Line=85: The content of element type "PERSONAE" must match "(TITLE,(PERSONA|PGROUP)+)".
+                            </pre>
+                        </div>
+                        <p>
+                            Al borrar el elemento <code>&lt;TITLE&gt;</code> de la línea 24, el elemento 
+                            <code>&lt;PERSONAE&gt;</code> se invalida porque no contiene los subelementos que la DTD espera de un 
+                            elemento <code>&lt;PERSONAE&gt;</code>. Dese cuenta de que el mensaje de error indica que el error 
+                            está en la línea 85 de <code>data/rich_iii.xml</code>, aunque eliminó el elemento 
+                            <code>&lt;TITLE&gt;</code> de la línea 24. Esto es porque la etiqueta de cierre del elemento 
+                            <code>&lt;PERSONAE&gt;</code> se ubica en la línea 85 y el analizador sólo lanza la excepción cuando 
+                            alcanza el final de elemento que está analizando.
+                        </p>
+                    </li>
+                    <li>
+                        <b>Abra el fichero DTD, <code>data/play.dtd</code> en un editor de texto.</b>
+                        <p>
+                            En el fichero DTD, puede ver la declaración del elemento <code>&lt;PERSONAE&gt;</code>, como también 
+                            la de todos los otros elementos que puede ser usada en documentos XML que se ajustan al DTD play. La 
+                            declaración de <code>&lt;PERSONAE&gt;</code> se parece a esto.
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+&lt;!ELEMENT PERSONAE (TITLE, (PERSONA | PGROUP)+)>
+                            </pre>
+                        </div>
+                        <p>
+                            Como puede ver, el elemento <code>&lt;PERSONAE&gt;</code> requiere un subelemento 
+                            <code>&lt;TITLE&gt;</code>. La clave tubería (<code>|</code>) significa que el subelemento 
+                            <code>&lt;PERSONA&gt;</code> o <code>&lt;PGROUP&gt;</code> pueden ser incluídos en un elemento 
+                            <code>&lt;PERSONAE&gt;</code>, y la clave mas (<code>+</code>) después del grupo 
+                            <code>(PERSONA | PGROUP)</code> significa que al menos uno o más de alguno de estos subelementos deben 
+                            ser incluídos.
+                        </p>
+                    </li>
+                    <li>
+                        <b>Agregue una clave marca de interrogación (<code>?</code>) después de <code>TITLE</code> en la 
+                            declaración de <code>&lt;PERSONAE&gt;</code>.</b>
+                        <p>
+                            Agregar una marca de interrogación a una declaración de subelemento en un DTD hace la presencia de una 
+                            instancia de ese subelemento opcional.
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+&lt;!ELEMENT PERSONAE (TITLE?, (PERSONA | PGROUP)+)>
+                            </pre>
+                        </div>
+                        <p>
+                            Si hubiera agregado un asterisco (<code>*</code>) después del elemento, podría incluir cero o múltiples 
+                            instancias de ese subelemento. Sin embargo, en este caso no tiene sentido tener más de un título en una 
+                            sección de un documento.
+                        </p>
+                        <p>
+                            No olvide salvar la modificación que ha hecho a <code>data/play.dtd</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <b>Ejecute el programa <code>SAXLocalNameCount</code>, con la validación DTD activada.</b>
+                        <code>% java sax/SAXLocalNameCount -dtd data/rich_iii.xml</code>
+                        <p>
+                            Esta vez, debe ver la salida apropiada de <code>SAXLocalNameCount</code>, sin errores.
+                        </p>
+                    </li>
+                </ol>
+                <p>
+                    <a id="gcxhp"></a>
+                </p>
+                <h2>
+                    Experimentar con los Errores de Validación de Esquema
+                </h2>
+                <p>
+                    El ejercicio previo demostró usando <code>SAXLocalNameCount</code> para validar un fichero XML contra un DTD. 
+                    En este ejercicio usará <code>SAXLocalNameCount</code> para validar un fichero XML diferente contra la 
+                    definición estándar de Esquema XML y un fichero fuente de esquema personalizado. De nuevo, este tipo de 
+                    validación será demostrado rompiendo el proceso de análisis modificando el fichero XML y el esquema, de forma 
+                    que el analizador lance errores.
+                </p>
+                <p>
+                    Como se mencionó arriba, estos ejemplos reusan el programa <code>SAXLocalNameCount</code>. Las ubicaciones 
+                    donde encontrará el ejemplo y sus ficheros asociados se dieron en 
+                    <a class="TutorialLink" target="_top" href="parsing.html#gcnrx">Ejecutar el Ejemplo del Analizador SAX sin 
+                        Validación</a>.
+                </p>
+                <ol>
+                    <li>
+                        <b>Si no lo ha hecho ya, navegue al directorio <code>samples</code>.</b>
+                        <code>% cd <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code></code>
+                    </li>
+                    <li>
+                        <b>Si no lo ha hecho ya, compile la clase de ejemplo.</b><code>% javac sax/*</code>
+                    </li>
+                    <li>
+                        <b>Abra el fichero <code>data/personal-schema.xml</code> en un editor de texto.</b>
+                        <p>
+                            Esto es un simple fichero XML que proporciona los nombres y detalles de contacto de los empleados de 
+                            una pequeña compañía. En este fichero XML, verá que ha sido asociado con un fichero de definición de 
+                            esquema <code>personal.xsd</code>.
+                        </p>
+                        <code>
+                            &lt;personnel xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; 
+                            xsi:noNamespaceSchemaLocation=&#39;personal.xsd&#39;&gt;
+                        </code>
+                    </li>
+                    <li>
+                        <b>Abra el fichero <code>data/personal.xsd</code> en un editor de texto.</b>
+                        <p>
+                            Este esquema define qué clases de información se requieren sobre cada empleado para un documento XML 
+                            asociado con el esquema para ser considerado válido. Por ejemplo, examinando la definición del esquema, 
+                            puede ver que cada elemento <code>person</code> requiere un <code>name</code>, y que cada nombre de 
+                            persona debe componerse de un nombre <code>family</code> y un nombre <code>given</code>. Los empleados 
+                            pueden también opcionalmente tener direccioes de correo y URLs.
+                        </p>
+                    </li>
+                    <li>
+                        <b>En <code>data/personal.xsd</code>, cambie el número mínimo de direcciones de correo requeridas para un 
+                            elemento <code>person</code> desde <code>0</code> a <code>1</code>.</b>
+                        <p>
+                            La declaración del elemento <code>email</code> es ahora como sigue.
+                        </p>
+                        <code>
+                            &lt;xs:element ref=&quot;email&quot; minOccurs=&#39;1&#39; maxOccurs=&#39;unbounded&#39;/&gt;
+                        </code>
+                    </li>
+                    <li>
+                        <b>En <code>data/personal-schema.xml</code>, elimine el elemento <code>email</code> del elemento 
+                            <code>person</code> <code>one.worker</code>.</b>
+                        <p>
+                            Worker One ahora se ve como esto:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+&lt;person id="one.worker">
+  &lt;name>&lt;family>Worker&lt;/family> &lt;given>One&lt;/given>&lt;/name>
+  &lt;link manager="Big.Boss"/>
+&lt;/person>
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Ejecute <code>SAXLocalNameCount</code> contra <code>personal-schema.xml</code>, sin validación de 
+                            esquema.</b><code>% java sax/SAXLocalNameCount data/personal-schema.xml</code>
+                        <p>
+                            <code>SAXLocalNameCount</code> le informa del número de veces que cada elemento ocurre en 
+                            <code>personal-schema.xml</code>.
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+Local Name "email" occurs 5 times
+Local Name "name" occurs 6 times
+Local Name "person" occurs 6 times
+Local Name "family" occurs 6 times
+Local Name "link" occurs 6 times
+Local Name "personnel" occurs 1 times
+Local Name "given" occurs 6 times
+                            </pre>
+                        </div>
+                        <p>
+                            Ve que <code>email</code> solo ocurre cinco veces, mientras que hay seis elementos <code>person</code> 
+                            en <code>personal-schema.xml</code>. Entonces, debido a que establecemos las ocurrencias mínimas del 
+                            elemento <code>email</code> en 1 por elemento <code>person</code>, sabemos que este documento no es 
+                            válido. Sin embargo, debido a que no se le dijo a <code>SAXLocalNameCount</code> que validara contra un 
+                            esquema, no se informó del error.
+                        </p>
+                    </li>
+                    <li>
+                        <b>Ejecute <code>SAXLocalNameCount</code> de nuevo,  esta vez especificando que el documento 
+                            <code>personal&mdash;schema.xml</code> debe ser validado contra la definición de esquema 
+                            <code>personal.xsd</code>.</b>
+                        <p>
+                            Como vio en <a href="#gcwtl">Validar con Esquema XML</a> arriba, <code>SAXLocalNameCount</code> tiene 
+                            una opción para habilitar la validación de esquema. Ejecute <code>SAXLocalNameCount</code> con el 
+                            comando siguiente.
+                        </p>
+                        <code>% java sax/SAXLocalNameCount -xsd data/personal-schema.xml</code>
+                        <p>
+                            Esta vez, verá el siguiente mensaje de error.
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+Exception in thread "main" org.xml.sax.SAXException: Error: 
+URI=file:<i>install_dir</i>/samples/data/personal-schema.xml 
+Line=19: cvc-complex-type.2.4.a: Invalid content was found starting with 
+element 'link'. 
+One of '{email}' is expected.
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Restaure el elemento <code>email</code> al elemento <code>person</code> de <code>one.worker</code>.</b>
+                    </li>
+                    <li>
+                        <b>Ejecute <code>SAXLocalNameCount</code> una tercera vez, de nuevo especificando que el documento 
+                            <code>personal&mdash;schema.xml</code> debe ser validado contra la definición de esquema 
+                            <code>personal.xsd</code>.</b>
+                        <code>% java sax/SAXLocalNameCount -xsd data/personal-schema.xml</code>
+                        <p>
+                            Esta vez verá la salida correcta, sin errores.
+                        </p>
+                    </li>
+                    <li>
+                        <b>Abra <code>personal-schema.xml</code> en un editor de texto de nuevo.</b>
+                    </li>
+                    <li>
+                        <b>Borre la declaración de la definición del esquema <code>personal.xsd</code> desde el elemento 
+                            <code>personnel</code> element.</b>
+                        <p>
+                            Elimine el código en cursiva del elemento <code>personnel</code>.
+                        </p>
+                        <code>&lt;personnel <i>xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; 
+                                xsi:noNamespaceSchemaLocation=&#39;personal.xsd&#39;/</i>&gt;</code>
+                    </li>
+                    <li>
+                        <b>Ejecute <code>SAXLocalNameCount</code>, de nuevo especificando validación de esquema.</b>
+                        <code>% java sax/SAXLocalNameCount -xsd data/personal-schema.xml</code>
+                        <p>
+                            Obviamente, esto no funcionará, ya que la definición del esquema contra la cual validar el fichero XML 
+                            no ha sido declarada. Verá el error siguiente.
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+Exception in thread "main" org.xml.sax.SAXException: 
+Error: URI=file:<i>install_dir</i>/samples/data/personal-schema.xml 
+Line=8: cvc-elt.1: Cannot find the declaration of element 'personnel'.
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Ejecute <code>SAXLocalNameCount</code> de nuevo, esta vez pasándole el fichero de definición de esquema 
+                            en la línea de comandos.</b>
+                        <code>% java sax/SAXLocalNameCount -xsdss data/personal.xsd data/personal-schema.xml</code>
+                        <p>
+                            Esta vez use la opción de <code>SAXLocalNameCount</code> que le permite especificar una definición de 
+                            esquema que no está codificado en la aplicación. Debe ver la salida correcta.
+                        </p>
+                    </li>
+                </ol>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="parsing.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="events.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Analizar un archivo XML Mediante SAX<br />
+            <b>Página siguiente:</b> Manejando Eventos Léxicos
+        </div>
+    </body>
+</html> 

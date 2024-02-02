@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Respuestas a Preguntas y Ejercicios: Concurrencia (Los Tutoriales de Java&trade; &gt; Clases Esenciales &gt; 
+            Excepciones)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe las excepciones, la entrada/salida básica, concurrencia,
+              expresiones regulares, y el entorno de la plataforma" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java exception, java input output, java
+              threads, java regex, regular expressions, path, classpath, environment variable" />
+        <link rel="stylesheet" href="../../../indice.css" type="text/css"/>
+        <script>
+            function showCode(displayCodePage, codePath) {
+                var codePathEls = codePath.split("/");
+                var currDocPathEls = location.href.split("/");
+                currDocPathEls.pop();
+                while (codePathEls.length > 0) {
+                    if (codePathEls[0] === "..") {
+                        codePathEls.shift();
+                        currDocPathEls.pop();
+                    } else {
+                        break;
+                    }
+                }
+                var fullCodePath = currDocPathEls.join("/") + "/" + codePathEls.join("/");
+                if (codePath.indexOf(".java") !== -1 || codePath.indexOf(".jnlp") !== -1) {
+                    window.location.href = displayCodePage + "?code=" + encodeURI(fullCodePath);
+                } else {
+                    window.location.href = fullCodePath;
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper  clearfix">       
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div> 
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                            </div>
+                            <div class="PrintHeaders">
+                                <b>Recorrido:</b> Clases Esenciales
+                                <br />
+                                <b>Lección:</b> Concurrencia
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="MainFlow_wide">
+            <span id="BreadCrumbs">
+                <a href="../../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../../index.html" target="_top">Clases Esenciales</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Concurrencia</a>
+            </span>
+            <div class="NavBit">
+                <a href="../QandE/questions.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a href="../../TOC.html">TdC</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Respuestas a Preguntas y Ejercicios: Concurrencia</h1>
+            </div>
+            <div id="PageContent">
+                <h2>Preguntas</h2>
+                <ol>
+                    <li>
+                        ¿Puede pasar un objeto <code>Thread</code> a <code>Executor.execute</code>? ¿Tendría sentido esa invocación?
+                        <p>
+                            <b>Respuesta:</b> <code>Thread</code> implementa el interfaz <code>Runnable</code>, así que puede pasar
+                            una instancia de <code>Thread</code> a <code>Executor.execute</code>. Sin embargo no tiene sentido usar
+                            objetos <code>Thread</code> de esta forma. Si el objeto está directamente instanciando desde
+                            <code>Thread</code>, su método <code>run</code> no hace nada. Puede definir una subclase de
+                            <code>Thread</code> con un método útil <code>run</code> &mdash; pero tal clase implementaría
+                            características que el ejecutor no usaría.
+                        </p>
+                    </li>
+                </ol>
+                <h2>Ejercicios</h2>
+                <ol>
+                    <li>
+                        <b>Ejercicio:</b> Compile y ejecute
+                        <a class="SourceLink" target="_blank" href="HilosMal.java"
+                           onclick="showCode('../../../displayCode.html', 'HilosMal.java'); return false;">
+                            <code>HilosMal.java</code></a>:
+                        <div class="codeblock">
+                            <pre>
+
+public class HilosMal {
+
+    static String mensaje;
+
+    private static class CorrectorThread
+        extends Thread {
+
+        public void run() {
+            try {
+                sleep(1000);
+            } catch (InterruptedException e) {}
+            // Sentencia clave 1:
+            mensaje = "Las yeguas comen avena.";
+        }
+    }
+
+    public static void main(String args[])
+        throws InterruptedException {
+
+        (new CorrectorThread()).start();
+        mensaje = "Las yeguas no comen avena.";
+        Thread.sleep(2000);
+        // Sentencia clave 2:
+        System.out.println(mensaje);
+    }
+}
+                            </pre>
+                        </div>
+                        <p>
+                            La aplicación imprimirá &quot;Las yeguas comen avena.&quot; ¿Está garantizado que siempre hace esto? Si
+                            no, ¿porqué no? ¿Ayudaría cambiar los parámetros de las dos invocaciones de <code>Sleep</code>? ¿Cómo
+                            garantizaría que todos los cambios a <code>mensaje</code> fueran visibles al hilo principal?
+                        </p>
+                        <p>
+                            <b>Solución:</b> El programa casi siempre imprimirá &quot;Las yeguas comen avena.&quot; Sin embargo,
+                            este resultado no está garantizado, porque no hay una relación ocurre-antes entre la &quot;Sentencia
+                            clave 1&quot; y la &quot;Sentencia clave 2&quot;. Esto es verdad incluso si &quot;Sentencia clave 
+                            1&quot; en realidad se ejecuta antes que &quot;Sentencia clave 2&quot; &mdash; recuerde, una relación
+                            ocurre-antes va sobre visibilidad, no secuencia.
+                        </p>
+                        <p>
+                            Hay dos formas de que pueda garantizar que todos los cambios a <code>mensaje</code> sean visibles al
+                            hilo principal:
+                        </p>
+                        <ul>
+                            <li>
+                                En el hilo principal, mantenga una referencia a la instancia <code>CorrectorThread</code>. Entonces
+                                invoque <code>join</code> sobre esa instancia antes de referirse a <code>mensaje</code>
+                            </li>
+                            <li>
+                                Encapsular <code>mensaje</code> en un objeto con métodos sincronizados. Nunca referencie
+                                <code>mensaje</code> excepcto a través de esos métodos.
+                            </li>
+                        </ul>
+                        <p>
+                            Ambas técnicas establecen la necesaria relación ocurre-antes, haciendo los cambios a 
+                            <code>mensaje</code> visibles.
+                        </p>
+                        <p>
+                            Una tercera técnica es simplemente declara <code>mensaje</code> como <code>volatile</code>. Esto
+                            garantiza que cualquier escritura a <code>mensaje</code> (como en &quot;Sentencia clave 1&quot;) tendrá
+                            una relación ocurre-antes con las lecturas posteriores de <code>mensaje</code> (como en
+                            &quot;Sentencia clave 2&quot;). Pero no garantiza que &quot;Sentencia clave 1&quot; ocurrirá
+                            <i>literalmente</i> antes que &quot;Sentencia clave 2&quot;. Ellas sucederán <i>probablemente</i> en
+                            secuencia, pero a causa de las incertidumbres de la planificación y la granularidad desconocida de
+                            <code>sleep</code>, esto no está garantizado.
+                        </p>
+                        <p>
+                            Cambiar los argumentos de las dos invocaciones de <code>sleep</code> no ayuda tampoco, ya que esto
+                            no garantiza una relación ocurre-antes.
+                        </p>
+                    </li>
+                    <li>
+                        <b>Ejercicio:</b> Modifique el ejemplo productor-consumidor en
+                        <a href="../guardmeth.html">Bloques Vigilados</a> para usar una clase estándar de librería en vez de la
+                        clase <code>Drop</code>.
+                        <p>
+                            <b>Solución:</b> El interfaz
+                            <a class="APILink" target="_blank"
+                               href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/BlockingQueue.html">
+                                <code>java.util.concurrent.BlockingQueue</code></a> define un método <code>get</code> que bloquea
+                            si la cola está vacía, y métodos <code>put</code> que bloquean si la cola está llena. Estas son
+                            efectivamente las mismas operaciones definidas por <code>Gota</code> &mdash; ¡excepto que
+                            <code>Gota</code> no es una cola! Sin embargo, hay otra forma de ver a Gota. es una cola con una
+                            capacidad de cero. Ya que no hay sitio en la cola para <i>ningún</i> elemento, cada
+                            <code>get</code> bloquea hasta el correspondiente <code>tomar</code> y cada <code>tomar</code> bloquea
+                            hasta el correspondiente <code>get</code>. Hay una implementación de <code>BlockingQueue</code>
+                            que tiene precisamente este comportamiento:
+                            <a class="APILink" target="_blank"
+                               href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/SynchronousQueue.html">
+                                <code>java.util.concurrent.SynchronousQueue</code></a>.
+                        </p>
+                        <p>
+                            <code>BlockingQueue</code> es casi un reemplazo para <code>Gota</code>. El principal problema en
+                            <a class="SourceLink" target="_blank" href="Productor.java"
+                               onclick="showCode('../../../displayCode.html', 'Productor.java'); return false;">
+                                <code>Productor</code></a> es que con <code>BlockingQueue</code>, los métodos <code>put</code> y
+                            <code>get</code> lanzan <code>InterruptedException</code>. Esto significa que el <code>try</code>
+                            existente debe ser movido un nivel arriba:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+
+import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+
+public class Productor implements Runnable {
+    private BlockingQueue&lt;String&gt; colaBloqueante;
+
+    public Productor(BlockingQueue&lt;String&gt; colaBloqueante) {
+        this.colaBloqueante = colaBloqueante;
+    }
+
+    public void run() {
+        String infoImportante[] = {
+            &quot;Las yeguas comen avena&quot;,
+            &quot;Los conejos comen avena&quot;,
+            &quot;Los pequeños corderos comen hiedra&quot;,
+            &quot;Un niño también comerá hiedra&quot;
+        };
+        Random aleatorio = new Random();
+
+        try {
+            for (int i = 0;
+                 i &lt;infoImportante.length;
+                 i++) {
+                colaBloqueante.put(infoImportante[i]);
+                Thread.sleep(aleatorio.nextInt(5000));
+            }
+            colaBloqueante.put(&quot;HECHO&quot;);
+        } catch (InterruptedException e) {}
+    }
+}
+                            </pre>
+                        </div>
+                        Cambios similares son requeridos para
+                        <a class="SourceLink" target="_blank" href="Consumidor.java"
+                           onclick="showCode('../../../displayCode.html', 'Consumidor.java'); return false;">
+                            <code>Consumidor</code></a>:
+                        <div class="codeblock">
+                            <pre>
+
+import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+
+public class Consumidor implements Runnable {
+    private BlockingQueue&lt;String&gt; colaBloqueante;
+
+    public Consumidor(BlockingQueue&lt;String&gt; colaBloqueante) {
+        this.colaBloqueante = colaBloqueante;
+    }
+
+    public void run() {
+        Random aleatorio = new Random();
+        try {
+            for (String mensaje = colaBloqueante.take();
+                 ! mensaje.equals(&quot;HECHO&quot;);
+                 mensaje = colaBloqueante.take()) {
+                System.out.format(&quot;MENSAJE RECIBIDO: %s%n&quot;,
+                                  mensaje);
+                Thread.sleep(aleatorio.nextInt(5000));
+            }
+        } catch (InterruptedException e) {}
+    }
+}
+                            </pre>
+                        </div>
+                        Para
+                        <a class="SourceLink" target="_blank" href="EjemploProductorConsumidor.java"
+                           onclick="showCode('../../../displayCode.html', 'EjemploProductorConsumidor.java'); return false;">
+                            <code>EjemploProductorConsumidor</code></a>, simplemente cambiamos la declaración del objeto
+                        <code>gota</code>:
+                        <div class="codeblock">
+                            <pre>
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
+
+public class EjemploProductorConsumidor {
+    public static void main(String[] args) {
+        BlockingQueue&lt;String&gt; cola =
+            new SynchronousQueue&lt;String&gt; ();
+        (new Thread(new Productor(cola))).start();
+        (new Thread(new Consumidor(cola))).start();
+    }
+}
+                            </pre>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+        <div class="NavBit">
+            <a href="../QandE/questions.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+            <a href="../../TOC.html">TdC</a>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a>
+                            página y todo el material en las páginas bajo el anuncio &quot;Los Tutoriales de Java&quot; está sujeto
+                            a estos
+                            <a href="../../../information/cpyr.html">avisos legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página Anterior:</b> Preguntas y Ejercicios: Concurrencia
+        </div>
+    </body>
+</html>

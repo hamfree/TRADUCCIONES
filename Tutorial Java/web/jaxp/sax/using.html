@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Utilizando DTDHandler y EntityResolver (Los Tutoriales de Java&trade; &gt;
+            IPA de Java para Procesado de XML (JAXP) &gt; IPA Simple para XML)
+        </title>
+        <meta name="description" content="Este tutorial de Java JAXP describe la IPA de Java para el procesado de XML (jaxp), XSLT, 
+              SAX, y tópicos de XML relacionados" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jaxp, xml, xslt, sax" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">IPA Simple para XML</a></div>
+                <div class="linkAHEAD"><a href="when.html">Cuando usar SAX</a></div>
+                <div class="linkAHEAD"><a href="parsing.html">Analizar un archivo XML Mediante SAX</a></div>
+                <div class="linkAHEAD"><a href="validation.html">Implementando la Validación en SAX</a></div>
+                <div class="linkAHEAD"><a href="events.html">Manejando Eventos Léxicos</a></div>
+                <div class="nolinkAHEAD">Utilizando <code>DTDHandler</code> y <code>EntityResolver</code></div>
+                <div class="linkAHEAD"><a href="info.html">Información Adicional</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> IPA de Java para Procesado de XML (JAXP)<br />
+                <b>Lección:</b> IPA Simple para XML
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">IPA de Java para Procesado de XML (JAXP)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">IPA Simple para XML</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="events.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="info.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Utilizando <code>DTDHandler</code> y <code>EntityResolver</code></h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Esta sección presenta los dos manejadores de eventos SAX restantes: <code>DTDHandler</code> y 
+                    <code>EntityResolver</code>. Se invoca el <code>DTDHandler</code> cuando el DTD encuentra una entidad no 
+                    analizada o un declaración de notación. El <code>EntityResolver</code> entra en juego cuando un URN 
+                    (ID público) debe resolverse en una URL (ID del sistema).
+                </p>
+                <p>
+                    <a id="gcylk"></a>
+                </p>
+                <h2>
+                    La IPA de <code>DTDHandler</code>
+                </h2>
+                <p>
+                    <a class="TutorialLink" target="_top" href="validation.html">Elegir la Implementación del Analizador</a> mostró 
+                    un método para referenciar un fichero que contiene datos binarios, como un fichero de imagen, usando tipos de 
+                    datos MIME. Ese es el mecanismo más simple y más extensible. Sin embargo, por compatibilidad con los datos más 
+                    viejos del estilo SGML, también es posible definir una entidad sin analizar.
+                </p>
+                <p>
+                    La palabra clave <code>NDATA</code> define una entidad sin analizar:
+                </p>
+                <p>
+                    <code>&lt;!ENTITY myEntity SYSTEM &quot;..URL..&quot; NDATA gif&gt;</code>
+                </p>
+                <p>
+                    La palabra clave <code>NDATA</code> dice que los datos en esta entidad no son datos XML analizables, sino que 
+                    son datos que utilizan alguna otra notación. En este caso, la notación se llama <code>gif</code>. El DTD debe 
+                    después incluir una declaración para esa notación, que se parecería a lo siguiente.
+                </p>
+                <p>
+                    <code>&lt;!NOTATION gif SYSTEM &quot;..URL..&quot;&gt;</code>
+                </p>
+                <p>
+                    Cuando el analizador ve una entidad no analizada o una declaración de notación, no hace nada con la información 
+                    excepto pasarla a la aplicación usando la interfaz <code>DTDHandler</code>. La interfaz define dos métodos.
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>notationDecl(String name, String publicId, String systemId)</code>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>unparsedEntityDecl(String name, String publicId, String systemId, String notationName</code>
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Al método <code>notationDecl</code> se le pasa el nombre de la notación y el identificador público o del 
+                    sistema, o ambos, dependiendo de cuál se declare en la DTD. Al método <code>unparsedEntityDecl</code> se le 
+                    pasó al nombre de la entidad, los identificadores apropiados, y el nombre de la notación que usa.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota </b>&mdash; La interfaz <code>DTDHandler</code> se implementa por la clase <code>DefaultHandler</code>.
+                </p>
+                <hr />
+                <p>
+                    Las notaciones pueden también ser usadas en declaraciones de atributo. Por ejemplo, la siguiente declaración 
+                    requiere anotaciones para los formatos de ficheros de imagen GIF y PNG.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;!ENTITY image EMPTY>
+&lt;!ATTLIST image ...  type  NOTATION  (gif | png) "gif">
+                    </pre>
+                </div>
+                <p>
+                    Aquí, el tipo se declara como gif o o png. El valor predeterminado, si no se especifica ninguno, es gif.
+                </p>
+                <p>
+                    Si la referencia de notación se usa para describir una entidad no analizada o un atributo, depende de la 
+                    aplicación realizar el procesamiento correspondiente. El analizador no sabe nada en absoluto sobre la semántica 
+                    de las notaciones. Solo transmite las declaraciones.
+                </p>
+                <p>
+                    <a id="gcymm"></a>
+                </p>
+                <h2>
+                    La IPA de <code>EntityResolver</code>
+                </h2>
+                <p>
+                    La IPA de <code>EntityResolver</code> le permite convertir un ID público (URN) en un ID de sistema (URL). Su 
+                    aplicación puede necesitar hacer eso, por ejemplo, para convertir algo como 
+                    <code>href=&quot;urn:/someName&quot;</code> en <code>&quot;http://someURL&quot;</code>.
+                </p>
+                <p>
+                    La interfaz <code>EntityResolver</code> define un método único:
+                </p>
+                <p>
+                    <code>resolveEntity(String publicId, String systemId)</code>
+                </p>
+                <p>
+                    Este método devuelve un objeto <code>InputSource</code>, que puede ser usado para acceder a los contenidos de 
+                    la entidad. Convertir una URL en un <code>InputSource</code> es bastante fácil. Pero la URL que se pasa como el 
+                    ID del sistema será la ubicación del documento original que, probablemente, se encuentre en algún lugar de la 
+                    web. Para acceder a una copia local, si hay una, debe mantener un catálogo en alguna parte en el sistema que 
+                    asocia nombres (IDs públicos) en URLs locales.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="events.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="info.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Manejando Eventos Léxicos<br />
+            <b>Página siguiente:</b> Información Adicional
+        </div>
+    </body>
+</html> 

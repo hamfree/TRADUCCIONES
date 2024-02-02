@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Creando Restricciones Personalizadas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="bean-validation-advanced.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="bean-validation-advanced002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GKFGX">
+      <h2 id="creating-custom-constraints">Creando Restricciones Personalizadas</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Validación de Beans define anotaciones, interfaces y clases para permitir a los 
+            desarrolladores crear restricciones personalizadas.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>
+                <a href="#GKAIA">
+                  Uso de las Restricciones Integradas para Crear una Nueva Restricción
+                </a>
+              </p>
+            </li>
+            <li>
+              <p><a href="#CIHCICAI">Eliminar la Ambigüedad en los Objetivos de Restricción</a></p>
+            </li>
+            <li>
+              <p>
+                <a href="#implementing-temporal-constraints-using-clockprovider">
+                  Implementación de Restricciones Temporales Mediante ClockProvider
+                </a>
+              </p>
+            </li>
+            <li>
+              <p><a href="#custom-constraints">Restricciones Personalizadas</a></p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="GKAIA">
+          <h3 id="using-the-built-in-constraints-to-make-a-new-constraint">
+            Uso de las Restricciones Integradas para Crear una Nueva Restricción
+          </h3>
+          <div class="paragraph">
+            <p>
+              Validación de Beans incluye varias restricciones integradas que se pueden combinar 
+              para crear nuevas restricciones reutilizables. Esto puede simplificar la definición de 
+              restricciones al permitir que los desarrolladores definan una restricción 
+              personalizada compuesta por varias restricciones integradas que luego se pueden 
+              aplicar a los atributos de los componentes con una sola anotación.
+            </p>
+          </div>
+          <div id="GKAJU" class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Pattern.List({
+  /* Un número de formato “+1-NNN-NNN-NNNN” */
+@Pattern(regexp = “\\+1-\\d{3}-\\d{3}-\\d{4})
+@Constraint(validatedBy = {})
+@Documented
+@Target({ElementType.METHOD,
+    ElementType.FIELD,
+    ElementType.ANNOTATION_TYPE,
+    ElementType.CONSTRUCTOR,
+    ElementType.PARAMETER
+    ElementType.Type_Use})
+@Retention(RetentionPolicy.RUNTIME)
+@Repeatable(List.class)
+public @interface USPhoneNumber {
+String message() default "No es un Número de Teléfono Válido de EEUU";
+Class&lt;?&gt;[] groups() default {};
+Class&lt;? extends Payload&gt;[] payload() default {};
+  @Target({ElementType.METHOD,
+     ElementType.FIELD,
+     ElementType.ANNOTATION_TYPE,
+     ElementType.CONSTRUCTOR,
+     ElementType.PARAMETER
+     ElementType.Type_Use })
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@interface List {
+USPhoneNumber[] value();
+}
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              También puede implementar un <code>Constraint Validator</code> para validar la 
+              restricción <code>@USPhoneNumber</code>. Para obtener más información sobre el uso de 
+              <code>Constraint Validator</code>, consulte 
+              <code>javax.validation.ConstraintValidator</code>.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@USPhoneNumber
+protected String phone;
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="CIHCICAI">
+          <h3 id="removing-ambiguity-in-constraint-targets">
+            Eliminar la Ambigüedad en los Objetivos de Restricción
+          </h3>
+          <div class="paragraph">
+            <p>
+              Las restricciones personalizadas que se pueden aplicar tanto a los valores devueltos 
+              como a los parámetros del método requieren un elemento 
+              <code>validationAppliesTo</code> para identificar el destino de la restricción.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Constraint(validatedBy=MyConstraintValidator.class)
+@Target({ METHOD, FIELD, TYPE, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+@Retention(RUNTIME)
+public @interface MyConstraint {
+  String message() default "{com.example.constraint.MyConstraint.message}";
+  Class&lt;?&gt;[] groups() default {};
+  ConstraintTarget validationAppliesTo() default ConstraintTarget.PARAMETERS;
+...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Esta restricción establece el objetivo <code>validationAppliesTo</code> de forma 
+              predeterminada en los parámetros del método.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@MyConstraint(validationAppliesTo=ConstraintTarget.RETURN_TYPE)
+public String doSomething(String param1, String param2) { ... }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              En el ejemplo anterior, el destino se establece en el valor de retorno del método.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sect1">
+      <h2 id="_implementing_temporal_constraints_using_clockprovider">
+        Implementación de Restricciones Temporales Mediante ClockProvider
+      </h2>
+      <div class="sectionbody">
+        <div id="implementing-temporal-constraints-using-clockprovider" class="paragraph">
+          <p>
+            En Validación de Beans 2.0, una instancia de Clock está disponible para 
+            implementaciones de validador para validar cualquier restricción basada en fecha u hora 
+            temporal.
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+ValidatorFactory validatorFactory = Validation.
+	buildDefaultValidatorFactory();
+ClockProvider clockProvider = validatorFactory.getClockProvider();
+java.time.Clock Clock = clockProvider.getClock();
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            También puede registrar un <code>ClockProvider</code> personalizado con una 
+            <code>ValidatorFactory</code>:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+//Registre una implementación de proveedor de reloj personalizado con la fábrica de validadores
+ValidatorFactory factory = Validation
+       .byDefaultProvider().configure()
+          .clockProvider( new CustomClockProvider() )
+          .buildValidatorFactory();
+//Recupere y use el proveedor de reloj personalizado y el reloj en la implementación del validador
+public class CustomConstraintValidator implements ConstraintValidator&lt;CustomConstraint, Object&gt; {
+    public boolean isValid(Object value, ConstraintValidatorContext context){
+        java.time.Clock clock = context.getClockProvider().getClock();
+        ...
+        ...
+    }
+}
+            </code></pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Vea ClockProvider en 
+            <code>
+              <a href="https://javaee.github.io/javaee-spec/javadocs/" 
+                 class="bare">https://javaee.github.io/javaee-spec/javadocs/</a>
+            </code>.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="sect1">
+      <h2 id="_custom_constraints">Restricciones Personalizadas</h2>
+      <div class="sectionbody">
+        <div id="custom-constraints" class="paragraph">
+          <p>
+            Considere a un empleado en una empresa ubicada en los EE. UU. Cuando registra el número 
+            de teléfono de un empleado o modifica el número de teléfono, el número de teléfono debe 
+            validarse para garantizar que el número de teléfono se ajuste al patrón de números 
+            de teléfono de EE. UU.
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public class Employee extends Person {
+  @USPhoneNumber
+  protected String phone;
+  public Employee(String name, String phone, int age){
+    super(name, age);
+    this.phone = phone;
+  }
+  public String getPhone() {
+    return phone;
+  }
+  public void setPhone(String phone) {
+    this.phone = phone;
+  }
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            La definición de restricción <code>@USPhoneNumber</code> se define en el ejemplo que se 
+            encuentra en <a href="bean-validation-advanced001.html#GKAIA">
+              Uso de las Restricciones Integradas para Crear una Nueva Restricción</a>. En el 
+            ejemplo, se usa otra restricción <code>@Pattern</code> para validar el número de 
+            teléfono.
+          </p>
+        </div>
+        <div class="sect2">
+          <h3 id="_using_in_built_value_extractors_in_custom_containers">
+            Uso de extractores de valor incorporados en contenedores personalizados
+          </h3>
+          <div id="using-in-built-value-extractors-in-custom-containers" class="paragraph">
+            <p>Validación en cascada:</p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Validación de Beans admite la validación en cascada para varias entidades. Puede 
+              especificar <code>@Valid</code> en un miembro del objeto que se valida para garantizar 
+              que el miembro también se valide en cascada. Puede validar argumentos de tipo, por 
+              ejemplo, tipos parametrizados y sus miembros si los miembros tienen la anotación 
+              <code>@Valid</code> especificada.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public class Department {
+    private List&lt ;@Valid Employee&gt; employeesList;
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Al especificar <code>@Valid</code> en un tipo parametrizado, cuando se valida una 
+              instancia de <code>Department</code>, todos los elementos como <code>Employee</code> 
+              en <code>employeesList</code> también se validan. En este ejemplo, el "teléfono" de 
+              cada empleado se valida con la restricción <code>@USPhoneNumber</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para más información vea 
+              <code>
+                <a href="https://javaee.github.io/javaee-spec/javadocs/" class="bare">
+                  https://javaee.github.io/javaee-spec/javadocs/</a>
+              </code>
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Extractor de valores:</p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Al validar el objeto o el gráfico del objeto, también puede ser necesario validar las 
+              restricciones en los tipos parametrizados de un contenedor. Para validar los elementos 
+              del contenedor, el validador debe extraer los valores de estos elementos en el 
+              contenedor. Por ejemplo, para validar los valores de los elementos de 
+              <code>List</code> contra una o más restricciones como 
+              <code>List&lt;@NotOnVacation Employee&gt;</code> o para aplicar la validación en 
+              cascada a <code>List&lt; @Valid Employee&gt;</code>, necesita un extractor de valores 
+              para el contenedor <code>List</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La validación de beans proporciona extractores de valor incorporados para los tipos de 
+              contenedores más utilizados, como List, Iterable y otros. Sin embargo, también es 
+              posible implementar y registrar implementaciones de extractores de valor para tipos de 
+              contenedores personalizados o anular las implementaciones de extractores de valor 
+              incorporados.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Considere una calculadora de estadísticas para un grupo de entidades 'Persona' y 
+              'Empleado' es uno de los subtipos de la entidad 'Persona'.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public class StatsCalculator&lt;T extends Person&gt; {
+  /* Validación en cascada y restricción @NotNull*/
+  private List&lt;@NotNull @Valid T&gt; members = new ArrayList&lt;T&gt;();
+  public void addMember(T member) {
+    members.add(member);
+  }
+  public boolean removeMember(T member) {
+    return members.remove(member);
+  }
+  public int getAverageAge() {
+    if (members.size() == 0)
+      return 0;
+    short sum = 0;
+    for (T member : members) {
+      if(member != null) {
+        sum += member.getAge();
+      }
+    }
+    return sum / members.size();
+  }
+  public int getOldest() {
+    int oldest = -1;
+    for (T member : members) {
+      if(member != null) {
+        if (member.getAge() &gt; oldest) {
+          oldest = member.getAge();
+        }
+      }
+    }
+    return oldest;
+  }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Cuando se valida <code>StatsCalculator</code>, el campo "miembros" también se valida. 
+              El extractor de valores incorporado para <code>List</code> se usa para extraer los 
+              valores de <code>List</code> para validar los elementos en <code>List</code>. En el 
+              caso de una lista basada en empleados, se valida cada elemento "Empleado". Por 
+              ejemplo, el "teléfono" de un empleado se valida mediante la restricción 
+              <code>@USPhoneNumber</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              En el siguiente ejemplo, consideremos una <code>StatisticsPrinter</code> que imprime 
+              las estadísticas o muestra las estadísticas en pantalla.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public class StatisticsPrinter {
+    private StatsCalculator&lt;@Valid Employee&gt; calculator;
+    public StatisticsPrinter(StatsCalculator&lt;Employee&gt; statsCalculator){
+      this.calculator = statsCalculator;
+    }
+    public void displayStatistics(){
+      //Use StatsCalculator, get stats, format and display them.
+    }
+    public void printStatistics(){
+      //Use StatsCalculator, get stats, format and print them.
+    }
+  }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El contenedor <code>StatisticsPrinter</code> usa <code>StatisticsCalculator</code>. 
+              Cuando se valida <code>StatisticsPrinter</code>, <code>StatisticsCalculator</code> 
+              también se valida mediante la validación en cascada, como la anotación 
+              <code>@Valid</code>. Sin embargo, para recuperar los valores del tipo de contenedor 
+              <code>StatsCalculator</code>, se requiere un extractor de valores. Una implementación 
+              de <code>ValueExtractor</code> para <code>StatsCalculator</code> es la siguiente:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public class ExtractorForStatsCalculator implements ValueExtractor&lt;StatsCalculator&lt;@ExtractedValue ?&gt;&gt;{
+    @Override
+    public void extractValues(StatsCalculator&lt;@ExtractedValue ?&gt; statsCalculator,
+        ValueReceiver valueReceiver) {
+        /* La recuperación de valor simple se realiza aquí.
+           Es posible adaptar o desencapsular el valor si es necesario. */
+      valueReceiver.value("&lt;extracted value&gt;", statsCalculator);
+    }
+  }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Existen múltiples mecanismos para registrar el <code>ValueExtractor</code> con 
+              Validación de Beans. Consulte la sección de implementaciones 
+              “Registering ValueExtractor” en la especificación de Validación de Beans 
+              <code>
+                <a href="http://www.jcp.org/en/jsr/detail?id=380" class="bare">
+                  http: //www.jcp.org/en/jsr/detail?id=380
+                </a>
+              </code>. Uno de los mecanismos es dar de alta el extractor de valores con Validación 
+              de Beans Context.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+ValidatorFactory validatorFactory = Validation
+        .buildDefaultValidatorFactory();
+    ValidatorContext context = validatorFactory.
+        usingContext()
+        .addValueExtractor(new ExtractorForStatsCalculator());
+    Validator validator = context.getValidator();
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Usando este validador, <code>StatsisticsPrinter</code> se valida en la siguiente 
+              secuencia de operaciones:
+            </p>
+          </div>
+          <div class="olist arabic">
+            <ol class="arabic">
+              <li>
+                <p><code>StatisticsPrinter</code> está validado.</p>
+                <div class="olist loweralpha">
+                  <ol class="loweralpha" type="a">
+                    <li>
+                      <p>
+                        Se validan los miembros de <code>StatisticsPrinter</code> que necesitan 
+                        validación en cascada.
+                      </p>
+                    </li>
+                    <li>
+                      <p>
+                        Para los tipos de contenedores, se determina el extractor de valores. En el 
+                        caso de <code>StatsCalculator</code>, se encuentra 
+                        <code>ExtractorForStatsCalculator</code> y luego se recuperan los valores 
+                        para su validación.
+                      </p>
+                    </li>
+                    <li>
+                      <p>
+                        Se validan <code>StatsCalculator</code> y sus miembros, como 
+                        <code>List</code>.
+                      </p>
+                    </li>
+                    <li>
+                      <p>
+                        El <code>ValueExtractor</code> integrado para <code>java.util.List</code> se 
+                        utiliza para recuperar los valores de los elementos de la lista y los 
+                        validados. En este caso, se validan el empleado y el campo "teléfono" que 
+                        está anotado con la restricción <code>@USPhoneNumber</code>.
+                      </p>
+                    </li>
+                  </ol>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="bean-validation-advanced.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="bean-validation-advanced002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

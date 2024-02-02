@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Uso de Seguridad Programática con Aplicaciones Web</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="security-webtier002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="security-webtier004.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GJIIE">
+      <h2 id="using-programmatic-security-with-web-applications">
+        Uso de Seguridad Programática con Aplicaciones Web
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            La seguridad programática es utilizada por aplicaciones conscientes de la seguridad cuando la 
+            seguridad declarativa por sí sola no es suficiente para expresar el modelo de seguridad de la 
+            aplicación.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p><a href="#GIRCJ">Autenticación de Usuarios Mediante Programación</a></p>
+            </li>
+            <li>
+              <p><a href="#BNCBA">Comprobación de la Identidad del Llamador Mediante Programación</a></p>
+            </li>
+            <li>
+              <p><a href="#GJJLQ">Código de Ejemplo para Seguridad Programática</a></p>
+            </li>
+            <li>
+              <p><a href="#BNCBB">Declaración y Vinculación de Referencias de Roles</a></p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="GIRCJ">
+          <h3 id="authenticating-users-programmatically">Autenticación de Usuarios Mediante Programación</h3>
+          <div class="paragraph">
+            <p>
+              Los siguientes métodos de la interfaz <code>HttpServletRequest</code> le permiten autenticar 
+              usuarios para una aplicación web mediante programación.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  <code>authenticate</code> permite que una aplicación provoque la autenticación de la persona 
+                  que llama a la solicitud por parte del contenedor desde un contexto de solicitud sin 
+                  restricciones. Aparece un cuadro de diálogo de inicio de sesión y recopila el nombre de 
+                  usuario y la contraseña con fines de autenticación.
+                </p>
+              </li>
+              <li>
+                <p>
+                  <code>login</code> permite que una aplicación recopile información de nombre de usuario y 
+                  contraseña como una alternativa a la especificación de autenticación basada en formularios 
+                  en un descriptor de implementación de la aplicación.
+                </p>
+              </li>
+              <li>
+                
+                <p>
+                  <code>logout</code> permite que una aplicación restablezca la identidad de la persona que 
+                  llama de una solicitud.
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              El siguiente código de ejemplo muestra cómo utilizar los métodos <code>login</code> y 
+              <code>logout</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+package test;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.math.BigDecimal;
+import javax.ejb.EJB;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+@WebServlet(name="TutorialServlet", urlPatterns={"/TutorialServlet"})
+public class TutorialServlet extends HttpServlet {
+    @EJB
+    private ConverterBean converterBean;
+    /**
+     * Processes requests for both HTTP &lt;code&gt;GET&lt;/code&gt;
+     *    and &lt;code&gt;POST&lt;/code&gt; methods.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    protected void processRequest(HttpServletRequest request,
+            HttpServletResponse response)
+    throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        try {
+            out.println("&lt;html&gt;");
+            out.println("&lt;head&gt;");
+            out.println("&lt;title&gt;Servlet TutorialServlet&lt;/title&gt;");
+            out.println("&lt;/head&gt;");
+            out.println("&lt;body&gt;");
+            request.login("TutorialUser", "TutorialUser");
+            BigDecimal result =
+                converterBean.dollarToYen(new BigDecimal("1.0"));
+            out.println("&lt;h1&gt;Servlet TutorialServlet result of dollarToYen= "
+                + result + "&lt;/h1&gt;");
+            out.println("&lt;/body&gt;");
+            out.println("&lt;/html&gt;");
+        } catch (Exception e) {
+            throw new ServletException(e);
+        } finally {
+            request.logout();
+            out.close();
+        }
+    }
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>El siguiente código de ejemplo muestra cómo usar el método <code>authenticate</code>:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+package com.example.test;
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+public class TestServlet extends HttpServlet {
+    protected void processRequest(HttpServletRequest request,
+            HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        try {
+            request.authenticate(response);
+            out.println("Authenticate Successful");
+        } finally {
+            out.close();
+        }
+    }
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="BNCBA">
+          <h3 id="checking-caller-identity-programmatically">
+            Comprobación de la Identidad del Llamador Mediante Programación
+          </h3>
+          <div class="paragraph">
+            <p>
+              En general, el contenedor debe aplicar la gestión de la seguridad de forma transparente para el 
+              componente web. La IPA de seguridad descrita en esta sección debe usarse solo en las situaciones 
+              menos frecuentes en las que los métodos del componente web necesitan acceder a la información 
+              del contexto de seguridad.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Servlet 4.0 especifica los siguientes métodos que le permiten acceder a la información de 
+              seguridad sobre la persona que llama al componente.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  <code>getRemoteUser</code> determina el nombre de usuario con el que se autentica el 
+                  cliente. El método <code>getRemoteUser</code> devuelve el nombre del usuario remoto (la 
+                  persona que llama) asociado por el contenedor con la solicitud. Si no se ha autenticado 
+                  ningún usuario, este método devuelve <code>null</code>.
+                </p>
+              </li>
+              <li>
+                <p>
+                  <code>isUserInRole</code> determina si un usuario remoto tiene un rol de seguridad 
+                  específico. Si no se ha autenticado ningún usuario, este método devuelve <code>false</code>. 
+                  Este método espera un parámetro de usuario <code>String</code> <code>role-name</code>.
+                </p>
+                <div class="paragraph">
+                  <p>
+                    El elemento <code>security-role-ref</code> debe declararse en el descriptor de 
+                    implementación con un subelemento <code>role-name</code> que contiene el nombre del rol 
+                    que se pasará al método. El uso de referencias de roles de seguridad se analiza en 
+                    <a href="#BNCBB">Declaración y Vinculación de Referencias de Roles</a>.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <p>
+                  <code>getUserPrincipal</code> determina el nombre principal del usuario actual y devuelve un 
+                  objeto <code>java.security.Principal</code>. Si no se ha autenticado ningún usuario, este 
+                  método devuelve <code>null</code>. Llamar al método <code>getName</code> en el 
+                  <code>Principal</code> devuelto por <code>getUserPrincipal</code> devuelve el nombre del 
+                  usuario remoto.
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Su aplicación puede tomar decisiones de lógica empresarial en función de la información obtenida 
+              mediante estas IPA.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="GJJLQ">
+          <h3 id="example-code-for-programmatic-security">Código de Ejemplo para Seguridad Programática</h3>
+          <div class="paragraph">
+            <p>
+              El siguiente código demuestra el uso de la seguridad programática para el inicio de sesión 
+              programático. Este servlet hace lo siguiente.
+            </p>
+          </div>
+          <div class="olist arabic">
+            <ol class="arabic">
+              <li>
+                <p>Muestra información sobre el usuario actual.</p>
+              </li>
+              <li>
+                <p>Solicita al usuario que inicie sesión.</p>
+              </li>
+              <li>
+                <p>
+                  Imprime la información nuevamente para demostrar el efecto del método <code>login</code>.
+                </p>
+              </li>
+              <li>
+                <p>Cierra la sesión del usuario.</p>
+              </li>
+              <li>
+                <p>
+                  Imprime la información nuevamente para demostrar el efecto del método <code>logout</code>.
+                </p>
+              </li>
+            </ol>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+package enterprise.programmatic_login;
+import java.io.*;
+import java.net.*;
+import javax.annotation.security.DeclareRoles;
+import javax.servlet.*;
+import javax.servlet.http.*;
+@DeclareRoles("javaeeuser")
+public class LoginServlet extends HttpServlet {
+    /**
+     * Processes requests for both HTTP GET and POST methods.
+     * @param request servlet request
+     * @param response servlet response
+     */
+    protected void processRequest(HttpServletRequest request,
+                 HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        try {
+            String userName = request.getParameter("txtUserName");
+            String password = request.getParameter("txtPassword");
+            out.println("Before Login" + "&lt;br&gt;&lt;br&gt;");
+            out.println("IsUserInRole?.."
+                        + request.isUserInRole("javaeeuser")+"&lt;br&gt;");
+            out.println("getRemoteUser?.." + request.getRemoteUser()+"&lt;br&gt;");
+            out.println("getUserPrincipal?.."
+                        + request.getUserPrincipal()+"&lt;br&gt;");
+            out.println("getAuthType?.." + request.getAuthType()+"&lt;br&gt;&lt;br&gt;");
+            try {
+                request.login(userName, password);
+            } catch(ServletException ex) {
+                out.println("Login Failed with a ServletException.."
+                    + ex.getMessage());
+                return;
+            }
+            out.println("After Login..."+"&lt;br&gt;&lt;br&gt;");
+            out.println("IsUserInRole?.."
+                        + request.isUserInRole("javaeeuser")+"&lt;br&gt;");
+            out.println("getRemoteUser?.." + request.getRemoteUser()+"&lt;br&gt;");
+            out.println("getUserPrincipal?.."
+                        + request.getUserPrincipal()+"&lt;br&gt;");
+            out.println("getAuthType?.." + request.getAuthType()+"&lt;br&gt;&lt;br&gt;");
+            request.logout();
+            out.println("After Logout..."+"&lt;br&gt;&lt;br&gt;");
+            out.println("IsUserInRole?.."
+                        + request.isUserInRole("javaeeuser")+"&lt;br&gt;");
+            out.println("getRemoteUser?.." + request.getRemoteUser()+"&lt;br&gt;");
+            out.println("getUserPrincipal?.."
+                        + request.getUserPrincipal()+"&lt;br&gt;");
+            out.println("getAuthType?.." + request.getAuthType()+"&lt;br&gt;");
+        } finally {
+            out.close();
+        }
+    }
+    ...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="BNCBB">
+          <h3 id="declaring-and-linking-role-references">
+            Declaración y Vinculación de Referencias de Roles
+          </h3>
+          <div class="paragraph">
+            <p>
+              Una referencia de función de seguridad es una asignación entre el nombre de una función que se 
+              llama desde un componente web mediante <code>isUserInRole(String role)</code> y el nombre de una 
+              función de seguridad que se ha definido para la aplicación. Si no se declara ningún elemento 
+              <code>security-role-ref</code> en un descriptor de implementación y se llama al método 
+              <code>isUserInRole</code>, el contenedor comprueba de forma predeterminada el nombre del rol 
+              proporcionado con la lista de todos los elementos roles de seguridad definidos para la 
+              aplicación web. El uso del método predeterminado en lugar del elemento 
+              <code>security-role-ref</code> limita su flexibilidad para cambiar los nombres de los roles en 
+              una aplicación sin volver a compilar el servlet que realiza la llamada.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El elemento <code>security-role-ref</code> se usa cuando una aplicación usa 
+              <code>HttpServletRequest.isUserInRole(String role)</code>. El valor pasado al método 
+              <code>isUserInRole</code> es una <code>String</code> que representa el nombre del rol del 
+              usuario. El valor del elemento <code>role-name</code> debe ser el <code>String</code> utilizado 
+              como parámetro para <code>HttpServletRequest.isUserInRole(String role)</code>. El 
+              <code>role-link</code> debe contener el nombre de uno de los roles de seguridad definidos en los 
+              elementos <code>security-role</code>. El contenedor utiliza la asignación de 
+              <code>security-role-ref</code> a <code>security-role</code> al determinar el valor de retorno de 
+              la llamada.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Por ejemplo, para asignar la referencia del rol de seguridad <code>cust</code> al rol de 
+              seguridad con el nombre de rol <code>bankCustomer</code>, los elementos se verían así:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;servlet&gt;
+...
+    &lt;security-role-ref&gt;
+        &lt;role-name&gt;cust&lt;/role-name&gt;
+        &lt;role-link&gt;bankCustomer&lt;/role-link&gt;
+    &lt;/security-role-ref&gt;
+...
+&lt;/servlet&gt;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Si un usuario en el rol de seguridad <code>bankCustomer</code> llama al método de servlet, 
+              <code>isUserInRole("cust")</code> devuelve <code>true</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El elemento <code>role-link</code> en el elemento <code>security-role-ref</code> debe coincidir 
+              con un <code>role-name</code> definido en el elemento <code>security-role</code> del mismo 
+              descriptor de implementación <code>web.xml</code>, como se muestra aquí:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;security-role&gt;
+    &lt;role-name&gt;bankCustomer&lt;/role-name&gt;
+&lt;/security-role&gt;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Una referencia de función de seguridad, incluido el nombre definido por la referencia, se limita 
+              al componente cuyo descriptor de implementación contiene el elemento descriptor de 
+              implementación <code>security-role-ref</code>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="security-webtier002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="security-webtier004.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

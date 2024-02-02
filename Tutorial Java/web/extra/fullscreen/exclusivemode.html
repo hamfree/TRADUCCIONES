@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Modo Exclusivo de Pantalla-Completa (Los Tutoriales de Java&trade; &gt; Extras &gt; IPA del Modo Exclusivo de
+            Pantalla-Completa)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe los genéricos, la IPA del modo de pantalla completo, y 
+              los recursos relacionados con la certificación de Java" />
+        <meta name="keywords" content="programación en java, aprender java, ejemplos de código java, genéricos de java, IPA del 
+              modo de pantalla completa, certificación" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">IPA del Modo Exclusivo de Pantalla-Completa</a></div>
+                <div class="nolinkAHEAD">Modo Exclusivo de Pantalla-Completa</div>
+                <div class="linkAHEAD"><a href="displaymode.html">Modo de Pantalla</a></div>
+                <div class="linkAHEAD"><a href="rendering.html">Renderizado Pasivo versus Activo</a></div>
+                <div class="linkAHEAD"><a href="doublebuf.html">Bufer Doble e Intercambio de Páginas</a></div>
+                <div class="linkAHEAD"><a href="bufferstrategy.html">BufferStrategy y BufferCapabilities</a></div>
+                <div class="linkAHEAD"><a href="example.html">Ejemplos</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Extras<br />
+                <b>Lección:</b> IPA del Modo Exclusivo de Pantalla-Completa
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Extras</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">IPA del Modo Exclusivo de Pantalla-Completa</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="displaymode.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Modo Exclusivo de Pantalla-Completa</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Los programadores que usan la IPA DirectX de Microsoft pueden estar ya familiarizados con el modo exclusivo de pantalla 
+                    completa. Otros programadores pueden ser algo nuevos en el concepto. En cualquier caso, el modo exclusivo de pantalla 
+                    completa es una característica poderosa de la versión 1.4 de J2SE&trade; que permite al programador suspender el sistema 
+                    de ventanas para que el dibujo se pueda hacer directamente en la pantalla.
+                </p>
+                <p>
+                    Este es un ligero cambio de paradigma del tipo habitual de programa de IGU en muchos sentidos. En los programas 
+                    tradicionales de IGU de Java, el AWT es responsable de propagar <i>eventos de pintar</i> desde el sistema operativo, a 
+                    través del <i>hilo de despacho de eventos</i>, y llamando al método <code>Component.paint</code> de AWT cuando sea 
+                    apropiado. En las aplicaciones exclusivas de pantalla completa, el pintado se realiza activamente por el propio programa.
+                    Adicionalmente, una aplicación IGU tradicional está limitada a la profundidad de bit y el tamaño de la pantalla elegida 
+                    por el usuario. En una aplicación de pantalla completa exclusiva, el programa puede controlar la profundidad de bit y el 
+                    tamaño (<i>modo de pantalla</i>) de la pantalla. Finalmente, muchas más técnicas avanzadas, tales como <i>intercambio de 
+                    páginas</i> (descrita abajo) y el búfer estéreo (utilizando sistemas que usan un conjunto separado de marcos para cada 
+                    ojo) requieren, en algunas plataformas, que una aplicación primero se encuentre el módo exclusivo de pantalla completa.
+                </p>
+                <h2>
+                    Conceptos básicos de imagen acelerada por hardware
+                </h2>
+                <p>
+                    Para entender la IPA del modo exclusivo de pantalla completa, necesita entender algunos principios básicos de las 
+                    imágenes acelerados por el hardware. El interfaz <code>VolatileImage</code> encapsula una superficie la cual puede o no 
+                    aprovechar las ventajas de la aceleración por hardware. Tales superficies pueden perder su aceleración hardware o su 
+                    memoria a instancias del sistema operativo (de ahí el nombre 'volátil'). Vea el <em>Tutorial</em> 
+                    <code>VolatileImage</code> (próximamente)  para más información sobre las imágenes volátiles.
+                </p>
+                <p>
+                    El modo exclusivo de pantalla completa se maneja a través de un objeto <code>java.awt.GraphicsDevice</code>. Para obtener
+                    una lista de todos los dispositivos gráficos de pantalla disponibles (en sistemas de uno o múltiples monitores), puede 
+                    llamar al método <code>getScreenDevices</code> del <code>java.awt.GraphicsEnvironment</code> local; para la pantalla por 
+                    defecto (primaria) (la única pantalla en un sistema de único monitor), puede llamar al método 
+                    <code>getDefaultScreenDevice</code>.
+                </p>
+                <p>
+                    Una vez que tiene el dispositivo gráfico, puede llamar a uno de los siguientes métodos:
+                </p>
+                <ul>
+                    <li>
+                        <code>public boolean isFullScreenSupported()</code><br/>
+                        Este método devuelve si está disponible o no el modo exclusivo de pantalla completa. En sistemas donde el modo 
+                        exclusivo de pantalla completa no está disponible, es probablemente mejor ejecutar una aplicación en modo de ventana 
+                        con un tamaño fijo que establecer una ventana de pantalla completa.
+                    </li>
+                    <li>
+                        <code>public void setFullScreenWindow(Window w)</code><br/>
+                        Dada una ventana, este método habilita el modo exclusivo de pantalla completa usando esa ventana. Si el modo 
+                        exclusivo de pantalla completa no está disponible, la ventana se posiciona en (0,0) y se redimensiona para ocupar 
+                        toda la pantalla. Use este método con un parámetro <code>null</code> para salir del modo exclusivo de pantalla 
+                        completa.
+                    </li>
+                </ul>
+                <h2>
+                    Consejos de programación
+                </h2>
+                <p>
+                    Aquí hay algunos consejos sobre la programación usando el modo exclusivo de pantalla completa:
+                </p>
+                <ul>
+                    <li>
+                        Verifique <code>isFullScreenSupported</code> antes de ingresar en el modo exclusivo de pantalla completa. Si no es 
+                        compatible, el rendimiento puede verse degradado.
+                    </li>
+                    <li>
+                        Entrar y salir del modo de pantalla completa es más robusto cuando se usa una cláusula <code>try...finally</code>. 
+                        Esto es no sólo una buena práctica de codificación, sino que también evita que su programa permanezca en el modo 
+                        exclusivo de pantalla completa más tiempo del que debería:
+                        <div class="codeblock">
+                            <pre>
+GraphicsDevice myDevice;
+Window myWindow;
+
+try {
+    myDevice.setFullScreenWindow(myWindow);
+    ...
+} finally {
+    myDevice.setFullScreenWindow(null);
+}
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        La mayoría de las aplicaciones de pantalla completa exclusiva son más adecuadas para usar ventanas no decoradas. 
+                        Desactive las decoraciones en el marco o diálogo usando el método <code>setUndecorated</code>.
+                    </li>
+                    <li>
+                        Las aplicaciones de pantalla completa exclusiva no deberían ser redimensionable, ya que redimensionar una aplicación 
+                        de pantalla completa puede causar un comportamiento impredecible (o posiblemente peligrosa).
+                    </li>
+                    <li>
+                        Por razones de seguridad, el usuario debe otorgar el permiso <code>fullScreenExclusive</code> al usar el modo 
+                        exclusivo de pantalla completa en un applet.
+                    </li>
+                </ul>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="displaymode.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos
+                            <a href="../../information/cpyr.html">avisos legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> IPA del Modo Exclusivo de Pantalla-Completa<br />
+            <b>Página siguiente:</b> Modo de Pantalla
+        </div>
+    </body>
+</html> 

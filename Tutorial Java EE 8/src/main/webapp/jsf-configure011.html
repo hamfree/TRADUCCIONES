@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Registrando un Renderizador Personalizado con un Kit de Renderizado</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jsf-configure010.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-configure012.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BNAXH">
+      <h2 id="registering-a-custom-renderer-with-a-render-kit">
+        Registrando un Renderizador Personalizado con un Kit de Renderizado
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Cuando el desarrollador de la aplicación crea un renderizador personalizado, como se describe en 
+            <a href="jsf-custom006.html#BNAWA">Delegación de Renderizado a un Renderizador</a>. debe 
+            registrarlo utilizando el kit de renderizado apropiado. Debido a que la aplicación de mapas de 
+            imágenes implementa un mapa de imágenes HTML, las clases <code>AreaRenderer</code> y 
+            <code>MapRenderer</code> en el estudio de caso de la librería Duke's Bookstore deben registrarse 
+            usando el kit de renderizado HTML.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            El renderizador se registra mediante la anotación <code>@FacesRenderer</code>, como se describe en
+            <a href="jsf-custom006.html#BNAWB">Creando la Clase del Renderizador</a>, o utilizando el elemento 
+            <code>render-kit</code> del archivo de recursos de configuración de la aplicación. Aquí hay una 
+            configuración hipotética de <code>AreaRenderer</code>:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;render-kit&gt;
+    &lt;renderer&gt;
+        &lt;component-family&gt;Area&lt;/component-family&gt;
+        &lt;renderer-type&gt;DemoArea&lt;/renderer-type&gt;
+        &lt;renderer-class&gt;
+            dukesbookstore.renderers.AreaRenderer
+        &lt;/renderer-class&gt;
+        &lt;attribute&gt;
+            &lt;attribute-name&gt;onmouseout&lt;/attribute-name&gt;
+            &lt;attribute-class&gt;java.lang.String&lt;/attribute-class&gt;
+        &lt;/attribute&gt;
+        &lt;attribute&gt;
+            &lt;attribute-name&gt;onmouseover&lt;/attribute-name&gt;
+            &lt;attribute-class&gt;java.lang.String&lt;/attribute-class&gt;
+        &lt;/attribute&gt;
+        &lt;attribute&gt;
+            &lt;attribute-name&gt;styleClass&lt;/attribute-name&gt;
+            &lt;attribute-class&gt;java.lang.String&lt;/attribute-class&gt;
+        &lt;/attribute&gt;
+    &lt;/renderer&gt;
+    ...
+            </code></pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Los atributos especificados en una etiqueta <code>renderer</code> anulan cualquier configuración 
+            en la anotación <code>@FacesRenderer</code>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            El elemento <code>render-kit</code> representa una implementación 
+            javax.faces.render.<code>RenderKit</code>. Si no se especifica <code>render-kit-id</code>, se 
+            asume el kit de renderizado HTML predeterminado. El elemento <code>renderer</code> representa una 
+            implementación de <code>javax.faces.render.Renderer</code>. Al anidar el elemento 
+            <code>renderer</code> dentro del elemento <code>render-kit</code>, está registrando el 
+            renderizador con la implementación <code>RenderKit</code> asociada con el elemento
+            <code>render-kit</code>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            <code>render-class</code> es el nombre de clase completamente calificado del 
+            <code>Renderer</code>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Los elementos <code>component-family</code> y <code>renderer-type</code> son utilizados por un 
+            componente para encontrar renderizadores que puedan renderizarlo. El identificador 
+            <code>component-family</code> debe coincidir con el devuelto por el método <code>getFamily</code> 
+            de la clase de componente. La familia de componentes representa un componente o conjunto de 
+            componentes que puede representar un renderizador en particular. El <code>renderer-type</code> 
+            debe coincidir con el devuelto por el método <code>getRendererType</code> de la clase de 
+            controlador de etiquetas.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Al utilizar la familia de componentes y el tipo de renderizador para buscar renderizadores de 
+            componentes, la implementación de JavaServer Faces permite que un componente sea renderizado por 
+            múltiples renderizadores y permite que un renderizador renderice múltiples componentes.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Cada una de las etiquetas de <code>attribute</code> especifica un atributo dependiente de la 
+            representación y su tipo. El elemento <code>attribute</code> no afecta la ejecución en tiempo de 
+            ejecución de su aplicación. Más bien, proporciona información a las herramientas sobre los 
+            atributos que admite el <code>Renderer</code>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            El objeto responsable de renderizar un componente (ya sea el propio componente o un renderizador 
+            en el que el componente delega la renderización) puede usar facetas para ayudar en el proceso de 
+            renderizado. Estas facetas permiten al desarrollador de componentes personalizados controlar 
+            algunos aspectos de la representación del componente. Considere este ejemplo de etiqueta de 
+            componente personalizado:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;d:dataScroller&gt;
+    &lt;f:facet name="header"&gt;
+        &lt;h:panelGroup&gt;
+            &lt;h:outputText value="Account Id"/&gt;
+            &lt;h:outputText value="Customer Name"/&gt;
+            &lt;h:outputText value="Total Sales"/&gt;
+        &lt;/h:panelGroup&gt;
+    &lt;/f:facet&gt;
+    &lt;f:facet name="next"&gt;
+        &lt;h:panelGroup&gt;
+            &lt;h:outputText value="Siguiente"/&gt;
+            &lt;h:graphicImage url="/images/arrow-right.gif" /&gt;
+        &lt;/h:panelGroup&gt;
+    &lt;/f:facet&gt;
+    ...
+&lt;/d:dataScroller&gt;
+            </code></pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            La etiqueta del componente <code>dataScroller</code> incluye un componente que representará el 
+            encabezado y un componente que representará el botón Siguiente. Si el renderizador asociado con 
+            este componente renderiza las facetas, puede incluir los siguientes elementos <code>facet</code> 
+            en el elemento <code>render</code>:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;facet&gt;
+    &lt;description&gt;This facet renders as the header of the table. It should be
+         a panelGroup with the same number of columns as the data.
+    &lt;/description&gt;
+    &lt;display-name&gt;header&lt;/display-name&gt;
+    &lt;facet-name&gt;header&lt;/facet-name&gt;
+&lt;/facet&gt;
+&lt;facet&gt;
+    &lt;description&gt;This facet renders as the content of the "next" button in
+         the scroller. It should be a panelGroup that includes an outputText
+         tag that has the text "Siguiente" and a right arrow icon.
+    &lt;/description&gt;
+    &lt;display-name&gt;Siguiente&lt;/display-name&gt;
+    &lt;facet-name&gt;next&lt;/facet-name&gt;
+&lt;/facet&gt;
+            </code></pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Si un componente que admite facetas proporciona su propio renderizado y desea incluir elementos 
+            <code>facet</code> en el archivo de recursos de configuración de la aplicación, debe colocarlos en 
+            la configuración del componente en lugar de en la configuración del renderizador.
+          </p>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jsf-configure010.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-configure012.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

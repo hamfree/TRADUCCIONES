@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Escribiendo un Cliente y Servidor de Datagramas (Los Tutoriales de Java&trade; &gt; Personalizando la Red &gt; Todo 
+            Sobre los Datagramas)
+        </title>
+        <meta name="description" content="Este tutorial de Java sobre redes describe las capacidades de red de la plataforma Java, 
+              trabajando con URL, sockets, datagramas y cookies." />
+        <meta name="keywords" content="java programming, learn java, java sample code, java networking, java url, java socket,
+              datagram, java cookie" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Todo Sobre los Datagramas</a></div>
+                <div class="linkAHEAD"><a href="definition.html">¿Qué es un Datagrama?</a></div>
+                <div class="nolinkAHEAD">Escribiendo un Cliente y Servidor de Datagramas</div>
+                <div class="linkAHEAD"><a href="broadcasting.html">Difusion a Varios Destinatarios</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Personalizando la Red<br />
+                <b>Lección:</b> Todo Sobre los Datagramas
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Personalizando la Red</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Todo Sobre los Datagramas</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="definition.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="broadcasting.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Escribiendo un Cliente y Servidor de Datagramas</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    El ejemplo presentado en esta sección consiste de dos aplicaciones: un cliente y un servidor. El servidor 
+                    recibe continuamente paquetes de datagramas a través de un socket de datagrama. Cada paquete de datagrama 
+                    recibido por el servidor indica un petición de cliente para una cita. Cuando el servidor recibe un datagrama, 
+                    responde enviando un paquete datagrama que contiene una línea &quot;cita del momento&quot; de vuelta al 
+                    cliente.
+                </p>
+                <p>
+                    La aplicación cliente en este ejemplo es bastante simple. Envía un único paquete datagrama al servidor 
+                    indicando que al cliente le gustaría recibir un cita del momento. El cliente luego espera a que el servidor le 
+                    envíe un paquete de datagrama en respuesta.
+                </p>
+                <p>
+                    Dos clases implementan la aplicación servidor: <code>QuoteServer</code> y <code>QuoteServerThread</code>. Una 
+                    única clase implementa la aplicación cliente: <code>QuoteClient</code>.
+                </p>
+                <p>
+                    Investiguemos estas clases, empezando con la clase que contiene el método <code>main</code> para la aplicación 
+                    servidor. <a class="TutorialLink" target="_top" href="../../deployment/applet/server.html">Trabajando Con 
+                        Aplicación del Lado del Servidor</a> contiene una versión en applet de la clase <code>QuoteClient</code>.
+                </p>
+                <h2>
+                    <a id="mainprogram">La Clase QuoteServer</a>
+                </h2>
+                <p>
+                    La clase  <a class="SourceLink" target="_blank" href="examples/QuoteServer.java" 
+                                 onclick="showCode('../../displayCode.html', 'examples/QuoteServer.java'); return false;">
+                        <code>QuoteServer</code></a>, mostrada aquí en su totalidad, contiene un único método: el método 
+                    <code>main</code> para la aplicación de servidor de citas. El método <code>main</code> crea simplemente un 
+                    nuevo objeto <code>QuoteServerThread</code> y lo inicia:
+                </p>
+                <div class="codeblock">
+                    <pre>
+import java.io.*;
+
+public class QuoteServer {
+    public static void main(String[] args) throws IOException {
+        new QuoteServerThread().start();
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    La clase <code>QuoteServerThread</code> implementa la lógica principal del servidor de citas.
+                </p>
+                <h2>
+                    La Clase <code>QuoteServerThread</code>
+                </h2>
+                <p>
+                    Cuando se crea, el 
+                    <a class="SourceLink" target="_blank" href="examples/QuoteServerThread.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/QuoteServerThread.java'); return false;">
+                        <code>QuoteServerThread</code></a> crea un <code>DatagramSocket</code> en el puerto 4445 (elegido 
+                    arbitrariamente). Este es el <code>DatagramSocket</code> a través del cual el servidor se comunica con 
+                    todos sus clientes.
+                </p>
+                <div class="codeblock">
+                    <pre>
+public QuoteServerThread() throws IOException {
+    this("QuoteServer");
+}
+
+public QuoteServerThread(String name) throws IOException {
+    super(name);
+    socket = new DatagramSocket(4445);
+
+    try {
+        in = new BufferedReader(new FileReader("one-liners.txt"));
+    }   
+    catch (FileNotFoundException e){
+        System.err.println("Couldn't open quote file.  Serving time instead.");
+    }
+}  
+                    </pre>
+                </div>
+                <p>
+                    Recuerde que ciertos puertos están dedicados a servicios bien conocidos y no puede usarlos. Si especifica un 
+                    puerto que está en uso, la creación del <code>DatagramSocket</code> fallará.
+                </p>
+                <p>
+                    El constructor también abre un <code>BufferedReader</code> para un fichero llamado 
+                    <a class="SourceLink" target="_blank" href="examples/one-liners.txt" 
+                       onclick="showCode('../../displayCode.html', 'examples/one-liners.txt'); return false;">
+                        <code>one-liners.txt</code></a> el cual contiene una lista de citas. Cada cita en el fichero está en una 
+                    línea por sí misma.
+                </p>
+                <p>
+                    Ahora, para la parte interesante de <code>QuoteServerThread</code>: su método <code>run</code>. El método 
+                    <code>run</code> sobreescribe <code>run</code> en la clase <code>Thread</code> y proporciona la implementación 
+                    para el hilo. Para información sobre hilos, vea 
+                    <a class="TutorialLink" target="_top" href="../../essential/concurrency/runthread.html">Definiendo e Iniciando 
+                        un Hilo</a>.
+                </p>
+                <p>
+                    El método <code>run</code> contiene un bucle <code>while</code> que continúa mientras haya más citas en el 
+                    fichero. Durante cada iteración del bucle, el hilo espera que llegue un <code>DatagramPacket</code> a través 
+                    del <code>DatagramSocket</code>. El paquete indica una petición desde un cliente. En respuesta a la petición 
+                    del cliente, el <code>QuoteServerThread</code> obtiene una cita del fichero, la coloca en un 
+                    <code>DatagramPacket</code> y la manda a través del <code>DatagramSocket</code> al cliente que la pidió.
+                </p>
+                <p>
+                    Veamos primero la sección que recibe las peticiones desde los clientes:
+                </p>
+                <div class="codeblock">
+                    <pre>
+byte[] buf = new byte[256];
+DatagramPacket packet = new DatagramPacket(buf, buf.length);
+socket.receive(packet);
+                    </pre>
+                </div>
+                <p>
+                    La primera sentencia crea un vector de bytes el cual se usa para crear un <code>DatagramPacket</code>. El 
+                    <code>DatagramPacket</code>. será usado para recibir un datagrama desde el socket debido al constructor usado 
+                    para crearlo. Este constructor requiere sólo dos argumentos: un vector de bytes que contenga los datos 
+                    específicos del cliente y la longitud del vector de bytes. Cuando se construye un <code>DatagramPacket</code>. 
+                    para enviar a través del <code>DatagramSocket</code>, también debe suplir la dirección de Internet y el número 
+                    de puerto del destino del paquete. Verá esto más tarde cuando describamos cómo el servidor responde a la 
+                    petición del cliente.
+                </p>
+                <p>
+                    La última sentencia en el trozo de código previo recibe un datagrama desde el socket (la información recibida 
+                    desde el cliente se copia dentro del paquete). El método receive espera para siempre hasta que se recibe un 
+                    paquete. Si no se recibe ningún paquete, el servidor no avanza más y sólo espera.
+                </p>
+                <p>
+                    Ahora asuma que, el servidor ha recibido una petición desde un cliente por una cita. Ahora el servidor debe 
+                    responder. Esta sección del código en el método run construye la respuesta:
+                </p>
+                <div class="codeblock">
+                    <pre>
+String dString = null;
+if (in == null)
+    dString = new Date().toString();
+else
+    dString = getNextQuote();
+buf = dString.getBytes();
+                    </pre>
+                </div>
+                <p>
+                    Si el fichero de citas no fue abierto por alguna razón, entonces <code>in</code> es igual a nulo. Si este es el 
+                    caso, el servidor de citas sirve la hora del día a cambio. De otra forma, el servidor de citas obtiene la 
+                    siguiente cita del fichero ya abierto. Finalmente, el código convierte la cadena en un vector de bytes.
+                </p>
+                <p>
+                    Ahora, el método <code>run</code> envía la respuesta al cliente a través del <code>DatagramSocket</code> con 
+                    este código:
+                </p>
+                <div class="codeblock">
+                    <pre>
+InetAddress address = packet.getAddress();
+int port = packet.getPort();
+packet = new DatagramPacket(buf, buf.length, address, port);
+socket.send(packet);
+                    </pre>
+                </div>
+                <p>
+                    Las dos primeras sentencias en este segmento de código obtienen la dirección Internet y el número de puerto, 
+                    respectivamente, desde el paquete de datagrama recibido desde el cliente. La dirección de Internet y el número 
+                    de puerto indican de dónde vino el paquete de datagrama. Esto es donde el servidor debe mandar su respuesta. En 
+                    este ejemplo, el vector de bytes del paquete del datagrama no contiene información relevante. La llegada de 
+                    un paquete en sí mismo indica una petición desde un cliente que puede ser encontrado en la dirección de 
+                    Internet y número de puerto indicado en el paquete de datagrama.
+                </p>
+                <p>
+                    La tercera sentencia crea un nuevo objeto <code>DatagramPacket</code> destinado a enviar un mensaje de 
+                    datagrama a través del socket de datagramas. Puede decir que el nuevo <code>DatagramPacket</code> está 
+                    destinado a enviar datos a través del socket a causa del constructor utilizado para crearlo. Este constructor 
+                    requiere cuantro argumentos. Los dos primeros argumentos son los mismos requeridos por el constructor usado 
+                    para crear los datagramas que se reciben: un vector de bytes conteniendo el mensaje desde el remitente al 
+                    destinatario y la longitud de este vector. Los dos argumentos siguientes son diferentes: una dirección de 
+                    Internet y un número de puerto. Estos dos argumentos son la dirección completa del destino del paquete de 
+                    datagrama y debe ser suplida por el remitente del datagrama. La última línea de código envia el
+                    <code>DatagramPacket</code> de esa forma.
+                </p>
+                <p>
+                    Cuando el servidor ha leído todas las citas desde el fichero, el bucle <code>while</code> termina y el método 
+                    <code>run</code> limpia:
+                </p>
+                <div class="codeblock">
+                    <pre>
+socket.close();
+                    </pre>
+                </div>
+                <h2>
+                    La Clase QuoteClient
+                </h2>
+                <p>
+                    La clase <a class="SourceLink" target="_blank" href="examples/QuoteClient.java" 
+                                onclick="showCode('../../displayCode.html', 'examples/QuoteClient.java'); return false;">
+                        <code>QuoteClient</code></a> implementa una aplicación cliente para el <code>QuoteServer</code>. Esta 
+                    aplicación envía una petición al <code>QuoteServer</code>, espera su respuesta, y, cuando se recibe la 
+                    respuesta, la visualiza en la salida estándar. Veamos el código en detalle.
+                </p>
+                <p>
+                    La clase <code>QuoteClient</code> contiene un método, el método <code>main</code> para la aplicación cliente. 
+                    En lo alto del método <code>main</code> se declaran varias variables locales para su uso:
+                </p>
+                <div class="codeblock">
+                    <pre>
+int port;
+InetAddress address;
+DatagramSocket socket = null;
+DatagramPacket packet;
+byte[] sendBuf = new byte[256];
+                    </pre>
+                </div>
+                <p>
+                    Primero, el método <code>main</code> procesa los argumentos de línea de comando usados al invocar la aplicación 
+                    <code>QuoteClient</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+if (args.length != 1) {
+    System.out.println("Usage: java QuoteClient &lt;hostname&gt;");
+    return;
+}
+                    </pre>
+                </div>
+                <p>
+                    La aplicación <code>QuoteClient</code> requiere un argumento de línea de comandos: el nombre de la máquina en 
+                    la cual se está ejecutando <code>QuoteServer</code>.
+                </p>
+                <p>
+                    A continuación, el método <code>main</code> crea un <code>DatagramSocket</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+DatagramSocket socket = new DatagramSocket();
+                    </pre>
+                </div>
+                <p>
+                    El cliente usa un constructor que no requiere un número de puerto. Este constructor simplemente enlaza el 
+                    <code>DatagramSocket</code> a culquier puerto local disponible. No importa a qué puerto se enlaza el cliente 
+                    porque los <code>DatagramPacket</code>s contienen la información de dirección. El servidor obtiene el número 
+                    de puerto desde los <code>DatagramPacket</code>s y envía su respuesta a ese puerto.
+                </p>
+                <p>
+                    A continuación, el programa <code>QuoteClient</code> envía una petición al servidor:
+                </p>
+                <div class="codeblock">
+                    <pre>
+byte[] buf = new byte[256];
+InetAddress address = InetAddress.getByName(args[0]);
+DatagramPacket packet = new DatagramPacket(buf, buf.length, 
+                                address, 4445);
+socket.send(packet);
+                    </pre>
+                </div>
+                <p>
+                    El segmento de código obtiene la dirección de Internet para la máquina nombrada en la línea de comandos 
+                    (presublimente el nombre de la máquina en la cual se está ejecutando el servidor). Esta 
+                    <code>InetAddress</code> y el número de puerto 4445 (el número de puerto que el servidor usó para crear su 
+                    <code>DatagramSocket</code>) son entonces usados para crear un 
+                    <code>DatagramPacket</code> destinado para esa dirección de Internet y número de puerto. Por lo tanto el 
+                    <code>DatagramPacket</code> será entregado al servidor de citas.
+                </p>
+                <p>
+                    Note que el código crea un <code>DatagramPacket</code> con un vector de bytes vacío. El vector de bytes está 
+                    vacío porque este paquete de datagrama es simplemente un petición al servidor por información. Todo lo que 
+                    necesita saber el servidor para enviar una respuesta &mdash; la dirección y el número de puerto al cual 
+                    responder &mdash; es parte automáticamente del paquete.
+                </p>
+                <p>
+                    A continuación, el cliente obtiene una respuesta desde el servidor y lo visualiza:
+                </p>
+                <div class="codeblock">
+                    <pre>
+packet = new DatagramPacket(buf, buf.length);
+socket.receive(packet);
+String received = new String(packet.getData(), 0, packet.getLength());
+System.out.println("Quote of the Moment: " + received);
+                    </pre>
+                </div>
+                <p>
+                    Para obtener una respuesta del servidor, el cliente crea un paquete &quot;receive&quot; y usa el método 
+                    receive de <code>DatagramSocket</code> para recibir la respuesta del servidor. El método receive espera hasta 
+                    que un paquete de datagrama destinado para el cliente llegue a través del socket. Note que si la respuesta del 
+                    servidor se pierde de alguna forma, el cliente esperará para siempre debido a la política de no-garantía del 
+                    modelo de datagramas. Normalmente, un cliente establece un temporizador de forma que no espere para siempre 
+                    por una respuesta; si no llega una respuesta, el temporizador se apaga y el cliente retransmite.
+                </p>
+                <p>
+                    Cuando el cliente recibe una respuesta desde el servidor, el cliente usa el método getData para recuperar los 
+                    datos del paquete. El cliente luego convierte los datos a una cadena y la visualiza.
+                </p>
+                <h2>
+                    Ejecutando el Servidor y el Cliente
+                </h2>
+                <p>
+                    Después de que ha compilado con éxito los programas servidor y cliente, los ejecuta. Tiene que ejecutar el 
+                    programa servidor primero. Simplemente use el intérprete Java y especifique el nombre de clase 
+                    <code>QuoteServer</code>.
+                </p>
+                <p>
+                    Una vez que el servidor ha arrancado, puede ejecutar el programa cliente. Recuerde ejecutar el programa cliente 
+                    con un argumento de línea de comandos: el nombre de la máquina en la cual se está ejecutando 
+                    <code>QuoteServer</code>.
+                </p>
+                <p>
+                    Después el cliente envía una petición y recibe una respuesta desde el servidor, verí una salida similar a esta:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Quote of the Moment:
+Good programming is 99% sweat and 1% coffee.
+                    </pre>
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="definition.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="broadcasting.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> ¿Qué es un Datagrama?<br />
+            <b>Página siguiente:</b> Difusion a Varios Destinatarios
+        </div>
+    </body>
+</html> 

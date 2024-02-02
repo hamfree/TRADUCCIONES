@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Configurando WebSockets</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jsf-ws001.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-ws003.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1">
+      <h2 id="configuring-websockets">Configurando WebSockets</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Para configurar WebSockets para su uso en aplicaciones web JSF, primero habilite el extremo de 
+            WebSocket usando el parámetro de contexto en <code>web.xml</code>:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;context-param&gt;
+&lt;param-name&gt;javax.faces.ENABLE_WEBSOCKET_ENDPOINT&lt;/param-name&gt;
+&lt;param-value&gt;true&lt;/param-value&gt;
+&lt;/context-param&gt;
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Si su servidor está configurado para ejecutar un contenedor WebSocket en un puerto TCP diferente 
+            al del contenedor HTTP, puede usar el parámetro de contexto entero opcional 
+            <code>javax.faces.WEBSOCKET_ENDPOINT_PORT</code> para especificar explícitamente el puerto:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;context-param&gt;
+&lt;param-name&gt;javax.faces.WEBSOCKET_ENDPOINT_PORT&lt;/param-name&gt;
+&lt;param-value&gt;8000&lt;/param-value&gt;
+&lt;/context-param&gt;
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="sect2">
+          <h3 id="websocket-usage-client-side">Uso del WebSocket: Lado del Cliente</h3>
+          <div class="paragraph">
+            <p>
+              Declare la etiqueta <code>f:websocket</code> en la vista JSF con un nombre de canal y una 
+              función de escucha de JavaScript <code>onmessage</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>El siguiente ejemplo hace referencia a una función de escucha de JavaScript existente:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;f:websocket channel="someChannel"
+onmessage="someWebsocketListener" /&gt;
+function someWebsocketListener(message, channel, event) { console.log(message);
+}
+&lt;f:websocket channel="someChannel"
+onmessage="
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>Este ejemplo declara una función de escucha de JavaScript en línea:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;f:websocket channel="someChannel"
+onmessage="function(m){console.log(m);}" /&gt;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>La función de escucha JavaScript <code>onmessage</code> se invoca con tres argumentos:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p><code>message</code>: El mensaje push como un objeto JSON</p>
+              </li>
+              <li>
+                <p><code>channel</code>: El nombre del canal</p>
+              </li>
+              <li>
+                <p><code>event</code>: La instancia <code>MessageEvent</code></p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Cuando se conecta correctamente, el WebSocket está abierto de forma predeterminada mientras el 
+              documento esté abierto y se volverá a conectar automáticamente, a intervalos crecientes, cuando 
+              la conexión se cierre o se anule, como resultado de eventos como un error de red o reinicio del 
+              servidor. No se volverá a conectar automáticamente cuando falle el primer intento de conexión. 
+              El WebSocket se cerrará implícitamente después de que se descargue el documento.
+            </p>
+          </div>
+        </div>
+        <div class="sect2">
+          <h3 id="websocket-usage-server-side">Uso del WebSocket: Lado del Servidor</h3>
+          <div class="paragraph">
+            <p>
+              En el lado de la programación de Java, inyecte un <code>PushContext</code> usando la anotación 
+              <code>@Push</code> en el canal dado en cualquier CDI o artefacto administrado por contenedor, 
+              como <code>@Named</code >, o <code>@WebServlet</code>, donde desee enviar un mensaje push. Luego 
+              invoque <code>PushContext.send(Object)</code> con cualquier objeto Java que represente el 
+              mensaje push.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>For example:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Inject @Push
+private PushContext someChannel;
+public void sendMessage(Object message) {
+someChannel.send(message);
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Por defecto, el nombre del canal se toma del nombre de la variable en la que se realiza la 
+              inyección.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Opcionalmente, el nombre del canal se puede especificar usando el atributo <code>channel</code>. 
+              El siguiente ejemplo inyecta el contexto push para el nombre del canal <code>foo</code> en una 
+              variable llamada <code>bar</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p><code>@Inject @Push(channel="foo") private PushContext bar;</code></p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El objeto del mensaje se codificará como JSON y se entregará como un argumento de mensaje de la 
+              función de escucha de JavaScript <code>onmessage</code> asociada con el nombre del canal. Puede 
+              ser una cadena, pero también puede ser una colección, un mapa o un JavaBean.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jsf-ws001.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-ws003.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

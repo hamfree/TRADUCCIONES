@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            ¿Porqué StAX? (Los Tutoriales de Java&trade; &gt; IPA de Java para Procesado de XML (JAXP) &gt; 
+            IPA de Transmisión para XML)
+        </title>
+        <meta name="description" content="Este tutorial de Java JAXP describe la IPA de Java para el procesado de XML (jaxp), XSLT, 
+              SAX, y tópicos de XML relacionados" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jaxp, xml, xslt, sax" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">IPA de Transmisión para XML</a></div>
+                <div class="nolinkAHEAD">¿Porqué StAX?</div>
+                <div class="linkAHEAD"><a href="api.html">IPA de StAX</a></div>
+                <div class="linkAHEAD"><a href="using.html">Utilizando StAX</a></div>
+                <div class="linkAHEAD"><a href="parser.html">Implementación del Analizador de Flujos XML de Oracle</a></div>
+                <div class="linkAHEAD"><a href="example.html">Código de Ejemplo</a></div>
+                <div class="linkAHEAD"><a href="info.html">Información Adicional</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> IPA de Java para Procesado de XML (JAXP)<br />
+                <b>Lección:</b> IPA de Transmisión para XML
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">IPA de Java para Procesado de XML (JAXP)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">IPA de Transmisión para XML</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="api.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>¿Porqué StAX?</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    El proyecto StAX fue encabezado por BEA con el apoyo de Sun Microsystems, y la 
+                    <a class="OutsideLink" target="_blank" 
+                       href="http://jcp.org/en/jsr/detail?id=173">especficación JSR 173</a> pasó la votación de aprobación final 
+                    del Java Community Process en marzo de 2004. El objetivo primario de la IPA de StAX es &ldquo;dar control de 
+                    análisis al programador mediante la exposición de una IPA basada en iterador simple. Esto permite al 
+                    programador solicitar el siguiente evento (extraer el evento) y permite que el estado se almacene de forma 
+                    procedimental.&rdquo; StAX fue creado para abordar las limitaciones en las dos IPA de análisis más 
+                    frecuentes, SAX y DOM.<a id="bnbdx"></a>
+                </p>
+                <h2>
+                    Retransmisión contra DOM
+                </h2>
+                <p>
+                    <a id="indexterm-5"></a><a id="indexterm-6"></a>
+                </p>
+                <p>
+                    Generalmente hablando, hay dos modelos de programación para trabajar con conjuntos de información XML: 
+                    <b>retransmisión</b> y el <b>modelo de objetos de documento</b> (DOM).
+                </p>
+                <p>
+                    El modelo DOM implica la creación de objetos en memoria que representan un árbol de documento entero y el 
+                    estado del conjunto de información completo para un documento XML. Una vez en memoria, se pueden navegar 
+                    libremente los árboles DOM y analizarse arbitrariamente y, como tal, proporcionan la máxima flexibilidad para 
+                    los desarrolladores. Sin embargo, el coste de esta flexibilidad es una huella de memoria potencialmente grande 
+                    y requisitos de procesador significativos, porque la representación entera del documento debe ser mantenida en 
+                    memoria como objetos durante la duración del procesado del documento. Esto puede no ser un problema cuando 
+                    trabaja con documentos pequeños, pero los requerimientos de memoria y procesador pueden escalar rápidamente con 
+                    el tamaño del documento.
+                </p>
+                <p>
+                    La transmisión se refiere a un modelo de programación en el cual los conjuntos de información XML se transmiten 
+                    y analizan serialmente en tiempo de ejecución de la aplicación, a menudo en tiempo real, y a menudo desde 
+                    fuentes dinámicas cuyos contenidos no son precisamente conocidos de antemano. Además, los analizadores basados 
+                    en flujo pueden comenzar a generar resultados inmediatamente, y los elementos del conjunto de información se 
+                    pueden descartar y recolectar la basura inmediatamente después de su uso. Mientras proporcionan una huella de 
+                    memoria más pequeña, y requerimientos de procesador reducidos, y un rendimiento más alto en ciertas 
+                    situaciones, la principal desventaja con el procesamiento de secuencias es que sólo puede ver el estado del 
+                    conjunto de información en una ubicación a la vez en el documento. Está esencialmente limitado a la vista de
+                    &ldquo;tubo de cartón&rdquo; de un documento, lo que implica que necesita saber qué procesamiento desea hacer 
+                    antes de leer el documento XML.
+                </p>
+                <p>
+                    Los modelos de transmisión para el procesado de XML son particularmente útiles cuando su aplicación tiene 
+                    limitaciones estrictas de memoria, como con un teléfono móvil ejecutando la Plataforma Java, Edición Micro 
+                    (Plataforma Java ME), o cuando su aplicación necesita procesar varias peticiones simultáneamente, como con un 
+                    servidor de aplicaciones. En realidad, se puede argumentar que la mayoría de la lógica empresarial XML puede 
+                    beneficiarse del procesamiento de flujo y no requiere el mantenimiento en memoria de árboles DOM completos.
+                </p>
+                <p>
+                    <a id="bnbdy"></a>
+                </p>
+                <h2>
+                    Análisis de Extracción contra Análisis de Inserción
+                </h2>
+                <p>
+                    <a id="indexterm-7"></a><a id="indexterm-8"></a>
+                </p>
+                <p>
+                    El <b>análisis de extracción</b> de transmisión se refiere a un modelo de programación en el cual una 
+                    aplicación cliente llama a métodos en una librería de análisis XML cuando necesita interacturar con un conjunto 
+                    de información XML&mdash;es decir, el cliente sólo obtiene (extrae) datos XML cuando los solicita 
+                    explícitamente.
+                </p>
+                <p>
+                    El <b>análisis de inserción</b> de transmisión se refiere a un modelo de programación en el cual un analizador 
+                    XML envía (inserta) datos XML al cliente cuando el analizador encuentra elementos en un conjunto de información 
+                    XML&mdash;es decir, el analizador envía los datos ya esté o no listo el cliente para usarlos en ese momento.
+                </p>
+                <p>
+                    El análisis de extracción proporciona varias ventajas sobre el análisis de inserción cuando se trabaja con 
+                    flujos XML:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Con el análisis de extracción, el cliente controla el hilo de la aplicación, y puede llamar a los 
+                            métodos en el analizador cuando lo necesita. Por el contrario, con el procesamiento de inserción, el 
+                            analizador controla el hilo de la aplicación y el cliente sólo puede aceptar invocaciones del 
+                            analizador.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Las librerías de análisis de extracción pueden ser mucho más pequeñas y el código de cliente para 
+                            interactuar con esas librerías más simple que con las librerías de inserción, incluso para los 
+                            documentos más complejos.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Los clientes de extracción pueden leer varios documentos a la vez con un sólo hilo.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Una analizador de extracción StAX puede filtrar documentos XML de forma que se puedan ignorar los 
+                            elementos innecesarios para el cliente y puede admitir vistas XML de datos no XML.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    <a id="bnbdz"></a>
+                </p>
+                <h2>
+                    Casos de Uso de StAX
+                </h2>
+                <p>
+                    <a id="indexterm-9"></a>
+                </p>
+                <p>
+                    La especificación StAX define una serie de casos de uso para la IPA:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <a id="indexterm-10"></a>Enlace de datos
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    Desagrupamiento de un documento XML
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Ordenamiento de un documento XML
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Procesamiento de documentos en paralelos
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Comunicación inalámbrica
+                                </p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>
+                            <a id="indexterm-11"></a>Procesamiento de mensajes del Protocolo Simple de Acceso a Objetos (SOAP)
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    Analizar estructuras predecibles simples
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Analizar representaciones de gráficos con referencias directas
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Análisis del Lenguaje de Descripción de Servicios Web (WDSL)
+                                </p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>
+                            Fuentes de datos virtuales
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    Ver como datos XML almacenados en bases de datos
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Ver datos en objetos Java creados por enlace de datos XML
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Navegar por un árbol DOM como una secuencia de eventos
+                                </p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>
+                            Análisis de vocabularios XML específicos
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Procesamiento XML canalizado
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Un descripción completa de todos estos casos de uso está más allá del alcance de esta lección. Por favor 
+                    refiérase a la especificación StAX para obtener más información.
+                </p>
+                <p>
+                    <a id="bnbea"></a>
+                </p>
+                <h2>
+                    Comparando StAX con Otras IPAs de JAXP
+                </h2>
+                <p>
+                    Como una IPA en la familia JAXP, StAX puede compararse, entre otras IPAs, a SAX, TrAX, y JDOM. De las dos 
+                    últimas, StAX no es tan potente o flexible como TrAX o JDOM, pero tampoco requiere tanta memoria o carga de 
+                    procesador para ser útil, y StAX puede, en muchos casos, superar a las IPAs basadas en DOM. Los mismos 
+                    argumentos descritos anteriormente, que sopesan el costo/beneficio del modelo DOM frente al modelo de 
+                    transmisión, se aplican aquí.
+                </p>
+                <p>
+                    Con esto en mente, se pueden hacer las comparaciones más cercanas entre StAX y SAX, y es aquí donde StAX ofrece 
+                    características que son beneficiosas en muchos casos; algunas de estas incluyen:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Los clientes habilitados para StAX son generalmente más fáciles de codificar que los clientes SAX. Si 
+                            bien se puede argumentar que los analizadores SAX son un poco más fáciles de escribir, el código del 
+                            analizador StAX puede ser más pequeño y el código necesario para que el cliente interactúe con el 
+                            analizador más simple.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            StAX es una IPA bidireccional, lo que significa que puede leer y escribir documentos XML. SAX es de 
+                            sólo lectura, por lo que se necesita otra IPA si se desea escribir documentos XML.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            SAX es una IPA de envío, mientras que StAX es de extracción. Las compensaciones entre las IPAs de 
+                            envío y extracción descritas anteriormente se aplican aquí.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    La tabla siguiente resume las características comparativas de  StAX, SAX, DOM, y TrAX. (La tabla se adaptó de 
+                    <a class="OutsideLink" target="_blank" 
+                       href="http://www.developer.com/xml/article.php/3397691">¿StAX pertenece a su caja de herramientas XML?</a> 
+                    por Jeff Ryan).
+                </p>
+                <p>
+                    <a id="indexterm-12"></a>
+                </p>
+                <table class="celda">
+                    <caption>
+                        Resumen de Funciones de la IPA del Analizador XML
+                    </caption>
+                    <col style="width:26%" />
+                    <col style="width:18%" />
+                    <col style="width:19%" />
+                    <col style="width:19%" />
+                    <col style="width:15%" />
+                    <tr>
+                        <th id="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Característica
+                            </p>
+                        </th>
+                        <th id="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                StAX
+                            </p>
+                        </th>
+                        <th id="h3" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                SAX
+                            </p>
+                        </th>
+                        <th id="h4" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                DOM
+                            </p>
+                        </th>
+                        <th id="h5" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                TrAX
+                            </p>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Tipo de IPA
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Extracción, transmisión
+                            </p>
+                        </td>
+                        <td headers="h3" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Envío, transmisión
+                            </p>
+                        </td>
+                        <td headers="h4" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Árbol en memoria
+                            </p>
+                        </td>
+                        <td headers="h5" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Regla XSLT
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Facilidad de Uso
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Alta
+                            </p>
+                        </td>
+                        <td headers="h3" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Media
+                            </p>
+                        </td>
+                        <td headers="h4" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Alta
+                            </p>
+                        </td>
+                        <td headers="h5" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Media
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Capacidad XPath
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                No
+                            </p>
+                        </td>
+                        <td headers="h3" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                No
+                            </p>
+                        </td>
+                        <td headers="h4" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Sí
+                            </p>
+                        </td>
+                        <td headers="h5" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Sí
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Eficiencia CPU y Memoria
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Buena
+                            </p>
+                        </td>
+                        <td headers="h3" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Buena
+                            </p>
+                        </td>
+                        <td headers="h4" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Varía
+                            </p>
+                        </td>
+                        <td headers="h5" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Varía
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Sólo hacia adelante
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Sí
+                            </p>
+                        </td>
+                        <td headers="h3" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Sí
+                            </p>
+                        </td>
+                        <td headers="h4" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                No
+                            </p>
+                        </td>
+                        <td headers="h5" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                No
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Leer XML
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Sí
+                            </p>
+                        </td>
+                        <td headers="h3" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Sí
+                            </p>
+                        </td>
+                        <td headers="h4" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Sí
+                            </p>
+                        </td>
+                        <td headers="h5" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Sí
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Escribir XML
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Sí
+                            </p>
+                        </td>
+                        <td headers="h3" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                No
+                            </p>
+                        </td>
+                        <td headers="h4" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Sí
+                            </p>
+                        </td>
+                        <td headers="h5" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Sí
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Crear, Leer, Actualizar, Eliminar
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                No
+                            </p>
+                        </td>
+                        <td headers="h3" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                No
+                            </p>
+                        </td>
+                        <td headers="h4" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                No
+                            </p>
+                        </td>
+                        <td headers="h5" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                No
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="api.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> IPA de Transmisión para XML<br />
+            <b>Página siguiente:</b> IPA de StAX
+        </div>
+    </body>
+</html> 

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Descargar Extensiones (Los Tutoriales de Java&trade; &gt; El Mecanismo de Extensión &gt; Creando y Usando Extensiones)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe cómo crear y usar extensiones o paquetes opcionales  y 
+              hacerlos seguros" />
+        <meta name="keywords" content="programar java, aprender java, código ejemplo java, extensiones de java, paquetes opcionales 
+              java" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Creando y Usando Extensiones</a></div>
+                <div class="linkAHEAD"><a href="install.html">Extensiones Instaladas</a></div>
+                <div class="nolinkAHEAD">Descargar Extensiones</div>
+                <div class="linkAHEAD"><a href="load.html">Entendiendo la Carga de Clases de Extensión</a></div>
+                <div class="linkAHEAD"><a href="spi.html">Creando Aplicaciones Extensibles</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> El Mecanismo de Extensión<br />
+                <b>Lección:</b> Creando y Usando Extensiones
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">El Mecanismo de Extensión</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Creando y Usando Extensiones</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="install.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="load.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Descargar Extensiones</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Las extensiones de descarga son conjuntos de clases (y recursos relacionados) en ficheros JAR. Un manifiesto de 
+                    un fichero JAR puede contener cabeceras que se refieran a una o más extensiones de descarga. Las extensiones 
+                    pueden referenciarse en una de dos formas:
+                </p>
+                <ul>
+                    <li>
+                        por una cabecera <code>Class-Path</code>
+                    </li>
+                    <li>
+                        por una cabecera <code>Extension-List</code>
+                    </li>
+                </ul>
+                <p>
+                    Tenga en cuenta que como máximo se permite una de cada en un manifiesto. Las extensiones de descarga 
+                    indicadas por una cabecera <code>Class-Path</code> son descargadas sólo por la vida útil de la aplicación que 
+                    las descarga, tales como un navegador web. Su ventaja es que nada se instala en el cliente; su desventaja es 
+                    que se descargan cada que vez que se necesiten. Las extensiones de descarga que son descargadas por una 
+                    cabecera <code>Extension-List</code> son instaladas en el directorio <code>/lib/ext</code> del EEJ que las 
+                    descarga. Su ventaja es que son descargadas la primera vez que se necesitan; subsecuentemente se pueden usar 
+                    sin descargarlas. Pero, como veremos más tarde en este tutorial, son más complejas de desplegar.
+                </p>
+                <p>
+                    Ya que las extensiones de descarga que usan cabeceras <code>Class-Path</code> son más simples, consideremoslas 
+                    primero. Asuma para el ejemplo que <code>a.jar</code> y <code>b.jar</code> son dos ficheros JAR en el mismo 
+                    directorio, y que el manifiesto de <code>a.jar</code> contiene esta cabecera:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Class-Path: b.jar
+                    </pre>
+                </div>
+                <p>
+                    Entonces las clases en <code>b.jar</code> sirven como clases de extensión para los propósitos de las clases en 
+                    <code>a.jar</code>. Las clases en <code>a.jar</code> pueden invocar clases en <code>b.jar</code> sin que las 
+                    clases de <code>b.jar</code> tengan que ser nombradas en la ruta de clases. <code>a.jar</code> puede o no ser 
+                    en si misma una extensión. Si <code>b.jar</code> no estuviera en el mismo directorio que <code>a.jar</code>, 
+                    entonces el valor de la cabecera <code>Class-Path</code> debería ser establecido a la ruta relativa de 
+                    <code>b.jar</code>.
+                </p>
+                <p>
+                    No hay nada especial sobre las clases que están jugando el rol de una extensión de descarga. Son tratadas 
+                    solamente como extensiones porque están referenciadas por el manifiesto del otro fichero JAR.
+                </p>
+                <p>
+                    Para un mejor entendimiento de cómo trabajan las extensiones de descarga, creemos una y pongámosla en uso.
+                </p>
+                <h2>
+                    Un Ejemplo
+                </h2>
+                <p>
+                    Suponga que queremos crear un applet que haga uso de la clase <code>RectangleArea</code> de la sección previa:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public final class RectangleArea {  
+    public static int area(java.awt.Rectangle r) {
+        return r.width * r.height;
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    En la sección previa, usted hizo la clase <code>RectangleArea</code> una extensión instalada colocando el 
+                    fichero JAR que la contiene dentro del directorio <code>lib/ext</code> del EEJ. Al hacerla una extensión 
+                    instalada, permitió que cualquier aplicación use la clase <code>RectangleArea</code> como si fuera parte de la
+                    plataforma de Java.
+                </p>
+                <p>
+                    Si quiere ser capaz de usar la clase <code>RectangleArea</code> desde un applet, la situación es un poco 
+                    diferente. Suponga, por ejemplo, que tiene un applet, <code>AreaApplet</code>,  que hace uso de la clase 
+                    <code>RectangleArea</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+import java.applet.Applet;
+import java.awt.*;
+
+public class AreaApplet extends Applet {
+    Rectangle r;
+
+    public void init() {    
+        int width = 10;
+        int height = 5;
+
+        r = new Rectangle(width, height);
+    }
+
+    public void paint(Graphics g) {
+        g.drawString("The rectangle's area is " 
+                      + RectangleArea.area(r), 10, 10);
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Este applet instancia un rectángulo de 10 <var>x</var> 5 y entonces visualiza el área de rectángulo usando el 
+                    método <code>RectangleArea.area</code>.
+                </p>
+                <p>
+                    Sin embargo, no puede asumir que todo el que descarga y usa su applet va a tener la clase 
+                    <code>RectangleArea</code> disponible en su sistema, como una extensión instalada o de otro modo. Una forma de 
+                    sortear ese problema es hacer disponible la clase <code>RectangleArea</code> desde el lado del servidor, y 
+                    puede hacer eso usándola como una extensión de descarga.
+                </p>
+                <p>
+                    Veamos cómo eso está hecho, asumamos que usted empaquetó <code>AreaApplet</code> en un fichero JAR llamado 
+                    <code>AreaApplet.jar</code> y que la clase <code>RectangleArea</code> está empaquetada en 
+                    <code>RectangleArea.jar</code>. Para que <code>RectangleArea.jar</code> sea tratada como una extensión de 
+                    descarga, <code>RectangleArea.jar</code> debe estar listada en la cabecera <code>Class-Path</code> del 
+                    manifiesto de <code>AreaApplet.jar</code>. El manifiesto de <code>AreaApplet.jar</code> podría parecerse a 
+                    este, por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Manifest-Version: 1.0
+Class-Path: RectangleArea.jar
+                    </pre>
+                </div>
+                <p>
+                    El valor de la cabecera <code>Class-Path</code> en este manifiesto es <code>RectangleArea.jar</code> sin path 
+                    especificado, indicando que <code>RectangleArea.jar</code> está ubicado en el mismo directorio que el fichero 
+                    JAR del applet.
+                </p>
+                <h2>
+                    Más sobre la Cabecera Class-Path
+                </h2>
+                <p>
+                    Si un applet o aplicación usa más de una extensión, puede listar múltiples URLs en un manifiesto. Por ejemplo, 
+                    lo siguiente es una cabecera válida:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Class-Path: area.jar servlet.jar images/
+                    </pre>
+                </div>
+                <p>
+                    En la clase <code>Class-Path</code> cualesquiera URLs listadas que no terminen con '<code>/</code>' se asumen 
+                    que son ficheros JAR. Las URLs que terminan en '<code>/</code>' indican directorios. En el ejemplo precedente, 
+                    <code>images/</code> podría ser un directorio que contiene recursos necesarios por el applet o la aplicación.
+                </p>
+                <p>
+                    Note que sólo se permite una cabecera <code>Class-Path</code> en un fichero de manifiesto, y que cada línea en 
+                    un manifiesto no debe tener más de 72 caracteres de largo. Si necesita especificar más entradas de ruta de 
+                    clases de las que cabrán en una línea, puede extenderlas en subsecuentes líneas de continuación. Comienze cada 
+                    línea de continuación con dos espacios. Por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Class-Path: area.jar servlet.jar monitor.jar datasource.jar
+  provider.jar gui.jar
+                    </pre>
+                </div>
+                <p>
+                    Una versión futura puede eliminar la limitación de tener sólo una instancia de cada cabecera, y de limitar las 
+                    líneas a sólo 72 caracteres.
+                </p>
+                <p>
+                    Las extensiones de descarga pueden estar &quot;conectadas en serie&quot;, lo que significa que el manifiesto de 
+                    una extensión descargda puede tener una cabecera de <code>Class-Path</code> que se refiera a una segunda 
+                    extensión, la cual puede referir a una tercera extensión, etcétera.
+                </p>
+                <h2>
+                    Instalar Extensiones de Descarga
+                </h2>
+                <p>
+                    En el ejemplo de arriba, la extensión descargada por el applet está disponible sólo mientras el navegador que 
+                    cargó el applet está aún ejecutándose. Sin embargo, los applets pueden disparar instalaciones de extensiones, 
+                    si se incluye información adicional en los manifiestos del applet y la extensión.
+                </p>
+                <p>
+                    Ya que este mecanismo extiende la IPA principal de la plataforma, su uso debe aplicarse con prudencia. Rara vez 
+                    es apropiado para interfaces utilizadas por una sola o pequeño conjunto de aplicaciones. Todos los símbolos 
+                    visibles deberían seguir las convenciones de jerarquía de clases y nombres de dominio invertido.
+                </p>
+                <p>
+                    Los requerimientos básicos son que tanto el applet como las extensiones proporcionen información sobre la 
+                    versión en sus manifiestos, y que estén firmados. La información de versión permite al Plug-in de Java 
+                    asegurarse de que el código de extensión tiene la versión esperada por el applet. Por ejemplo, el 
+                    <code>AreaApplet</code> podría especificar una extensión <code>areatest</code> en su manifiesto:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Manifest-Version: 1.0
+Extension-List: areatest
+areatest-Extension-Name: area
+areatest-Specification-Version: 1.1
+areatest-Implementation-Version: 1.1.2
+areatest-Implementation-Vendor-Id: com.example
+areatest-Implementation-URL: http://www.example.com/test/area.jar
+                    </pre>
+                </div>
+                <p>
+                    El manifiesto en <code>area.jar</code> debería proporcionar la información correspondiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Manifest-Version: 1.0
+Extension-Name: area
+Specification-Vendor: Example Tech, Inc
+Specification-Version: 1.1
+Implementation-Vendor-Id: com.example
+Implementation-Vendor: Example Tech, Inc
+Implementation-Version: 1.1.2
+                    </pre>
+                </div>
+                <p>
+                    Tanto el applet como la extensión deben estar firmadas, por el mismo firmante. Firmar los ficheros jar los 
+                    modificará internamente, proporcionando más información en sus archivos de manifiesto. El firmado ayuda a 
+                    asegurar que sólo código confiable se instala. Una forma simple de firmar ficheros jar es crear primero un 
+                    almacen de claves, y entonces usarlo para mantener certificados para el applet y la extensión. Por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+keytool -genkey -dname "cn=Fred" -alias test  -validity 180
+                    </pre>
+                </div>
+                <p>
+                    Será preguntado por el almacén de clave y las contraseña de la clave. Después de generar una clave, los 
+                    ficheros jar pueden ser firmados.
+                </p>
+                <div class="codeblock">
+                    <pre>
+jarsigner AreaApplet.jar test
+jarsigner area.jar test
+                    </pre>
+                </div>
+                <p>
+                    Será preguntado por el almacén de claves y la contraseña de la clave. Más información sobre 
+                    <code>keytool</code>, <code>jarsigner</code>, y otras herramientas de seguridad existe en 
+                    <a class="OutsideLink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/SecurityToolsSummary.html">Summary of
+                        Tools for the Java 2 Platform Security</a>.
+                </p>
+                <p>
+                    Aquí está <code>AreaDemo.html</code>, el cual carga el applet y causa que el código de la extensión sea 
+                    descargado e instalado:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;html&gt;
+&lt;body&gt;
+  &lt;applet code="AreaApplet.class" archive="AreaApplet.jar"/&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+                    </pre>
+                </div>
+                <p>
+                    Cuando la página se carga por primera vez, se le dice al usuario que el applet requiere la instalación de la 
+                    extensión. Un cuadro de diálogo posterior informa al usuario sobre el applet firmado. Aceptar ambos instala 
+                    la extensión en la carpeta <code>lib/ext</code> del EEJ y ejecuta el applet.
+                </p>
+                <p>
+                    Después de reiniciar el navegador web y cargar la misma página web, sólo se presenta el diálogo sobre el 
+                    firmante del applet, porque <code>area.jar</code> ya está instalado. Esto también es verdad si 
+                    <code>AreaDemo.html</code> se abre en un navegador web diferente (asumiendo que ambos navegadores usan el 
+                    mismo EEJ).
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="install.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="load.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Extensiones Instaladas<br />
+            <b>Página siguiente:</b> Entendiendo la Carga de Clases de Extensión
+        </div>
+    </body>
+</html>

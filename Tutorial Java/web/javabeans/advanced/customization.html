@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Personalización del Bean (Los Tutoriales de Java&trade; &gt; JavaBeans(TM) &gt; Temas Avanzados de JavaBeans)
+        </title>
+        <meta name="description" content="Este tutorial de Java JavaBean describe el uso de la IPA de JavaBeans para desarrollar 
+              componentes JavaBean" />
+        <meta name="keywords" content="java programming, learn java, java sample code, javabean, bean persistence, java
+              introspection, beancontext" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Temas Avanzados de JavaBeans</a></div>
+                <div class="linkAHEAD"><a href="persistence.html">Persistencia del Bean</a></div>
+                <div class="linkAHEAD"><a href="longpersistence.html">La Persistencia a Largo Plazo</a></div>
+                <div class="nolinkAHEAD">Personalización del Bean</div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> JavaBeans(TM)<br />
+                <b>Lección:</b> Temas Avanzados de JavaBeans
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">JavaBeans(TM)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Temas Avanzados de JavaBeans</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="longpersistence.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../end.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Personalización del Bean</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    La <em>Personalización</em> proporciona un significado para modificar la apariencia y comportamiento de un bean
+                    dentro de un constructor de aplicacón para que satisfaga sus necesidades específicas. Hay varios niveles de 
+                    personalización disponibles para un desarrollador de beans para permitir a otros desarrolladores para obtener 
+                    el máximo beneficio de la funcionalidad potencial de un bean.
+                </p>
+                <hr />
+                <p>
+                    Los enlaces siguientes son útiles para aprender sobre los editores de propiedades y personalizadores:
+                </p>
+                <ul>
+                    <li>interfaz 
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/beans/PropertyEditor.html">
+                            <code>PropertyEditor</code></a>
+                    </li>
+                    <li>clase 
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/beans/PropertyEditorSupport.html">
+                            <code>PropertyEditorSupport</code></a>
+                    </li>
+                    <li>clase 
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/beans/PropertyEditorManager.html">
+                            <code>PropertyEditorManager</code></a>
+                    </li>
+                    <li>interfaz 
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/beans/Customizer.html">
+                            <code>Customizer</code></a>
+                    </li>
+                    <li>interfaz 
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/beans/BeanInfo.html"><code>BeanInfo</code></a>
+                    </li>
+                </ul>
+                <hr />
+                <p>
+                    La apariencia y comportamiento de un bean se pueden personalizar en tiempo de diseño dentro de las 
+                    herramientas de construcción compatibles con beans. Hay dos formas de personalizar un bean:
+                </p>
+                <ul>
+                    <li>
+                        Usando un <em>editor de propiedades</em>. Cada propiedad de bean tiene su propio editor de propiedad. El 
+                        Constructor IGU de NetBeans usualmente visualiza los editores de propiedades del bean en la ventana 
+                        Propiedades. El editor de propiedad que está asociado con un tipo de propiedad en particular edita ese tipo 
+                        de propiedad.
+                    </li>
+                    <li>
+                        Usando <em>personalizadores</em>. Los personalizadores le dan un control completo del IGU sobre la 
+                        personalización del bean. Los personalizadores se usan cuando los editores de propiedades no son prácticos 
+                        o aplicacbles. A diferencia de los editors de propiedades, que están asociados con una propiedad, un 
+                        personalizador está asociado con un bean.
+                    </li>
+                </ul>
+                <h2>
+                    Editores de Propiedades
+                </h2>
+                <p>
+                    Un editor de propiedad es una herramienta para personalizar un tipo de propiedad en particular. Los editores de 
+                    propiedades se activan en la ventana Propiedades. Este ventana determina el tipo de propiedad, busca un editor 
+                    de propiedad relevante, y muestra el valor actual de la propiedad de una forma relevante.
+                </p>
+                <p>
+                    Los editores de propiedades deben implementar la interfaz <code>PropertyEditor</code>, la cual proporciona 
+                    métodos para especificar cómo una propiedad debe ser mostrado en una hoja de propiedades. La figura siguiente 
+                    representa la ventana de Propiedades conteniendo las propiedades de <code>myBean1</code>:
+                </p>
+                <div class="centrado">
+                    <img src="../../figures/javabeans/customization.gif" width="260" height="332"
+                         alt="Esta figura representa las propiedades de myBean1 en la ventana Propiedades" />
+                </div>
+                <p>
+                    Empieza el proceso de editar estas propiedades pulsando la entrada propiedad. Al hacer clic en la mayoría de 
+                    estas entradas, aparecerán paneles separados. Por ejemplo, para configurar el <code>foreground</code> o el 
+                    <code>background</code> usa las cajas de selección con elecciones de colores, o presion el botón 
+                    &quot;...&quot; para trabajar con una ventana estándar de Editor de Color. Pulsar en la propiedad 
+                    <code>toolTipText</code> abre una ventana Editor de Cadena.
+                </p>
+                <p>
+                    La clase de soporte <code>PropertyEditorSupport</code> proporciona una implementación predeterminada de la 
+                    interfaz <code>PropertyEditor</code>. Al crear una subclase de su editor de propiedades desde 
+                    <code>PropertyEditorSupport</code>, simplemente puede sobreescribir los métodos que necesita.
+                </p>
+                <p>
+                    Para mostrar el valor de la propiedad actual &quot;sample&quot; dentro de la ventana Propiedades, necesita 
+                    sobreescribir <code>isPaintable</code> para devolver <code>true</code>. Después debe sobreescribir 
+                    <code>paintValue</code> para pintar el valor de la propiedad actual en un rectángulo de la hoja de propiedades. 
+                    Aquí está cómo <code>ColorEditor</code> implementa <code>paintValue</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public void paintValue(java.awt.Graphics gfx, java.awt.Rectangle box) {
+    Color oldColor = gfx.getColor();
+    gfx.setColor(Color.black);
+    gfx.drawRect(box.x, box.y, box.width-3, box.height-3);
+    gfx.setColor(color);
+    gfx.fillRect(box.x+1, box.y+1, box.width-4, box.height-4);
+    gfx.setColor(oldColor);
+}
+                    </pre>
+                </div>
+                <p>
+                    Para admitir el editor de propiedades personalizado, sobreescriba dos métodos más. Sobreescriba 
+                    <code>supportsCustomEditor</code> para devolver true, y después sobreescriba <code>getCustomEditor</code> para 
+                    devolver una instancia personalizada del editor. <code>ColorEditor.getCustomEditor</code> devuelve 
+                    <code>this</code>.
+                </p>
+                <p>
+                    Además, la clase <code>PropertyEditorSupport</code> mantiene una lista de <code>PropertyChangeListener</code>, 
+                    y dispara notificaciones de eventos de cambios de propiedad a esos listener cuando se cambia una propiedad 
+                    enlazada.
+                </p>
+                <h2>
+                    <a id="findEditor">Cómo Se Asocian los Editores de Propiedades con las Propiedades</a>
+                </h2>
+                <p>
+                    Los editores de propiedades se descubren y asocian a una propiedad determinada de la siguiente forma:
+                </p>
+                <ul>
+                    <li>
+                        Asociación explícita en forma de un objeto <code>BeanInfo</code>. El editor de una propiedad de título se 
+                        establece con la línea de código siguiente:
+                        <div class="codeblock">
+                            <pre>
+pd.setPropertyEditorClass(TitleEditor.class);
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        Registro explícito mediante el método <code>java.beans.PropertyEditorManager.registerEditor</code>. Este 
+                        método toma dos argumentos: el tipo de clase bean, y la clase editor que se asocia con ese tipo.
+                    </li>
+                    <li>
+                        Búsqueda de nombre. Si una clase no tiene asociado explícitamente un editor de propiedad, entonces el 
+                        <code>PropertyEditorManager</code> busca el editor de propiedades de esa clase de las formas siguientes:
+                        <ul>
+                            <li>
+                                Agrega &quot;Editor&quot; al nombre completamente cualificado de la clase. Por ejemplo, para la 
+                                clase <code>my.package.ComplexNumber</code>, el gestor del editor de propiedad buscará la clase 
+                                <code>my.package.ComplexNumberEditor</code>.
+                            </li>
+                            <li>
+                                Agrega &quot;Editor&quot; al nombre de clase y buscando en una ruta de clases.
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <h2>
+                    <a id="customizer">Personalizadores</a>
+                </h2>
+                <p>
+                    Ha aprendido que las herramientas de construcción le proporcionan soporte para crear sus propios editores de 
+                    propiedades. ¿Qué otras necesidades deben satisfacer los constructores visuales para los beans complejos de 
+                    carácter empresarial? A menudo no es deseable tener todas las propiedades de un bean reveladas en una única 
+                    (algunas veces enorme) hoja de propiedad. ¿Qué pasa si una sola elección de raíz sobre el tipo de bean hace que 
+                    la mitad de las propiedades sean irrelevantes? La especificación JavaBeans proporciona personalizadores 
+                    definidos por el usuario, a través de los cuales puede definir un nivel más alto de personalización para las 
+                    propiedades de los beans que el que está disponible con los editores de propiedades.
+                </p>
+                <p>
+                    Cuando use un bean <i>Customizer</i>, tiene el control completo sobre cómo configurar o editar un bean. Un 
+                    Personalizador es una aplicación que se dirige específicamente a la personalización de un bean. Algunas veces 
+                    las propiedades son insuficientes para representar los atributos configurables de un bean. Los personalizadores 
+                    se usan cuando son necesarias instrucciones sofisticadas para cambiar un bean, y donde los editores de 
+                    propiedades son demasiado primitivos para conseguir la personalización del bean.
+                </p>
+                <p>
+                    Todos los personalizadores deben:
+                </p>
+                <ul>
+                    <li>
+                        Extender <code>java.awt.Component</code> o alguna de sus subclases.
+                    </li>
+                    <li>
+                        Implementar la interfaz <code>java.beans.Customizer</code>. Esto significa implementar los métodos para 
+                        registrar objetos <code>PropertyChangeListener</code>, y disparar los eventos de cambios de propiedad a 
+                        esos listeners cuando ocurre un cambio en el bean objetivo.
+                    </li>
+                    <li>
+                        Implementar un constructor predeterminado.
+                    </li>
+                    <li>
+                        Asociar el personalizador con su clase objetivo vía <code>BeanInfo.getBeanDescriptor</code>.
+                    </li>
+                </ul>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="longpersistence.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../end.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> La Persistencia a Largo Plazo<br />
+            <b>Página siguiente:</b> Final de la Lección
+        </div>
+    </body>
+</html> 

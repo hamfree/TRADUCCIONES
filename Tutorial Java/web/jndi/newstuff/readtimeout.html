@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Configuración de Tiempo de Espera para Operaciones LDAP (Los Tutoriales de Java&trade; &gt; 
+            Nombrado en Java e Interfaz de Directorio &gt; Nuevas funcionalidades en KDJ 5.0 y KDJ 6)
+        </title>
+        <meta name="description" content="Este tutorial de Java JNDI describe la tecnología de Nombrado en Java e Interfaz de 
+              Directorio (JNDI), operaciones de nombre y directorio, y LDAP" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jndi, ldap, jndi service provider" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Nuevas funcionalidades en KDJ 5.0 y KDJ 6</a></div>
+                <div class="linkAHEAD"><a href="dn.html">Recuperando el Nombre Distinguido</a></div>
+                <div class="linkAHEAD"><a href="controls-std.html">Controles estándar de LDAP</a></div>
+                <div class="linkAHEAD"><a href="paged-results.html">Control de Resultados Paginados</a></div>
+                <div class="linkAHEAD"><a href="sort.html">Control de Ordenación</a></div>
+                <div class="linkAHEAD"><a href="mdsaIT.html">Gestionar Control de Referencia</a></div>
+                <div class="linkAHEAD"><a href="ldapname.html">Manipulando LdapName (Nombre Distinguido)</a></div>
+                <div class="linkAHEAD"><a href="rdn.html">Manipulando Nombre Distinguido Relativo (RDN)</a></div>
+                <div class="nolinkAHEAD">Configuración de Tiempo de Espera para Operaciones LDAP</div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Nombrado en Java e Interfaz de Directorio<br />
+                <b>Lección:</b> Nuevas funcionalidades en KDJ 5.0 y KDJ 6
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Nombrado en Java e Interfaz de Directorio</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Nuevas funcionalidades en KDJ 5.0 y KDJ 6</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="rdn.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../end.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Configuración de Tiempo de Espera para Operaciones LDAP</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Cuando una petición LDAP se hace por un cliente a un servidor y el servido no responde por alguna razón, el 
+                    cliente espera eternamente a que el servidor responda hasta que se agote el tiempo de espera de TCP. En el 
+                    lado del cliente lo que el usuario experimenta es esencialmente un bloqueo del proceso. Para controlar la 
+                    petición LDAP de manera oportuna, se puede configurar un tiempo de espera de lectura para el proveedor de 
+                    servicios JNDI/LDAP desde Java SE 6.
+                </p>
+                <p>
+                    La nueva propiedad de entorno:
+                </p>
+                <p>
+                    <code>com.sun.jndi.ldap.read.timeout</code>
+                </p>
+                <p>
+                    Puede ser usada para especificar el tiempo de espera de lectura para una operación LDAP. El valor de esta 
+                    propiedad es la representación de cadena de un entero representando el tiempo de espera de lectura en 
+                    milisegundos para las operaciones LDAP. Si el proveedor LDAP no obtiene una respuesta LDAP dentro del periodo 
+                    especificado, aborta el intento de lectura. El entero debería ser mayor que cero. Un número entero menor o 
+                    igual a cero significa que no se especifica ningún tiempo de espera de lectura, lo que equivale a esperar la 
+                    respuesta infinitamente hasta que se reciba, lo que por defecto es el comportamiento original.
+                </p>
+                <p>
+                    Si no se especifica esta propiedad, lo predeterminado es esperar la respuesta hasta que se reciba.<br />
+                    Por ejemplo, <code>env.put(&quot;com.sun.jndi.ldap.read.timeout&quot;, &quot;5000&quot;);</code> causa que el 
+                    proveedor de servicio LDAP aborta el intento de lectura si el servidor no responde con una respuesta en 5 
+                    segundos.
+                </p>
+                <p>
+                    Aquí tiene un ejemplo,
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/ReadTimeoutTest.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/ReadTimeoutTest.java'); return false;">
+                        <code>ReadTimeoutTest</code></a>, que usa un servidor ficticio que no responde a las peticiones LDAP para 
+                    mostrar cómo esta propiedad se comporta cuando se establece a un valor no cero.
+                </p>
+                <div class="codeblock">
+                    <pre>
+env.put(Context.INITIAL_CONTEXT_FACTORY,
+        "com.sun.jndi.ldap.LdapCtxFactory");
+env.put("com.sun.jndi.ldap.read.timeout", "1000");
+env.put(Context.PROVIDER_URL, "ldap://localhost:2001");
+
+Server s = new Server();
+
+try {
+
+    // start the server
+    s.start();
+ 
+   // Create initial context
+   DirContext ctx = new InitialDirContext(env);
+   System.out.println("LDAP Client: Connected to the Server");
+        :
+        :
+} catch (NamingException e) {
+   e.printStackTrace();
+}
+                    </pre>
+                </div>
+                <p>
+                    El programa de arriba imprime el seguimiento de pila de abajo, ya que el servidor ni siquiera responde a la 
+                    solicitud de vinculación LDAP cuando se crea un InitialDirContext. El cliente agota el tiempo de espera de la 
+                    respuesta del servidor.
+                </p>
+                <div class="codeblock">
+                    <pre>
+Server: Connection accepted
+javax.naming.NamingException: LDAP response read timed out, timeout used:1000ms.
+:
+:
+
+at javax.naming.directory.InitialDirContext.&lt;init&gt;(InitialDirContext.java:82)
+at ReadTimeoutTest.main(ReadTimeoutTest.java:32)
+                    </pre>
+                </div>
+                <p>
+                    Dese cuenta de que esta propiedad es diferente de la otra propiedad de entorno 
+                    <code>com.sun.jndi.ldap.connect.timeout</code> que establece el tiempo de espera para conectar al servidor. El 
+                    tiempo de espera de lectura se aplica a la respuesta LDAP desde el servidor después de que se establezca la 
+                    conexión inicial con el servidor.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="rdn.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../end.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Manipulando Nombre Distinguido Relativo (RDN)<br />
+            <b>Página siguiente:</b> Final de la Lección
+        </div>
+    </body>
+</html> 

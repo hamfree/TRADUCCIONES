@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Manejo de Errores (Los Tutoriales de Java&trade; &gt; IPA de Java para Procesado de XML (JAXP) &gt; JAXP 1.5 y Nuevas 
+            Propiedades)
+        </title>
+        <meta name="description" content="Este tutorial de Java JAXP describe la IPA de Java para el procesado de XML (jaxp), XSLT, 
+              SAX, y tópicos de XML relacionados" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jaxp, xml, xslt, sax" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">JAXP 1.5 y Nuevas Propiedades</a></div>
+                <div class="linkAHEAD"><a href="backgnd.html">Fondo</a></div>
+                <div class="linkAHEAD"><a href="resources.html">Recursos Externos</a></div>
+                <div class="linkAHEAD"><a href="properties.html">Nuevas Propiedades</a></div>
+                <div class="linkAHEAD"><a href="scope.html">Alcance y Orden</a></div>
+                <div class="linkAHEAD"><a href="security.html">Relación con el SecurityManager</a></div>
+                <div class="linkAHEAD"><a href="propSettings.html">Configuración de las Propiedades del Sistema</a></div>
+                <div class="linkAHEAD"><a href="usingProps.html">Usando las Propiedades</a></div>
+                <div class="nolinkAHEAD">Manejo de Errores</div>
+                <div class="linkAHEAD"><a href="stax.html">StAX</a></div>
+                <div class="linkAHEAD"><a href="conclusion.html">Conclusion</a></div>
+                <div class="linkAHEAD"><a href="references.html">Referencias</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> IPA de Java para Procesado de XML (JAXP)<br />
+                <b>Lección:</b> JAXP 1.5 y Nuevas Propiedades
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">IPA de Java para Procesado de XML (JAXP)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">JAXP 1.5 y Nuevas Propiedades</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="usingProps.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="stax.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Manejo de Errores</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Dado que las propiedades son nuevas para la versión actual, se recomienda que las aplicaciones detecten las 
+                    excepciones propias de la interfaz, por ejemplo, SAXException en el siguiente ejemplo. La captura de 
+                    aplicaciones puede funcionar correctamente en versiones anteriores, por ejemplo, el código de muestra contiene 
+                    el siguiente método que detecta si la muestra se ejecuta con una versión del KDJ o una implementación JAXP que 
+                    admita la nueva propiedad:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public boolean isNewPropertySupported() {
+       try {
+           SAXParserFactory spf = SAXParserFactory.newInstance();
+           SAXParser parser = spf.newSAXParser();
+           parser.setProperty("http://javax.xml.XMLConstants/property/accessExternalDTD", "file");
+       } catch (ParserConfigurationException ex) {
+           fail(ex.getMessage());
+       } catch (SAXException ex) {
+           String err = ex.getMessage();
+           if (err.indexOf("Property 'http://javax.xml.XMLConstants/property/accessExternalDTD' is not recognized.") > -1)
+           {
+             //expected, jaxp 1.5 not supported
+             return false;
+           }
+       }
+       return true;
+  }
+                    </pre>
+                </div>
+                <p>
+                    Si el acceso a los recursos externos se deniega debido a las restricciones establecidas por las nuevas 
+                    propiedades, se lanzará una excepción con un error en el siguiente formato:
+                </p>
+                <div class="codeblock">
+                    <pre>
+[type of construct]: Failed to read [type of construct] "[name of the external resource]", because "[type of restriction]" access is not allowed due to restriction set by the [property name] property.
+                    </pre>
+                </div>
+                <p>
+                    Por ejemplo, si recuperar una DTD externa se deniega por restricción al protocolo http tal como el siguiente:
+                    <code>parser.setProperty("http://javax.xml.XMLConstants/property/accessExternalDTD", "file");</code> y si el 
+                    analizador analiza un fichero XML que contiene una referencia externa a 
+                    <code>"http://java.sun.com/dtd/properties.dtd"</code>, el mensaje de error parecería como el siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+External DTD: Failed to read external DTD ''http://java.sun.com/dtd/properties.dtd'', because ''http'' access is not allowed due to restriction set by the accessExternalDTD property.
+                    </pre>
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="usingProps.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="stax.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Usando las Propiedades<br />
+            <b>Página siguiente:</b> StAX
+        </div>
+    </body>
+</html> 

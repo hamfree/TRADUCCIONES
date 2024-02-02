@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Convirtiendo Código Heredado para Usar Genéricos (Los Tutoriales de Java&trade; &gt; Extras &gt; Genéricos)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe los genéricos, la IPA del modo de pantalla completo, y 
+              los recursos relacionados con la certificación de Java" />
+        <meta name="keywords" content="programación en java, aprender java, ejemplos de código java, genéricos de java, IPA del 
+              modo de pantalla completa, certificación" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Genéricos</a></div>
+                <div class="linkAHEAD"><a href="intro.html">Introducción</a></div>
+                <div class="linkAHEAD"><a href="simple.html">Definiendo Genéricos Simples</a></div>
+                <div class="linkAHEAD"><a href="subtype.html">Genéricos y Subtipado</a></div>
+                <div class="linkAHEAD"><a href="wildcards.html">Los Comodines</a></div>
+                <div class="linkAHEAD"><a href="methods.html">Métodos Genéricos</a></div>
+                <div class="linkAHEAD"><a href="legacy.html">Interoperando con Código Heredado</a></div>
+                <div class="linkAHEAD"><a href="fineprint.html">La Letra Pequeña</a></div>
+                <div class="linkAHEAD"><a href="literals.html">Clases Literales como Objetos de Tipo en Tiempo de Ejecución</a></div>
+                <div class="linkAHEAD"><a href="morefun.html">Más Diversión con Comodines</a></div>
+                <div class="nolinkAHEAD">Convirtiendo Código Heredado para Usar Genéricos</div>
+                <div class="linkAHEAD"><a href="acknowledgements.html">Agradecimientos</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Extras <br /><b>Lección:</b> Genéricos
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Extras</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Genéricos</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="morefun.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="acknowledgements.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Convirtiendo Código Heredado para Usar Genéricos</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Anteriormente, mostramos cómo el código nuevo y heredado pueden interoperar. Ahora, es hora de mirar el problema más duro 
+                    de &quot;transformar en genérico&quot; código viejo.
+                </p>
+                <p>
+                    Si decide convertir código viejo para usar genéricos, necesita pensar cuidadosamente sobre cómo modificar la IPA.
+                </p>
+                <p>
+                    Necesita asegurarse de que la IPA genérica no sea excesivamente restrictiva: debe continuar el soporte del contrato 
+                    original de la IPA. Considere de nuevo algunos ejemplos desde <code>java.util.Collection</code>. La IPA pre-genérica se 
+                    ve así:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>interface</b> Collection {
+    <b>public boolean</b> containsAll(Collection c);
+    <b>public boolean</b> addAll(Collection c);
+}
+                    </pre>
+                </div>
+                <p>
+                    Un intento ingenuo de convertirlo a genérico sería la siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>interface</b> Collection&lt;E&gt; {
+
+    <b>public boolean</b> containsAll(Collection&lt;E&gt; c);
+    <b>public boolean</b> addAll(Collection&lt;E&gt; c);
+}
+                    </pre>
+                </div>
+                <p>
+                    Mientras esto es ciertamente seguro, no cumple con el contrato original de la IPA. El método <code>containsAll()</code> 
+                    trabaja con cualquier clase de colección entrante. Esto sólo sucederá si la colección entrante contiene realmente sólo 
+                    instancias de <code>E</code>, pero:
+                </p>
+                <ul>
+                    <li>
+                        El tipo estático de la colección entrante podría diferir, quizás porque el llamante no sabe el tipo preciso de la 
+                        colección que se pasa, o quizás porque es una <code>Collection&lt;S&gt;</code>, donde <code>S</code> es un subtipo de 
+                        <code>E</code>.
+                    </li>
+                    <li>
+                        Es perfectamente legítimo llamar a <code>containsAll()</code> con una colección de un tipo diferente. La rutina 
+                        debería funcionar, devolviendo <code>false</code>.
+                    </li>
+                </ul>
+                <p>
+                    En el caso de <code>addAll()</code>, deberíamos poder agregar cualquier colección que conste de instancias de un subtipo 
+                    de <code>E</code>. Vimos como manejar esta situación correctamente en la sección 
+                    <a class="TutorialLink" target="_top" href="methods.html">Métodos genéricos</a>.
+                </p>
+                <p>
+                    También necesita asegurar que la IPA revisada retenga la compatibilidad binaria con los clientes viejos. Esto implica que 
+                    el borrado de la IPA debe ser la misma que la IPA original, no genérica. En la mayoría de los casos, esto se cae 
+                    naturalmente, pero hay algunos casos sutiles. Examinaremos uno de estos casos más sutiles que hemos encontrado, el método 
+                    <code>Collections.max()</code>. Como vimos en la sección <a class="TutorialLink" target="_top" href="morefun.html">Más 
+                        Diversión con Comodines</a>, una firma plausible para <code>max()</code> es:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>public static</b> &lt;T <b>extends</b> Comparable&lt;? <b>super</b> T&gt;&gt; 
+        T max(Collection&lt;T&gt; coll)
+                    </pre>
+                </div>
+                <p>
+                    Esto está bien, excepto que la eliminación de esta firma es:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>public static</b> Comparable max(Collection coll)
+                    </pre>
+                </div>
+                <p>
+                    la cual es diferente de la firma original de <code>max()</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>public static</b> Object max(Collection coll)
+                    </pre>
+                </div>
+                <p>
+                    Ciertamente podría haber especificado esta firma para <code>max()</code>, pero no se hizo, y todos los archivos binarios 
+                    de clases viejos que llaman a <code>Collections.max()</code> dependen de la firma que devuelve <code>Object</code>.
+                </p>
+                <p>
+                    Podemos forzar que la eliminación sea diferente, especificando explícitamente una superclase en el límite para el 
+                    parámetro de tipo formal <code>T</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>public static</b> &lt;T <b>extends</b> Object &amp; Comparable&lt;? <b>super</b> T&gt;&gt; 
+        T max(Collection&lt;T&gt; coll)
+                    </pre>
+                </div>
+                <p>
+                    Esto es un ejemplo de dar <i>multiples límites</i> para un parámetro de tipo, usando la sintaxis 
+                    <code>T1 &amp; T2 ... &amp; Tn</code>. Se sabe que una variable de tipo con múltiples límites es un subtipo de todos los 
+                    tipos enumerados en el límite. Cuando se usa un límite múltiple, el tipo primero mencionado en el límite se usa como 
+                    borrado de la variable de tipo.
+                </p>
+                <p>
+                    Finalmente, debemos recordar que <code>max</code> sólo lee de su colección de entrada, por lo que es aplicable a las 
+                    colecciones de cualquier subtipo de <code>T</code>.
+                </p>
+                <p>
+                    Esto nos lleva a la firma real utilizada en el KDJ:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>public static</b> &lt;T <b>extends</b> Object &amp; Comparable&lt;? <b>super</b> T&gt;&gt; 
+        T max(Collection&lt;? <b>extends</b> T&gt; coll)
+                    </pre>
+                </div>
+                <p>
+                    Es muy raro que algo tan complicado surja en la práctica, pero los diseñadores ee bibliotecas expertos deberían estar 
+                    preparados para pensar con mucho cuidado al convertir las IPAs existentes.
+                </p>
+                <p>
+                    Otro problema a tener en cuenta son los <i>retornos covariantes</i>, es decir, refinar el tipo de retorno de un método en 
+                    una subclase. No debe aprovechar esta característica en una IPA antigua. Para ver por qué, veamos un ejemplo.
+                </p>
+                <p>
+                    Suponga que su IPA original tenía la forma:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>public class</b> Foo {
+    // <i>Factoría. Debe crear una instancia de</i> 
+    // <i>cualquier clase en la que se declare.</i>
+    <b>public</b> Foo create() {
+        ...
+    }
+}
+
+<b>public class</b> Bar <b>extends</b> Foo {
+    // <i>Realmente crea un Bar.</i>
+    <b>public</b> Foo create() {
+        ...
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Aprovechando los retornos covariantes, lo modifica a:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>public class</b> Foo {
+    // <i>Factoría. Debe crear una instancia de</i> 
+    // <i>cualquier clase en la que se declare.</i>
+    <b>public</b> Foo create() {
+        ...
+    }
+}
+
+<b>public class</b> Bar <b>extends</b> Foo {
+    // <i>Realmente crea un Bar.</i>
+    <b>public</b> Bar create() {
+        ...
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Ahora, suponga que un cliente externo a su código escribió lo siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>public class</b> Baz <b>extends</b> Bar {
+    // <i>Realmente crea un Baz.</i>
+    <b>public</b> Foo create() {
+        ...
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    La máquina virtual de Java no soporta directamente la sobreescritura de métodos con diferentes tipos de retorno. Esta 
+                    característica es soportada por el compilador. Consecuentemente, a menos que la clase <code>Baz</code> sea recompilada, 
+                    no sobreescribirá adecuadamente el método <code>create()</code> de <code>Bar</code>. Además, <code>Baz</code> tendrá que 
+                    modificarse, ya que el código será rechazado como está escrito: el tipo de retorno de <code>create()</code> en 
+                    <code>Baz</code> no es un subtipo del tipo de retorno de <code>create()</code> en <code>Bar</code>.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="morefun.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="acknowledgements.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos
+                            <a href="../../information/cpyr.html">avisos legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Más Diversión con Comodines<br />
+            <b>Página siguiente:</b> Agradecimientos
+        </div>
+    </body>
+</html> 

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Escribiendo un DOM como si fuera un archivo XML (Los Tutoriales de Java&trade; &gt; IPA de Java para Procesado de XML 
+            (JAXP) &gt; Transformaciones del Lenguaje Extensible de Hojas de Estilo (XLST))
+        </title>
+        <meta name="description" content="Este tutorial de Java JAXP describe la IPA de Java para el procesado de XML (jaxp), XSLT, 
+              SAX, y tópicos de XML relacionados" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jaxp, xml, xslt, sax" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Transformaciones del Lenguaje Extensible de Hojas de Estilo (XLST)</a></div>
+                <div class="linkAHEAD"><a href="intro.html">Introduciendo XSL, XSLT, y XPath</a></div>
+                <div class="linkAHEAD"><a href="xpath.html">Cómo trabaja XPath</a></div>
+                <div class="nolinkAHEAD">Escribiendo un DOM como si fuera un archivo XML</div>
+                <div class="linkAHEAD"><a href="generatingXML.html">Generando XML desde una Estructura de Datos Arbitraria</a></div>
+                <div class="linkAHEAD"><a href="transformingXML.html">Transformando Datos de XML con XSLT</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> IPA de Java para Procesado de XML (JAXP)<br />
+                <b>Lección:</b> Transformaciones del Lenguaje Extensible de Hojas de Estilo (XLST)
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">IPA de Java para Procesado de XML (JAXP)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Transformaciones del Lenguaje Extensible de Hojas de Estilo (XLST)</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="xpath.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="generatingXML.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Escribiendo un DOM como si fuera un archivo XML</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Después de que ha construído un DOM (ya sea analizando un fichero XML o construyéndolo programáticamente) 
+                    frecuentemente quiere salvarlo como un XML. Esta sección le muestra cómo hacer eso usando el paquete de 
+                    transformación Xalan.
+                </p>
+                <p>
+                    Usando ese paquete, creará un objeto transformador para conectar un <code>DOMSource</code> a un 
+                    <code>StreamResult</code>. Después invocará el método <code>transform()</code> del transformador para escribir 
+                    el DOM como datos XML.
+                </p>
+                <p>
+                    <a id="gghiy"></a>
+                </p>
+                <h2>
+                    Leer el XML
+                </h2>
+                <p>
+                    El primer paso es crear un DOM en memoria analizando un fichero XML. A estas alturas, debería sentirse cómodo 
+                    con el proceso.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Nota:</strong>&nbsp;
+                    <p>
+                        El código descrito en esta sección está en el fichero <code>TransformationApp01.java</code>.
+                        <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                           onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                            <code>Descargue los ejemplos XSLT</code></a> y descomprímalos en el directorio 
+                        <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                    </p>
+                    <hr />
+                </div>
+                <p>
+                    El código siguiente proporciona una plantilla básica para comenzar. Es básicamente el mismo código que fué usado 
+                    en el inicio de la lección 
+                    <a class="TutorialLink" target="_top" href="../dom/index.html">Modelo de Objetos del Documento</a>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+import javax.xml.parsers.DocumentBuilder; 
+import javax.xml.parsers.DocumentBuilderFactory; 
+import javax.xml.parsers.FactoryConfigurationError; 
+import javax.xml.parsers.ParserConfigurationException; 
+import org.xml.sax.SAXException; 
+import org.xml.sax.SAXParseException; 
+
+import org.w3c.dom.Document;
+import org.w3c.dom.DOMException;
+
+import java.io.*;
+
+public class TransformationApp01 {
+
+    static Document document; 
+
+    public static void main(String argv[]) {
+        if (argv.length != 1) {
+            System.err.println("Usage: java TransformationApp01 filename");
+            System.exit (1);
+        }
+
+        DocumentBuilderFactory factory =
+        DocumentBuilderFactory.newInstance();
+
+        try {
+            File f = new File(argv[0]);
+            DocumentBuilder builder =
+            factory.newDocumentBuilder();
+            document = builder.parse(f);
+  
+        } 
+        catch (SAXParseException spe) {
+            // Error generated by the parser
+            System.out.println("\n** Parsing error"
+                               + ", line " + spe.getLineNumber()
+                               + ", uri " + spe.getSystemId());
+            System.out.println("  " + spe.getMessage() );
+  
+            // Use the contained exception, if any
+            Exception x = spe;
+            if (spe.getException() != null)
+                x = spe.getException();
+            x.printStackTrace();
+        }
+        catch (SAXException sxe) {
+            // Error generated by this application
+            // (or a parser-initialization error)
+            Exception x = sxe;
+            if (sxe.getException() != null)
+                x = sxe.getException();
+            x.printStackTrace();
+        }
+        catch (ParserConfigurationException pce) {
+            // Parser with specified options 
+            // cannot be built
+            pce.printStackTrace();
+        }
+        catch (IOException ioe) {
+            // I/O error
+            ioe.printStackTrace();
+        }
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    <a id="gghgi"></a>
+                </p>
+                <h2>
+                    Crear un Transformador
+                </h2>
+                <p>
+                    El paso siguiente es crear un transformador que puede usar para transmitir el XML a <code>System.out</code>. 
+                    Para empezar, se requieren las siguientes declaraciones de importación.
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>import javax.xml.transform.Transformer;</b>
+<b>import javax.xml.transform.TransformerFactory;</b>
+<b>import javax.xml.transform.TransformerException;</b>
+<b>import javax.xml.transform.TransformerConfigurationException;</b>
+<b>import javax.xml.transform.dom.DOMSource;</b> 
+<b>import javax.xml.transform.stream.StreamResult;</b>
+import java.io.*;
+                    </pre>
+                </div>
+                <p>
+                    Aquí, agrega una serie de clases que deberían ahora formar un patrón estándar: una entidad 
+                    (<code>Transformer</code>), la factoría para crearla (<code>TransformerFactory</code>), y las excepciones que 
+                    pueden ser generadas por cada una. Ya que una transformación siempre tiene una fuente y un resultado, luego 
+                    importa las clases necesarias para usar un DOM como una fuente (<code>DOMSource</code>) y un flujo de salida 
+                    para el resultado (<code>StreamResult</code>).
+                </p>
+                <p>
+                    A continuación, agregue el código para realizar la transformación:
+                </p>
+                <div class="codeblock">
+                    <pre>
+try {
+    File f = new File(argv[0]);
+    DocumentBuilder builder = factory.newDocumentBuilder();
+    document = builder.parse(f);
+
+    <b>// Use a Transformer for output</b>
+    <b>TransformerFactory tFactory =</b>
+    <b>TransformerFactory.newInstance();</b>
+    <b>Transformer transformer = 
+    tFactory.newTransformer();</b>
+
+    <b>DOMSource source = new DOMSource(document);</b>
+    <b>StreamResult result = new StreamResult(System.out);</b>
+    <b>transformer.transform(source, result);</b>
+}
+                    </pre>
+                </div>
+                <p>
+                    Aquí, crea un objeto transformador, usa el DOM para construir un objeto fuente, y usa <code>System.out</code> 
+                    para construir un objeto resultado. Después le indica al transformador que opere en el objeto fuente y emita al 
+                    objeto resultado.
+                </p>
+                <p>
+                    En este caso, el &quot;transformador&quot; no está en realidad cambiando nada. En terminología XSLT, está 
+                    usando la transformación de identidad, lo que significa que la &quot;transformación&quot; genera una copia de 
+                    la fuente, sin cambios.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Nota:</strong>&nbsp;
+                    <p>
+                        Puede especificar una variedad de propiedades de salida para los objetos transformadores, como se define en 
+                        la especificación W3C en 
+                        <a class="OutsideLink" target="_blank" href="http://www.w3.org/TR/xslt#output">
+                            http://www.w3.org/TR/xslt#output</a>. Por ejemplo, para obtener la salida con sangría, puede invocar el 
+                        siguiente método:
+                    </p>
+                    <div class="codeblock">
+                        <pre>
+% transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                        </pre>
+                    </div>
+                    <hr />
+                </div>
+                <p>
+                    Finalmente, el siguiente código remarcado captura los nuevos errores que se pueden generar:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>} 
+catch (TransformerConfigurationException tce) {</b>
+    <b>System.out.println("* Transformer Factory error");</b>
+    <b>System.out.println(" " + tce.getMessage());</b>
+
+    <b>Throwable x = tce;</b>
+    <b>if (tce.getException() != null)</b>
+        <b>x = tce.getException();</b>
+    <b>x.printStackTrace(); </b>
+<b>} 
+catch (TransformerException te) {</b>
+    <b>System.out.println("* Transformation error");</b>
+    <b>System.out.println(" " + te.getMessage());</b>
+
+    <b>Throwable x = te;</b>
+    <b>if (te.getException() != null)</b>
+        <b>x = te.getException();</b>
+    <b>x.printStackTrace();</b>
+} 
+catch (SAXParseException spe) {
+    // ...
+}
+                    </pre>
+                </div>
+                <p>
+                    <strong>Notas</strong>
+                </p>
+                <ul>
+                    <li>
+                        Las <code>TransformerExceptions</code> se lanzan por el objeto transformador.
+                    </li>
+                    <li>
+                        Las <code>TransformerConfigurationExceptions</code> se lanzan por la factoría.
+                    </li>
+                    <li>
+                        Para preservar la configuración <code>DOCTYPE</code> del documento XML, es también necesario agregar el 
+                        código siguiente:
+                        <div class="codeblock">
+                            <pre>
+import javax.xml.transform.OutputKeys;
+...
+if (document.getDoctype() != null) {
+    String systemValue = (new File (document.getDoctype().getSystemId())).getName();
+    transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, systemValue);
+}
+                            </pre>
+                        </div>
+                    </li>
+                </ul>
+                <p>
+                    Para obtener más información sobre la configuración de la factoría y el manejo de errores de validación, 
+                    consulte 
+                    <a class="TutorialLink" target="_top" href="../dom/readingXML.html">Leyendo Datos XML en un DOM</a>. 
+                    <a id="gghig"></a>
+                </p>
+                <h3>
+                    Ejecutar el Ejemplo <code>TransformationApp01</code>
+                </h3>
+                <ol>
+                    <li>
+                        <b>Navegue al directorio <code>samples</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+% cd <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>
+                            <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                               onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                                <code>Descargue los ejemplos XSLT pulsando este enlace</code></a> y descomprímalos dentro del 
+                            directorio <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.</b>
+                    </li>
+                    <li>
+                        <b>Navegue al directorio <code>xslt</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+% cd xslt
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Compile el ejemplo <code>TransformationApp01</code>.</b>
+                        <p>
+                            Teclee el siguiente comando:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+% javac TransformationApp01.java
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Ejecute el ejemplo <code>TransformationApp01</code> sobre un fichero XML.</b>
+                        <p>
+                            En el caso de abajo, <code>TransformationApp01</code> se ejecuta sobre el fichero <code>foo.xml</code>,
+                            encontrado en el directorio <code>xslt/data</code> después de que ha descomprimido el paquete de 
+                            ejemplos.
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+% java TransformationApp01 data/foo.xml
+                            </pre>
+                        </div>
+                        <p>
+                            Verá la salida siguiente:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+&lt;?xml version="1.0" 
+    encoding="UTF-8" 
+    standalone="no"?>&lt;doc>
+  &lt;name first="David" last="Marston"/>
+  &lt;name first="David" last="Bertoni"/>
+  &lt;name first="Donald" last="Leslie"/>
+  &lt;name first="Emily" last="Farmer"/>
+  &lt;name first="Joseph" last="Kesselman"/>
+  &lt;name first="Myriam" last="Midy"/>
+  &lt;name first="Paul" last="Dick"/>
+  &lt;name first="Stephen" last="Auriemma"/>
+  &lt;name first="Scott" last="Boag"/>
+  &lt;name first="Shane" last="Curcuru"/>
+                            </pre>
+                        </div>
+                        <p>
+                            Como se mencionó en <a href="#gghgi">Crear un Transformador</a>, este transformador no ha cambiado 
+                            realmente nada, sino que acaba de realizar la transformación de identidad, para generar una copia de la 
+                            fuente. Se realizará una transformación real en 
+                            <a class="TutorialLink" target="_top" href="generatingXML.html">Generando XML desde una Estructura de 
+                                Datos Arbitraria</a>.
+                        </p>
+                    </li>
+                </ol>
+                <p>
+                    <a id="gghkx"></a>
+                </p>
+                <h2>
+                    Escribir un Subárbol del DOM
+                </h2>
+                <p>
+                    Es también posible operar con un subárbol del DOM. En esta sección, experimentará con esa opción.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Nota:</strong>&nbsp;
+                    <p>
+                        El código descrito en esta sección está en TranformationApp02.java. Si aún no lo ha hecho, 
+                        <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                           onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                            <code>descargue los ejemplos XSLT</code></a> y descomprímalos dentro del directorio 
+                        <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                    </p>
+                    <hr />
+                </div>
+                <p>
+                    La única diferencia en el proceso es que ahora creará un <code>DOMSource</code> usando un nodo en el DOM, en 
+                    vez del DOM entero. El primer paso es importar las clases que necesita para obtener el nodo que quiere, como 
+                    se muestra en el código remarcado siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+import org.w3c.dom.Document;
+import org.w3c.dom.DOMException;
+<b>import org.w3c.dom.Node;</b>
+<b>import org.w3c.dom.NodeList;</b> 
+                    </pre>
+                </div>
+                <p>
+                    El paso siguiente es encontrar un buen nodo para el experimento. El código remarcado siguiente selecciona el 
+                    primer elemento <code>&lt;name&gt;</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+try {
+    File f = new File(argv[0]);
+    DocumentBuilder builder = factory.newDocumentBuilder();
+    document = builder.parse(f);
+
+    <b>NodeList list = document.getElementsByTagName("name");</b>
+    <b>Node node = list.item(0); </b>
+}
+                    </pre>
+                </div>
+                <p>
+                    En <a href="#gghgi">Crear un Transformador</a>, el objeto fuente fue construído desde el documento entero por 
+                    la siguiente línea de código:
+                </p>
+                <div class="codeblock">
+                    <pre>
+DOMSource source = new DOMSource(document);
+                    </pre>
+                </div>
+                <p>
+                    Sin embargo, la línea resaltada de código debajo construye un objeto fuente que consiste del subárbol enraizado 
+                    en un nodo en particular.
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>DOMSource source = new DOMSource(node);</b>
+StreamResult result = new StreamResult(System.out);
+transformer.transform(source, result);
+                    </pre>
+                </div>
+                <p>
+                    <a id="gghku"></a>
+                </p>
+                <h3>
+                    Ejecutar el Ejemplo <code>TranformationApp02</code>
+                </h3>
+                <ol>
+                    <li>
+                        <b>Navegue al directorio <code>samples</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+% cd <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>
+                            <a class="SourceLink" target="_blank" href="../examples/xslt_samples.zip" 
+                               onclick="showCode('../../displayCode.html', '../examples/xslt_samples.zip'); return false;">
+                                <code>Descargue los ejemplos XSLT pulsando este enlace</code></a> y descomprímalos dentro del 
+                            directorio <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.</b>
+                    </li>
+                    <li>
+                        <b>Navegue al directorio <code>xslt</code>.</b>
+                        <div class="codeblock">
+                            <pre>
+cd xslt
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Compile el ejemplo <code>TranformationApp02</code>.</b>
+                        <p>
+                            Teclee el siguiente comando:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+% javac xslt/TranformationApp02.java
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        <b>Ejecute el ejemplo <code>TranformationApp02</code> sobre un fichero XML.</b>
+                        <p>
+                            En el caso de abajo, <code>TranformationApp02</code> se ejecuta sobre el fichero <code>foo.xml</code>, 
+                            encontrado en el directorio <code>xslt/data</code> después de que ha descomprimido el paquete de 
+                            ejemplos.
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+% java TranformationApp02 data/foo.xml
+                            </pre>
+                        </div>
+                        <p>
+                            Verá la salida siguiente:
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+&lt;?xml version="1.0" encoding="UTF-8" 
+    standalone="no"?>&lt;doc>&lt;name 
+    first="David" last="Marston"/>
+                            </pre>
+                        </div>
+                        <p>
+                            Esta vez, sólo se imprimió el primer elemento <code>&lt;name&gt;</code>.
+                        </p>
+                        <p>
+                            En este punto, ha visto cómo usar un transformador para escribir un DOM y cómo usar un subárbol de un 
+                            DOM como el objeto fuente en una transformación. En la siguiente sección, verá como usar un 
+                            transformador para crear XML desde cualquier estructura de datos que sea capaz de analizar.
+                        </p>
+                    </li>
+                </ol>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="xpath.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="generatingXML.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Cómo trabaja XPath<br />
+            <b>Página siguiente:</b> Generando XML desde una Estructura de Datos Arbitraria
+        </div>
+    </body>
+</html> 

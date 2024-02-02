@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Negociación de Contenido en Tiempo de Ejecución</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jaxrs-advanced005.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jaxrs-advanced007.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GKQBQ">
+      <h2 id="runtime-content-negotiation">Negociación de Contenido en Tiempo de Ejecución</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Las anotaciones <code>@Produces</code> y <code>@Consumes</code> manejan la negociación de 
+            contenido estático en JAX-RS. Estas anotaciones especifican las preferencias de contenido del 
+            servidor. Los encabezados HTTP como <code>Accept</code>, <code>Content-Type</code> y 
+            <code>Accept-Language</code> definen las preferencias de negociación de contenido del cliente.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Para obtener más detalles sobre los encabezados HTTP para la negociación de contenido, consulte 
+            HTTP /1.1 - Negociación de contenido 
+            (<code>http://www.w3.org/Protocols/rfc2616/rfc2616-sec12.html</code>).
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>El siguiente fragmento de código muestra las preferencias de contenido del servidor:</p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Produces("text/plain")
+@Path("/employee")
+public class Employee {
+    @GET
+    public String getEmployeeAddressText(String address) {...}
+    @Produces("text/xml")
+    @GET
+    public String getEmployeeAddressXml(Address address) {...}
+}
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Se llama al método <code>getEmployeeAddressText</code> para una solicitud HTTP similar a la 
+            siguiente:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+GET /employee
+Accept: text/plain
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>Esto producirá la siguiente respuesta:</p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+500 Oracle Parkway, Redwood Shores, CA
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Se llama al método <code>getEmployeeAddressXml</code> para una solicitud HTTP similar a la 
+            siguiente:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+GET /employee
+Accept: text/xml
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>Esto producirá la siguiente respuesta:</p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;address street="500 Oracle Parkway, Redwood Shores, CA" country="USA"/&gt;
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Con la negociación de contenido estático, también puede definir varios tipos de contenido y medios 
+            para el cliente y el servidor.
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Produces("text/plain", "text/xml")
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Además de admitir la negociación de contenido estático, JAX-RS también admite la negociación de 
+            contenido en tiempo de ejecución mediante la clase <code>javax.ws.rs.core.Variant</code> y los 
+            objetos <code>Request</code>. La clase <code>Variant</code> especifica la representación de 
+            recursos de la negociación de contenido. Cada instancia de la clase <code>Variant</code> puede 
+            contener un tipo de medio, un idioma y una codificación. El objeto <code>Variant</code> define la 
+            representación de recursos que admite el servidor. La clase 
+            <code>Variant.VariantListBuilder</code> se utiliza para crear una lista de variantes de 
+            representación.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            El siguiente fragmento de código muestra cómo crear una lista de variantes de representación de 
+            recursos:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+List&lt;Variant&gt; vs = Variant.mediatypes("application/xml", "application/json")
+        .languages("en", "fr").build();
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Este fragmento de código llama al método <code>build</code> de la clase 
+            <code>VariantListBuilder</code>. La clase <code>VariantListBuilder</code> se invoca cuando llama a 
+            los métodos <code>mediatypes</code>, <code>languages</code> o <code>encodings</code>. El método 
+            <code>build</code> construye una serie de representaciones de recursos. La lista 
+            <code>Variant</code> creada por el método <code>build</code> tiene todas las combinaciones 
+            posibles de elementos especificados en <code>mediatypes</code>, <code>languages</code> y métodos 
+            de <code>encodings</code>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            En este ejemplo, el tamaño del objeto <code>vs</code> como se define en este fragmento de código 
+            es 4 y el contenido es el siguiente:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+[["application/xml","en"], ["application/json","en"],
+    ["application/xml","fr"],["application/json","fr"]]
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            El método <code>javax.ws.rs.core.Request.selectVariant</code> acepta una lista de objetos 
+            <code>Variant</code> y elige el objeto <code>Variant</code> que coincide con la solicitud HTTP. 
+            Este método compara su lista de objetos <code>Variant</code> con los encabezados 
+            <code>Accept</code>, <code>Accept-Encoding</code>, <code>Accept-Language</code> y 
+            <code>Accept-Charset</code> de la solicitud HTTP.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            El siguiente fragmento de código muestra cómo usar el método <code>selectVariant</code> para 
+            seleccionar la <code>Variant</code> más aceptable de los valores en la solicitud del cliente:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@GET
+public Response get(@Context Request r) {
+    List&lt;Variant&gt; vs = ...;
+    Variant v = r.selectVariant(vs);
+    if (v == null) {
+        return Response.notAcceptable(vs).build();
+    } else {
+        Object rep = selectRepresentation(v);
+        return Response.ok(rep, v);
+    }
+}
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            El método <code>selectVariant</code> devuelve el objeto <code>Variant</code> que coincide con la 
+            solicitud o nulo si no se encuentran coincidencias. En este fragmento de código, si el método 
+            devuelve un valor nulo, se crea un objeto <code>Response</code> para una respuesta no aceptable. 
+            De lo contrario, se devuelve un objeto <code>Response</code> con un estado OK y que contiene una 
+            representación en forma de una entidad <code>Object</code> y una <code>Variant</code>.
+          </p>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jaxrs-advanced005.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jaxrs-advanced007.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

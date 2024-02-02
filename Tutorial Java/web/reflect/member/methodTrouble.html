@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Solución de Problemas (Los Tutoriales de Java&trade; &gt; La IPA de Reflexión &gt; Miembros)
+        </title>
+        <meta name="description" content="Este tutorial de reflexión de Java describe el uso de la reflexión para acceder y 
+              manipular clases, campos, métodos y constructores" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java reflection" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Miembros</a></div>
+                <div class="linkAHEAD"><a href="field.html">Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldTypes.html">Obteniendo los Tipos de los Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldModifiers.html">Recuperando y Analizando Modificadores de los Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldValues.html">Obteniendo y Estableciendo los Valores de los Campos</a></div>
+                <div class="linkBHEAD"><a href="fieldTrouble.html">Solución de Problemas</a></div>
+                <div class="linkAHEAD"><a href="method.html">Métodos</a></div>
+                <div class="linkBHEAD"><a href="methodType.html">Obteniendo Información del Tipo del Método</a></div>
+                <div class="linkBHEAD"><a href="methodparameterreflection.html">Obteniendo los Nombre de los Parámetros del Método</a></div>
+                <div class="linkBHEAD"><a href="methodModifiers.html">Recuperando y Analizando Modificadores del Método</a></div>
+                <div class="linkBHEAD"><a href="methodInvocation.html">Invocando Métodos</a></div>
+                <div class="nolinkBHEAD">Solución de Problemas</div>
+                <div class="linkAHEAD"><a href="ctor.html">Constructores</a></div>
+                <div class="linkBHEAD"><a href="ctorLocation.html">Encontrando Constructores</a></div>
+                <div class="linkBHEAD"><a href="ctorModifiers.html">Recuperando y Analizando Modificadores del Constructor</a></div>
+                <div class="linkBHEAD"><a href="ctorInstance.html">Creando Nuevas Instancias de Clase</a></div>
+                <div class="linkBHEAD"><a href="ctorTrouble.html">Solución de Problemas</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> La IPA de Reflexión<br />
+                <b>Lección:</b> Miembros<br />
+                <b>Sección:</b> Métodos
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">La IPA de Reflexión</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Miembros</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="methodInvocation.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="ctor.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Solución de Problemas</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Esta sección contiene ejemplos de los problemas que los desarrolladores podrían encontrar cuando usan reflexión 
+                    para localizar, invocar, u obtener información sobre los métodos.
+                </p>
+                <h2>
+                    NoSuchMethodException Debido al Borrado de Tipo
+                </h2>
+                <p>
+                    El ejemplo 
+                    <a class="SourceLink" target="_blank" href="example/MethodTrouble.java" 
+                       onclick="showCode('../../displayCode.html', 'example/MethodTrouble.java'); return false;">
+                        <code>MethodTrouble</code></a> ilustra qué ocurre cuando el borrado de tipo no se toma en consideración por 
+                    el código que busca un método en particular en una clase.
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+import java.lang.reflect.Method;
+
+public class MethodTrouble&lt;T&gt;  {
+    public void lookup(T t) {}
+    public void find(Integer i) {}
+
+    public static void main(String... args) {
+	try {
+	    String mName = args[0];
+	    Class cArg = Class.forName(args[1]);
+	    Class&lt;?&gt; c = (new MethodTrouble&lt;Integer&gt;()).getClass();
+	    Method m = c.getMethod(mName, cArg);
+	    System.out.format(&quot;Found:%n  %s%n&quot;, m.toGenericString());
+
+        // production code should handle these exceptions more gracefully
+	} catch (NoSuchMethodException x) {
+	    x.printStackTrace();
+	} catch (ClassNotFoundException x) {
+	    x.printStackTrace();
+	}
+    }
+}
+                    </pre>
+                </div>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java MethodTrouble lookup java.lang.Integer</em>
+java.lang.NoSuchMethodException: MethodTrouble.lookup(java.lang.Integer)
+        at java.lang.Class.getMethod(Class.java:1605)
+        at MethodTrouble.main(MethodTrouble.java:12)
+                    </pre>
+                </div>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java MethodTrouble lookup java.lang.Object</em>
+Found:
+  public void MethodTrouble.lookup(T)
+                    </pre>
+                </div>
+                <p>
+                    Cuando se declara un método con un tipo de parámetro genérico, el compiladore reemplazará el tipo genérico con 
+                    su límite superior, en esta ocasión, el límite superior de <code>T</code> es 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html"><code>Object</code></a>. Así, cuando 
+                    el código busca <code>lookup(Integer)</code>, no se encuentra el método, a pesar de que la instancia de 
+                    <code>MethodTrouble</code> se creó de la siguiente manera:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Class&lt;?&gt; c = (new MethodTrouble&lt;Integer&gt;()).getClass();
+                    </pre>
+                </div>
+                <p>
+                    La búsqueda de <code>lookup(Object)</code> se realiza correctamente como se esperaba.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java MethodTrouble find java.lang.Integer</em>
+Found:
+  public void MethodTrouble.find(java.lang.Integer)
+&#36; <em>java MethodTrouble find java.lang.Object</em>
+java.lang.NoSuchMethodException: MethodTrouble.find(java.lang.Object)
+        at java.lang.Class.getMethod(Class.java:1605)
+        at MethodTrouble.main(MethodTrouble.java:12)
+                    </pre>
+                </div>
+                <p>
+                    En este caso, <code>find()</code> no tiene parámetros genéricos, así que los tipos de parámetro buscados por 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getMethod-java.lang.String-java.lang.Class...-">
+                        <code>getMethod()</code></a> deben coincidir exactamente.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Consejo:</strong>&nbsp;Pase siempre el límite superior del tipo parametrizado cuando busque un método.
+                    <hr />
+                </div>
+                <h2>
+                    IllegalAccessException al Invocar un Método
+                </h2>
+                <p>
+                    Se lanza una 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/IllegalAccessException.html">
+                        <code>IllegalAccessException</code></a> si se intenta invocar un método <code>privado</code> o inaccesible 
+                    de otra modo.
+                </p>
+                <p>
+                    El ejemplo 
+                    <a class="SourceLink" target="_blank" href="example/MethodTroubleAgain.java" 
+                       onclick="showCode('../../displayCode.html', 'example/MethodTroubleAgain.java'); return false;">
+                        <code>MethodTroubleAgain</code></a> muestra un rastro de pila típico que resulta de intentar invocar un 
+                    método privado en otra clase.
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+class AnotherClass {
+    private void m() {}
+}
+
+public class MethodTroubleAgain {
+    public static void main(String... args) {
+	AnotherClass ac = new AnotherClass();
+	try {
+	    Class&lt;?&gt; c = ac.getClass();
+ 	    Method m = c.getDeclaredMethod(&quot;m&quot;);
+//  	    m.setAccessible(true);      // solution
+ 	    Object o = m.invoke(ac);    // IllegalAccessException
+
+        // production code should handle these exceptions more gracefully
+	} catch (NoSuchMethodException x) {
+	    x.printStackTrace();
+	} catch (InvocationTargetException x) {
+	    x.printStackTrace();
+	} catch (IllegalAccessException x) {
+	    x.printStackTrace();
+	}
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    A continuación, se muestra el seguimiento de la pila para la excepción lanzada.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java MethodTroubleAgain</em>
+java.lang.IllegalAccessException: Class MethodTroubleAgain can not access a
+  member of class AnotherClass with modifiers "private"
+        at sun.reflect.Reflection.ensureMemberAccess(Reflection.java:65)
+        at java.lang.reflect.Method.invoke(Method.java:588)
+        at MethodTroubleAgain.main(MethodTroubleAgain.java:15)
+                    </pre>
+                </div>
+                <div class="note">
+                    <hr />
+                    <strong>Consejo:</strong>&nbsp;Existe una restricción de acceso que evita la invocación reflexiva de métodos 
+                    que normalmente no serían accesibles mediante la invocación directa. (Esto incluye &mdash; pero no está 
+                    limitado  a &mdash; métodos <code>private</code> en una clase separada y métodos públicos en una clase privada 
+                    separada). Sin embargo, <code>Method</code> se declaró para extender 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/AccessibleObject.html">
+                        <code>AccessibleObject</code></a> el cual proporciona la habilidad de suprimir esta comprobación a través 
+                    de 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/AccessibleObject.html#setAccessible-boolean-">
+                        <code>AccessibleObject.setAccessible()</code></a>. Si tiene éxito, las invocaciones posteriores de este 
+                    objeto de método no fallarán debido a este problema.
+                    <hr />
+                </div>
+                <h2>
+                    IllegalArgumentException desde Method.invoke()
+                </h2>
+                <p>
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html#invoke-java.lang.Object-java.lang.Object...-">
+                        <code>Method.invoke()</code></a> ha sido adaptado para ser un método de aridad variable. Esta es una gran 
+                    conveniencia, sin embargo, puede dar lugar a un comportamiento inesperado. El ejemplo 
+                    <a class="SourceLink" target="_blank" href="example/MethodTroubleToo.java" 
+                       onclick="showCode('../../displayCode.html', 'example/MethodTroubleToo.java'); return false;">
+                        <code>MethodTroubleToo</code></a> muestra varias formas en las cuales 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html#invoke-java.lang.Object-java.lang.Object...-">
+                        <code>Method.invoke()</code></a> puede producir resultados confusos.
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+import java.lang.reflect.Method;
+
+public class MethodTroubleToo {
+    public void ping() { System.out.format(&quot;PONG!%n&quot;); }
+
+    public static void main(String... args) {
+	try {
+	    MethodTroubleToo mtt = new MethodTroubleToo();
+	    Method m = MethodTroubleToo.class.getMethod(&quot;ping&quot;);
+
+ 	    switch(Integer.parseInt(args[0])) {
+	    case 0:
+  		m.invoke(mtt);                 // works
+		break;
+	    case 1:
+ 		m.invoke(mtt, null);           // works (expect compiler warning)
+		break;
+	    case 2:
+		Object arg2 = null;
+		m.invoke(mtt, arg2);           // IllegalArgumentException
+		break;
+	    case 3:
+		m.invoke(mtt, new Object[0]);  // works
+		break;
+	    case 4:
+		Object arg4 = new Object[0];
+		m.invoke(mtt, arg4);           // IllegalArgumentException
+		break;
+	    default:
+		System.out.format(&quot;Test not found%n&quot;);
+	    }
+
+        // production code should handle these exceptions more gracefully
+	} catch (Exception x) {
+	    x.printStackTrace();
+	}
+    }
+}
+                    </pre>
+                </div>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java MethodTroubleToo 0</em>
+PONG!
+                    </pre>
+                </div>
+                <p>
+                    Ya que todos los parámetros de 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html#invoke-java.lang.Object-java.lang.Object...-">
+                        <code>Method.invoke()</code></a> son opcionales excepto el primero, pueden ser omitidos cuando el método a 
+                        invocar no tenga parámetros.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java MethodTroubleToo 1</em>
+PONG!
+                    </pre>
+                </div>
+                <p>
+                    El código en este caso genera esta advertencia del compilador porque <code>null</code> es ambiguo.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>javac MethodTroubleToo.java</em>
+MethodTroubleToo.java:16: warning: non-varargs call of varargs method with
+  inexact argument type for last parameter;
+ 		m.invoke(mtt, null);           // works (expect compiler warning)
+ 		              ^
+  cast to Object for a varargs call
+  cast to Object[] for a non-varargs call and to suppress this warning
+1 warning
+                    </pre>
+                </div>
+                <p>
+                    No es posible determinar si <code>null</code> representa una matriz de argumentos nula o un primer argumento de 
+                    <code>null</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java MethodTroubleToo 2</em>
+java.lang.IllegalArgumentException: wrong number of arguments
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke
+          (NativeMethodAccessorImpl.java:39)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke
+          (DelegatingMethodAccessorImpl.java:25)
+        at java.lang.reflect.Method.invoke(Method.java:597)
+        at MethodTroubleToo.main(MethodTroubleToo.java:21)
+                    </pre>
+                </div>
+                <p>
+                    Esto falla a pesar del hecho de que el argumento es <code>null</code>, porque el tipo es un 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html"><code>Object</code></a> y 
+                    <code>ping()</code> no espera argumentos en absoluto.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java MethodTroubleToo 3</em>
+PONG!
+                    </pre>
+                </div>
+                <p>
+                    Esto funciona porque <code>new Object[0]</code> crea una matriz vacía, y para un método varargs, esto es 
+                    equivalente a no pasar ninguno de los argumentos opcionales.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java MethodTroubleToo 4</em>
+java.lang.IllegalArgumentException: wrong number of arguments
+        at sun.reflect.NativeMethodAccessorImpl.invoke0
+          (Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke
+          (NativeMethodAccessorImpl.java:39)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke
+          (DelegatingMethodAccessorImpl.java:25)
+        at java.lang.reflect.Method.invoke(Method.java:597)
+        at MethodTroubleToo.main(MethodTroubleToo.java:28)
+                    </pre>
+                </div>
+                <p>
+                    A diferencia del ejemplo previo, si se almacena una matriz vacía en un 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html"><code>Object</code></a>, entonces es 
+                       tratado como un 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html">
+                        <code>Object</code></a>. Esto falla por la misma razoón que el caso 2 falla, <code>ping()</code> no espera 
+                        un argumento.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Consejo:</strong>&nbsp;Cuando un método <code>foo(Object... o)</code> se declara el compilador pondrá 
+                    todos los argumentos pasados a <code>foo()</code> en una matriz de tipo 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html"><code>Object</code></a>. La 
+                       implementación de <code>foo()</code> es la misma como si fuera declarada <code>foo(Object[] o)</code>. 
+                       Entender esto puede ayudar a evitar los tipos de problemas ilustrados arriba.
+                    <hr />
+                </div>
+                <h2>
+                    InvocationTargetException Cuando Falla el Método Invocado
+                </h2>
+                <p>
+                    Una 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/InvocationTargetException.html">
+                        <code>InvocationTargetException</code></a> encapsula todas las excepciones (comprobadas y no comprobadas) 
+                        producidas cuando se invoca un método del objeto. El ejemplo 
+                    <a class="SourceLink" target="_blank" href="example/MethodTroubleReturns.java" 
+                       onclick="showCode('../../displayCode.html', 'example/MethodTroubleReturns.java'); return false;">
+                        <code>MethodTroubleReturns</code></a> muestra cómo recuperar la excepción original lanzada por el método 
+                        invocado.
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+public class MethodTroubleReturns {
+    private void drinkMe(int liters) {
+	if (liters &lt; 0)
+	    throw new IllegalArgumentException(&quot;I can't drink a negative amount of liquid&quot;);
+    }
+
+    public static void main(String... args) {
+	try {
+	    MethodTroubleReturns mtr  = new MethodTroubleReturns();
+ 	    Class&lt;?&gt; c = mtr.getClass();
+   	    Method m = c.getDeclaredMethod(&quot;drinkMe&quot;, int.class);
+	    m.invoke(mtr, -1);
+
+        // production code should handle these exceptions more gracefully
+	} catch (InvocationTargetException x) {
+	    Throwable cause = x.getCause();
+	    System.err.format(&quot;drinkMe() failed: %s%n&quot;, cause.getMessage());
+	} catch (Exception x) {
+	    x.printStackTrace();
+	}
+    }
+}
+                    </pre>
+                </div>
+                <div class="codeblock">
+                    <pre>
+&#36; <em>java MethodTroubleReturns</em>
+drinkMe() failed: I can't drink a negative amount of liquid
+                    </pre>
+                </div>
+                <div class="note">
+                    <hr />
+                    <strong>Consejo:</strong>&nbsp;Si se lanza una 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/InvocationTargetException.html">
+                        <code>InvocationTargetException</code></a>, el método fue invocado. La diagnosis del problemas será la 
+                        misma que si el método fuera llamado directamente y lanzara la excepción que recupera 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/InvocationTargetException.html#getCause--">
+                        <code>getCause()</code></a>. Esta excepción no indica un problema con el paquete de reflexión o su uso.
+                    <hr />
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="methodInvocation.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="ctor.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Invocando Métodos<br />
+            <b>Página siguiente:</b> Constructores
+        </div>
+    </body>
+</html> 

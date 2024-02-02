@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Hilos Worker y el hilo SwingWorker (Los Tutoriales de Java&trade; &gt; Creando una IGU (Interfaz Gráfica de Usuario) 
+            con JFC/Swing &gt; Concurrencia en Swing)
+        </title>
+        <meta name="description" content="Este tutorial de Swing Java describe el desarrollo de interfaces gráficas de usuario (GUI)
+              para aplicaciones y applets que utilizan componentes Swing" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java swing, java ui, java user interface,
+              swing components, swing events, swing layout  " />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">>Concurrencia in Swing</a></div>
+                <div class="linkAHEAD"><a href="initial.html">Hilos Iniciales</a></div>
+                <div class="linkAHEAD"><a href="dispatch.html">El Hilo Despachador de Eventos</a></div>
+                <div class="nolinkAHEAD">Hilos Worker y el hilo SwingWorker</div>
+                <div class="linkBHEAD"><a href="simple.html">Tareas en Segundo Plano Simples</a></div>
+                <div class="linkBHEAD"><a href="interim.html">Tareas que Tienen Resultados Provisionales</a></div>
+                <div class="linkBHEAD"><a href="cancel.html">Cancelando Tareas en Segundo Plano</a></div>
+                <div class="linkBHEAD"><a href="bound.html">Propiedades Ligadas y Métodos de Estado</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing<br />
+                <b>Lección:</b> Concurrencia en Swing
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Concurrencia en Swing</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="dispatch.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="simple.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Hilos Worker y el hilo SwingWorker</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Cuando un programa Swing necesita ejecutar una tarea que dura mucho tiempo, habitualmente usa uno de los 
+                    <i>hilos de trabajo</i>, también conocidos como los <i>hilos en segundo plano</i>. Cada tarea que se ejecuta en
+                    un hilo de trabajo es representada por una instancia de
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/swing/SwingWorker.html">
+                        <code>javax.swing.SwingWorker</code></a>. <code>SwingWorker</code> en sí misma es una clase abstracta; debe
+                    definir una subclase para crear un objeto <code>SwingWorker</code>; las clases anónimas internas son a
+                    menudo útiles para crear objetos <code>SwingWorker</code> muy simples.
+                </p>
+                <p><code>SwingWorker</code> establece una variedad de características de control y comuniación:
+                </p>
+                <ul>
+                    <li>
+                        La subclase de <code>SwingWorker</code> puede definir un método, <code>done</code>, el cual es
+                        automáticamente invocado en el hilo despachador de eventos cuando la tarea en segundo plano se ha terminado.
+                    </li>
+                    <li>
+                        <code>SwingWorker</code> implementa
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Future.html">
+                            <code>java.util.concurrent.Future</code></a>. Esta interfaz permite a la tarea en segundo plano
+                        suministrar un valor de retorno al otro hilo. Otros métodos en esta interfaz permiten la cancelación de
+                        la tarea en segundo plano y descubrir si la tarea en segundo plano ha finalizado o ha sido cancelada.
+                    </li>
+                    <li>
+                        La tarea en segundo plano puede suministrar resultados inmediatos invocando 
+                        <code>SwingWorker.publish</code>, lo que causa que se invoque <code>SwingWorker.process</code> desde el
+                        hilo despachador de eventos.
+                    </li>
+                    <li>
+                        La tarea en segundo plano puede definir propiedades ligadas. Los cambios a estas propiedades disparan
+                        eventos, causando que los métodos que manejan eventos sean invocados en el hilo despachador de eventos.
+                    </li>
+                </ul>
+                <p>
+                    Estas características son descritas en las siguiente subsecciones.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Nota:</strong>&nbsp;<p>La clase <code>javax.swing.SwingWorker</code> fue agregada a la plataforma Java
+                        en Java SE 6. Anteriormente a esto, otra clase, también llamada <code>SwingWorker</code>, fue ampliamente
+                        utilizada para algunos de los mismos propósitos. La vieja <code>SwingWorker</code> no formó parte de la
+                        especificación de la plataforma Java, y no se proporcionó como parte del KDJ.
+                    </p>
+                    <p>
+                        La nueva <code>javax.swing.SwingWorker</code> es una clase completamente nueva. Su funcionalidad no es un
+                        superconjunto estricto de la vieja <code>SwingWorker</code>. Los métodos en las dos clases que tienen la
+                        misma función no tienen los mismos nombres. Además, las instancias de la vieja clase
+                        <code>SwingWorker</code> eran reutilizables, mientras que una nueva instancia de
+                        <code>javax.swing.SwingWorker</code> se necesita para cada nueva tarea en segundo plano.
+                    </p>
+                    <p>
+                        A través de los Tutoriales de Java ,cualquier mención de <code>SwingWorker</code> ahora se refiera a 
+                        <code>javax.swing.SwingWorker</code>.
+                    </p>
+                    <hr />
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="dispatch.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="simple.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.</p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página Anterior:</b> El Hilo Despachador de Eventos<br />
+            <b>Página Siguiente:</b> Tareas en Segundo Plano Simples
+        </div>
+    </body>
+</html>

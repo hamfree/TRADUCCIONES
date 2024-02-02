@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>La Aplicación address-book</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="persistence-basicexamples003.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="persistence-querylanguage.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GKANQ">
+      <h2 id="the-address-book-application">La Aplicación address-book</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            La aplicación de ejemplo <code>address-book</code> es una aplicación web sencilla que almacena 
+            datos de contacto. Utiliza una única clase de entidad, <code>Contact</code>, que utiliza la IPA de 
+            Java para JavaBeans Validation (Validación de Beans) para validar los datos almacenados en los 
+            atributos persistentes de la entidad, como se describe en 
+            <a href=" persistence-intro002.html#GKAHQ">Validación de Propiedades y Campos Persistentes</a>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p><a href="#GKAOJ">Validación de Restricciones de Beans en address-book</a></p>
+            </li>
+            <li>
+              <p>
+                <a href="#GKANL">
+                  Especificar Mensajes de Error para las Restricciones en address-book
+                </a>
+              </p>
+            </li>
+            <li>
+              <p>
+                <a href="#GKAON">
+                  Validar las Entradas de Contactos desde una Aplicación de JavaServer Faces
+                </a>
+              </p>
+            </li>
+            <li>
+              <p><a href="#GKAOP">Ejecutando el Ejemplo address-book</a></p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="GKAOJ">
+          <h3 id="bean-validation-constraints-in-address-book">
+            Validación de Restricciones de Beans en address-book
+          </h3>
+          <div class="paragraph">
+            <p>
+              La entidad <code>Contact</code> utiliza las restricciones <code>@NotNull</code>, 
+              <code>@Pattern</code> y <code>@Past</code> en los atributos persistentes.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La restricción <code>@NotNull</code> marca el atributo como un campo obligatorio. El atributo 
+              debe establecerse en un valor no nulo antes de que la entidad pueda conservarse o modificarse. 
+              Validación de Beans arrojará un error de validación si el atributo es nulo cuando se persiste o 
+              modifica la entidad.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La restricción <code>@Pattern</code> define una expresión regular con la que el valor del 
+              atributo debe coincidir antes de que la entidad pueda conservarse o modificarse. Esta 
+              restricción tiene dos usos diferentes en <code>address-book</code>.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  La expresión regular declarada en la anotación <code>@Pattern</code> en el campo 
+                  <code>email</code> coincide con las direcciones de correo electrónico del nombre de 
+                  formulario `@<code>domain name</code>. <code>dominio de nivel superior, que solo permite 
+                    caracteres válidos para las direcciones de correo electrónico. Por ejemplo, 
+                    `username@example.com</code> pasará la validación, al igual que 
+                  <code>firstname.lastname@mail.example.com</code>. Sin embargo, 
+                  <code>firstname,lastname@example.com</code>, que contiene una coma ilegal en el nombre 
+                  local, fallará en la validación.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Los campos <code>mobilePhone</code> y <code>homePhone</code> se anotan con una restricción 
+                  <code>@Pattern</code> que define una expresión regular para hacer coincidir los números de 
+                  teléfono de la forma <code>(` xxx</code>)` xxx`-`xxxx.
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              La restricción <code>@Past</code> se aplica al campo de cumpleaños, que debe ser 
+              <code>java.util.Date</code> en el pasado.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Estas son las partes relevantes de la clase de entidad <code>Contact</code>:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Entity
+public class Contact implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    @NotNull
+    protected String firstName;
+    @NotNull
+    protected String lastName;
+    @Pattern(regexp = "[a-z0-9!#$%&amp;'*+/=?^_`{|}~-]+(?:\\."
+            + "[a-z0-9!#$%&amp;'*+/=?^_`{|}~-]+)*@"
+            + "(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9]"
+            + "(?:[a-z0-9-]*[a-z0-9])?",
+            message = "{invalid.email}")
+    protected String email;
+    @Pattern(regexp = "^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$",
+            message = "{invalid.phonenumber}")
+    protected String mobilePhone;
+    @Pattern(regexp = "^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$",
+            message = "{invalid.phonenumber}")
+    protected String homePhone;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    @Past
+    protected Date birthday;
+    ...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GKANL">
+          <h3 id="specifying-error-messages-for-constraints-in-address-book">
+            Especificar Mensajes de Error para las Restricciones en address-book
+          </h3>
+          <div class="paragraph">
+            <p>
+              Algunas de las restricciones en la entidad <code>Contact</code> especifican un mensaje opcional:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Pattern(regexp = "^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$",
+        message = "{invalid.phonenumber}")
+protected String homePhone;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El elemento de mensaje opcional en la restricción <code>@Pattern</code> anula el mensaje de 
+              validación predeterminado. El mensaje se puede especificar directamente:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Pattern(regexp = "^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$",
+        message = "¡Numero de telefono invalido!")
+protected String homePhone;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las restricciones en <code>Contact</code>, sin embargo, son cadenas en el paquete de recursos 
+              <code>ValidationMessages.properties</code>, en 
+              <code>_tut-install_/examples/persistence/address-book/src/java/</code>. Esto permite que los 
+              mensajes de validación se ubiquen en un solo archivo de propiedades y que los mensajes se 
+              localicen fácilmente. Los mensajes de Validación de Beans anulados deben colocarse en un archivo 
+              de propiedades del paquete de recursos llamado <code>ValidationMessages.properties</code> en el 
+              paquete predeterminado, con paquetes de recursos localizados que toman la forma 
+              <code>ValidationMessages_`locale-prefix</code>.properties`. Por ejemplo, 
+              <code>ValidationMessages_es.properties</code> es el paquete de recursos que se usa en las 
+              regiones de habla hispana.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="GKAON">
+          <h3 id="validating-contact-input-from-a-javaserver-faces-application">
+            Validar las Entradas de Contactos desde una Aplicación de JavaServer Faces
+          </h3>
+          <div class="paragraph">
+            <p>
+              La aplicación <code>address-book</code> utiliza una interfaz web JavaServer Faces para permitir 
+              a los usuarios ingresar contactos. Si bien JavaServer Faces tiene un mecanismo de validación de 
+              entrada de formulario que usa etiquetas en archivos Facelets XHTML, <code>address-book</code> no 
+              usa estas etiquetas de validación. Las restricciones de Validación de Beans en los beans 
+              administrados de JavaServer Faces, en este caso en la entidad <code>Contact</code>, activan 
+              automáticamente la validación cuando se envían los formularios.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El siguiente fragmento de código del archivo Facelets <code>Create.xhtml</code> muestra parte 
+              del formulario de entrada para crear nuevas instancias de <code>Contact</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;h:form&gt;
+    &lt;table columns="3" role="presentation"&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;h:outputLabel value="#{bundle.CreateContactLabel_firstName}"
+                               for="firstName" /&gt;&lt;/td&gt;
+            &lt;td&gt;&lt;h:inputText id="firstName"
+                             value="#{contactController.selected.firstName}"
+                             title="#{bundle.CreateContactTitle_firstName}"/&gt;
+            &lt;/td&gt;
+            &lt;td&gt;&lt;h:message for="firstName" /&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;h:outputLabel value="#{bundle.CreateContactLabel_lastName}"
+                               for="lastName" /&gt;&lt;/td&gt;
+            &lt;td&gt;&lt;h:inputText id="lastName"
+                             value="#{contactController.selected.lastName}"
+                             title="#{bundle.CreateContactTitle_lastName}" /&gt;
+            &lt;/td&gt;
+            &lt;td&gt;&lt;h:message for="lastName" /&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        ...
+    &lt;/table&gt;
+&lt;/h:form&gt;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las etiquetas <code>&lt;h:inputText&gt;</code> <code>firstName</code> y <code>lastName</code> 
+              están vinculadas a los atributos en la instancia de entidad <code>Contact</code> 
+              <code>seleccionada</code> en el bean de sesión sin estado <code>ContactController</code>. Cada 
+              etiqueta <code>&lt;h:inputText&gt;</code> tiene una etiqueta <code>&lt;h:message&gt;</code> 
+              asociada que mostrará mensajes de error de validación. Sin embargo, el formulario no requiere 
+              ninguna etiqueta de validación de JavaServer Faces.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="GKAOP">
+          <h3 id="running-the-address-book-example">
+            Ejecutando el Ejemplo address-book
+          </h3>
+          <div class="paragraph">
+            <p>
+              Puede usar el EID de NetBeans o Maven para compilar, empaquetar, implementar y ejecutar la 
+              aplicación <code>libro de direcciones</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Aquí se tratan los siguientes temas:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  <a href="#GKAOD">
+                    Para Ejecutar el Ejemplo address-book Usando el EID NetBeans
+                  </a>
+                </p>
+              </li>
+              <li>
+                <p>
+                  <a href="#GKANZ">
+                    Para Ejecutar el address-book Example Usando  Maven
+                  </a>
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="sect3" id="GKAOD">
+            <h4 id="to-run-the-address-book-example-using-netbeans-ide">
+              Para Ejecutar el Ejemplo address-book Usando el EID NetBeans
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                     Asegúrese de que se haya iniciado el servidor GlassFish (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Si el servidor de la base de datos aún no se está ejecutando, inícielo siguiendo las 
+                    instrucciones en 
+                    <a href="usingexamples004.html#BNADK">Arrancando y Parando Apache Derby</a>.
+                  </p>
+                </li>
+                <li>
+                  <p>En el menú Archivo, elija Abrir proyecto.</p>
+                </li>
+                <li>
+                  <p>En el cuadro de diálogo Abrir proyecto, vaya a:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/persistence
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Seleccione la carpeta <code>address-book</code>.</p>
+                </li>
+                <li>
+                  <p>Haga clic en Abrir proyecto.</p>
+                </li>
+                <li>
+                  <p>
+                    En la pestaña Proyectos, haga clic con el botón derecho en el proyecto 
+                    <code>address-book</code> y seleccione Ejecutar.
+                  </p>
+                  <div class="paragraph">
+                    <p>
+                      Una vez implementada la aplicación, aparece una ventana del navegador web en la 
+                      siguiente URL:
+                    </p>
+                  </div>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+http://localhost:8080/address-book/
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    Haga clic en Mostrar todos los elementos de contacto y luego en Crear nuevo contacto. 
+                    Introduzca valores en los campos; luego haga clic en Guardar.
+                  </p>
+                  <div class="paragraph">
+                    <p>
+                      Si alguno de los valores ingresados viola las restricciones en <code>Contact</code>, 
+                      aparecerá un mensaje de error en rojo junto al campo con los valores incorrectos.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+          <div class="sect3" id="GKANZ">
+            <h4 id="to-run-the-address-book-example-using-maven">
+              Para Ejecutar el address-book Example Usando Maven
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Asegúrese de que se haya iniciado el servidor GlassFish (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Si el servidor de la base de datos aún no se está ejecutando, inícielo siguiendo las 
+                    instrucciones en 
+                    <a href="usingexamples004.html#BNADK">Arrancando y Parando Apache Derby</a>.
+                  </p>
+                </li>
+                <li>
+                  <p>En una ventana de terminal, vaya a:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/persistence/address-book/
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Introduzca el siguiente comando:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+mvn install
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      Esto compilará y ensamblará la aplicación <code>address-book</code> en un WAR. Luego, el 
+                      archivo WAR se implementa en el servidor GlassFish.
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    Abra una ventana del navegador web e ingrese la siguiente URL:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+http://localhost:8080/address-book/
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    Haga clic en Mostrar todos los elementos de contacto y luego en Crear nuevo contacto. 
+                    Introduzca valores en los campos; luego haga clic en Guardar.
+                  </p>
+                  <div class="paragraph">
+                    <p>
+                      Si alguno de los valores ingresados viola las restricciones en <code>Contacto</code>, 
+                      aparecerá un mensaje de error en rojo junto al campo con los valores incorrectos.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="persistence-basicexamples003.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="persistence-querylanguage.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

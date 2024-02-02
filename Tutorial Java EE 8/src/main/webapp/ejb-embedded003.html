@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>La Aplicación de Ejemplo standalone</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="ejb-embedded002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="ejb-async.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GKCPV">
+      <h2 id="the-standalone-example-application">La Aplicación de Ejemplo standalone</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            La aplicación de ejemplo <code>standalone</code> demuestra cómo crear una instancia del 
+            contenedor de enterprise bean incrustado en una clase de prueba JUnit y llamar a un 
+            método de negocio de bean de sesión.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>
+                <a href="#BEIDAJAC">
+                  Descripción General de la Aplicación de Ejemplo standalone
+                </a>
+              </p>
+            </li>
+            <li>
+              <p>
+                <a href="#GKCQP">
+                  Para Ejecutar la Aplicación de Ejemplo standalone Usando el EID NetBeans
+                </a>
+              </p>
+            </li>
+            <li>
+              <p>
+                <a href="#BEIGHEHJ">
+                  Para Ejecutar la Aplicación de Ejemplo standalone Usando Maven
+                </a>
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="BEIDAJAC">
+          <h3 id="overview-of-the-standalone-example-application">
+            Descripción General de la Aplicación de Ejemplo standalone
+          </h3>
+          <div class="paragraph">
+            <p>
+              Probar los métodos de negocio de un enterprise bean en una prueba unitaria permite a 
+              los desarrolladores ejercitar la lógica de negocio de una aplicación por separado de 
+              las demás capas de la aplicación, como la capa de presentación, y sin tener que 
+              implementar la aplicación en un servidor Java EE.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El ejemplo <code>standalone</code> tiene dos componentes principales: 
+              <code>StandaloneBean</code>, un bean de sesión sin estado, y 
+              <code>StandaloneBeanTest</code>, una clase de prueba JUnit que actúa como un cliente 
+              para <code>StandaloneBean</code> utilizando el contenedor incrustado.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              <code>StandaloneBean</code> es un bean de sesión simple que expone una vista local sin 
+              interfaz con un único método de negocio, <code>returnMessage</code>, que devuelve 
+              "¡Saludos!" como una <code>String</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Stateless
+public class StandaloneBean {
+    private static final String message = "¡Saludos!";
+    public String returnMessage() {
+        return message;
+    }
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              <code>StandaloneBeanTest</code> llama a <code>StandaloneBean.returnMessage</code> y 
+              comprueba que el mensaje devuelto es correcto. Primero, se crea una instancia de 
+              contenedor incrustado y un contexto inicial dentro del método <code>setUp</code>, que 
+              se anota con <code>org.junit.Before</code> para indicar que el método debe ejecutarse 
+              antes de la prueba. métodos:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Before
+public void setUp() {
+    ec = EJBContainer.createEJBContainer();
+    ctx = ec.getContext();
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El método <code>testReturnMessage</code>, anotado con <code>org.junit.Test</code> para 
+              indicar que el método incluye una prueba unitaria, obtiene una referencia a 
+              <code>StandaloneBean</code> a través de una instancia de <code>Context</code> y llama 
+              a <code>StandaloneBean.returnMessage</code>. El resultado se compara con el resultado 
+              esperado mediante una aserción JUnit, <code>assertEquals</code>. Si la cadena devuelta 
+              de <code>StandaloneBean.returnMessage</code> es igual a "¡Saludos!" se pasa la prueba:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Test
+public void testReturnMessage() throws Exception {
+    logger.info("Testing standalone.ejb.StandaloneBean.returnMessage()");
+    StandaloneBean instance = (StandaloneBean)
+            ctx.lookup("java:global/classes/StandaloneBean");
+    String expResult = "¡Saludos!";
+    String result = instance.returnMessage();
+    assertEquals(expResult, result);
+}
+               </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Finalmente, el método <code>tearDown</code>, anotado con <code>org.junit.After</code> 
+              para indicar que el método debe ejecutarse después de que se hayan ejecutado todas las 
+              pruebas unitarias, cierra la instancia del contenedor incrustado:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@After
+public void tearDown() {
+    if (ec != null) {
+        ec.close();
+    }
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GKCQP">
+          <h3 id="to-run-the-standalone-example-application-using-netbeans-ide">
+            Para Ejecutar la Aplicación de Ejemplo standalone Usando el EID NetBeans
+          </h3>
+          <div class="olist arabic">
+            <ol class="arabic">
+              <li>
+                <p>
+                  Asegúrese de que el servidor GlassFish se haya iniciado (consulte 
+                  <a href="usingexamples002.html#BNADI">
+                    Arrancando y Parando el Servidor GlassFish</a>).
+                </p>
+              </li>
+              <li>
+                <p>En el menú Archivo, elija Abrir proyecto.</p>
+              </li>
+              <li>
+                <p>En el cuadro de diálogo Abrir proyecto, vaya a:</p>
+                <div class="listingblock">
+                  <div class="content">
+                    <pre class="prettyprint highlight">
+                      <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/ejb
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <p>
+                  Seleccione la carpeta <code>independiente</code> y haga clic en Abrir proyecto.
+                </p>
+              </li>
+              <li>
+                <p>
+                  En la pestaña Proyectos, haga clic con el botón derecho en <code>standalone</code> 
+                  y seleccione Test.
+                </p>
+                <div class="paragraph">
+                  <p>
+                    Esto ejecutará la clase de prueba JUnit <code>StandaloneBeanTest</code>. La 
+                    pestaña Salida muestra el progreso de la prueba y el registro de salida.
+                  </p>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect2" id="BEIGHEHJ">
+          <h3 id="to-run-the-standalone-example-application-using-maven">
+            Para Ejecutar la Aplicación de Ejemplo standalone Usando Maven
+          </h3>
+          <div class="olist arabic">
+            <ol class="arabic">
+              <li>
+                <p>
+                  Asegúrese de que el servidor GlassFish se haya iniciado (consulte 
+                  <a href="usingexamples002.html#BNADI">
+                    Arrancando y Parando el Servidor GlassFish</a>).
+                </p>
+              </li>
+              <li>
+                <p>En una ventana de terminal, vaya a:</p>
+                <div class="listingblock">
+                  <div class="content">
+                    <pre class="prettyprint highlight">
+                      <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/ejb/standalone/
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <p>Introduzca el siguiente comando:</p>
+                <div class="listingblock">
+                  <div class="content">
+                    <pre class="prettyprint highlight">
+                      <code class="language-oac_no_warn" data-lang="oac_no_warn">
+mvn install
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+                <div class="paragraph">
+                  <p>
+                    Este comando compila y empaqueta la aplicación en un archivo JAR y ejecuta la 
+                    clase de prueba JUnit <code>StandaloneBeanTest</code>.
+                  </p>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="ejb-embedded002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="ejb-async.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

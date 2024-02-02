@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Enlazando Valores e Instancias de Componente a Propiedades del Bean Gestionado</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jsf-custom012.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-custom014.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BNATG">
+      <h2 id="binding-component-values-and-instances-to-managed-bean-properties">
+        Enlazando Valores e Instancias de Componente a Propiedades del Bean Gestionado
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Una etiqueta de componente puede conectar sus datos a un bean administrado mediante uno de los 
+            siguientes métodos:
+          </p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>Vinculando el valor de su componente a una propiedad del bean</p>
+            </li>
+            <li>
+              <p>Vinculando la instancia de su componente a una propiedad del bean</p>
+            </li>
+          </ul>
+        </div>
+        <div class="paragraph">
+          <p>
+            Para vincular el valor de un componente a una propiedad del bean gestionado, el atributo 
+            <code>value</code> de una etiqueta de componente usa una expresión de valor EL. Para vincular una 
+            instancia de componente a una propiedad del bean, el atributo <code>binding</code> de una etiqueta 
+            de componente usa una expresión de valor.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Cuando una instancia de componente está vinculada a una propiedad del bean gestionado, la 
+            propiedad contiene el valor local del componente. Por el contrario, cuando el valor de un 
+            componente está vinculado a una propiedad del bean gestionado, la propiedad contiene el valor 
+            almacenado en el bean gestionado. Este valor se actualiza con el valor local durante la fase 
+            Actualizar Valores del modelo del ciclo de vida. Ambos métodos tienen ventajas.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            La vinculación de una instancia de componente a una propiedad de bean tiene las siguientes 
+            ventajas.
+          </p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>
+                El bean gestionado puede modificar mediante programación los atributos de los componentes.
+              </p>
+            </li>
+            <li>
+              <p>
+                El bean gestionado puede crear instancias de componentes en lugar de permitir que el autor 
+                de la página lo haga.
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div class="paragraph">
+          <p>Vincular el valor de un componente a una propiedad del bean tiene las siguientes ventajas.</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>El autor de la página tiene más control sobre los atributos del componente.</p>
+            </li>
+            <li>
+              <p>
+                El bean gestionado no depende de la IPA de JavaServer Faces (como las clases de componentes), 
+                lo que permite una mayor separación de la capa de presentación de la capa del modelo.
+              </p>
+            </li>
+            <li>
+              <p>
+                La implementación de JavaServer Faces puede realizar conversiones en los datos según el tipo 
+                de propiedad del bean sin que el desarrollador necesite aplicar un convertidor.
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div class="paragraph">
+          <p>
+            En la mayoría de las situaciones, vinculará el valor de un componente en lugar de su instancia a 
+            una propiedad de bean. Deberá utilizar un enlace de componente solo cuando necesite cambiar uno de 
+            los atributos del componente de forma dinámica. Por ejemplo, si una aplicación renderiza un 
+            componente solo bajo ciertas condiciones, puede establecer la propiedad <code>rendered</code> del 
+            componente en consecuencia accediendo a la propiedad a la que está vinculado el componente.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Al hacer referencia a la propiedad utilizando el atributo <code>value</code> de la etiqueta de 
+            componente, debe utilizar la sintaxis adecuada. Por ejemplo, suponga que un bean gestionado 
+            llamado <code>MyBean</code> tiene esta propiedad <code>int</code>:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+protected int currentOption = null;
+public int getCurrentOption(){...}
+public void setCurrentOption(int option){...}
+            </code></pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            El atributo <code>value</code> que hace referencia a esta propiedad debe tener esta expresión de 
+            vinculación de valor:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+#{myBean.currentOption}
+            </code></pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Además de vincular el valor de un componente a una propiedad de bean, el atributo 
+            <code>value</code> puede especificar un valor literal o puede asignar los datos del componente a 
+            cualquier tipo primitivo (como <code>int</code>), estructura (como una matriz) o colección (como 
+            una lista), independientemente de un componente JavaBeans. La <a href="#BNATH">tabla 15-3</a> 
+            enumera algunos ejemplos de expresiones de vinculación de valores que puede usar con el atributo 
+            <code>value</code>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p><a id="sthref78"></a><a id="BNATH"></a></p>
+        </div>
+        <div class="paragraph">
+          <p><strong>Tabla 15-3 Ejemplos de Expresiones de Vinculación de Valores</strong></p>
+        </div>
+        <table class="tableblock frame-all grid-all" style="width: 60%;">
+          <colgroup>
+            <col style="width: 50%;">
+            <col style="width: 50%;">
+          </colgroup>
+          <tbody>
+            <tr>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock"><strong>Valor</strong></p></td>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock"><strong>Expresión</strong></p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">Un Booleano</p></td>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock"><code>cart.numberOfItems&gt; 0</code></p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock">
+                  Una propiedad inicializada a partir de un parámetro de inicialización de contexto
+                </p>
+              </td>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock"><code>initParam.quantity</code></p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock">Una propiedad de bean</p></td>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock"><code>cashierBean.name</code></p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock">Un valor en una matriz</p></td>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock"><code>books[3]</code></p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock">Un valor en una colección</p></td>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock"><code>books["fiction"]</code></p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock">Una propiedad de un objeto en una matriz de objetos</p></td>
+              <td class="tableblock halign-left valign-top">
+                <p class="tableblock"><code>books[3].price</code></p></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="paragraph">
+          <p>
+            Las siguientes dos secciones explican cómo usar el atributo <code>value</code> para vincular el 
+            valor de un componente a una propiedad de bean u otros objetos de datos y cómo usar el atributo 
+            <code>binding</code> para vincular una instancia de componente a una propiedad de bean.
+          </p>
+        </div>
+        <div class="sect2" id="BNATI">
+          <h3 id="binding-a-component-value-to-a-property">
+            Enlazando un Valor de Componente a una Propiedad
+          </h3>
+          <div class="paragraph">
+            <p>
+              Para vincular el valor de un componente a una propiedad de bean gestionado, especifique el 
+              nombre del bean y la propiedad usando el atributo <code>value</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Esto significa que la primera parte de la expresión de valor EL debe coincidir con el nombre del 
+              bean gestionado hasta el primer punto (<code>.</code>) y la parte de la expresión de valor 
+              después del punto debe coincidir con la propiedad del bean gestionado.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Por ejemplo, en el caso de estudio de Duke's Bookstore, la etiqueta <code>h:dataTable</code> en 
+              <code>bookcatalog.xhtml</code> establece el valor del componente en el valor de la propiedad 
+              <code>books</code> del bean de respaldo <code>BookstoreBean</code>, cuyo nombre es 
+              <code>store</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;h:dataTable id="books"
+             value="#{store.books}"
+             var="book"
+             headerClass="list-header"
+             styleClass="list-background"
+             rowClasses="list-row-even, list-row-odd"
+             border="1"
+             summary="#{bundle.BookCatalog}"&gt;
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El valor se obtiene llamando al método <code>getBooks</code> del bean de respaldo, que a su vez 
+              llama al método <code>getBooks</code> del bean de sesión <code>BookRequestBean</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Si usa el archivo de recursos de configuración de la aplicación para configurar beans 
+              gestionados en lugar de definirlos en clases de beans gestionados, el nombre del bean en la 
+              expresión <code>value</code> debe coincidir con el elemento <code>nombre-bean-gestionado</code> 
+              de la declaración del bean gestionado hasta el primer punto (<code>.</code>) en la expresión. De 
+              manera similar, la parte de la expresión de valor después del punto debe coincidir con el nombre 
+              especificado en el elemento <code>nombre-propiedad</code> correspondiente en el archivo de 
+              recursos de configuración de la aplicación.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Por ejemplo, considere esta configuración de bean gestionado, que configura el bean 
+              <code>ImageArea</code> correspondiente al libro superior izquierdo en el mapa de imágenes en la 
+              página <code>index.html</code> del caso de estudio de Duke's Bookstore:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;managed-bean eager="true"&gt;
+    ...
+    &lt;managed-bean-name&gt;Book201&lt;/managed-bean-name&gt;
+    &lt;managed-bean-class&gt;dukesbookstore.model.ImageArea&lt;/managed-bean-class&gt;
+    &lt;managed-bean-scope&gt;application&lt;/managed-bean-scope&gt;
+    &lt;managed-property&gt;
+        ...
+        &lt;property-name&gt;shape&lt;/property-name&gt;
+        &lt;value&gt;rect&lt;/value&gt;
+    &lt;/managed-property&gt;
+    &lt;managed-property&gt;
+        ...
+        &lt;property-name&gt;alt&lt;/property-name&gt;
+        &lt;value&gt;Duke&lt;/value&gt;
+    &lt;/managed-property&gt;
+    ...
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Este ejemplo configura un bean llamado <code>Book201</code>, que tiene varias propiedades, una 
+              de las cuales se llama <code>shape</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Aunque las etiquetas <code>bookstore:area</code> en la página <code>index.xhtml</code> no se 
+              vinculan a una propiedad <code>ImageArea</code> (se vinculan al bean en sí), podría hacer 
+              referencia a la propiedad mediante una expresión de valor del atributo <code>value</code> de la 
+              etiqueta del componente:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;h:outputText value="#{Book201.shape}" /&gt;
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Vea <a href="jsf-configure005.html#BNAWQ">Configurando Beans Gestionados</a> para obtener 
+              información sobre cómo configurar beans en el archivo de recursos de configuración de la 
+              aplicación.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BNATJ">
+          <h3 id="binding-a-component-value-to-an-implicit-object">
+            Enlazando un Valor de Componente a un Objeto Implícito
+          </h3>
+          <div class="paragraph">
+            <p>
+              Una fuente de datos externa a la que puede hacer referencia un atributo <code>value</code> es un 
+              objeto implícito.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La página <code>bookreceipt.xhtml</code> del caso de estudio de Duke's Bookstore tiene una 
+              referencia a un objeto implícito:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;h:outputFormat title="thanks"
+                value="#{bundle.ThankYouParam}"&gt;
+    &lt;f:param value="#{sessionScope.name}"/&gt;
+&lt;/h:outputFormat&gt;
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Esta etiqueta obtiene el nombre del cliente del alcance de la sesión y lo inserta en el mensaje 
+              parametrizado en la clave <code>ThankYouParam</code> del paquete de recursos. Por ejemplo, si el 
+              nombre del cliente es Gwen Canigetit, esta etiqueta mostrará:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+Gracias, Gwen Canigetit, por comprarnos sus libros.
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              La recuperación de valores de otros objetos implícitos se realiza de forma similar al ejemplo 
+              que se muestra en esta sección. La <a href="#BNATK">tabla 15-4</a> enumera los objetos 
+              implícitos a los que puede hacer referencia un atributo de valor. Todos los objetos implícitos, 
+              excepto los objetos de alcance, son de solo lectura y, por lo tanto, no deben usarse como 
+              valores para un componente <code>UIInput</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p><a id="sthref79"></a><a id="BNATK"></a></p>
+          </div>
+          <div class="paragraph">
+            <p><strong>Tabla 15-4 Objetos Implícitos</strong></p>
+          </div>
+          <table class="tableblock frame-all grid-all" style="width: 75%;">
+            <colgroup>
+              <col style="width: 20%;">
+              <col style="width: 80%;">
+            </colgroup>
+            <tbody>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><strong>Objeto Implícito</strong></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><strong>Lo Que Es</strong></p></td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>applicationScope</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    Un <code>Map</code> de los valores de atributo del alcance de la aplicación, codificados 
+                    por nombre de atributo
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>cookie</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    Un <code>Map</code> de los valores de las cookies para la solicitud actual, codificado por 
+                    el nombre de la cookie.
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>facesContext</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">La instancia de <code>FacesContext</code> para la solicitud actual</p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>header</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    Un <code>Map</code> de valores de encabezado HTTP para la solicitud actual, codificado por 
+                    nombre de encabezado
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>headerValues</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    Un <code>Map</code> de matrices de <code>String</code> que contienen todos los valores de 
+                    encabezado para los encabezados HTTP en la solicitud actual, codificados por el nombre del 
+                    encabezado
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>initParam</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    Un <code>Map</code> de los parámetros de inicialización del contexto para esta aplicación 
+                    web
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>param</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    Un <code>Map</code> de los parámetros de solicitud para esta solicitud, con clave por 
+                    nombre de parámetro
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>paramValues</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    Un <code>Map</code> de matrices de <code>String</code> que contienen todos los valores de 
+                    los parámetros de la solicitud en la solicitud actual, codificados por el nombre del 
+                    parámetro
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>requestScope</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    Un <code>Map</code> de los atributos de solicitud para esta solicitud, codificado por 
+                    nombre de atributo
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>sessionScope</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    Un <code>Map</code> de los atributos de sesión para esta solicitud, codificado por nombre 
+                    de atributo
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top"><p class="tableblock"><code>view</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    El <code>UIComponent</code> raíz en el árbol de componentes actual almacenado en 
+                    <code>FacesRequest</code> para esta solicitud
+                  </p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sect2" id="BNATL">
+          <h3 id="binding-a-component-instance-to-a-bean-property">
+            Enlazando una Instancia de Componente a una Propiedad de Bean
+          </h3>
+          <div class="paragraph">
+            <p>
+              Una instancia de componente se puede vincular a una propiedad de bean usando una expresión de 
+              valor con el atributo <code>binding</code> de la etiqueta del componente. Por lo general, 
+              vincula una instancia de componente en lugar de su valor a una propiedad de bean si el bean debe 
+              cambiar dinámicamente los atributos del componente.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Aquí hay dos etiquetas de la página <code>bookcashier.xhtml</code> que vinculan componentes a 
+              propiedades de bean:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;h:selectBooleanCheckbox id="fanClub"
+                         rendered="false"
+                         binding="#{cashierBean.specialOffer}" /&gt;
+&lt;h:outputLabel for="fanClub"
+               rendered="false"
+               binding="#{cashierBean.specialOfferText}"
+               value="#{bundle.DukeFanClub}"/&gt;
+&lt;/h:outputLabel&gt;
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              La etiqueta <code>h:selectBooleanCheckbox</code> muestra una casilla de verificación y vincula 
+              el componente <code>fanClub</code> <code>UISelectBoolean</code> a la propiedad 
+              <code>specialOffer</code> del bean <code>cashier</code>. La etiqueta <code>h:outputLabel</code> 
+              une el componente que representa la etiqueta de la casilla de verificación a la propiedad 
+              <code>specialOfferText</code> del bean <code>cashier</code>. Si la configuración regional de la 
+              aplicación es inglés, se representa la etiqueta <code>h:outputLabel</code>.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+I'd like to join the Duke Fan Club, free with my purchase of over $100
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los atributos <code>rendered</code> de ambas etiquetas se establecen en <code>false</code> para 
+              evitar que la casilla de verificación y su etiqueta se rendericen. Si el cliente hace un pedido 
+              grande y hace clic en el botón Enviar, el método <code>submit</code> de <code>CashierBean</code> 
+              establece las propiedades <code>rendered</code> de ambos componentes en <code>true</code>, lo 
+              que hace que se representen la casilla de verificación y su etiqueta.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Estas etiquetas utilizan enlaces de componentes en lugar de enlaces de valores porque el bean 
+              gestionado debe establecer dinámicamente los valores de las propiedades <code>rendered</code> 
+              de los componentes.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Si las etiquetas usaran enlaces de valor en lugar de enlaces de componentes, el bean gestionado 
+              no tendría acceso directo a los componentes y, por lo tanto, requeriría código adicional para 
+              acceder a los componentes desde la instancia <code>FacesContext</code> para cambiar las 
+              propiedades <code>rendered</code> de los componentes.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              <a href="jsf-develop002.html#BNAUK">
+                Escribiendo Propiedades Ligadas a Instancias de Componente
+              </a> explica cómo escribir las propiedades del bean vinculadas a los componentes del ejemplo.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jsf-custom012.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-custom014.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

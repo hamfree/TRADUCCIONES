@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Configuración LDAP (Los Tutoriales de Java&trade; &gt; Nombrado en Java e Interfaz de Directorio &gt;
+            Configuración del Software)
+        </title>
+        <meta name="description" content="Este tutorial de Java JNDI describe la tecnología de Nombrado en Java e Interfaz de 
+              Directorio (JNDI), operaciones de nombre y directorio, y LDAP" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jndi, ldap, jndi service provider" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Configuración del Software</a></div>
+                <div class="nolinkAHEAD">Configuración LDAP</div>
+                <div class="linkAHEAD"><a href="package.html">Configuración de la aplicación Java</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Nombrado en Java e Interfaz de Directorio<br />
+                <b>Lección:</b> Configuración del Software
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Nombrado en Java e Interfaz de Directorio</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Configuración del Software</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="package.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Configuración LDAP</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    A continuación, se muestran los pasos necesarios para crear una aplicación Java que acceda a un servidor de 
+                    directorio LDAP.
+                </p>
+                <ol>
+                    <li>
+                        Instalar el Software de la <a href="">Plataforma Java</a>.
+                    </li>
+                    <li>
+                        Obtenga el software del Servidor de Directorio que se describió 
+                        <a class="TutorialLink" target="_top" href="index.html#SERVER">más temprano</a>.
+                    </li>
+                    <li>
+                        Configure el Servidor de Directorio con el esquema deseado. Para usar los ejemplos en este tutorial se 
+                        necesita que un <a href="#SCHEMA">esquema</a> especial sea configurado en el servidor.
+                    </li>
+                    <li>
+                        Llene el servidor de directorio con el contenido deseado. Para usar los ejemplos en este tutorial es 
+                        necesario completar un <a href="#LDIF">contenido</a> especial en el servidor.
+                    </li>
+                    <li>
+                        Escribir una aplicación JNDI para acceder al Directorio, compilarla y ejecutarla contra el Servidor de 
+                        Directorio para obtener sus resultados deseados. Los ejemplos JNDI se cubren en la siguiente 
+                        <a class="TutorialLink" target="_top" href="../ops/index.html">lección</a>.
+                    </li>
+                </ol>
+                <p>
+                    Los <em>primeros dos</em> pasos se cubrieron en la sección anterior. El resto de esta lección describe el 
+                    paso <em>tres</em> y parte del paso <em>cuatro</em>. El paso <em>cinco</em> que implica escribir una aplicación 
+                    JNDI se cubre en la siguiente lección que muestra cómo escribir aplicaciones JNDI para realizar varias 
+                    operaciones en el directorio.
+                </p>
+                <p>
+                    Una vez ha configurado el directorio, o ha dirigido su programa para que se comunique con un directorio 
+                    existente, ¿qué tipo de información puede esperar encontrar allí?
+                </p>
+                <p>
+                    El directorio puede ser visto como compuesto por vinculaciones de nombre a objeto. Esto es, cada objeto en el 
+                    directorio tiene un nombre correspondiente. Puede recuperar un objeto en el directorio buscándolo por su 
+                    nombre.
+                </p>
+                <p>
+                    También se almacenan en el directorio los atributos. Un objeto en el directorio, además de tener un nombre, 
+                    también tiene un conjunto opcional de atributos. Puede pedir al directorio los atributos de un objeto, como 
+                    también pedirle la búsqueda por un objeto que tenga ciertos atributos.
+                </p>
+                <h2>
+                    <a id="SCHEMA">Paso 3: Esquema Directorio</a>
+                </h2>
+                <p>
+                    Un esquema especifica los tipos de objetos que un directorio puede contener. Este tutorial llena el directorio 
+                    con entradas, algunas de las cuales requieren definiciones de esquema especiales. Para acomodar estas entradas, 
+                    debe primero deshabilitar la comprobación-de-esquema en el servidor o agregar los ficheros de esquema que 
+                    acompañan a este tutorial al servidor. Ambas tareas son típicamente realizadas por el administrador del 
+                    servidor de directorio.
+                </p>
+                <p>
+                    Este tutorial viene con dos ficheros de esquemas que deben ser instalados:
+                </p>
+                <ul>
+                    <li>
+                        <a class="SourceLink" target="_blank" href="config/java.schema" 
+                           onclick="showCode('../../displayCode.html', 'config/java.schema'); return false;">
+                            <code>Esquema para objetos Java</code></a>
+                    </li>
+                    <li>
+                        <a class="SourceLink" target="_blank" href="config/corba.schema" 
+                           onclick="showCode('../../displayCode.html', 'config/corba.schema'); return false;">
+                            <code>Esquema para objetos CORBA</code></a>
+                    </li>
+                </ul>
+                <p>
+                    El formato de estos ficheros es una descripción formal que posiblemente no puede ser directamente copiada y 
+                    pegada en los ficheros de configuración del servidor. Específicamente, la sintaxis de los atributos se 
+                    describen en términos de la 
+                    <a class="OutsideLink" target="_blank" href="http://www.ietf.org/rfc/rfc2252.txt">RFC 2252</a>.
+                </p>
+                <p>
+                    Diferentes servidores de directorios tienen diferentes formas de configurar sus esquemas. Este tutorial incluye 
+                    algunas herramientas para instalar los esquemas Java y CORBA en los servidores de directorio que permiten que 
+                    sus esquemas sean modificados a través de LDAP. Lo siguiente es una lista de las tareas que las herramientas 
+                    pueden realizar.
+                </p>
+                <ol>
+                    <li>
+                        <a class="SourceLink" target="_blank" 
+                           href="config/CreateJavaSchema.java" 
+                           onclick="showCode('../../displayCode.html', 'config/CreateJavaSchema.java'); return false;">
+                            <code>Crear Esquema de Java</code></a>
+                    </li>
+                    <li>
+                        <a class="SourceLink" target="_blank" 
+                           href="config/CreateCorbaSchema.java" 
+                           onclick="showCode('../../displayCode.html', 'config/CreateCorbaSchema.java'); return false;">
+                            <code>Crear Esquema de CORBA</code></a>
+                    </li>
+                </ol>
+                <p>
+                    Siga las instrucciones del 
+                    <a class="SourceLink" target="_blank" href="config/README-SCHEMA.TXT" 
+                       onclick="showCode('../../displayCode.html', 'config/README-SCHEMA.TXT'); return false;">
+                        <code>archivo README</code></a> adjunto para ejecutar estos programas.
+                </p>
+                <hr />
+                <p>
+                    <strong>Nota: Directorio Activo de Windows.</strong> El Directorio Activo gestiona su esquema usando un formato 
+                    interno. Para actualizar el esquema, puede usar el complemento de la Consola de Administración del Directorio 
+                    Activo, <code>ADSIEdit</code>, o la utilidad <code>CreateJavaSchema</code>, siguiendo las instrucciones para el 
+                    Directorio Activo.
+                </p>
+                <hr />
+                <h2>
+                    Paso 4: Proporcionar Contenido de Directorio para Este Tutorial
+                </h2>
+                <p>
+                    <a id="LDIF"></a>En los ejemplos de este recorrido, los resultados mostrados reflejan como el directorio LDAP 
+                    ha sido configurado usando el fichero de configuración (
+                    <a class="SourceLink" target="_blank" href="config/tutorial.ldif" 
+                       onclick="showCode('../../displayCode.html', 'config/tutorial.ldif'); return false;">
+                        <code>tutorial.ldif</code></a>) que acompaña este tutorial. Si está usando un servidor existente, o un 
+                    servidor con una configuración diferente, entonce podría ver resultados diferentes. Antes de que pueda 
+                    cargar el fichero de configuración (
+                    <a class="SourceLink" target="_blank" href="config/tutorial.ldif" 
+                       onclick="showCode('../../displayCode.html', 'config/tutorial.ldif'); return false;">
+                        <code>tutorial.ldif</code></a>) dentro del servidor de directorio, debe seguir las instrucciones para 
+                    actualizar el esquema del servidor o puede usar los comandos <em>ldapadd</em> o <em>ldapmodify</em> si  
+                    están disponibles en su sistema UNIX.
+                </p>
+                <p>
+                    Por ejemplo, usando ldapmodify  podría hacer (conectando los valores apropiados para el nombre del host, 
+                    admnistrador DN (opción -D), y la clave de acceso):
+                </p>
+                <div class="codeblock">
+                    <pre>
+ldapmodify -a -c -v -h hostname -p 389\
+        -D "cn=Administrator, cn=users, dc=xxx, dc=xxx"\
+        -w passwd -f tutorial.ldif
+                    </pre>
+                </div>
+                <hr />
+                <p>
+                    <strong>Nota de Instalación: Control de Acceso.</strong> Diferentes servidores de directorio gestionan el 
+                    control de acceso diferentemente. Algunos ejemplos en este tutorial realiza actualizaciones al directorio. 
+                    También, la parte del espacio de nombres donde ha instalado el tutorial podría tener restricciones de acceso 
+                    de lectura. Por lo tanto, debe realizar acciones específica en el servidor para que el directorio sea 
+                    legible y/o actualizable para que esos ejemplos funcionen.
+                    Para el 
+                    <a class="OutsideLink" target="_blank" 
+                       href="http://www.oracle.com/technetwork/testcontent/index-085178.html">Servidor Directorio de Oracle</a> 
+                    agregue la entrada <code>aci</code> sugerida en el fichero 
+                    <a class="SourceLink" target="_blank" href="config/sunds.aci.ldif" 
+                       onclick="showCode('../../displayCode.html', 'config/sunds.aci.ldif'); return false;">
+                        <code>sunds.aci.ldif</code></a> a la entrada <code>dn: o=JNDITutorial</code> para hacer el directorio 
+                    entero legible y actualizable. Alternativamente, puede cambiar los ejemplos de forma que puedan 
+                    autenticarse al directorio. Los detalles de cómo hacer esto están descritos en la lección 
+                    <a class="TutorialLink" target="_top" href="../ldap/security.html">Seguridad</a>.
+                </p>
+                <p>
+                    <strong>Nota de Instalación: Configuración del Espacio de Nombres.</strong> Las entradas en el fichero 
+                    <a class="SourceLink" target="_blank" href="config/tutorial.ldif" 
+                       onclick="showCode('../../displayCode.html', 'config/tutorial.ldif'); return false;">
+                        <code>tutorial.ldif</code></a> usa el nombre distinguido (DN) &quot;o=JNDITutorial&quot; para el contexto 
+                    de nombre raíz. Si no ha configurado su servidor de directorio para tener &quot;o=JNDITutorial&quot; como 
+                    un contexto de nombre raíz, entonces su intento de importar <code>tutorial.ldif</code> fallará. La forma 
+                    más fácil de evitar este problema es agregrar el DN de un contexto de nombre raíz para cada línea 
+                    &quot;dn:&quot; en el fichero <code>tutorial.ldif</code>. Por ejemplo, si su servidor ya tiene el contexto 
+                    de nombre ráiz &quot;dc=imc,dc=org&quot;, entonces debe cambiar la línea 
+                </p>
+                <div class="codeblock">
+                    <pre>
+dn: o=JNDITutorial
+                    </pre>
+                </div>
+                <p>
+                    a
+                </p>
+                <div class="codeblock">
+                    <pre>
+dn: o=JNDITutorial, dc=imc, dc=org
+                    </pre>
+                </div>
+                <p>
+                    Haga este cambio por cada línea que empieza con &quot;dn:&quot; en el fichero. Después, en todos los ejemplos 
+                    en este tutorial, siempre que utilice &quot;o=JNDITutorial&quot;, utilice 
+                    &quot;o=JNDITutorial, dc=imc, dc=org&quot; en su lugar.
+                </p>
+                <p>
+                    <strong>Nota de Instalación: Formato de Fichero.</strong> Dependiendo de la plataforma del sistema operativo 
+                    que está usando, podría necesitar editar <code>tutorial.ldif</code> de forma que contenga los caracteres de 
+                    nueva línea correctos para esa plataforma. Por ejemplo, si encuentra que <code>tutorial.ldif</code> contiene 
+                    caracteres de nueva línea de estilo Windows (CRLF) y está importando este fichero en un servidor de directorio 
+                    que se está ejecutando en una plataforma UNIX, entonces necesita editar el fichero y reemplazar los CRLF con 
+                    LF. Un síntoma de este problema es que el servidor de directorio rechaze todas las entradas en 
+                    <code>tutorial.ldif</code>.
+                </p>
+                <p>
+                    <strong>Nota de Instalación: Directorio Activo de Windows.</strong>
+                </p>
+                <ol>
+                    <li>
+                        El contexto de nombre raíz no a va a ser &quot;o=jnditutorial&quot;. Será de la forma 
+                        &quot;dc=x,dc=y,dc=z&quot;. Necesita seguir la nota previa de 
+                        <strong>Configuración del Espacio de Nombres</strong>.
+                    </li>
+                    <li>
+                        Agregue las clases de objeto y atributos relacionados para las clases de objeto &quot;inetOrgPerson&quot; 
+                        y &quot;groupOfUniqueNames&quot; al esquema de Directorio Activo usando el complemento de la Consola de 
+                        Gestión del Directorio Activo, <code>ADSIEdit</code>. Se define &quot;groupOfUniqueNames&quot; en el 
+                        <a class="OutsideLink" target="_blank" href="http://www.ietf.org/rfc/rfc2256.txt">RFC 2256</a>
+                        , &quot;inetOrgPerson&quot; en el 
+                        <a class="OutsideLink" target="_blank" href="http://www.ietf.org/rfc/rfc2798.txt">RFC 2798</a>.
+                    </li>
+                    <li>
+                        Alguna de las relaciones jerárquicas usadas por este tutorial no están permitidas de forma predeterminada 
+                        en el Directorio Activo. Para habilitar estas relaciones, agréguelas uando el complemento de Consola de 
+                        Gestión del Directorio Activo, <code>ADSIEdit</code>.
+                        <div class="codeblock">
+                            <pre>
+objectclass: organizationalUnit
+possible superiors: domainDNS
+                    inetOrgPerson
+                    organizaton
+                    organizationalPerson
+                    organizationalUnit
+                    person
+                    top
+
+objectclass: groupOfUniqueNames
+possible superiors: top
+
+objectclass: inetOrgPerson
+possible superiors: container
+                    organizationalPerson
+                    person
+                    top
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        Borre una de los dos atributos &quot;sn&quot; desde la entrada Mark Twain en <code>tutorial.ldif</code>. 
+                        El Directorio Activo define &quot;sn&quot; como un atributo de un único valor, al contrario de lo que 
+                        indica el 
+                        <a class="OutsideLink" target="_blank" href="http://www.ietf.org/rfc/rfc2256.txt">RFC 2256</a>.
+                    </li>
+                    <li>
+                        Use la utilidad de línea de comandos <code>ldifde</code> para cargar el fichero modificado 
+                        <code>tutorial.ldif</code>.
+                        <div class="codeblock">
+                            <pre>
+# ldifde -i -v -k -f tutorial.ldif
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        La mayoría de los ejemplos asumen que el directorio ha sido configurado para permitir el acceso para leer y 
+                        actualizar no autenticado. Su configuración de Directorio Activo podría no permitirle hacer eso. Vea la 
+                        nota de instalación <strong>Control de Acceso</strong>.
+                    </li>
+                    <li>
+                        Leer una entrada algunas veces produce más atributos de los que son mostrados en el tutorial porque el 
+                        Directorio Activo a menudo devuelve algunos atributos internos.
+                    </li>
+                    <li>
+                        La creación de entradas podría requerir la especificación de atributos adicionales específicos del 
+                        Directorio Activo o el uso de otras clases de objeto.
+                    </li>
+                </ol>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="package.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Configuración del Software<br />
+            <b>Página siguiente:</b> Configuración de la aplicación Java
+        </div>
+    </body>
+</html> 

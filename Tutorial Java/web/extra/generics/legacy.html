@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Interoperando con Código Heredado (Los Tutoriales de Java&trade; &gt; Extras &gt; Genéricos)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe los genéricos, la IPA del modo de pantalla completo, y 
+              los recursos relacionados con la certificación de Java" />
+        <meta name="keywords" content="programación en java, aprender java, ejemplos de código java, genéricos de java, IPA del 
+              modo de pantalla completa, certificación" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Genéricos</a></div>
+                <div class="linkAHEAD"><a href="intro.html">Introducción</a></div>
+                <div class="linkAHEAD"><a href="simple.html">Definiendo Genéricos Simples</a></div>
+                <div class="linkAHEAD"><a href="subtype.html">Genéricos y Subtipado</a></div>
+                <div class="linkAHEAD"><a href="wildcards.html">Los Comodines</a></div>
+                <div class="linkAHEAD"><a href="methods.html">Métodos Genéricos</a></div>
+                <div class="nolinkAHEAD">Interoperando con Código Heredado</div>
+                <div class="linkAHEAD"><a href="fineprint.html">La Letra Pequeña</a></div>
+                <div class="linkAHEAD"><a href="literals.html">Clases Literales como Objetos de Tipo en Tiempo de Ejecución</a></div>
+                <div class="linkAHEAD"><a href="morefun.html">Más Diversión con Comodines</a></div>
+                <div class="linkAHEAD"><a href="convert.html">Convirtiendo Código Heredado para Usar Genéricos</a></div>
+                <div class="linkAHEAD"><a href="acknowledgements.html">Agradecimientos</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Extras<br />
+                <b>Lección:</b> Genéricos
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Extras</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Genéricos</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="methods.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="fineprint.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Interoperando con Código Heredado</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Hasta ahora, todos nuestros ejemplos han asumido un mundo idealizado, donde todo el mundo está usando la última 
+                    versión del lenguaje de programación Java, que soporta genéricos.
+                </p>
+                <p>
+                    Por desgracia, en realidad este no es el caso. Se han escrito millones de líneas de código en versiones 
+                    anteriores del lenguaje, y no todas se convertirán de la noche a la mañana.
+                </p>
+                <p>
+                    Más tarde, en la sección 
+                    <a class="TutorialLink" target="_top" href="convert.html">Convirtiendo Código Heredado para Usar Genéricos</a>, 
+                    abordaremos el problema de convertir su código antiguo para usar genéricos. En esta sección, nos enfocaremos en 
+                    un problema simple: ¿como podemos hacer que el código heredado y el código genérico interactúen? Esta cuestión 
+                    tiene dos partes: usar código heredado dentro del código genérico y usar código genérico dentro del código 
+                    heredado.
+                </p>
+                <h2>
+                    Usar código heredado en código genérico
+                </h2>
+                <p>
+                    ¿Cómo puede usar código antiguo, mientras disfruta de los beneficios de los genéricos en su propio código?
+                    
+                </p>
+                <p>
+                    Como ejemplo, suponga que quiere usar el paquete <code>com.Example.widgets</code>. La gente de Example.com 
+                    comercializa un sistema para el contro de inventario, cuyos aspectos más destacadso se muestran a continuación:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>package</b> com.Example.widgets;
+
+<b>public interface</b> Part {...}
+
+<b>public class</b> Inventory {
+    /**
+     * Agrega un Assembly nuevo a la base de datos del inventario.
+     * El assemby recibe el nombre name, y 
+     * consiste de un conjunto de partes especificados por parts.
+     * Todos los elementos de la colección parts 
+     * deben soportar el interfaz Part.
+     **/ 
+    <b>public static void</b> addAssembly(String name, Collection parts) {...}
+    <b>public static</b> Assembly getAssembly(String name) {...}
+}
+
+<b>public interface</b> Assembly {
+    // <i>Devuelve una colección de Parts</i>
+    Collection getParts();
+}
+                    </pre>
+                </div>
+                <p>
+                    Ahora, a usted le gustaría agregar código nuevo que usa la IPA de arriba. Sería bueno asegurarse de que siempre 
+                    llama a <code>addAssembly()</code> con los argumentos apropiados - esto es, que la colección que usted pasa es 
+                    de hecho una <code>Collection</code> de <code>Part</code>. Por supuesto, los genéricos están hechos a medida 
+                    para esto:
+                    
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>package</b> com.mycompany.inventory;
+
+<b>import</b> com.Example.widgets.*;
+
+<b>public class</b> Blade implements Part {
+    ...
+}
+
+<b>public class</b> Guillotine implements Part {
+}
+
+<b>public class</b> Main {
+    <b>public static void</b> main(String[] args) {
+        Collection&lt;Part&gt; c = new ArrayList&lt;Part&gt;();
+        c.add(new Guillotine()) ;
+        c.add(new Blade());
+        Inventory.addAssembly("thingee", c);
+        Collection&lt;Part&gt; k = Inventory.getAssembly("thingee").getParts();
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Cuando llamamos a <code>addAssembly</code>, este espera que el segundo parámetro sea del tipo 
+                    <code>Collection</code>. El argumento real es del tipo <code>Collection&lt;Part&gt;</code>. Esto funciona, 
+                    ¿pero porqué? Después de todo, la mayoría de las colecciones no contienen objetos <code>Part</code>, por lo que 
+                    en general, el compilador no tiene forma de saber a qué tipo de colección se refiere el tipo 
+                    <code>Collection</code>.
+                </p>
+                <p>
+                    En el código genérico apropiado, <code>Collection</code> siempre estaría acompañado de un parámetro de tipo. 
+                    Cuando un tipo genérico como <code>Collection</code> se usa sin un parámetro de tipo, se le llama un 
+                    <i>tipo crudo</i>.
+                </p>
+                <p>
+                    El primer instinto de la mayoría de las personas es que <code>Collection</code> significa realmente 
+                    <code>Collection&lt;Object&gt;</code>. Sin embargo, como vimos anteriormente, no es seguro pasar una 
+                    <code>Collection&lt;Part&gt;</code> en un lugar donde se requiere una <code>Collection&lt;Object&gt;</code>. Es 
+                    más exacto decir que el tipo <code>Collection</code> denota una colección de algún tipo desconocido, al igual 
+                    que <code>Collection&lt;?&gt;</code>.
+                </p>
+                <p>
+                    ¡Pero espere, eso tampoco puede ser correcto! Considere la llamada a <code>getParts()</code>, la cual devuelve 
+                    una <code>Collection</code>. Esta es entonces asignada a <code>k</code>, la cual es una 
+                    <code>Collection&lt;Part&gt;</code>. Si el resultado de la llamada es una <code>Collection&lt;?&gt;</code>, la 
+                    asignación sería un error.
+                </p>
+                <p>
+                    En realidad, la asignación es legal, pero genera una <i>advertencia no verificada</i>. La advertencia se 
+                    necesita, porque el hecho es que el compilador no puede garantizar su corrección. No tenemos forma de comprobar 
+                    el código herededado en <code>getAssembly()</code> para asegurar que de hecho la colección que se retorna es 
+                    una colección de <code>Part</code>s. El tipo usado en el código es <code>Collection</code>, y uno podría 
+                    insertar legalmente toda clase de objetos dentro de tal colección.
+                    
+                </p>
+                <p>
+                    Entonces, ¿no debería ser esto un error? Teóricamente hablando, si; pero en la práctica, si el código genérico 
+                    va a llamar código heredado, esto tiene se que ser permitido. Depende de usted, el programador, asegurarse de 
+                    que en este caso, la asignación es segura porque el contrato de <code>getAssembly()</code> dice que devuelve 
+                    una colección de <code>Part</code>s, a pesar de que la firma de tipo no muestra esto.
+                </p>
+                <p>
+                    Entonces los tipos crudos son muy parecidos a los comodines, pero no están tipificados tan estrictamente. Esto 
+                    es una decisión deliberada de diseño, para permitir a los genéricos interoperar con el código heredado 
+                    pre-existente.
+                </p>
+                <p>
+                    Llamar a código heredado desde código genérico es inherentemente peligroso; una vez que mezcla código genérico 
+                    con código heredado no genérico, todas las garantías de seguridad que el sistema de tipos genéricos usualmente 
+                    ofrece son nulas. Sin embargo, aún está mejor de lo que era sin usar genéricos en absoluto. Al menos usted sabe 
+                    que el código de su lado es consistente.
+                </p>
+                <p>
+                    En este momento hay mucho más código no genérico disponible que de código genérico, e inevitablemente habrá 
+                    situaciones en las que deben mezclarse.
+                </p>
+                <p>
+                    Si encuentra que debe mezclar código heredado y genérico, ponga mucha atención a las advertencias no 
+                    verificadas. Piense cuidadosamente cómo puede justificar la seguridad del código que da lugar a la advertencia.
+                </p>
+                <p>
+                    ¿Qué ocurre si aún cometió un error, y el código que causó la advertencia no es seguro? Echemos un vistazo a 
+                    tal situación. En el proceso, vamos a obtener una idea del funcionamiento del compilador.
+                </p>
+                <h2>
+                    Borrado y traducción
+                </h2>
+                <div class="codeblock">
+                    <pre>
+<b>public</b> String loophole(Integer x) {
+    List&lt;String&gt; ys = new LinkedList&lt;String&gt;();
+    List xs = ys;
+    xs.add(x); // <i>Advertencia no comprobada en tiempo de compilación</i>
+    <b>return</b> ys.iterator().next();
+}
+                    </pre>
+                </div>
+                <p>
+                    Aquí, hemos asociado una lista de strings y una lista vieja plana. Insertamos un <code>Integer</code> en la 
+                    lista, e intentamos extraer un <code>String</code>. Esto está claramente mal. Si ignoramos la advertencia e 
+                    intentamos ejecutar este código, fallará exactamente en el punto donde intentamos usar el tipo equivocado. En 
+                    tiempo de ejecución, éste código se comporta así:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>public</b> String loophole(Integer x) {
+    List ys = new LinkedList;
+    List xs = ys;
+    xs.add(x); 
+    <b>return</b>(String) ys.iterator().next(); // <i>error en tiempo de ejecución</i>
+}
+                    </pre>
+                </div>
+                <p>
+                    Cuando extraemos un elemento de la lista, e intentamos tratarla como una cadena moldeándola a 
+                    <code>String</code>, obtendremos una <code>ClassCastException</code>. La misma cosa ocurre con la versión 
+                    genérica de <code>loophole()</code>.
+                </p>
+                <p>
+                    La razón para esto es, que los genéricos están implementados por el compilador de Java como una conversión 
+                    front-end llamada <i>borrado</i>. Puede (casi) pensar en ella como una traducción de fuente a fuente, mediante 
+                    la cual la versión genérica de <code>loophole()</code> se convierte a la versión no genérica.
+                </p>
+                <p>
+                    Como resultado, <b>la seguridad e integridad de los tipos de la máquina virtual Java nunca están en riesgo, 
+                        incluso en presencia de advertencias no verificadas</b>.
+                </p>
+                <p>
+                    Básicamente, la eliminación elimina (o <i>borra</i>) toda la información de tipo genérico. Se desecha toda la 
+                    información de tipo entre paréntesis angulares, por ejemplo, un tipo parametrizado como 
+                    <code>List&lt;String&gt;</code> es convertido en una <code>List</code>. Todos los usos restantes de las 
+                    variables de tipo se reemplazan por el límite superior de la variable de tipo 
+                    (generalmente <code>Object</code>). Y, siempre que el código resultante no sea de tipo correcto, se inserta una 
+                    conversión al tipo apropiado, como en la última línea de <code>loophole</code>.
+                </p>
+                <p>
+                    Los detalles completos del borrado están más allá del alcance de este tutorial, pero la descripción simple que 
+                    acabamos de dar no está lejos de la verdad. Es bueno saber un poco sobre esto, especialmente si quiere hacer 
+                    cosas más sofisticadas como convertir IPAs existentes para que usen genéricos (vea la sección 
+                    <a class="TutorialLink" target="_top" href="convert.html">Convirtiendo Código Heredado para Usar Genéricos</a>)
+                    , o simplemente quiere entender por qué las cosas son como son.
+                </p>
+                <h2>
+                    Usar código genérico en código heredado
+                </h2>
+                <p>
+                    Ahora consideremos el caso inverso. Imagine que Example.com elije convertir su IPA para usar genéricos, pero 
+                    algunos de sus clientes no lo tienen aún. Entonces ahora el código se ve así:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>package</b> com.Example.widgets;
+
+<b>public interface</b> Part { 
+    ...
+}
+
+<b>public class</b> Inventory {
+    /**
+     * Agrega un Assembly nuevo a la base de datos del inventario.
+     * El assemby recibe el nombre name, y 
+     * consiste de un conjunto de partes especificados por parts.
+     * Todos los elementos de la colección parts 
+     * deben soportar el interfaz Part.
+     **/
+    <b>public static void</b> addAssembly(String name, Collection&lt;Part&gt; parts) {...}
+    <b>public static</b> Assembly getAssembly(String name) {...}
+}
+
+<b>public interface</b> Assembly {
+    // <i>Devuelve una colección de Parts</i>
+    Collection&lt;Part&gt; getParts();
+}
+                    </pre>
+                </div>
+                <p>
+                    y el código del cliente se ve así:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>package</b> com.mycompany.inventory;
+
+<b>import</b> com.Example.widgets.*;
+
+<b>public class</b> Blade implements Part {
+...
+}
+
+<b>public class</b> Guillotine implements Part {
+}
+
+<b>public class</b> Main {
+    <b>public static void</b> main(String[] args) {
+        Collection c = new ArrayList();
+        c.add(new Guillotine()) ;
+        c.add(new Blade());
+
+        // <i>1: advertencia no comprobada</i>
+        Inventory.addAssembly("thingee", c);
+
+        Collection k = Inventory.getAssembly("thingee").getParts();
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    El código de cliente fue escrito antes de que los genéricos fueran introducidos, pero usan el paquete 
+                    <code>com.Example.widgets</code> y la librería de colecciones, los cuales usan tipos genéricos. Todos los usos 
+                    de las declaraciones de tipo genérico en el código cliente son tipos crudos.
+                </p>
+                <p>
+                    La línea 1 genera una advertencia no comprobada, porque una <code>Collection</code> cruda está siendo pasada 
+                    cuando se espera una <code>Collection</code> de <code>Part</code>s, y el compilador no puede asegurar que la 
+                    <code>Collection</code> cruda sea realmente una <code>Collection</code> de <code>Part</code>s.
+                </p>
+                <p>
+                    Como alternativa, puede compilar el código de cliente usando la bandera source 1.4, asegurando que se generen 
+                    advertencias. Sin embargo, en ese caso no será capaz de usar ninguna de las nuevas caracterícas del lenguaje 
+                    introducidas en el KDJ 5.0.
+                </p>
+                <hr />
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="methods.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="fineprint.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos
+                            <a href="../../information/cpyr.html">avisos legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Métodos Genéricos<br />
+            <b>Página siguiente:</b> La Letra Pequeña
+        </div>
+    </body>
+</html> 

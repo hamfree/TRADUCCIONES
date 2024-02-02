@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Manejando Eventos Léxicos (Los Tutoriales de Java&trade; &gt; IPA de Java para Procesado de XML (JAXP) &gt; IPA Simple 
+            para XML)
+        </title>
+        <meta name="description" content="Este tutorial de Java JAXP describe la IPA de Java para el procesado de XML (jaxp), XSLT, 
+              SAX, y tópicos de XML relacionados" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jaxp, xml, xslt, sax" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">IPA Simple para XML</a></div>
+                <div class="linkAHEAD"><a href="when.html">Cuando usar SAX</a></div>
+                <div class="linkAHEAD"><a href="parsing.html">Analizar un archivo XML Mediante SAX</a></div>
+                <div class="linkAHEAD"><a href="validation.html">Implementando la Validación en SAX</a></div>
+                <div class="nolinkAHEAD">Manejando Eventos Léxicos</div>
+                <div class="linkAHEAD"><a href="using.html">Utilizando <code>DTDHandler</code> y <code>EntityResolver</code></a></div>
+                <div class="linkAHEAD"><a href="info.html">Información Adicional</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> IPA de Java para Procesado de XML (JAXP)<br />
+                <b>Lección:</b> IPA Simple para XML
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">IPA de Java para Procesado de XML (JAXP)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">IPA Simple para XML</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="validation.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="using.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Manejando Eventos Léxicos</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    En este punto, usted ha asimilado muchos conceptos XML, incluyendo DTDs y entidades externas. También ha 
+                    aprendido a manejar el analizador SAX. El resto de esta lección cubre temas avanzados que necesitará comprender 
+                    sólo si está escribiendo aplicaciones basadas en SAX. Si su objetivo primario es escribir las aplicaciones 
+                    basadas en DOM, puede saltar a 
+                    <a class="TutorialLink" target="_top" href="../dom/index.html">Modelo de Objeto de Documento</a>.
+                </p>
+                <p>
+                    Usted vió anteriormente que si está escribiendo texto como XML, necesita saber si está en una sección CDATA. Si 
+                    es así, los corchetes de ángulo (&lt;) y ampersands (&amp;) deben aparecer sin cambios. Pero si no está en una 
+                    sección CDATA, deben ser reemplazados por las entidades predefinidas  
+                    <code>&amp;lt;</code> y <code>&amp;amp;</code>. Pero, ¿cómo sabe si está procesando una sección CDATA?
+                </p>
+                <p>
+                    Por otra parte, si está filtrando XML de alguna manera, desea pasar comentarios. Normalmente el analizador 
+                    ignora los comentarios. ¿Cómo puede obtener comentarios para que pueda hacerse eco de ellos?
+                </p>
+                <p>
+                    Esta sección responde esas preguntas. Le muestra cómo usar <code>org.xml.sax.ext.LexicalHandler</code> para 
+                    identificar comentarios, secciones CDATA, y referencias a entidades analizadas.
+                </p>
+                <p>
+                    Los comentarios, las etiquetas CDATA, y referencias a entidades analizadas constituyen información léxica, esto 
+                    es, información que se refiere al texto del propio XML, en lugar del contenido de información del XML. La 
+                    mayoría de las aplicaciones, por supuesto, están preocupadas sólo por el contenido del documento XML. Tales 
+                    aplicaciones no usarán la IPA de <code>LexicalEventListener</code>. Pero las aplicaciones que generan texto XML 
+                    lo encontrarán invaluable.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota </b> &mdash; la gestión del evento léxico es una característica opcional del analizador. No se requiere 
+                    que las implementaciones del analizador lo soporten. ( La implementación de referencia lo hace). Esta 
+                    descripción asume que su analizador lo hace.
+                </p>
+                <hr />
+                <h2>
+                    <a id="gcymx"></a>Cómo Funciona <code>LexicalHandler</code>
+                </h2>
+                <p>
+                    Para estar informado cuando el analizador SAX ve información léxica, configure el <code>XmlReader</code> que 
+                    subyace al analizador con un <code>LexicalHandler</code>. La interfaz <code>LexicalHandler</code> define los 
+                    siguientes métodos de gestión de eventos.
+                </p>
+                <dl>
+                    <dt>
+                        <code>comment(String comment)</code>
+                    </dt>
+                    <dd>
+                        <p>
+                            Pasa comentarios a la aplicación.
+                        </p>
+                    </dd>
+                    <dt>
+                        <code>startCDATA()</code>, <code>endCDATA()</code>
+                    </dt>
+                    <dd>
+                        <p>
+                            Indica cuando una sección CDATA está iniciando o terminando, lo que le indica a su aplicación qué 
+                            clase de caracteres esperar la próxima vez que se llame a <code>characters()</code>.
+                        </p>
+                    </dd>
+                    <dt>
+                        <code>startEntity(String name)</code>, <code>endEntity(String name)</code>
+                    </dt>
+                    <dd>
+                        <p>
+                            Da el nombre de una entidad analizada.
+                        </p>
+                    </dd>
+                    <dt>
+                        <code>startDTD(String name, String publicId, String systemId)</code>, <code>endDTD()</code>
+                    </dt>
+                    <dd>
+                        <p>
+                            Indica cuando está siendo procesado un DTD, y lo identifica.
+                        </p>
+                    </dd>
+                </dl>
+                <p>
+                    Para activar el Manejador Léxico, su aplicación debe extender <code>DefaultHandler</code> e implementar la 
+                    interfaz <code>LexicalHandler</code>. Después, debe configurar su instancia <code>XMLReader</code> a la  que el 
+                    analizador delega, y configúrelo para enviar eventos léxicos a su manejador léxico, como se muestra debajo.
+                </p>
+                <div class="codeblock">
+                    <pre>
+// ...
+
+SAXParser saxParser = factory.newSAXParser();
+XMLReader xmlReader = saxParser.getXMLReader();
+xmlReader.setProperty("http://xml.org/sax/properties/lexical-handler",
+                      handler); 
+// ...
+                    </pre>
+                </div>
+                <p>
+                    Aquí, configura el <code>XMLReader</code> usando el método <code>setProperty()</code> definido en la clase 
+                    <code>XMLReader</code>. La propiedad nombre, definida como parte del estándar SAX, es la URN, 
+                    <code>http://xml.org/sax/properties/lexical-handler</code>.
+                </p>
+                <p>
+                    Finalmente, agregue algo como el código siguiente para definir los métodos apropiados que implementarán la 
+                    interfaz.
+                </p>
+                <div class="codeblock">
+                    <pre>
+// ...
+
+public void warning(SAXParseException err) {
+    // ...
+}
+
+public void comment(char[] ch, int start, int length) throws SAXException {
+    // ...   
+}
+
+public void startCDATA() throws SAXException {
+    // ...
+}
+
+public void endCDATA() throws SAXException {
+    // ...
+}
+
+public void startEntity(String name) throws SAXException {
+    // ...
+}
+
+public void endEntity(String name) throws SAXException {
+    // ...
+}
+
+public void startDTD(String name, String publicId, String systemId)
+    throws SAXException {
+    // ...
+}
+
+public void endDTD() throws SAXException {
+    // ...
+}
+
+private void echoText() {
+    // ...
+}
+
+// ...
+                    </pre>
+                </div>
+                <p>
+                    Este código transformará su aplicación de análisis en un manejador léxico. Todo lo que queda por hacer es darle 
+                    a cada uno de estos nuevos métodos una acción para realizar.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="validation.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="using.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Implementando la Validación en SAX<br />
+            <b>Página siguiente:</b> Utilizando <code>DTDHandler</code> y <code>EntityResolver</code>
+        </div>
+    </body>
+</html> 

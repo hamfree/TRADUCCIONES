@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Escribiendo Métodos de Bean Gestionado</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jsf-develop002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-ajax.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BNAVB">
+      <h2 id="writing-managed-bean-methods">Escribiendo Métodos de Bean Gestionado</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Los métodos de un bean gestionado pueden realizar varias funciones específicas de la aplicación 
+            para los componentes de la página. Estas funciones incluyen
+          </p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>Realización de procesos asociados a la navegación</p>
+            </li>
+            <li>
+              <p>Manejo de eventos de acción</p>
+            </li>
+            <li>
+              <p>Realización de la validación del valor del componente</p>
+            </li>
+            <li>
+              <p>Manejo de eventos de cambio de valor</p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="sthref68">
+          <h3 id="why-use-managed-beans">Porqué Usar Beans Gestionados</h3>
+          <div class="paragraph">
+            <p>
+              Al usar un bean gestionado para realizar estas funciones, elimina la necesidad de implementar la 
+              interfaz <code>javax.faces.validator.Validator</code> para manejar la validación o una de las 
+              interfaces de escucha para manejar eventos. Además, al usar un bean gestionado en lugar de una 
+              implementación de <code>Validator</code> para realizar la validación, elimina la necesidad de 
+              crear una etiqueta personalizada para la implementación de <code>Validator</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              En general, es una buena práctica incluir estos métodos en el mismo bean gestionado que define 
+              las propiedades de los componentes que hacen referencia a estos métodos. La razón para hacerlo 
+              es que los métodos pueden necesitar acceder a los datos del componente para determinar cómo 
+              manejar el evento o realizar la validación asociada con el componente.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las siguientes secciones explican cómo escribir varios tipos de métodos de bean gestionados.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BNAVC">
+          <h3 id="writing-a-method-to-handle-navigation">Escribiendo un Método para Manejar la Navegación</h3>
+          <div class="paragraph">
+            <p>
+              Un método de acción, un método de bean gestionado que maneja el procesamiento de navegación, 
+              debe ser un método público que no toma parámetros y devuelve un <code>Object</code>, que es el 
+              resultado lógico que usa el sistema de navegación para determinar la página siguiente que se 
+              mostrará. Se hace referencia a este método mediante el atributo <code>action</code> de la 
+              etiqueta de componente.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El siguiente método de acción es del bean gestionado <code>CashierBean</code>, que se invoca 
+              cuando un usuario hace clic en el botón Enviar en la página. Si el usuario ha pedido más de $100 
+              en libros, este método establece las propiedades de <code>rendered</code> de los componentes 
+              <code>fanClub</code> y <code>specialOffer</code> en <code>true</code>, lo que hace que se 
+              muestren en la página la próxima vez que se procese.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Después de establecer las propiedades de <code>rendered</code> de los componentes en 
+              <code>true</code>, este método devuelve el resultado lógico <code>null</code>. Esto hace que la 
+              implementación de JavaServer Faces vuelva a representar la página sin crear una nueva vista de 
+              la página, conservando la entrada del cliente. Si este método devolviera <code>purchase</code>, 
+              que es el resultado lógico a utilizar para avanzar a una página de pago, la página se volvería a 
+              representar sin retener la entrada del cliente. En este caso, desea volver a renderizar la 
+              página sin borrar los datos.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Si el usuario no compra más de $100 en libros o si el componente <code>thankYou</code> ya se ha 
+              renderizado, el método devuelve <code>bookreceipt</code>. La implementación de JavaServer Faces 
+              carga la página <code>bookreceipt.xhtml</code> después de que este método devuelve:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+public String submit() {
+    ...
+    if ((cart().getTotal()&gt; 100.00) &amp;&amp; !specialOffer.isRendered()) {
+        specialOfferText.setRendered(true);
+        specialOffer.setRendered(true);
+        return null;
+    } else if (specialOffer.isRendered() &amp;&amp; !thankYou.isRendered()) {
+        thankYou.setRendered(true);
+        return null;
+    } else {
+        ...
+        cart.clear();
+        return ("bookreceipt");
+    }
+}
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Normalmente, un método de acción devolverá un resultado <code>String</code>, como se muestra en 
+              el ejemplo anterior. Alternativamente, puede definir una clase <code>Enum</code> que encapsule 
+              todas las cadenas de resultados posibles y luego hacer que un método de acción devuelva una 
+              constante <code>enum</code>, que representa una <code>String</code> en particular resultado 
+              definido por la clase <code>Enum</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El siguiente ejemplo usa una clase <code>Enum</code> para encapsular todos los resultados 
+              lógicos:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+public enum Navigation  {
+    main, accountHist, accountList, atm, atmAck, transferFunds,
+     transferAck, error
+}
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Cuando devuelve un resultado, un método de acción usa la notación de puntos para hacer 
+              referencia al resultado de la clase <code>Enum</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+public Object submit(){
+    ...
+    return Navigation.accountHist;
+}
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              La sección 
+              <a href="jsf-page-core004.html#BNATP">Referenciando un Método Que Realiza la Navegación</a> 
+              explica cómo una etiqueta de componente hace referencia a este método. La sección 
+              <a href="jsf-develop002.html#BNAUK">
+                Escribiendo Propiedades Ligadas a Instancias de Componente
+              </a> explica cómo escribir las propiedades de bean a las que están vinculados los componentes.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BNAVD">
+          <h3 id="writing-a-method-to-handle-an-action-event">
+            Escribiendo un Método para Manejar un Evento Action
+          </h3>
+          <div class="paragraph">
+            <p>
+              Un método de bean gestionado que maneja un evento de acción debe ser un método público que 
+              acepte un evento de acción y devuelva <code>void</code>. Se hace referencia a este método 
+              mediante el atributo <code>actionListener</code> de la etiqueta del componente. Solo los 
+              componentes que implementan <code>javax.faces.component.ActionSource</code> pueden hacer 
+              referencia a este método.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              En el siguiente ejemplo, un método de un bean gestionado llamado <code>ActionBean</code> procesa 
+              el evento de un usuario que hace clic en uno de los enlaces de la página:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+public void chooseBookFromLink(ActionEvent event) {
+    String current = event.getComponent().getId();
+    FacesContext context = FacesContext.getCurrentInstance();
+    String bookId = books.get(current);
+    context.getExternalContext().getSessionMap().put("bookId", bookId);
+}
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Este método obtiene el componente que generó el evento del objeto de evento; luego obtiene el 
+              ID del componente, que es un código para el libro. El método compara el código con un objeto 
+              <code>HashMap</code> que contiene los códigos de libro y los valores de ID de libro 
+              correspondientes. Finalmente, el método establece el ID del libro usando el valor seleccionado 
+              del objeto <code>HashMap</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              <a href="jsf-page-core004.html#BNATQ">Referenciando un Método Que Maneja un Evento Action</a> 
+              explica cómo una etiqueta de componente hace referencia a este método.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BNAVE">
+          <h3 id="writing-a-method-to-perform-validation">
+            Escribiendo un Método para Realizar una Validación
+          </h3>
+          <div class="paragraph">
+            <p>
+              En lugar de implementar la interfaz <code>javax.faces.validator.Validator</code> para realizar 
+              la validación de un componente, puede incluir un método en un bean gestionado para que se 
+              encargue de validar la entrada del componente. Un método de bean gestionado que realiza la 
+              validación debe aceptar un <code>javax.faces.context.FacesContext</code>, el componente cuyos 
+              datos deben ser validados y los datos a ser validados, al igual que el código 
+              <code>validate</code> el método de la interfaz <code>Validator</code> lo hace. Un componente se 
+              refiere al método de bean gestionado mediante el uso de su atributo <code>validator</code>. Solo 
+              se pueden validar los valores de los componentes <code>UIInput</code> o los valores de los 
+              componentes que amplían <code>UIInput</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Aquí hay un ejemplo de un método de bean gestionado que valida la entrada del usuario, de 
+              <a href="cdi-basicexamples003.html#GJCXV">El Ejemplo de CDI guessnumber-cdi</a>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+public void validateNumberRange(FacesContext context,
+                                UIComponent toValidate,
+                                Object value) {
+    if (remainingGuesses &lt;= 0) {
+        ((UIInput) toValidate).setValid(false);
+        FacesMessage message = new FacesMessage("No guesses left!");
+        context.addMessage(toValidate.getClientId(context), message);
+        return;
+    }
+
+    int input = (Integer) value;
+    if (input &lt; minimum || input&gt; maximum) {
+        ((UIInput) toValidate).setValid(false);
+
+        FacesMessage message = new FacesMessage("Invalid guess");
+        context.addMessage(toValidate.getClientId(context), message);
+    }
+}
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El método <code>validateNumberRange</code> realiza dos validaciones diferentes.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  Si el usuario se ha quedado sin conjeturas, el método establece la propiedad 
+                  <code>valid</code> del componente <code>UIInput</code> en <code>false</code>. Luego, pone en 
+                  cola un mensaje en la instancia de <code>FacesContext</code>, asocia el mensaje con el ID 
+                  del componente y regresa.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Si el usuario tiene algunas conjeturas restantes, el método recupera el valor local del 
+                  componente. Si el valor de entrada está fuera del rango permitido, el método vuelve a 
+                  establecer la propiedad <code>valid</code> del componente <code>UIInput</code> en 
+                  <code>false</code>, pone en cola un mensaje diferente en la instancia de 
+                  <code>FacesContext</code> y retorna.
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Consulte 
+              <a href="jsf-page-core004.html#BNATR">Referenciando un Método Que Realiza la Validación</a> para 
+              obtener información sobre cómo una etiqueta de componente hace referencia a este método.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BNAVF">
+          <h3 id="writing-a-method-to-handle-a-value-change-event">
+            Escribiendo un Método para Manejar un Evento Value-Change
+          </h3>
+          <div class="paragraph">
+            <p>
+              Un bean gestionado que maneja un evento de cambio de valor debe usar un método público que 
+              acepta un evento de cambio de valor y devuelve <code>void</code>. Se hace referencia a este 
+              método mediante el atributo <code>valueChangeListener</code> del componente. Esta sección 
+              explica cómo escribir un método de bean administrado para reemplazar la implementación de 
+              <code>javax.faces.event.ValueChangeListener</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La siguiente etiqueta de ejemplo proviene de 
+              <a href="jsf-page-core002.html#BNATA">
+                Registrando un Oyente Value-Change en un Componente
+              </a>, donde la etiqueta <code>h:inputText</code> con el <code>id</code> de <code>name</code> 
+              tiene una instancia de <code>ValueChangeListener</code> registrada en él. Esta instancia de 
+              <code>ValueChangeListener</code> maneja el evento de ingresar un valor en el campo 
+              correspondiente al componente. Cuando el usuario ingresa un valor, se genera un evento de cambio 
+              de valor y se invoca el método <code>processValueChange(ValueChangeEvent)</code> de la clase 
+              <code>ValueChangeListener</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;h:inputText id="name"
+             size="30"
+             value="#{cashierBean.name}"
+             required="true"
+             requiredMessage="#{bundle.ReqCustomerName}"&gt;
+     &lt;f:valueChangeListener
+         type="javaeetutorial.dukesbookstore.listeners.NameChanged" /&gt;
+&lt;/h:inputText&gt;
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              En lugar de implementar <code>ValueChangeListener</code>, puede escribir un método de bean 
+              gestionado para manejar este evento. Para hacer esto, mueva el método 
+              <code>processValueChange(ValueChangeEvent)</code> de la clase <code>ValueChangeListener</code>, 
+              llamada <code>NameChanged</code>, a su bean gestionado.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Aquí está el método de bean gestionado que procesa el evento de ingresar un valor en el campo 
+              <code>nombre</code> en la página:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+public void processValueChange(ValueChangeEvent event)
+        throws AbortProcessingException {
+    if (null != event.getNewValue()) {
+        FacesContext.getCurrentInstance().getExternalContext().
+                getSessionMap().put("name", event.getNewValue());
+    }
+}
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para que este método maneje el <code>ValueChangeEvent</code> generado por un componente de 
+              entrada, haga referencia a este método desde el atributo <code>valueChangeListener</code> de la 
+              etiqueta del componente. Consulte 
+              <a href="jsf-page-core004.html#BNATS">
+                Referenciando un Método Que Maneja un Evento Value-Change
+              </a> para obtener más información.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jsf-develop002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-ajax.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

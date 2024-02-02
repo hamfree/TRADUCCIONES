@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Sumario (Los Tutoriales de Java&trade; &gt; Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing &gt; Realización
+            de Pintado Personalizado)
+        </title>
+        <meta name="description" content="Este tutorial de Swing Java describe el desarrollo de interfaces gráficas de usuario (GUI)
+              para aplicaciones y applets que utilizan componentes Swing" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java swing, java ui, java user interface,
+              swing components, swing events, swing layout  " />
+        <link rel="stylesheet" href="../../indice.css" type="text/css" />
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper  clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Realización de Pintado Personalizado</a></div>
+                <div class="linkAHEAD"><a href="step1.html">Creando la Aplicación Demo (Paso 1)</a></div>
+                <div class="linkAHEAD"><a href="step2.html">Creando la Aplicación Demo (Paso 2)</a></div>
+                <div class="linkAHEAD"><a href="step3.html">Creando la Aplicación Demo (Paso 3)</a></div>
+                <div class="linkAHEAD"><a href="refining.html">Refinando el Diseño</a></div>
+                <div class="linkAHEAD"><a href="closer.html">Una Mirada más Cercana al Mecanismo de Pintado</a></div>
+                <div class="nolinkAHEAD">Sumario</div>
+                <div class="linkAHEAD"><a href="problems.html">Resolviendo Problemas Comunes de Pintado</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing<br />
+                <b>Lección:</b> Realización de Pintado Personalizado
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Realización de Pintado Personalizado</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="closer.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="problems.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Sumario</h1>
+            </div>
+            <div id="PageContent">
+
+                <ul>
+                    <li>
+                        En Swing, el pintado empieza con el método <code>paint</code>, el cual invoca a <code>paintComponent</code>, 
+                        <code>paintBorder</code>, and <code>paintChildren</code>. El sistema invocará esto automáticamente cuando 
+                        un componente se pinta por primera vez, es redimensionado, o se vuelve a exponer después de ser ocultado 
+                        por otra ventana.
+                    </li>
+                    <li>
+                        Los repintados programáticos se logran invocando el método <code>repaint</code> de un componente; <i>no</i> 
+                        invoque su <code>paintComponent</code> directamente. Invocar <code>repaint</code> causa que el subsistema 
+                        de pintado tome los pasos necesarios para asegurarse de que su método <code>paintComponent</code> sea 
+                        invocado en el momento apropiado.
+                    </li>
+                    <li>
+                        La versión de varios argumentos de <code>repaint</code> le permite reducir el 
+                        <em>rectángulo de recorte</em> del componente (la sección de la pantalla que se ve afectada por las 
+                        operaciones de pintado) para que el pintado pueda volverse más eficiente. Utilizamos esta técnica en el 
+                        método <code>moveSquare</code> evitando repintar secciones de la pantalla que no han cambiado. Hay también 
+                        una versión sin argumentos de este método que redibujará el área entera de la superficie del componente.
+                    </li>
+                    <li>
+                        Ya que hemos reducido el rectángulo de recorte, nuestro método <code>moveSquare</code> invoca 
+                        <code>repaint</code> no una vez, sino dos veces. La primera invocación repinta el área del componente donde 
+                        el cuadrado estaba <em>previamente</em> (el comportamiento heredado es rellenar el área con el color de 
+                        fondo actual). La segunda invocación pinta el área del componente donde el cuadro está <em>actualmente</em>.
+                    </li>
+                    <li>
+                        Puede invocar <code>repaint</code> múltiples veces desde dentro del mismo manejador de eventos, pero Swing 
+                        toma esa información y repinta el componente en sólo una operación.
+                    </li>
+                    <li>
+                        Para componentes con un Delegado de IU, debe pasar el parámetro <code>Graphics</code> con la línea 
+                        <code>super.paintComponent(g)</code> como primera línea de código en su sobrescritura de 
+                        <code>paintComponent</code>. Si no lo hace, entonces su componente será responsalbe de pintar manualmente 
+                        su fondo. Puede experimentar con esto comentando esa línea y recompilar para ver que el fondo ya no se 
+                        pinta.
+                    </li>
+                    <li>
+                        Factorizando nuestro código nuevo en una clase separada <code>RedSquare</code>, la aplicación mantiene un 
+                        diseño orientado a objetos, el cual mantiene el método <code>paintComponent</code> de la clase 
+                        <code>MyPanel</code> libre de desorden. El pintado aún funciona porque hemos pasado el objeto 
+                        <code>Graphics</code> al cuadrado rojo invocando su método <code>paintSquare(Graphics g)</code>. Tenga en 
+                        mente que el nombre de este método es uno que hemos creado desde cero; no estamos sobreescribiendo 
+                        <code>paintSquare</code> desde ningún sitio más arriba en la IPA de Swing.
+                    </li>
+                </ul>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="closer.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="problems.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales </a>.
+                        </p>
+                        <p class="footertext">Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.</p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Una Mirada más Cercana al Mecanismo de Pintado<br />
+            <b>Página siguiente:</b> Resolviendo Problemas Comunes de Pintado
+        </div>
+    </body>
+</html>

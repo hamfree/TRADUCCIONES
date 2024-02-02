@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Accediendo a los Recursos del Sistema de Audio (Los Tutoriales de Java&trade; &gt; Sonido)
+        </title>
+        <meta name="description" content="" />
+        <meta name="keywords" content="java programming, learn java, java sample code, " />
+        <link rel="stylesheet" href="../indice.css" type="text/css"/>
+        <script src="../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkAHEAD"><a href="sampled-overview.html">Descripción del Paquete Sampled</a></div>
+                <div class="nolinkAHEAD">Accediendo a los Recursos del Sistema de Audio</div>
+                <div class="linkAHEAD"><a href="playing.html">Reproducción de Audio</a></div>
+                <div class="linkAHEAD"><a href="capturing.html">Grabando Audio</a></div>
+                <div class="linkAHEAD"><a href="controls.html">Procesando Audio con Controles</a></div>
+                <div class="linkAHEAD"><a href="converters.html">Usando Ficheros y Convertidores de Formato</a></div>
+                <div class="linkAHEAD"><a href="overview-MIDI.html">Descripción del Paquete MIDI</a></div>
+                <div class="linkAHEAD"><a href="accessing-MIDI.html">Accediendo a los Recursos del Sistema MIDI</a></div>
+                <div class="linkAHEAD"><a href="MIDI-messages.html">Transmitiendo y Recibiendo Mensajes MIDI</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-intro.html">Introducción a los Secuenciadores</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-methods.html">Utilizando Métodos del Secuenciador</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-adv.html">Usando Características Avanzadas del Secuenciador</a></div>
+                <div class="linkAHEAD"><a href="MIDI-synth.html">Sintetizando Sonido</a></div>
+                <div class="linkAHEAD"><a href="SPI-intro.html">Introducción a los Interfaces de los Proveedores de Servicio</a></div>
+                <div class="linkAHEAD"><a href="SPI-providing-sampled.html">Proporcionando Servicios de Audio Sampleado</a></div>
+                <div class="linkAHEAD"><a href="SPI-providing-MIDI.html">Proporcionando Servicios MIDI</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Sonido
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="./index.html" target="_top">Sonido</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="sampled-overview.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="playing.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Accediendo a los Recursos del Sistema de Audio</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    La IPA de Sonido de Java toma un enfoque flexible a la configuración del sistema. Diferentes clases de 
+                    dispositivos (mezcladores) pueden ser instalados en una computadora. La IPA hace pocas suposiciones sobre qué 
+                    dispositivos se han instalado y cuáles son sus capacidades. En su lugar, proporciona formas para que el sistema 
+                    informe sobre los componentes de audio disponibles y formas para que su programa acceda a ellos.
+                </p>
+                <p>
+                    Las secciones siguientes muestran cómo su programa puede aprender qué recursos de audio muestreado han sido 
+                    instalados en el computador, y cómo puede obtener acceso a los recursos disponibles. Entre otras cosas, los 
+                    recursos incluyen los mezcladores y los varios tipos de líneas propiedad de los mezcladores.
+                </p>
+                <p></p>
+                <h2>
+                    La Clase AudioSystem
+                </h2>
+                <p>
+                    La clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/AudioSystem.html">
+                        <code>AudioSystem</code></a> actúa como una cámara de compensación para los componentes de audio, incluyendo 
+                    servicios integrados y separadamente servicios instalados desde proveedores de terceras partes. 
+                    <code>AudioSystem</code> sirve como un punto de entrada al programa de aplicación para acceder a esos 
+                    recursos de audio muestreado instalados. Puede preguntar a <code>AudioSystem</code> para saber qué clases 
+                    de recursos han sido instalados, y después puede obtener el acceso a ellos. Por ejemplo, un programa de 
+                    aplicación puede comenzar preguntando a la clase <code>AudioSystem</code> si hay un mezclador que tenga una 
+                    determinada configuración, tal como una de las configuraciones de entrada y salida ilustradas anteriormente 
+                    en la descripción de líneas. Desde el mezclador, el programa obtendría después las líneas de datos, y así.
+                </p>
+                <p>
+                    Aquí tiene alguno de los recursos que un programa de aplicación puede obtener de <code>AudioSystem</code>:
+                </p>
+                <ul>
+                    <li>
+                        Mezcladores &mdash; Un sistema habitualmente tiene una variedad de mezcladores instalados. Hay usualmente 
+                        al menos uno para entrada de audio y uno para salida de audio. También puede haber mezcladores que no tengan 
+                        puertos de E/S, sino que acepten audio de un programa de aplicación y devuelvan el audio mezclado al 
+                        programa. La clase <code>AudioSystem</code> proporciona una lista de todos los mezcladores instalados.
+                    </li>
+                    <li>
+                        Líneas &mdash; Aunque cada línea está asociada con un mezclador, un programa de aplicación puede obtener 
+                        una línea directamente del <code>AudioSystem</code>, sin tratar explícitamente con los mezcladores.
+                    </li>
+                    <li>
+                        Conversiones de formato &mdash; Un programa de aplicación puede usar las conversiones de formato para 
+                        traducir datos de audio de un formato a otro.
+                    </li>
+                    <li>
+                        Archivos y flujos &mdash; La clase <code>AudioSystem</code> proporciona métodos para traducir entre 
+                        archivos de audio y flujos de audio. Puede también informar del formato de archivo de un archivo de sonido 
+                        y puede escribir archivos en diferentes formatos.
+                    </li>
+                </ul>
+                <h2>
+                    Objetos de Información
+                </h2>
+                <p>
+                    Varias clases en la IPA de Sonido de Java proporciona información útil sobre las interfaces asociadas. Por 
+                    ejemplo, 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/Mixer.Info.html">
+                        <code>Mixer.Info</code></a> proporciona detalles sobre un mezclador instalado, tal como el fabricante, 
+                    nombre, descripción y versión del mezclador.
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/Line.Info.html">
+                        <code>Line.Info</code></a> obtiene la clase de una línea específica. Las subclases de <code>Line.Info</code>
+                    incluyen <a class="APILink" target="_blank"
+                                href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/Port.Info.html">
+                        <code>Port.Info</code></a> y 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/DataLine.Info.html">
+                        <code>DataLine.Info</code></a> , que obtienen detalles relevantes para un puerto y línea de datos 
+                    específicamente, respectivamente. Cada una de estas clases se describe más adelante en la sección apropiada 
+                    abajo. Es importante no confundir el objeto <code>Info</code> con el objeto del mezclador o línea que 
+                    describe.
+                </p>
+                <p></p>
+                <h3>
+                    Obtener un Mixer (Mezclador)
+                </h3>
+                <p>
+                    Habitualmente, una de las primeras cosas que un programa que usa la IPA de Sonido de Java necesita hacer es 
+                    obtener un mezclador, o al menos una línea del mezclador, de forma que pueda obtener sonido dentro y fuera de 
+                    la computadora. Su programa podría necesitar una clase de mezclador específico, o podría querer visualizar una 
+                    lista de todos los mezcladores disponibles de forma que el usuario puede seleccionar uno. En otro caso, 
+                    necesita aprender qué clases de mezcladores están instalados. <code>AudioSystem</code> proporciona el siguiente 
+                    método:
+                </p>
+                <div class="codeblock">
+                    <pre>
+static Mixer.Info[] getMixerInfo()
+                    </pre>
+                </div>
+                <p>
+                    Cada objeto 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/Mixer.Info.html">
+                        <code>Mixer.Info</code></a> devuelto por este método identifica un tipo de mezclador que está instalado. 
+                    (Usualmente un sistema tiene al menos un mezclador de un tipo dado. Si resulta que hay más de uno de un tipo 
+                    determinado, la matriz devuelta todavía solo tiene uno <code>Mixer.info</code> para ese tipo). Un programa 
+                    de aplicación puede iterar sobre los objetos <code>Mixer.Info</code> para encontrar uno apropiado, de 
+                    acuerdo a sus necesidades. El <code>Mixer.Info</code> incluye las cadenas siguientes para identificar la 
+                    clase de mezclador:
+                </p>
+                <ul>
+                    <li>Nombre</li>
+                    <li>Version</li>
+                    <li>Vendedor/Fabricante</li>
+                    <li>Descripción</li>
+                </ul>
+                <p>
+                    Estas son cadenas arbitrarias, de forma que un programa de aplicación que necesita un mezclador específico sabe 
+                    que´esperar y con qué comparar las cadenas. La compañía que proporciona el mezclador debe incluir esta 
+                    información en su documentación. Alternativamente, y quizás más típicamente, el programa de aplicación mostrará 
+                    todas las cadenas de los objetos <code>Mixer.Info</code> al usuario y permite al usuario elegir el mezclador 
+                    correspondiente.
+                </p>
+                <p>
+                    Una vez se encuentra un mezclador apropiado, el programa de aplicación invoca el siguiente método de 
+                    <code>AudioSystem</code> para obtener el mezclado deseado:
+                </p>
+                <div class="codeblock">
+                    <pre>
+static Mixer getMixer(Mixer.Info info)
+                    </pre>
+                </div>
+                <p>
+                    ¿Qué pasa si su programa necesita un mezclador que tenga ciertas capacidades, pero no necesita un mezclador 
+                    específico fabricado por un proveedor específico? ¿Y si no puede depender de que el usuario sepa qué mezclador 
+                    debe elegir? En ese caso, la información en los objetos <code>Mixer.Info</code> no será de mucha utilidad. En 
+                    su lugar, puede iterar sobre todos los objetos <code>Mixer.Info</code> devueltos por <code>getMixerInfo</code>, 
+                    obtener un mezclador para cada uno invocando a <code>getMixer</code>, y preguntar a cada mezclador por sus 
+                    capacidades. Por ejemplo, podría necesitar un mezclador que puede escribir sus datos de audio mezclados a cierto 
+                    número de líneas de datos destino simultáneamente. En ese caso, preguntaria a cada mezclador usando este método 
+                    de <code>Mixer</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+int getMaxLines(Line.Info info)
+                    </pre>
+                </div>
+                <p>
+                    Aquí, 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/Line.Info.html">
+                        <code>Line.Info</code></a> especificaría una <code>TargetDataLine</code>. La clase <code>Line.Info</code> 
+                    se describe en la sección siguiente.
+                </p>
+                <p></p>
+                <h3>
+                    Obtener una Line (Línea) del Tipo Deseado
+                </h3>
+                <p>
+                    Hay dos formas de obtener una línea:
+                </p>
+                <ul>
+                    <li>
+                        Directamente desde el objeto 
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/AudioSystem.html">
+                            <code>AudioSystem</code></a>
+                    </li>
+                    <li>
+                        Desde un mezclador que ya ha obtenido desde el objeto <code>AudioSystem</code>
+                    </li>
+                </ul>
+                <h3>
+                    Obtener una Line (Línea) Directamente desde el AudioSystem
+                </h3>
+                <p>
+                    Asumamos que no ha obtenido un mezclador, y que su programa es uno simple que realmente solo necesita una 
+                    cierta clase de línea; los detalles del mezclador no le importan. Puede usar el método de 
+                    <code>AudioSystem</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+static Line getLine(Line.Info info)
+                    </pre>
+                </div>
+                <p>
+                    el cual es análogo al método <code>getMixer</code> descrito previamente. A diferencia de 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/Mixer.Info.html"><code>Mixer.Info</code>
+                    </a> , la 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/Line.Info.html"><code>Line.Info</code>
+                    </a> usada como un arguemnto no almacena información textual para especificar la línea deseada. En su lugar, 
+                    almacena información sobre la clase de línea deseada.
+                </p>
+                <p>
+                    <code>Line.Info</code> es una clase abstracta, así que use una de sus subclases (
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/Port.Info.html"><code>Port.Info</code>
+                    </a> o
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/DataLine.Info.html">
+                        <code>DataLine.Info</code></a> ) para obtener una línea. El siguiente extracto de código usa la subclase 
+                    <code>DataLine.Info</code>  para obtener y abrir una línea de datos destino:
+                </p>
+                <div class="codeblock">
+                    <pre>
+TargetDataLine line;
+DataLine.Info info = new DataLine.Info(TargetDataLine.class, 
+    format); // format es un objeto AudioFormat
+if (!AudioSystem.isLineSupported(info)) {
+    // Maneja el error.
+    }
+    // Obtiene y abre la línea.
+try {
+    line = (TargetDataLine) AudioSystem.getLine(info);
+    line.open(format);
+} catch (LineUnavailableException ex) {
+        // Maneja el error.
+    //... 
+}
+                    </pre>
+                </div>
+                <p>
+                    Este código obtiene un objeto 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/TargetDataLine.html">
+                        <code>TargetDataLine</code></a> sin especificar ningún atributo mas que su clase y su formato de audio. 
+                        Puede usar código análogo para obtener otros tipos de líneas. Para una <code>SourceDataLine</code> o un 
+                    <code>Clip</code>,  simplemente substituya esa clase para <code>TargetDataLine</code> como la clase de la 
+                    variable de la línea, y tambíen en el primer argumento del constructor <code>DataLine.Info</code>.
+                </p>
+                <p>
+                    Para un <code>Port</code>, puede usar instancias estáticas de <code>Port.Info</code>, en código como el 
+                    siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+if (AudioSystem.isLineSupported(Port.Info.MICROPHONE)) {
+    try {
+        line = (Port) AudioSystem.getLine(
+            Port.Info.MICROPHONE);
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Tenga en cuenta que el uso del método <code>isLineSupported</code> para ver si el mezclador incluso tiene una 
+                    línea del tipo deseado.
+                </p>
+                <p>
+                    Recuerde que una línea de origen es una entrada a un mezclador, es decir, un objeto <code>Port</code> si el 
+                    mezclador representa un dispositivo de entrada de audio, y un <code>SourceDataLine</code> o objeto 
+                    <code>Clip</code> si el mezclaor representa un dispositivo de audio de salida. De forma similar, una línea de 
+                    destino es una salida del mezclador: un objeto <code>Port</code> para un mezclador de salida de audio, y un 
+                    objeto <code>TargetDataLine</code> para un mezclador de entrada de audio. ¿Qué pasa si un mezclador no se 
+                    conecta a ningún dispositivo de hardware externo? Por ejemplo, considere un mezclador interno o de solo 
+                    software que obtiene el audio desde un programa de aplicación y envía su audio mezclado de vuelta al programa. 
+                    Esta clase de objetos <code>TargetDataLine</code> para sus líneas de salida.
+                </p>
+                <p>
+                    Puede también usar los siguientes métodos de <code>AudioSystem</code> para aprender más sobre las líneas de 
+                    origen y destino de un tipo específico que son admitidas por un mezclador instalado:
+                </p>
+                <div class="codeblock">
+                    <pre>
+static Line.Info[] getSourceLineInfo(Line.Info info)
+static Line.Info[] getTargetLineInfo(Line.Info info)
+                    </pre>
+                </div>
+                <p>
+                    Tenga en cuenta que la matriz devuelta por cada uno de estos métodos indican tipos únicos de líneas, no 
+                    necesariamente todas las líneas. Por ejemplo, si dos líneas de un mezclador, o dos líneas de diferentes 
+                    mezcladores, tienen objetos <code>Line.Info</code> idénticos, las dos líneas serán representadas por solo una 
+                    <code>Line.Info</code> en la matriz devuelta.
+                </p>
+                <h3>
+                    Obtener una Line (Línea) desde un Mixer (Mezclador)
+                </h3>
+                <p>
+                    La interfaz <code>Mixer</code> incluye variaciones de los métodos de acceso de <code>AudioSystem</code> para 
+                    líneas de origen y destino, descritas arriba. Estos métodos de <code>Mixer</code> incluyen los que toman 
+                    argumentos <code>Line.Info</code>, simplemente como los métodos de <code>AudioSystem</code> hacen. Sin embargo, 
+                    <code>Mixer</code> también incluye estas variantes, que no toman argumentos:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Line.Info[] getSourceLineInfo()
+Line.Info[] getTargetLineInfo()
+                    </pre>
+                </div>
+                <p>
+                    Estos métodos devuelven matrices de todos los objetos <code>Line.Info</code> para la mezcladora particular. Una 
+                    vez que ha obtenido las matrices, puede iterar sobre ellas, llamando al método <code>getLine</code> de 
+                    <code>Mixer</code> para obtener cada línea, seguido por el método <code>open</code> de <code>Line</code> para 
+                    reservar el uso de cada línea para su programa.
+                </p>
+                <h3>
+                    Seleccionar Puertos de Entrada y Salida
+                </h3>
+                <p>
+                    La sección previa, sobre cómo obtener una línea del tipo deseado, se aplica tanto a los puertos como a otros 
+                    tipos de líneas. Puede obtener todos los puertos de origen (p.e., entrada) y destino (p.e., salida) pasando un 
+                    objeto <code>Port.Info</code> a los métodos de <code>AudioSystem</code> (o <code>Mixer</code>) 
+                    <code>getSourceLineInfo</code> y <code>getTargetLineInfo</code> que toman un argumento <code>Line.Info</code>. 
+                    Después itera sobre la matriz de objetos devuelta e invoca al método del Mixer <code>getLine</code> para 
+                    obtener cada puerto.
+                </p>
+                <p>
+                    Puede después abrir cada <code>Port</code> invocando el método <code>open</code> de <code>Line</code>. Abrir un 
+                    puerto significa que lo activa &mdash; es decir, permitir al sonido entrar o salir por el puerto. De forma 
+                    similar, puede cerrar puertos por los que no desea que pase el sonido, porque algunos puertos podrían estar aún 
+                    abiertos antes de que incluso usted los obtenga. Algunas plataformas dejan todos los puertos activados de forma 
+                    predeterminada; o un usuario administrador podría haber seleccionado que ciertos puertos estén activos o no, 
+                    usando otra programa de aplicación o software del sistema operativo.
+                </p>
+                <p>
+                    <strong>Advertencia:</strong> Si quiere seleccionar un cierto puerto y asegurarse de que el sonido en realidad 
+                    entre o salga por el puerto, puede abrir el puerto como se ha descrito. Sin embargo, ¡esto puede ser considerado 
+                    un comportamiento hostil al usuario! Por ejemplo, un usuario podría tener el puerto del altavoz apagado de 
+                    forma que no perturbe a sus compañeros. Ella estaría bastante molesta si su programa de repente anulara sus 
+                    deseos y comenzara a sonar música a todo volumen. Como otro ejemplo, un usuario querría asegurarse de que el 
+                    micrófono de su computadora no está nunca activado sin su conocimiento, para evitar las escuchas a escondidas. 
+                    En general, no se recomienda abrir o cerrar puertos a menos que su programa esté respondiendo a las intenciones 
+                    del usuario, como expresa a través de la interfaz del usuario. En su lugar, respeta las configuraciones que 
+                    el usuario o el sistema operativo ya ha seleccionado.
+                </p>
+                <p>
+                    No es necesario abrir o cerrar un puerto antes de que el mezclador al que está conectado funcione 
+                    correctamente. Por ejemplo, puede iniciar la reproducción de sonido en un mezclador de salida de audio, incluso 
+                    aunque todos sus puertos de salida estén cerrados. Los datos aún fluyen dentro del mezclador; la reproducción 
+                    no se bloquea. El usuario simplemnte no quiere oir nada. Tan pronto como el usuario abre un puerto de salida, 
+                    el sonido será audible a través de ese puerto, comenzando en cualquier punto del medio al que haya llegado la 
+                    reproducción.
+                </p>
+                <p>
+                    También, no necesita acceder a los puertos para aprender si el mezclador tiene ciertos puertos. Para aprender si 
+                    un mezclador es realmente un mezclador de salida de audio, por ejemplo, puede invocar 
+                    <code>getTargetLineInfo</code> paa ver si este tiene puertos de salida. No hay razón para acceder a los puertos 
+                    por si mismos a menos que quiera cambiar sus configuraciones (tales como su estado abierto-o-cerrado, o las 
+                    configuraciones de cualquier control que pudieran tener).
+                </p>
+                <p></p>
+                <h3>
+                    Permiso para Usar Recursos de Audio
+                </h3>
+                <p>
+                    La IPA de Sonido de Java incluye una clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/AudioPermission.html">
+                        <code>AudioPermission</code></a> que indica qué clases de acceso un applet (o una aplicación ejecutándose 
+                        con un gestor de seguridad) pueden tener al sistema de audio muestreado. El permiso para grabar sonido se 
+                        controla separadamente. Este permiso debe ser otorgado con cuidado, para ayudar a prevenir riesgos de 
+                        seguridad tales como las escuchas a escondidas no autorizadas. De forma predeterminada, los applets y 
+                        aplicaciones tienen los permisos otorgados como sigue:
+                </p>
+                <ul>
+                    <li>
+                        Un <em>applet</em> ejecutándose con el gestor de seguridad del applet puede reproducir, pero no grabar, 
+                        audio.
+                    </li>
+                    <li>Una <em>aplicación</em> ejecutándose sin gestor de seguridad puede tanto reproducir como grabar audio.</li>
+                    <li>
+                        Una aplicación ejecutándosse con el gestor de seguridad predeterminado puede reproducir, pero no grabar, 
+                        audio.
+                    </li>
+                </ul>
+                <p>
+                    En general, los applets se ejecutan bajo el escrutinio de un gestor de seguridad y no se les permite grabar 
+                    sonido. Las aplicaciones, por otro lado, no instalan automáticamente un gestor de seguridad, y son capaces de 
+                    grabar sonido. (Sin embargo, si se invoca el gestor de seguridad predeterminado de forma explícita por una 
+                    aplicación, no se le permite a la aplicación grabar sonido).
+                </p>
+                <p>
+                    Tanto los applets como las aplicaciones pueden grabar sonido incluso cuando se ejecutan con un gestor de 
+                    seguridad si se les ha otorgado explícitamente permiso para hacerlo.
+                </p>
+                <p>
+                    Si su programa no tiene permisos para grabar (o reproducir) sonido, se lanzará una excepción cuando intenta 
+                    abrir una línea. No hay nada que puede hacer sobre esto en su programa, mas que capturar la excepción e 
+                    informar del problema al usuario, porque los permisos no se pueden cambiar a través de la IPA. (Si pudieran, 
+                    serían inútiles, ¡porque nada estaría seguro!) Generalmente, los permisos se establecen en uno o más ficheros 
+                    de políticas de configuración, los cuales un usuario o administrador del sistema pueden editar usando un editor 
+                    de texto o el programa de Herramienta de Políticas.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="sampled-overview.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="playing.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Descripción del Paquete Sampled<br />
+            <b>Página siguiente:</b> Reproducción de Audio
+        </div>
+    </body>
+</html> 

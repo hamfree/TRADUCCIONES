@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Leyendo Datos XML en un DOM (Los Tutoriales de Java&trade; &gt; IPA de Java para Procesado de XML (JAXP) &gt; 
+            Modelo de Objetos del Documento)
+        </title>
+        <meta name="description" content="Este tutorial de Java JAXP describe la IPA de Java para el procesado de XML (jaxp), XSLT, 
+              SAX, y tópicos de XML relacionados" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jaxp, xml, xslt, sax" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Modelo de Objetos del Documento</a></div>
+                <div class="linkAHEAD"><a href="when.html">Cuando Usar DOM</a></div>
+                <div class="nolinkAHEAD">Leyendo Datos XML en un DOM</div>
+                <div class="linkAHEAD"><a href="validating.html">Validando con Schema XML</a></div>
+                <div class="linkAHEAD"><a href="info.html">Información Adicional</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> IPA de Java para Procesado de XML (JAXP)<br />
+                <b>Lección:</b> Modelo de Objetos del Documento
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">IPA de Java para Procesado de XML (JAXP)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Modelo de Objetos del Documento</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="when.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="validating.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle"><h1>Leyendo Datos XML en un DOM</h1></div>
+            <div id="PageContent">
+                <p>
+                    En esta sección, construirá un Modelo de Objetos del Documento  leyendo en un fichero XML existente.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> En 
+                    <a class="TutorialLink" target="_top" href="../xslt/index.html">Transformaciones del Lenguaje Extensible de 
+                        Hojas de Estilo (XLST)</a>, verá cómo escribir un DOM como un fichero XML. (También verá cómo convertir un 
+                        fichero de datos existente en un XML con relativa facilidad).
+                </p>
+                <hr />
+                <h2>
+                    <a id="gestu"></a>Crear el Programa
+                </h2>
+                <p>
+                    El Modelo de Objetos del Documento  proporciona IPAs que le permiten crear, modificar, eliminar, y reorganizar 
+                    los nodos. Antes de que intente crear un DOM, es de ayuda entender cómo se estructura un DOM. Esta serie de 
+                    ejemplos harán visibles las interioridades del DOM a través de un programa de ejemplo llamado 
+                    <code>DOMEcho</code>, que encontrará en el directorio 
+                    <code><i>INSTALL_DIR</i>/jaxp-<i>version</i>/samples/dom</code> después de que haya instalado la IPA de JAXP.
+                </p>
+                <h3>
+                    <a id="gestx"></a>Crear el Esqueleto
+                </h3>
+                <p>
+                    Lo primero, construya un programa simple para leer un documento XML en un DOM y después escribirlo de vuelta de 
+                    nuevo.
+                </p>
+                <p>
+                    Empieze con la lógica básica normal de una aplicación, y compruebe para asegurarse de que se ha proporcionado 
+                    un argumento en la línea de comandos:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public class DOMEcho {
+
+    static final String outputEncoding = "UTF-8";
+
+    private static void usage() {
+        // ...
+    }
+
+    public static void main(String[] args) throws Exception {
+        String filename = null;
+    
+        for (int i = 0; i &lt; args.length; i++) {
+            if (...) { 
+                // ...
+            } 
+            else {
+                filename = args[i];
+                if (i != args.length - 1) {
+                    usage();
+                }
+            }
+        }
+
+        if (filename == null) {
+            usage();
+        }
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Este código realiza todas las operaciones básicas de configuración. Toda la salida de <code>DOMEcho</code> usa 
+                    la codificación UTF-8. El método <code>usage()</code> que se llama si no se especifican argumentos simplemente 
+                    le dice qué argumentos espera <code>DOMEcho</code>, así que el código no se muestra aquí. Una cadena 
+                    <code>filename</code> es también declarada, que será el nombre del fichero XML que se analiza en un DOM por 
+                    <code>DOMEcho</code>.
+                </p>
+                <h3>
+                    <a id="gesun"></a>Importar las Clases Requeridas
+                </h3>
+                <p>
+                    En esta sección, todas las clases se nombran individualmente de forma que pueda ver de dónde viene cada clase, 
+                    en el caso de que quiera consultar la documentación de la IPA. En el fichero de ejemplo, las sentencias de 
+                    importación se realizaron con la forma corta, como con <code>javax.xml.parsers.*</code>.
+                </p>
+                <p>
+                    Estas son las IPAs de JAXP usadas por <code>DOMEcho</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+package dom;
+import javax.xml.parsers.DocumentBuilder; 
+import javax.xml.parsers.DocumentBuilderFactory;
+                    </pre>
+                </div>
+                <p>
+                    Estas clases son para las excepciones que pueden ser lanzadas cuando se analiza el documento XML:
+                </p>
+                <div class="codeblock">
+                    <pre>
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException; 
+import org.xml.sax.SAXParseException;
+import org.xml.sax.helpers.*
+                    </pre>
+                </div>
+                <p>
+                    Estas clases leen el fichero de ejemplo XML y gestionan la salida:
+                </p>
+                <div class="codeblock">
+                    <pre>
+import java.io.File;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+                    </pre>
+                </div>
+                <p>
+                    Finalmente, se importan las definiciones W3C para un DOM, las excepciones de DOM, entidades y nodos:
+                </p>
+                <div class="codeblock">
+                    <pre>
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentType;
+import org.w3c.dom.Entity;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+                    </pre>
+                </div>
+                <h3>
+                    <a id="gestm"></a>Manejar Errores
+                </h3>
+                <p>
+                    A continuación, agregue la lógica del manejo de errores. El punto más importante es que un constructor de 
+                    documentos conforme a JAXP requiere informar de las excepciones SAX cuando tenga problemas analizando un 
+                    documento XML. El analizador de DOM, en realidad, no tiene que usar un analizador SAX internamente, pero ya que 
+                    el estándar SAX está aún ahí, tiene sentido usarlo para informar de los errores. Como resultado, el código del 
+                    manejo de errores para aplicaciones DOM es muy similar al de las aplicaciones SAX:
+                </p>
+                <div class="codeblock">
+                    <pre>
+private static class MyErrorHandler implements ErrorHandler {
+     
+    private PrintWriter out;
+
+    MyErrorHandler(PrintWriter out) {
+        this.out = out;
+    }
+
+    private String getParseExceptionInfo(SAXParseException spe) {
+        String systemId = spe.getSystemId();
+        if (systemId == null) {
+            systemId = "null";
+        }
+
+        String info = "URI=" + systemId + " Line=" + spe.getLineNumber() +
+                      ": " + spe.getMessage();
+        return info;
+    }
+
+    public void warning(SAXParseException spe) throws SAXException {
+        out.println("Warning: " + getParseExceptionInfo(spe));
+    }
+        
+    public void error(SAXParseException spe) throws SAXException {
+        String message = "Error: " + getParseExceptionInfo(spe);
+        throw new SAXException(message);
+    }
+
+    public void fatalError(SAXParseException spe) throws SAXException {
+        String message = "Fatal Error: " + getParseExceptionInfo(spe);
+        throw new SAXException(message);
+    }
+}
+
+                    </pre>
+                </div>
+                <p>
+                    Como puede ver, el manejador de errores de la clase <code>DomEcho</code> genera su salida usando instancias 
+                    <code>PrintWriter</code>.
+                </p>
+                <h3>
+                    <a id="geswy"></a>Instanciar la Factoría
+                </h3>
+                <p>
+                    A continuación, agregue el código siguiente al método <code>main()</code>, para obtener una instancia de una 
+                    factoria que puede darnos un constructor de documentos.
+                </p>
+                <div class="codeblock">
+                    <pre>
+public static void main(String[] args) throws Exception {
+    <b>DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();</b>
+
+    // ...
+}
+
+                    </pre>
+                </div>
+                <h3>
+                    <a id="geswm"></a>Obtener un Analizador y Analizar el Fichero
+                </h3>
+                <p>
+                    Ahora, agregue el código siguiente a <code>main()</code> para obtener una instancia de un constructor, y úselo 
+                    para analizar el fichero especificado.
+                </p>
+                <div class="codeblock">
+                    <pre>
+DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+<b>DocumentBuilder db = dbf.newDocumentBuilder(); 
+Document doc = db.parse(new File(filename));</b>
+
+                    </pre>
+                </div>
+                <p>
+                    El fichero que está siendo analizado se proporciona por la variable <code>filename</code> que fue declarada al 
+                    principio del método <code>main()</code>, que se pasa a <code>DOMEcho</code> como un argumento cuando se 
+                    ejecuta el programa.
+                </p>
+                <h3>
+                    <a id="geswk"></a>Configurar la Factoría
+                </h3>
+                <p>
+                    De forma predeterminada, la factoría devuelve un analizador no validante que no sabe nada sobre espacios de 
+                    nombre. Para obtener un analizador que valide, o un que entienda los espacios de nombres (o ambos), puede 
+                    configurar la factoría para establecer una o ambas opciones usando el código siguiente.
+                </p>
+                <div class="codeblock">
+                    <pre>
+public static void main(String[] args) throws Exception {
+
+    String filename = null;
+    boolean dtdValidate = false;
+    boolean xsdValidate = false;
+    String schemaSource = null;
+        
+    for (int i = 0; i &lt; args.length; i++) {
+        if (args[i].equals("-dtd"))  { 
+            dtdValidate = true;
+        } 
+        else if (args[i].equals("-xsd")) {
+            xsdValidate = true;
+        } 
+        else if (args[i].equals("-xsdss")) {
+            if (i == args.length - 1) {
+                usage();
+            }
+            xsdValidate = true;
+            schemaSource = args[++i];
+        }
+        else {
+            filename = args[i];
+            if (i != args.length - 1) {
+                usage();
+            }
+        }
+    }
+
+    if (filename == null) {
+        usage();
+    }
+
+    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+    dbf.setNamespaceAware(true);
+    dbf.setValidating(dtdValidate || xsdValidate);
+
+    // ...
+
+    DocumentBuilder db = dbf.newDocumentBuilder();
+    Document doc = db.parse(new File(filename));
+}
+                    </pre>
+                </div>
+                <p>
+                    Como puede ver, los argumentos de la línea de comandos son configurados de forma que pueda informar a 
+                    <code>DOMEcho</code> a realizar la validación contra un DTD o un Esquema XML, y la factoría se configura para 
+                    reconocer el espacio de nombres y realizar cualquier tipo de validación que especifique el usuario.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> No se requiere que los analizadores compatibles con JAXP admitan todas las combinaciones de 
+                    estas opciones, aunque el analizador de referencia sí lo haga. Si especifica una combinación inválida de 
+                    opciones, la factoría genera una <code>ParserConfigurationException</code> cuando intente obtener una instancia 
+                    del analizador.
+                </p>
+                <hr />
+                <p>
+                    Más información sobre cómo usar los espacios de nombre y la validación se proporciona en 
+                    <a class="TutorialLink" target="_top" href="validating.html">Validando con Schema XML</a>, en el que se 
+                    describirá el código que falta en el extracto anterior.
+                </p>
+                <h3>
+                    <a id="gesxf"></a>Manejar los Errores de Validación
+                </h3>
+                <p>
+                    La respuesta predeterminada a un error de validación, como dicta el estándar SAX, es no hacer nada. El estándar 
+                    JAXP requiere que se lanzen excepciones SAX, de forma que usa exactamente los mismos mecanismos de manejo de 
+                    errores que usa para una aplicación SAX. En particular, usa el método <code>setErrorHandler</code> de la 
+                    clase <code>DocumentBuilder</code> para proporcionarle un objeto que implemente la interfaz 
+                    <code>ErrorHandler</code> de SAX.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> <code>DocumentBuilder</code> también tiene un método <code>setEntityResolver</code> que 
+                    puede usar.
+                </p>
+                <hr />
+                <p>
+                    El código siguiente configura el constructor de documento para que use el manejador de errores definido en 
+                    <a class="TutorialLink" target="_top" href="readingXML.html#gestm">Manejar Errores</a>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+DocumentBuilder db = dbf.newDocumentBuilder();
+OutputStreamWriter errorWriter = new OutputStreamWriter(System.err,
+                                         outputEncoding);
+db.setErrorHandler(new MyErrorHandler (new PrintWriter(errorWriter, true)));
+Document doc = db.parse(new File(filename));
+                    </pre>
+                </div>
+                <p>
+                    El código que ha visto hasta ahora ha configurado el constructor de documento, y lo ha configurado para que 
+                    realize la validación a pedido. El manejo de errores también está en su lugar. Sin embargo, <code>DOMEcho</code> 
+                    no hace nada todavía. En la siguiente sección, verá como visualizar la estructura de DOM y empezar a 
+                    explorarla. Por ejemplo, verá qué cómo se ven las referencias de entidades y las secciones CDATA en el DOM. Y 
+                    quizás lo más importante, verá cómo los nodos de texto (que contienen los datos reales) residen bajo los nodos 
+                    de elemento en un DOM.
+                </p>
+                <h2>
+                    <a id="gesxh"></a>Mostrar los Nodos DOM
+                </h2>
+                <p>
+                    Para crear o manipular un DOM, ayuda el tener una idea clara de cómo se estructuran los nodos en un DOM. Esta 
+                    sección del tutorial expone la estructura interna de un DOM, de forma que pueda ver qué contiene. El ejemplo 
+                    <code>DOMEcho</code> hace esto reflejando los nodos de DOM, y después visualizándolos en pantalla, con la 
+                    indentación apropiada para hacer aparente la jerarquía de nodos. La especificación de estos tipos de nodos se 
+                    puede encontrar en la 
+                    <a class="OutsideLink" target="_blank" href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113">
+                        Especificación Básica Nivel 2 del DOM</a>, bajo la especificación para <code>Nodo</code>. La 
+                    <a href="#gfzpy">Tabla&nbsp;3-1</a> de abajo está adaptada de esa especificación.
+                </p>
+                <p>
+                    <a id="gfzpy"></a>Tabla&nbsp;3-1 Tipos de Nodos
+                </p>
+                <table>
+                    <col style="width:25%" />
+                    <col style="width:25%" />
+                    <col style="width:25%" />
+                    <col style="width:25%" />
+                    <tr>
+                        <th id="h1" style="text-align:left;vertical-align:top" scope="col">
+                            <p>Nodo</p>
+                        </th>
+                        <th id="h2" style="text-align:left;vertical-align:top" scope="col">
+                            <p>Nombre del Nodo</p>
+                        </th>
+                        <th id="h3" style="text-align:left;vertical-align:top" scope="col">
+                            <p>Valor del Nodo</p>
+                        </th>
+                        <th id="h4" style="text-align:left;vertical-align:top" scope="col">
+                            <p>Atributos</p>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="text-align:left;vertical-align:top">
+                            <p><code>Attr</code></p>
+                        </td>
+                        <td headers="h2" style="text-align:left;vertical-align:top">
+                            <p>Nombre del atributo</p>
+                        </td>
+                        <td headers="h3" style="text-align:left;vertical-align:top">
+                            <p>Valor del atributo</p>
+                        </td>
+                        <td headers="h4" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="text-align:left;vertical-align:top">
+                            <p><code>CDATASection</code></p>
+                        </td>
+                        <td headers="h2" style="text-align:left;vertical-align:top">
+                            <p><code>#cdata-section</code></p>
+                        </td>
+                        <td headers="h3" style="text-align:left;vertical-align:top">
+                            <p>Contenido de la sección CDATA</p>
+                        </td>
+                        <td headers="h4" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="text-align:left;vertical-align:top">
+                            <p><code>Comment</code></p>
+                        </td>
+                        <td headers="h2" style="text-align:left;vertical-align:top">
+                            <p><code>#comment</code></p>
+                        </td>
+                        <td headers="h3" style="text-align:left;vertical-align:top">
+                            <p>Contenido del comentario</p>
+                        </td>
+                        <td headers="h4" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="text-align:left;vertical-align:top">
+                            <p><code>Document</code></p>
+                        </td>
+                        <td headers="h2" style="text-align:left;vertical-align:top">
+                            <p><code>#document</code></p>
+                        </td>
+                        <td headers="h3" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                        <td headers="h4" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="text-align:left;vertical-align:top">
+                            <p><code>DocumentFragment</code></p>
+                        </td>
+                        <td headers="h2" style="text-align:left;vertical-align:top">
+                            <p><code>#documentFragment</code></p>
+                        </td>
+                        <td headers="h3" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                        <td headers="h4" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="text-align:left;vertical-align:top">
+                            <p><code>DocumentType</code></p>
+                        </td>
+                        <td headers="h2" style="text-align:left;vertical-align:top">
+                            <p>Nombre del Tipo de Documento</p>
+                        </td>
+                        <td headers="h3" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                        <td headers="h4" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="text-align:left;vertical-align:top">
+                            <p><code>Element</code></p>
+                        </td>
+                        <td headers="h2" style="text-align:left;vertical-align:top">
+                            <p>Nombre de la etiqueta</p>
+                        </td>
+                        <td headers="h3" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                        <td headers="h4" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="text-align:left;vertical-align:top">
+                            <p><code>Entity</code></p>
+                        </td>
+                        <td headers="h2" style="text-align:left;vertical-align:top">
+                            <p>Nombre de la entidad</p>
+                        </td>
+                        <td headers="h3" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                        <td headers="h4" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="text-align:left;vertical-align:top">
+                            <p><code>EntityReference</code></p>
+                        </td>
+                        <td headers="h2" style="text-align:left;vertical-align:top">
+                            <p>Nombre de la entidad referenciada</p>
+                        </td>
+                        <td headers="h3" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                        <td headers="h4" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="text-align:left;vertical-align:top">
+                            <p><code>Notation</code></p>
+                        </td>
+                        <td headers="h2" style="text-align:left;vertical-align:top">
+                            <p>Nombre de la notación</p>
+                        </td>
+                        <td headers="h3" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                        <td headers="h4" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="text-align:left;vertical-align:top">
+                            <p><code>ProcessingInstruction</code></p>
+                        </td>
+                        <td headers="h2" style="text-align:left;vertical-align:top">
+                            <p>Objetivo</p>
+                        </td>
+                        <td headers="h3" style="text-align:left;vertical-align:top">
+                            <p>Contenido entero excluyendo el objetivo</p>
+                        </td>
+                        <td headers="h4" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" style="text-align:left;vertical-align:top">
+                            <p><code>Text</code></p>
+                        </td>
+                        <td headers="h2" style="text-align:left;vertical-align:top">
+                            <p><code>#text</code></p>
+                        </td>
+                        <td headers="h3" style="text-align:left;vertical-align:top">
+                            <p>Contenido del nodo de texto</p>
+                        </td>
+                        <td headers="h4" style="text-align:left;vertical-align:top">
+                            <p>nulo</p>
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    La información en esta tabla es extremadamente útil; la necesitará cuando trabaje con un DOM, porque todos 
+                    estos tipos están mezclados en un árbol de DOM.
+                </p>
+                <h3>
+                    <a id="gfzqh"></a>Obtener la Información del Tipo de Nodo
+                </h3>
+                <p>
+                    La información de tipo de elemento de nodo DOM se obtiene llamando a varios métodos de la clase 
+                    <code>org.w3c.dom.Node</code>. Los atributos de nodo expuestos por <code>DOMEcho</code> son reflejados por el 
+                    código siguiente.
+                </p>
+                <div class="codeblock">
+                    <pre>
+private void printlnCommon(Node n) {
+    out.print(" nodeName=\"" + n.getNodeName() + "\"");
+
+    String val = n.getNamespaceURI();
+    if (val != null) {
+        out.print(" uri=\"" + val + "\"");
+    }
+
+    val = n.getPrefix();
+
+    if (val != null) {
+        out.print(" pre=\"" + val + "\"");
+    }
+
+    val = n.getLocalName();
+    if (val != null) {
+        out.print(" local=\"" + val + "\"");
+    }
+
+    val = n.getNodeValue();
+    if (val != null) {
+        out.print(" nodeValue=");
+        if (val.trim().equals("")) {
+            // Whitespace
+            out.print("[WS]");
+        }
+        else {
+            out.print("\"" + n.getNodeValue() + "\"");
+        }
+    }
+    out.println();
+}
+                    </pre>
+                </div>
+                <p>
+                    Cada nodo DOM tiene al menos un tipo, un nombre, y un valor, el cual podría estar o no vacío. En el ejemplo de 
+                    arriba, los métodos <code>getNamespaceURI()</code>, <code>getPrefix()</code>, <code>getLocalName()</code>, y 
+                    <code>getNodeValue()</code> de la interfaz <code>Node</code> devuelven e imprimen la URI del espacio de nombres, 
+                    el prefijo del espacio de nombres, el nombre local cualificado y el valor del nodo reflejado. Dese cuenta que 
+                    el método <code>trim()</code> se llama sobre el valor devuelto por <code>getNodeValue()</code> para establecer 
+                    si el valor del nodo es un espacio en blanco vacío e imprimir un mensaje según proceda.
+                </p>
+                <p>
+                    Para la lista completa de los métodos de <code>Node</code> y la diferente información que devuelve, vea la 
+                    documentación de la IPA para 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Node.html"><code>Node</code></a>.
+                </p>
+                <p>
+                    A continuación, se define un método para establecer la indentación de los nodos cuando se impriman, de forma 
+                    que la jerarquía de nodos sea fácilmente visible.
+                </p>
+                <div class="codeblock">
+                    <pre>
+private void outputIndentation() {
+    for (int i = 0; i &lt; indent; i++) {
+        out.print(basicIndent);
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    La constante <code>basicIndent</code> para definir la unidad básica de indentación usada cuando 
+                    <code>DOMEcho</code> visualiza la jerarquía del árbol de nodos, se define agregando las siguientes líneas 
+                    remarcadas a la clase de constructor de <code>DOMEcho</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+public class DOMEcho {
+    static final String outputEncoding = "UTF-8";
+
+    <b>private PrintWriter out;</b>
+    <b>private int indent = 0;</b>
+    <b>private final String basicIndent = " ";</b>
+
+    DOMEcho(PrintWriter out) {
+        this.out = out;
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Como fue el caso con el manejador de errores definido en 
+                    <a class="TutorialLink" target="_top" href="readingXML.html#gestm">Manejar Errores</a>, el programa 
+                    <code>DOMEcho</code> creará su salida como instancias <code>PrintWriter</code>.
+                </p>
+                <h3>
+                    <a id="ggdwv"></a>Controles Léxicos
+                </h3>
+                <p>
+                    La información léxica es la información que necesita para reconstruir la sintaxis original de un documento XML. 
+                    Preservar la información léxica es importante en aplicaciones de edición, donde quiere salvar un documento que 
+                    sea un reflejo exacto del original completo con comentarios, referencias de entidades, y cualquier sección 
+                    CDATA que pueda haber incluído al principio.
+                </p>
+                <p>
+                    La mayoría de las aplicaciones, sin embargo, sólo están preocupadas con los contenidos de las estructuras XML. 
+                    Pueden permitirse ignorar los comentarios y no les importa si los datos se codificaron en una sección CDATA o 
+                    como texto sin formato, o si incluían una referencia de entidad. Para tales aplicaciones, es deseable un mínimo 
+                    de información léxica, porque simplifica el número y tipos de nodos DOM que la aplicación debe estar preparada 
+                    para examinar.
+                </p>
+                <p>
+                    Los métodos siguientes de <code>DocumentBuilderFactory</code> le dan el control sobre la información léxica que 
+                    ve en el DOM.
+                </p>
+                <dl>
+                    <dt><code>setCoalescing()</code></dt>
+                    <dd>
+                        <p>
+                            Para convertir nodos <code>CDATA</code> en nodos <code>Text</code> y agregarlos a un nodo 
+                            <code>Text</code> adyacente (si lo hay).
+                        </p>
+                    </dd>
+                    <dt><code>setExpandEntityReferences()</code></dt>
+                    <dd>
+                        <p>
+                            Para expandir los nodos de referencia a entidad.
+                        </p>
+                    </dd>
+                    <dt><code>setIgnoringComments()</code></dt>
+                    <dd>
+                        <p>
+                            Para ignorar los comentarios.
+                        </p>
+                    </dd>
+                    <dt><code>setIgnoringElementContentWhitespace()</code></dt>
+                    <dd>
+                        <p>
+                            Para ignorar los espacios en blanco que no son una parte significante del contenido de un elemento.
+                        </p>
+                    </dd>
+                </dl>
+                <p>
+                    Loa valores predeterminados para todas estas propiedades es falso, lo que preserva toda la información léxica 
+                    necesaria para reconstruir el documento entrante en su forma original. Establecerlos a verdadero le permite 
+                    construir el DOM más simple posible de forma que la aplicación pueda enfocarse en el contenido semántico de los 
+                    datos sin tenerse que preocuparse por los detalles de sintaxis léxica. La <a href="#ggdxy">Tabla&nbsp;3-2</a> 
+                    resume los efectos de las configuraciones.
+                </p>
+                <p>
+                    <a id="ggdxy"></a>Tabla&nbsp;3-2 Configuraciones de Control Léxico
+                </p>
+                <table>
+                    <col style="width:33%" />
+                    <col style="width:33%" />
+                    <col style="width:33%" />
+                    <tr>
+                        <th id="h101" style="text-align:left;vertical-align:top" scope="col">
+                            <p>IPA</p>
+                        </th>
+                        <th id="h102" style="text-align:left;vertical-align:top" scope="col">
+                            <p>Preservan la Información Léxica</p>
+                        </th>
+                        <th id="h103" style="text-align:left;vertical-align:top" scope="col">
+                            <p>Centrado en el Contenido</p>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td headers="h101" style="text-align:left;vertical-align:top">
+                            <p><code>setCoalescing()</code></p>
+                        </td>
+                        <td headers="h102" style="text-align:left;vertical-align:top">
+                            <p>Falso</p>
+                        </td>
+                        <td headers="h103" style="text-align:left;vertical-align:top">
+                            <p>Verdadero</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" style="text-align:left;vertical-align:top">
+                            <p><code>setExpandEntityReferences()</code></p>
+                        </td>
+                        <td headers="h102" style="text-align:left;vertical-align:top">
+                            <p>Falso</p>
+                        </td>
+                        <td headers="h103" style="text-align:left;vertical-align:top">
+                            <p>Verdadero</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" style="text-align:left;vertical-align:top">
+                            <p><code>setIgnoringComments()</code></p>
+                        </td>
+                        <td headers="h102" style="text-align:left;vertical-align:top">
+                            <p>Falso</p>
+                        </td>
+                        <td headers="h103" style="text-align:left;vertical-align:top">
+                            <p>Verdadero</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h101" style="text-align:left;vertical-align:top">
+                            <p><code>setIgnoringElementContent</code><code>Whitespace()</code></p>
+                        </td>
+                        <td headers="h102" style="text-align:left;vertical-align:top">
+                            <p>Falso</p>
+                        </td>
+                        <td headers="h103" style="text-align:left;vertical-align:top">
+                            <p>Verdadero</p>
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    La implementación de estos métodos en el método main del ejemplo <code>DomEcho</code> se muestra debajo.
+                </p>
+                <div class="codeblock">
+                    <pre>
+// ...
+
+dbf.setIgnoringComments(ignoreComments);
+dbf.setIgnoringElementContentWhitespace(ignoreWhitespace);
+dbf.setCoalescing(putCDATAIntoText);
+dbf.setExpandEntityReferences(!createEntityRefs);
+
+// ...
+                    </pre>
+                </div>
+                <p>
+                    Las variables booleanas <code>ignoreComments</code>, <code>ignoreWhitespace</code>, 
+                    <code>putCDATAIntoText</code>, y <code>createEntityRefs</code> se declaran al principio del código del método 
+                    main, y son establecidas por argumentos de línea de comandos cuando se ejecuta <code>DomEcho</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+public static void main(String[] args) throws Exception {
+    // ...
+
+    boolean ignoreWhitespace = false;
+    boolean ignoreComments = false;
+    boolean putCDATAIntoText = false;
+    boolean createEntityRefs = false;
+
+    for (int i = 0; i &lt; args.length; i++) {
+        if (...) {  // Validation arguments here
+           // ... 
+        } 
+        else if (args[i].equals("-ws")) {
+            ignoreWhitespace = true;
+        } 
+        else if (args[i].startsWith("-co")) {
+            ignoreComments = true;
+        }
+        else if (args[i].startsWith("-cd")) {
+            putCDATAIntoText = true;
+        } 
+        else if (args[i].startsWith("-e")) {
+            createEntityRefs = true;
+
+            // ...
+        } 
+        else {
+            filename = args[i];
+
+            // Must be last arg
+            if (i != args.length - 1) {
+                usage();
+            }
+        }
+    }
+
+    // ...
+}
+
+                    </pre>
+                </div>
+                <p>
+                    <a id="ggawi"></a>
+                </p>
+                <h2>
+                    Imprimir el Árbol de Nodos del DOM
+                </h2>
+                <p>
+                    La aplicación <code>DomEcho</code> le permite ver la estructura de un DOM, y demuestra qué nodos construyen el 
+                    DOM y cómo están organizados. Generalmente, la gran mayoría de nodos en un árbol DOM serán nodos de 
+                    <code>Element</code> y <code>Text</code>.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> Los nodos de texto existen <b>bajo</b> los nodos de elemento en un DOM, y los datos son 
+                    siempre almacenados en nodos de texto. Quizás el error más común en el procesado de DOM es navegar a un nodo 
+                    elemento y esperar que contenga los datos que se almacenan en ese elemento. ¡No es así! Incluso el nodo de 
+                    elemento más simple tiene un nodo de texto bajo este que contiene los datos.
+                </p>
+                <hr />
+                <p>
+                    El código para imprimir los nodos del árbol DOM con la indentación apropiada se muestra debajo.
+                </p>
+                <div class="codeblock">
+                    <pre>
+private void echo(Node n) {
+    outputIndentation();
+    int type = n.getNodeType();
+
+    switch (type) {
+        case Node.ATTRIBUTE_NODE:
+            out.print("ATTR:");
+            printlnCommon(n);
+            break;
+
+        case Node.CDATA_SECTION_NODE:
+            out.print("CDATA:");
+            printlnCommon(n);
+            break;
+
+        case Node.COMMENT_NODE:
+            out.print("COMM:");
+            printlnCommon(n);
+            break;
+
+        case Node.DOCUMENT_FRAGMENT_NODE:
+            out.print("DOC_FRAG:");
+            printlnCommon(n);
+            break;
+
+        case Node.DOCUMENT_NODE:
+            out.print("DOC:");
+            printlnCommon(n);
+            break;
+
+        case Node.DOCUMENT_TYPE_NODE:
+            out.print("DOC_TYPE:");
+            printlnCommon(n);
+            NamedNodeMap nodeMap = ((DocumentType)n).getEntities();
+            indent += 2;
+            for (int i = 0; i &lt; nodeMap.getLength(); i++) {
+                Entity entity = (Entity)nodeMap.item(i);
+                echo(entity);
+            }
+            indent -= 2;
+            break;
+
+        case Node.ELEMENT_NODE:
+            out.print("ELEM:");
+            printlnCommon(n);
+
+            NamedNodeMap atts = n.getAttributes();
+            indent += 2;
+            for (int i = 0; i &lt; atts.getLength(); i++) {
+                Node att = atts.item(i);
+                echo(att);
+            }
+            indent -= 2;
+            break;
+
+        case Node.ENTITY_NODE:
+            out.print("ENT:");
+            printlnCommon(n);
+            break;
+
+        case Node.ENTITY_REFERENCE_NODE:
+            out.print("ENT_REF:");
+            printlnCommon(n);
+            break;
+
+        case Node.NOTATION_NODE:
+            out.print("NOTATION:");
+            printlnCommon(n);
+            break;
+
+        case Node.PROCESSING_INSTRUCTION_NODE:
+            out.print("PROC_INST:");
+            printlnCommon(n);
+            break;
+
+        case Node.TEXT_NODE:
+            out.print("TEXT:");
+            printlnCommon(n);
+            break;
+
+        default:
+            out.print("UNSUPPORTED NODE: " + type);
+            printlnCommon(n);
+            break;
+    }
+
+    indent++;
+    for (Node child = n.getFirstChild(); child != null;
+         child = child.getNextSibling()) {
+        echo(child);
+    }
+    indent--;
+}
+                    </pre>
+                </div>
+                <p>
+                    Este código primero usa sentencias switch para imprimir los diferentes tipos de nodos y cualquier nodo hijo 
+                    posible, con la indentación apropiada.
+                </p>
+                <p>
+                    Los atributos del nodo no se incluyen como hijos en la jerarquía DOM. Se obtienen en cambio a través del método 
+                    <code>getAttributes</code> de la interfaz <code>Node</code>.
+                </p>
+                <p>
+                    La interfaz <code>DocType</code> es una extensión de <code>w3c.org.dom.Node</code>. Define el método 
+                    <code>getEntities</code>, que usa para obtener los nodos <code>Entity</code> &mdash; los nodos que definen las 
+                    entidades. Como los nodos <code>Attribute</code>, los nodos <code>Entity</code> no aparecen como hijos de nodos 
+                    DOM.
+                </p>
+                <p>
+                    <a id="ggdyc"></a>
+                </p>
+                <h2>
+                    Operaciones con Nodos
+                </h2>
+                <p>
+                    Esta sección echa un vistazo rápido a algunas de las operaciones que quizás desee aplicar a un DOM.
+                </p>
+                <ul>
+                    <li>
+                        <p>Crear nodos</p>
+                    </li>
+                    <li>
+                        <p>Recorrer nodos</p>
+                    </li>
+                    <li>
+                        <p>Buscar nodos</p>
+                    </li>
+                    <li>
+                        <p>Obtener el contenido de un nodo</p>
+                    </li>
+                    <li>
+                        <p>Crear atributos</p>
+                    </li>
+                    <li>
+                        <p>Eliminar y cambiar nodos</p>
+                    </li>
+                    <li>
+                        <p>Insertar nodos</p>
+                    </li>
+                </ul>
+                <p>
+                    <a id="ggdyj"></a>
+                </p>
+                <h3>
+                    Crear Nodos
+                </h3>
+                <p>
+                    Puede crear diferentes tipos de nodos usando los métodos de la interfaz <code>Document</code>. Por ejemplo, 
+                    <code>createElement</code>, <code>createComment</code>, <code>createCDATAsection</code>,
+                    <code>createTextNode</code>, etcétera. La lista completa de métodos para crear diferentes nodos se proporciona 
+                    en la documentación de la IPA para 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/org/w3c/dom/Document.html">
+                        <code>org.w3c.dom.Document</code></a>.
+                </p>
+                <p>
+                    <a id="ggdvz"></a>
+                </p>
+                <h3>
+                    Recorrer Nodos
+                </h3>
+                <p>
+                    La interfaz <code>org.w3c.dom.Node</code> define un número de métodos que puede usar para recorrer nodos, 
+                    incluyendo <code>getFirstChild</code>, <code>getLastChild</code>, <code>getNextSibling</code>,
+                    <code>getPreviousSibling</code>, y <code>getParentNode</code>. Esas operaciones son suficientes para ir de 
+                    cualquier parte en el árbol a cualquier otra ubicación en el árbol.
+                </p>
+                <p>
+                    <a id="ggdwa"></a>
+                </p>
+                <h3>
+                    Buscar Nodos
+                </h3>
+                <p>
+                    Cuando está buscando un nodo con un nombre particular, hay un poco más a tener en cuenta. Aunque es tentador 
+                    obtener el primer hijo e inspeccionarlo para ver si es el correcto, la búsqueda debe tener en cuenta el hecho 
+                    de que el primer hijo de la sublista podría ser un comentario o una instrucción de procesamiento. Si los datos 
+                    XML no han sido validados, podría incluso ser un nodo de texto conteniendo espacio en blanco a ignorar.
+                </p>
+                <p>
+                    En esencia, necesita buscar a través de la lista de nodos hijo, ignorando aquellos que no le preocupan y 
+                    examinando los que le interesan. Aquí tiene un ejemplo de la clase de rutina que necesita escribir cuando 
+                    busca nodos en una jerarquía DOM. Se presenta aquí por completo (completo con comentarios) para que pueda 
+                    usarla como una plantilla en sus aplicaciones.
+                </p>
+                <div class="codeblock">
+                    <pre>
+/**
+ * Find the named subnode in a node's sublist.
+ * &lt;ul>
+ * &lt;li>Ignores comments and processing instructions.
+ * &lt;li>Ignores TEXT nodes (likely to exist and contain
+ *         ignorable whitespace, if not validating.
+ * &lt;li>Ignores CDATA nodes and EntityRef nodes.
+ * &lt;li>Examines element nodes to find one with
+ *        the specified name.
+ * &lt;/ul>
+ * @param name  the tag name for the element to find
+ * @param node  the element node to start searching from
+ * @return the Node found
+ */
+public Node findSubNode(String name, Node node) {
+    if (node.getNodeType() != Node.ELEMENT_NODE) {
+        System.err.println("Error: Search node not of element type");
+        System.exit(22);
+    }
+
+    if (! node.hasChildNodes()) return null;
+
+    NodeList list = node.getChildNodes();
+    for (int i=0; i &lt; list.getLength(); i++) {
+        Node subnode = list.item(i);
+        if (subnode.getNodeType() == Node.ELEMENT_NODE) {
+           if (subnode.getNodeName().equals(name)) 
+               return subnode;
+        }
+    }
+    return null;
+}
+                    </pre>
+                </div>
+                <p>
+                    Para una explicación más en profundidad de este código, vea 
+                    <a class="TutorialLink" target="_top" href="when.html#gchls">Incrementar la Complejidad</a> en 
+                    <a class="TutorialLink" target="_top" href="when.html">Cuando Usar DOM</a>. Tenga en cuenta también que puede 
+                    utilizar las IPAs descritas en 
+                    <a class="TutorialLink" target="_top" href="readingXML.html#ggdwv">Controles Léxicos</a> para modificar la 
+                    clase de DOM que el analizador construye. Sin embargo, lo bueno de este código es que funcionará para casi 
+                    cualquier DOM.
+                </p>
+                <p>
+                    <a id="ggdxv"></a>
+                </p>
+                <h3>
+                    Obtener el Contenido de un Nodo
+                </h3>
+                <p>
+                    Cuando quiere obtener el texto que un nodo contiene, de nuevo necesita mirar a través de la lista de nodos hijo, 
+                    ignorando entradas que no le interesan y acumulando el texto que encuentre en los nodos <code>TEXT</code>, 
+                    nodos <code>CDATA</code>. y nodos <code>EntityRef</code>. Aquí tiene un ejemplo de la clase de rutina que puede 
+                    uar para ese proceso.
+                </p>
+                <div class="codeblock">
+                    <pre>
+/**
+  * Return the text that a node contains. This routine:
+  * &lt;ul>
+  * &lt;li>Ignores comments and processing instructions.
+  * &lt;li>Concatenates TEXT nodes, CDATA nodes, and the results of
+  *     recursively processing EntityRef nodes.
+  * &lt;li>Ignores any element nodes in the sublist.
+  *     (Other possible options are to recurse into element 
+  *      sublists or throw an exception.)
+  * &lt;/ul>
+  * @param    node  a  DOM node
+  * @return   a String representing its contents
+  */
+public String getText(Node node) {
+    StringBuffer result = new StringBuffer();
+    if (! node.hasChildNodes()) return "";
+
+    NodeList list = node.getChildNodes();
+    for (int i=0; i &lt; list.getLength(); i++) {
+        Node subnode = list.item(i);
+        if (subnode.getNodeType() == Node.TEXT_NODE) {
+            result.append(subnode.getNodeValue());
+        }
+        else if (subnode.getNodeType() == Node.CDATA_SECTION_NODE) {
+            result.append(subnode.getNodeValue());
+        }
+        else if (subnode.getNodeType() == Node.ENTITY_REFERENCE_NODE) {
+            // Recurse into the subtree for text
+            // (and ignore comments)
+            result.append(getText(subnode));
+        }
+    }
+
+    return result.toString();
+}
+                    </pre>
+                </div>
+                <p>
+                    
+                    Para una explicación más en profundidad de este código, vea 
+                    <a class="TutorialLink" target="_top" href="when.html#gchls">Incrementar la Complejidad</a> en
+                    <a class="TutorialLink" target="_top" href="when.html">Cuando Usar DOM</a>. De nuevo, puede simplificar este 
+                    código usando las IPAs descritas en 
+                    <a class="TutorialLink" target="_top" href="readingXML.html#ggdwv">Controles Léxicos</a> para modificar la 
+                    clase de DOM que el analizador construye. Sin embargo, lo bueno de este código es que funcionará para casi 
+                    cualquier DOM.
+                </p>
+                <p>
+                    <a id="ggdxn"></a>
+                </p>
+                <h3>
+                    Crear Atributos
+                </h3>
+                <p>
+                    La interfaz <code>org.w3c.dom.Element</code>, que extiende a Node, define una operación 
+                    <code>setAttribute</code>, que agrega un atributo a ese nodo. (Un nombre mejor desde el punto de vista de la 
+                    plataforma Java habría sido <code>addAttribute</code>. El atributo no es una propiedad de la clase, y se crea 
+                    un nuevo objeto). Puede usar también la operación <code>createAttribute</code> de <code>Document</code> para 
+                    crear una instancia de <code>Attribute</code> y después usar el método <code>setAttributeNode</code> para 
+                    agregarlo.
+                </p>
+                <p>
+                    <a id="ggdyw"></a>
+                </p>
+                <h3>
+                    Eliminar y Cambiar Nodos
+                </h3>
+                <p>
+                    Para eliminar un nodo, use el método <code>removeChild</code> de su nodo padre. Para cambiarlo, puede usar o la 
+                    operación <code>replaceChild</code> del nodo padre o la operación <code>setNodeValue</code> del nodo.
+                </p>
+                <p>
+                    <a id="ggdxt"></a>
+                </p>
+                <h3>
+                    Insertar Nodos
+                </h3>
+                <p>
+                    El punto importante a recordar cuando crea nuevos nodos es que cuando crear un nodo de elemento, el único dato 
+                    que especifica es un nombre. En efecto, ese nodo le da un gancho para colgar cosas. Usted cuelga un elemento 
+                    en el gancho agregandolo a su lista de nodos hijos. Por ejemplo, podría agregar un nodo de texto, un nodo 
+                    <code>CDATA</code>, o un nodo de atributo. Mientras construye, tenga en mente la estructura que ha visto en 
+                    este tutorial. Recuerde: Cada nodo en la jerarquía es extremadamente simple, conteniendo sólo un elemento de 
+                    datos.
+                </p>
+                <p>
+                    <a id="ggegf"></a>
+                </p>
+                <h2>
+                    Ejecutar el Ejemplo <code>DOMEcho</code>
+                </h2>
+                <p>
+                    Para ejecutar el ejemplo <code>DOMEcho</code>, siga los pasos de abajo.
+                </p>
+                <ol>
+                    <li>
+                        <b>Navegue al directorio <code>samples</code>.</b><code>% cd <i>install-dir</i>
+                            <code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.</code>
+                    </li>
+                    <li>
+                        <b>Compile las clases del ejemplo.</b><code>% javac dom/*</code>
+                    </li>
+                    <li>
+                        <b>Ejecute el programa <code>DOMEcho</code> sobre un fichero XML.</b>
+                        <p>
+                            Elija uno de los ficheros XML en el directorio <code>data</code> y ejecute el programa 
+                            <code>DOMEcho</code> con él. Aquí, hemos elegido ejecutar el programa con el fichero 
+                            <code>personal-schema.xml</code>.
+                        </p>
+                        <code>% java dom/DOMEcho data/personal-schema.xml</code>
+                        <p>
+                            El fichero XML <code>personal-schema.xml</code> contiene los ficheros de personal para una compañía 
+                            pequeña. Cuando ejecuta el programa <code>DOMEcho</code> en él, debe ver la salida siguiente.
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+DOC: nodeName="#document"
+ ELEM: nodeName="personnel" 
+       local="personnel"
+ TEXT: nodeName="#text" 
+       nodeValue=[WS]
+ ELEM: nodeName="person" 
+       local="person"
+ ATTR: nodeName="id" 
+       local="id" 
+       nodeValue="Big.Boss"
+ TEXT: nodeName="#text" 
+       nodeValue=[WS]
+ ELEM: nodeName="name" 
+       local="name"
+ ELEM: nodeName="family" 
+       local="family"
+ TEXT: nodeName="#text" 
+       nodeValue="Boss"
+ TEXT: nodeName="#text" 
+       nodeValue=[WS]
+ ELEM: nodeName="given" 
+       local="given"
+ TEXT: nodeName="#text" 
+       nodeValue="Big"
+ TEXT: nodeName="#text" 
+       nodeValue=[WS]
+ ELEM: nodeName="email" 
+       local="email"
+ TEXT: nodeName="#text" 
+       nodeValue="chief@foo.example.com"
+ TEXT: nodeName="#text" 
+       nodeValue=[WS]
+ ELEM: nodeName="link" 
+       local="link"
+ ATTR: nodeName="subordinates" 
+       local="subordinates" 
+       nodeValue="one.worker two.worker 
+                  three.worker four.worker
+                  five.worker"
+ TEXT: nodeName="#text" 
+       nodeValue=[WS]
+ TEXT: nodeName="#text" 
+       nodeValue=[WS]
+ ELEM: nodeName="person" 
+       local="person"
+ ATTR: nodeName="id" 
+       local="id" 
+       nodeValue="one.worker"
+ TEXT: nodeName="#text" 
+       nodeValue=[WS]
+ ELEM: nodeName="name" 
+       local="name"
+ ELEM: nodeName="family" 
+       local="family"
+ TEXT: nodeName="#text" 
+       nodeValue="Worker"
+ TEXT: nodeName="#text" 
+       nodeValue=[WS]
+ ELEM: nodeName="given" 
+       local="given"
+ TEXT: nodeName="#text" 
+       nodeValue="One"
+ TEXT: nodeName="#text" 
+       nodeValue=[WS]
+ ELEM: nodeName="email" 
+       local="email"
+ TEXT: nodeName="#text" 
+       nodeValue="one@foo.example.com"
+ TEXT: nodeName="#text" 
+       nodeValue=[WS]
+ ELEM: nodeName="link" 
+       local="link"
+ ATTR: nodeName="manager" 
+       local="manager" 
+       nodeValue="Big.Boss"
+ TEXT: nodeName="#text"
+       nodeValue=[WS]
+
+[...]
+
+                            </pre>
+                        </div>
+                        <p>
+                            Como puede ver, <code>DOMEcho</code> imprime todos los nodos para los diferentes elementos en el 
+                            documento, con la indentación correct para mostrar la jerarquía de nodos.
+                        </p>
+                    </li>
+                </ol>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="when.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="validating.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Cuando Usar DOM<br />
+            <b>Página siguiente:</b> Validando con Schema XML
+        </div>
+    </body>
+</html> 

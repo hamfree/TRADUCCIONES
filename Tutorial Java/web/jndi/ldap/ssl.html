@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            SSL y Sockets Personalizados (Los Tutoriales de Java&trade; &gt; Nombrado en Java e Interfaz de Directorio &gt;
+            Temas Avanzados para los Usuarios LDAP)
+        </title>
+        <meta name="description" content="Este tutorial de Java JNDI describe la tecnología de Nombrado en Java e Interfaz de 
+              Directorio (JNDI), operaciones de nombre y directorio, y LDAP" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jndi, ldap, jndi service provider" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Temas Avanzados para los Usuarios LDAP</a></div>
+                <div class="linkAHEAD"><a href="ldap.html">LDAP v3</a></div>
+                <div class="linkAHEAD"><a href="jndi.html">JNDI como una IPA de LDAP</a></div>
+                <div class="linkBHEAD"><a href="operations.html">Cómo las Operaciones LDAP se Mapean a las IPAs de JNDI</a></div>
+                <div class="linkBHEAD"><a href="exceptions.html">Cómo los Códigos de Error LDAP se Mapean a las Excepciones de JNDI</a></div>
+                <div class="linkAHEAD"><a href="security.html">Seguridad</a></div>
+                <div class="linkBHEAD"><a href="authentication.html">Modos de Autenticación en LDAP</a></div>
+                <div class="linkBHEAD"><a href="auth_mechs.html">Mecanismos de Autenticación</a></div>
+                <div class="linkBHEAD"><a href="anonymous.html">Anónimo</a></div>
+                <div class="linkBHEAD"><a href="simple.html">Simple</a></div>
+                <div class="linkBHEAD"><a href="sasl.html">SASL</a></div>
+                <div class="linkBHEAD"><a href="digest.html">Digest-MD5</a></div>
+                <div class="nolinkBHEAD">SSL y Sockets Personalizados</div>
+                <div class="linkAHEAD"><a href="rename.html">Más Operaciones LDAP</a></div>
+                <div class="linkBHEAD"><a href="compare.html">Comparación LDAP</a></div>
+                <div class="linkBHEAD"><a href="result.html">Resultados de la Búsqueda</a></div>
+                <div class="linkBHEAD"><a href="unsol.html"> Notificaciones no Solicitadas de LDAP</a></div>
+                <div class="linkAHEAD"><a href="connect.html">Gestión de Conexiones</a></div>
+                <div class="linkBHEAD"><a href="create.html">Creación</a></div>
+                <div class="linkBHEAD"><a href="close.html"> Cierre</a></div>
+                <div class="linkBHEAD"><a href="pool.html">Agrupación (Pooling)</a></div>
+                <div class="linkBHEAD"><a href="config.html">Configuración</a></div>
+                <div class="linkAHEAD"><a href="faq.html">Preguntas Frecuentes</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Nombrado en Java e Interfaz de Directorio<br />
+                <b>Lección:</b> Temas Avanzados para los Usuarios LDAP<br />
+                <b>Sección:</b> Seguridad
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Nombrado en Java e Interfaz de Directorio</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Temas Avanzados para los Usuarios LDAP</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="digest.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="rename.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>SSL y Sockets Personalizados</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Además de la autenticación SASL, la mayoría de los servidores LDAP permiten acceder a sus servicios a través de 
+                    SSL. SSL es especialmente útil para los servidores LDAP v2 porque el protocolo v2 no soporta la autenticación 
+                    SASL.
+                </p>
+                <p>
+                    Un servidor habilitado para SSL a menudo admite SSL de dos formas. En la forma más básica, el servidor admite 
+                    puertos SSL además de los puertos normales (no protegidos). La otra forma en la cual un servidor admite SSL es 
+                    a través del uso de la Extensión Start TLS
+                    (<a class="OutsideLink" target="_blank" href="http://www.ietf.org/rfc/rfc2830.txt">RFC 2830</a>). Esta opción 
+                    está disponible sólo en servidores LDAP v3 y se describe en detalle en la sección. <a id="SSLPROP"></a>
+                </p>
+                <h2>
+                    Uso de la Propiedad de Socket SSL
+                </h2>
+                <p>
+                    Por defecto, el proveedor de servicio LDAP en el KDJ usa sockets planos cuando se comunica con el servidor 
+                    LDAP. Para pedir que se usen sockets SSL, establezca la propiedad 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html#SECURITY_PROTOCOL">
+                        <code>Context.SECURITY_PROTOCOL</code></a> a <code>&quot;ssl&quot;</code>.
+                </p>
+                <p>
+                    En el 
+                    <a class="SourceLink" target="_blank" href="examples/Ssl.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/Ssl.java'); return false;">
+                        <code>siguiente ejemplo</code></a>, el servidor LDAP está ofreciendo SSL en el puerto 636. Para ejecutar 
+                    este programa, debe habilitar SSL en el puerto 636 de su servidor LDAP. Este procedimiento normalmente lo 
+                    lleva a cabo el administrador del directorio.
+                </p>
+                <hr />
+                <p>
+                    <a id="SERVER"></a> <strong>Requisitos del Servidor:</strong> El servidor LDAP debe estar configurado con 
+                    un certificado de servidor X.509 SSL y tener SSL habilitado. Habitualmente, debe primero obtener un certificado 
+                    firmado para el servidor de una autoridad de certificados (CA). Después, siga las instrucciones de su 
+                    fabricante de directorio de cómo habilitar SSL. Diferentes fabricantes tienen herramientas diferentes para 
+                    hacer esto.
+                </p>
+                <p>
+                    Para el 
+                    <a class="OutsideLink" target="_blank" 
+                       href="http://www.oracle.com/technetwork/testcontent/index-085178.html">
+                        Servidor de Directorio de Oracle, v5.2</a>, use la herramienta Gestión de Certificados en la Consola de 
+                    Administración para generar una Petición de Firma de Certificado (CSR). Envíe el CSR a una CA para obtener 
+                    un certificado de servidor X.509 SSL. Use la Consola de Administración, agregue el certificado a la lista 
+                    de certificados del servidor. También instale el certificado de la CA si no está ya en la lista de CAs 
+                    confiables del servidor. Habilite SSL usando la pestaña de Configuración en la Consola de Administración. 
+                    Seleccione el servidor en el panel de la izquierda. Seleccione la pestaña de Cifrado en el panel derecho. 
+                    Pulse las casillas para &quot;Habilitar SSL para este servidor&quot; y 
+                    &quot;Use esta familia de cifrado: RSA&quot;, asegurando de que el certificado de servidor que ha agregado 
+                    está en la lista de certificados.
+                </p>
+                <p>
+                    <a id="CLIENT"></a> <strong>Requisitos del Cliente:</strong> Necesita asegurar que el cliente confía en el 
+                    servidor LDAP que estará usando. Debe instalar el certificado del servidor (o el certificado de su CA) en la 
+                    base de datos de certificados de confianza de su EEJ. Aquí tiene un ejemplo.
+                </p>
+                <div class="codeblock">
+                    <pre>
+# cd <em>JAVA_HOME</em>/lib/security
+# keytool -import -file server_cert.cer -keystore jssecacerts
+                    </pre>
+                </div>
+                <p>
+                    Para información de cómo usar las herramientas de seguridad, vea el recorrido de 
+                    <a class="TutorialLink" target="_top" href="../../security/index.html">Seguridad</a>. Para información sobre 
+                    JSSE, vea la 
+                    <a class="OutsideLink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html">
+                        Guía de Referencia de la Extensión de Socket Seguro de Java (JSSE)</a>.
+                </p>
+                <hr />
+                <div class="codeblock">
+                    <pre>
+// Set up the environment for creating the initial context
+Hashtable&lt;String, Object&gt; env = new Hashtable&lt;String, Object&gt;();
+env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+env.put(Context.PROVIDER_URL, "ldap://localhost:636/o=JNDITutorial");
+
+// Specify SSL
+env.put(Context.SECURITY_PROTOCOL, "ssl");
+
+// Authenticate as S. User and password "mysecret"
+env.put(Context.SECURITY_AUTHENTICATION, "simple");
+env.put(Context.SECURITY_PRINCIPAL, 
+        "cn=S. User, ou=NewHires,o=JNDITutorial");
+env.put(Context.SECURITY_CREDENTIALS, "mysecret");
+
+// Create the initial context
+DirContext ctx = new InitialDirContext(env);
+
+// ... do something useful with ctx
+                    </pre>
+                </div>
+                <hr />
+                <p>
+                    <strong>Nota:</strong> Si usa SSL para conectar a un servidor sobre un puerto que <em>no</em> usa SSL, entonces 
+                    su programa se colgará. Del mismo modo, su usa un socket plano para conectar a un socket SSL de un servidor, 
+                    entonces su aplicación se colgará. Esta es una característica del protocolo SSL.
+                </p>
+                <hr />
+                <p>
+                    <a id="LDAPS"></a>
+                </p>
+                <h2>
+                    Usar la URL LDAPS
+                </h2>
+                <p>
+                    En vez de pedir el uso de SSL a través del uso de la propiedad 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html#SECURITY_PROTOCOL">
+                        <code>Context.SECURITY_PROTOCOL</code></a>, puede también pedir el uso de SSL a través del uso de URLs 
+                    LDAPS. Una URL LDAPS es similar a una URL LDAP excepto que el esquema de la URL es &quot;ldaps&quot; en 
+                    vez de &quot;ldap&quot;. Especifica el uso de SSL cuando se comunica con el servidor LDAP.
+                </p>
+                <p>
+                    En el 
+                    <a class="SourceLink" target="_blank" href="examples/Ldaps.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/Ldaps.java'); return false;">
+                        <code>siguiente ejemplo</code></a>, el servidor LDAP está ofreciendo SSL en el puerto 636. Para ejecutar 
+                    este programa, debe habilitar SSL en el puerto 6363 de su servidor LDAP.
+                </p>
+                <div class="codeblock">
+                    <pre>
+// Set up the environment for creating the initial context
+Hashtable&lt;String, Object&gt; env = new Hashtable&lt;String, Object&gt;();
+env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+
+// Specify LDAPS URL
+env.put(Context.PROVIDER_URL, "ldaps://localhost:636/o=JNDITutorial");
+
+// Authenticate as S. User and password "mysecret"
+env.put(Context.SECURITY_AUTHENTICATION, "simple");
+env.put(Context.SECURITY_PRINCIPAL, 
+        "cn=S. User, ou=NewHires, o=JNDITutorial");
+env.put(Context.SECURITY_CREDENTIALS, "mysecret");
+
+// Create the initial context
+DirContext ctx = new InitialDirContext(env);
+
+// ... do something useful with ctx
+                    </pre>
+                </div>
+                <p>
+                    Las URLS LDAPS se aceptan en cualquier parte donde se acepten las URLS LDAP. Compruebe el 
+                    <a class="OutsideLink" target="_blank" 
+                       href="https://docs.oracle.com/javase/jndi/tutorial/ldap/misc/url.html">Tutorial JNDI</a> por los detalles de 
+                    las URLs LDAP y LDAPS.<a id="EXTERNAL"></a>
+                </p>
+                <h2>
+                    Autenticación de Cliente: Usar SSL con el Mecanismo Externo SASL
+                </h2>
+                <p>
+                    SSL proporciona autenticación y otros servicios de seguridad en una capa inferior que LDAP. Si la autenticación 
+                    ha sido ya realizada en SSL, la capa LDAP puede usar esa información de autenticación de SSL usando el 
+                    mecanismo de SASL
+                    <a class="OutsideLink" target="_blank" href="http://www.ietf.org/rfc/rfc2222.txt">Externo</a>.
+                </p>
+                <p>
+                    El 
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/External.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/External.java'); return false;">
+                        <code>ejemplo siguiente</code></a> es como el 
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/Ssl.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/Ssl.java'); return false;">
+                        <code>ejemplo anterior de SSL</code></a>, excepto que en vez de usar autenticación simple, usa la 
+                    autenticación Externo de SASL. Al usar Externo, no necesita indicar ninguna información de principal o 
+                    contraseña, porque la recoge de SSL.
+                </p>
+                <hr />
+                <p>
+                    <a id="SERVER2"></a> <strong>Requisitos del Servidor:</strong> Este ejemplo requeiere que el servidor LDAP 
+                    permita la autenticación basada en el certificado del cliente. Además, el servidor LDAP debe confiar en (las CAs 
+                    de) los certificados del cliente que recibe, y debe ser capaz de asociar los nombres distinguidos del 
+                    propietario en los certificados del cliente a los principales que conoce. Siga las instrucciones de su 
+                    fabricante de directorio de cómo realizar estas tareas.
+                </p>
+                <p>
+                    <a id="CLIENT2"></a> <strong>Requisitos del Cliente:</strong> Este ejemplo requiere que el cliente tanga un 
+                    certificado de cliente X.509 SSL. Es más, el certificado debe ser almacenado como la primera entrada clave en 
+                    un archivo almacén de claves. Si esta entrada está protegida por contraseña, debe tener la misma contraseña que 
+                    el almacén de claves. Para más información sobre los almacenes de claves de JSSE, vea la 
+                    <a class="OutsideLink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html">Guía de 
+                        Referencia de la Extensión de Socket Seguro de Java (JSSE)</a>.
+                </p>
+                <hr />
+                <div class="codeblock">
+                    <pre>
+// Set up the environment for creating the initial context
+Hashtable&lt;String, Object&gt; env = new Hashtable&lt;String, Object&gt;(11);
+env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+env.put(Context.PROVIDER_URL, "ldap://localhost:636/o=JNDITutorial");
+
+// Principal and credentials will be obtained from the connection
+env.put(Context.SECURITY_AUTHENTICATION, "EXTERNAL");
+
+// Specify SSL
+env.put(Context.SECURITY_PROTOCOL, "ssl");
+
+// Create the initial context
+DirContext ctx = new InitialDirContext(env);
+
+...
+                    </pre>
+                </div>
+                <p>
+                    Para ejecutar este programa de forma que se use el certificado del cliente para la autenticación, debe 
+                    proporcionar (como propiedades del sistema) la ubicación y contraseña del almacén de claves que contiene el 
+                    certificado de cliente. Aquí tiene un ejemplo de cómo ejecutar el programa.
+                </p>
+                <div class="codeblock">
+                    <pre>
+java -Djavax.net.ssl.keyStore=MyKeystoreFile \
+    -Djavax.net.ssl.keyStorePassword=mysecret \
+    External
+                    </pre>
+                </div>
+                <p>
+                    Si no proporciona un almacén de claves. el programa se ejecutará usando la autenticación anónima porque no 
+                    existe credencial de cliente en SSL.
+                </p>
+                <p>
+                    Este ejemplo muestra la forma más básica de lograr la autenticación de cliente basada en certificados. Las 
+                    formas más avanzadas pueden ser logradas escribiendo y usando una factoría de sockets personalizada que acceda 
+                    al certificado del cliente de una manera más flexible, quizás usando un directorio LDAP. La sección siguiente 
+                    muestra cómo usar una factoría personalizada de sockets con su aplicación JNDI.
+                </p>
+                <h2>
+                    Usar Sockets Personalizados
+                </h2>
+                <p>
+                    Cuando usa SSL, el proveedor de LDAP usará, de forma predeterminada, la factoría de sockets, 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/net/ssl/SSLSocketFactory.html">
+                        <code>javax.net.ssl.SSLSocketFactory</code></a>, para crear un socket SSL para comunicar con el servidor, 
+                    usando la configuración predeterminada de JSSE. JSEE puede ser personalizada de una variedad de formas, 
+                    como se detalla en la 
+                    <a class="OutsideLink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html">
+                        Guía de Referencia de la Extensión de Socket Seguro de Java (JSSE)</a>. Sin embargo, hay veces que esas 
+                    personalizaciones no son suficientes y necesita tener más control sobre los sockets SSL, o los sockets en 
+                    general, usados por el proveedor de servicio de LDAP. Por ejemplo, podría necesitar sockets que puedan 
+                    eludir los cortafuegos, o sockets JSSE que utilizen políticas de recuperación/almacenamiento en caché no 
+                    predeterminadas para su confianza y almacenes de claves. Para establecer la implementación de la factoría 
+                    de sockets usada por el proveedor de servicios LDAP, establezca la propiedad 
+                    <code>&quot;java.naming.ldap.factory.socket&quot;</code> al nombre completamente cualificado de la clase de la 
+                    factoría de sockets. Esta clase debe implementar la clase abstracta 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/net/SocketFactory.html">
+                        <code>javax.net.SocketFactory</code></a> y proporcionar una implementación del método 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/net/SocketFactory.html#getDefault--">
+                        <code>getDefault()</code></a> que devuelve una instancia de la factoría de sockets. Vea la 
+                    <a class="OutsideLink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html">Guía de 
+                        Referencia de la Extensión de Socket Seguro de Java (JSSE)</a>.
+                </p>
+                <p>
+                    Aquí tiene un ejemplo de una 
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/CustomSocketFactory.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/CustomSocketFactory.java'); return false;">
+                        <code>factoría personalizada de sockets</code></a> que produce sockets planos.
+                </p>
+                <div class="codeblock">
+                    <pre>
+public class CustomSocketFactory extends SocketFactory {
+    public static SocketFactory getDefault() {
+
+        System.out.println("[acquiring the default socket factory]");
+        return new CustomSocketFactory();
+    }
+        ...
+}
+                    </pre>
+                </div>
+                <p>
+                    Dese cuenta de que este ejemplo crea una nueva instancia de <code>CustomSocketFactory</code> cada vez que se 
+                    crea una nueva conexión LDAP. Esto podría ser apropiado para algunas aplicaciones y factorías de sockets. Si 
+                    quiere reutilizar la misma factoría de sockets, <code>getDefault()</code> debería devolver un singleton.
+                </p>
+                <p>
+                    Para usar esta factoría de sockets personalizadas con un programa JNDI, establezca la propiedad 
+                    <code>&quot;java.naming.ldap.factory.socket&quot;</code>, como se muestra en el 
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/UseFactory.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/UseFactory.java'); return false;">
+                        <code>siguiente ejemplo</code></a>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+// Set up the environment for creating the initial context
+Hashtable&lt;String, Object&gt; env = new Hashtable&lt;String, Object&gt;();
+env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+env.put(Context.PROVIDER_URL, "ldap://localhost:389/o=JNDITutorial");
+
+// Specify the socket factory
+env.put("java.naming.ldap.factory.socket", "CustomSocketFactory");
+
+// Create the initial context
+DirContext ctx = new InitialDirContext(env);
+
+// ... do something useful with ctx
+                    </pre>
+                </div>
+                <p>
+                    La propiedad <code>&quot;java.naming.ldap.factory.socket&quot;</code> es útil para establecer la factoría de 
+                    sockets por contextos. Otra forma de controlar los sockets utilizados por el proveedor de servicio LDAP es 
+                    establecer la factoría de sockets para todos los sockets usado en todo el programa, usando 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/net/Socket.html#setSocketImplFactory-java.net.SocketImplFactory-">
+                        <code>java.net.Socket.setSocketImplFactory()</code></a>. El uso de de este método es menos flexible porque 
+                    afecta a todas las conexiones socket, no sólo a las conexiones LDAP y por lo tanto, debería ser usado con 
+                    cuidado.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="digest.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="rename.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Digest-MD5<br />
+            <b>Página siguiente:</b> Más Operaciones LDAP
+        </div>
+    </body>
+</html> 

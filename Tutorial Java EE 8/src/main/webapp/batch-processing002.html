@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Procesamiento por Lotes en Java EE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="batch-processing001.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="batch-processing003.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BCGGIBHA">
+      <h2 id="batch-processing-in-java-ee">Procesamiento por Lotes en Java EE</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Esta sección enumera los componentes del marco de procesamiento por lotes en Java EE y proporciona 
+            una descripción general de los pasos que debe seguir para crear una aplicación por lotes.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li><p><a href="#BABEAFJI">El Marco de Procesamiento por Lotes</a></p></li>
+            <li><p><a href="#BABCGDHJ">Creación de Aplicaciones por Lotes</a></p></li>
+            <li><p><a href="#BABDGDJB">Elementos de un Trabajo por Lotes</a></p></li>
+            <li><p><a href="#BABHJEJC">Propiedades y Parámetros</a></p></li>
+            <li><p><a href="#BABHJGDH">Instancias de Trabajos y Ejecuciones de Trabajos</a></p></li>
+            <li><p><a href="#BABBFGEF">Lotes y Estados de Salida</a></p></li>
+          </ul>
+        </div>
+        <div class="sect2" id="BABEAFJI">
+          <h3 id="the-batch-processing-framework">El Marco de Procesamiento por Lotes</h3>
+          <div class="paragraph">
+            <p>Java EE incluye un marco de procesamiento por lotes que consta de los siguientes elementos:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li><p>Un tiempo de ejecución por lotes que gestiona la ejecución de trabajos.</p></li>
+              <li><p>Un lenguaje de especificación de trabajo basado en XML</p></li>
+              <li><p>Una IPA de Java para interactuar con el tiempo de ejecución por lotes</p></li>
+              <li>
+                <p>
+                  Una IPA de Java para implementar pasos, elementos de decisión y otros artefactos por lotes
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las aplicaciones por lotes en Java EE contienen archivos XML y clases Java. Los archivos XML 
+              definen la estructura de un trabajo en términos de artefactos por lotes y las relaciones entre 
+              ellos. (Un artefacto por lotes es parte de un paso orientado a fragmentos, un paso orientado a 
+              tareas, un elemento de decisión u otro componente de una aplicación por lotes). Las clases de 
+              Java implementan la lógica de aplicación de los artefactos por lotes definidos en los archivos 
+              XML. El tiempo de ejecución por lotes analiza los archivos XML y carga los artefactos por lotes 
+              como clases Java para ejecutar los trabajos en una aplicación por lotes.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BABCGDHJ">
+          <h3 id="creating-batch-applications">Creación de Aplicaciones por Lotes</h3>
+          <div class="paragraph">
+            <p>El proceso para crear una aplicación por lotes en Java EE es el siguiente.</p>
+          </div>
+          <div class="olist arabic">
+            <ol class="arabic">
+              <li><p>Diseñe la aplicación por lotes.</p></li>
+              <li>
+                <p>
+                  Identifique las fuentes de entrada, el formato de los datos de entrada, el resultado final 
+                  deseado y las fases de procesamiento requeridas.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Organice la aplicación como un trabajo con pasos orientados a fragmentos, pasos orientados a 
+                  tareas y elementos de decisión. Determinar las dependencias entre ellos.
+                </p>
+              </li>
+              <li><p>Determine el orden de ejecución en términos de transiciones entre pasos.</p></li>
+              <li>
+                <p>
+                  Identifique los pasos que se pueden ejecutar en paralelo y los pasos que se pueden ejecutar 
+                  en más de un subproceso.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Cree los artefactos por lotes como clases de Java implementando las interfaces especificadas 
+                  por el marco para pasos, elementos de decisión, etc. Estas clases de Java contienen el 
+                  código para leer datos de fuentes de entrada, formatear elementos, procesar elementos y 
+                  almacenar resultados. Los artefactos por lotes pueden acceder a objetos de contexto desde el 
+                  tiempo de ejecución del lote mediante la inserción de dependencias.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Defina trabajos, pasos y su flujo de ejecución en archivos XML utilizando el lenguaje de 
+                  especificación de trabajos. Los elementos de los archivos XML hacen referencia a artefactos 
+                  por lotes implementados como clases Java. Los artefactos por lotes pueden acceder a 
+                  propiedades declaradas en los archivos XML, como nombres de archivos y bases de datos.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Utilice la IPA de Java proporcionada por el tiempo de ejecución por lotes para iniciar la 
+                  aplicación por lotes.
+                </p>
+              </li>
+            </ol>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las siguientes secciones describen en detalle cómo usar los componentes del marco de 
+              procesamiento por lotes en Java EE para crear aplicaciones por lotes.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BABDGDJB">
+          <h3 id="elements-of-a-batch-job">Elementos de un Trabajo por Lotes</h3>
+          <div class="paragraph">
+            <p>Un trabajo por lotes puede contener uno o más de los siguientes elementos:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li><p>Pasos</p></li>
+              <li><p>Flujos</p></li>
+              <li><p>Divisiones</p></li>
+              <li><p>Elementos de decisión</p></li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los pasos se describen en
+              <a href="batch-processing001.html#BCGJDEEH">Introducción al Procesamiento por Lotes</a>, y 
+              puede estar orientado a fragmentos u orientado a tareas. Los pasos orientados a fragmentos 
+              pueden ser pasos particionados. En un paso de fragmento particionado, el procesamiento de un 
+              elemento no depende de otros elementos, por lo que estos pasos pueden ejecutarse en más de un 
+              subproceso.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Un flujo es una secuencia de pasos que se ejecutan como una unidad. Una secuencia de pasos 
+              relacionados se puede agrupar en un flujo. Los pasos de un flujo no pueden hacer la transición a 
+              pasos fuera del flujo. El flujo pasa al siguiente elemento cuando se completa su último paso.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Una división es un conjunto de flujos que se ejecutan en paralelo; cada flujo se ejecuta en un 
+              hilo separado. La división pasa al siguiente elemento cuando se completan todos sus flujos.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los elementos de decisión utilizan el estado de salida del paso anterior para determinar el paso 
+              siguiente o para finalizar el trabajo por lotes.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BABHJEJC">
+          <h3 id="properties-and-parameters">Propiedades y Parámetros</h3>
+          <div class="paragraph">
+            <p>
+              Los trabajos y los pasos pueden tener una serie de propiedades asociadas a ellos. Las 
+              propiedades se definen en el archivo de definición de trabajo y los artefactos por lotes acceden 
+              a estas propiedades mediante objetos de contexto del tiempo de ejecución por lotes. El uso de 
+              propiedades de esta manera le permite desacoplar los parámetros estáticos del trabajo de la 
+              lógica de negocio y reutilizar artefactos por lotes en diferentes archivos de definición de 
+              trabajo.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La especificación de propiedades se describe en 
+              <a href="batch-processing004.html#BCGDDBBG">Uso del Lenguaje de Especificación de Trabajos</a>, 
+              y el acceso a las propiedades en artefactos por lotes se describe en 
+              <a href="batch-processing005.html #BCGHDHGH">Creación de Artefactos por Lotes</a>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las aplicaciones Java EE también pueden pasar parámetros a un trabajo cuando lo envían al tiempo 
+              de ejecución por lotes. Esto le permite especificar parámetros dinámicos que solo se conocen en 
+              tiempo de ejecución. Los parámetros también son necesarios para los pasos particionados, ya que 
+              cada partición necesita saber, por ejemplo, qué rango de elementos procesar.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La especificación de parámetros al enviar trabajos se describe en 
+              <a href="batch-processing006.html#BCGCAHCB">
+                Envío de Trabajos al Tiempo de Ejecución de Batch</a>. La especificación de parámetros para 
+              pasos particionados y el acceso a ellos en artefactos por lotes se demuestra en 
+              <a href="batch-processing009.html#BCGFCACD">La Aplicación de Ejemplo phonebilling</a>.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BABHJGDH">
+          <h3 id="job-instances-and-job-executions">Instancias de Trabajos y Ejecuciones de Trabajos</h3>
+          <div class="paragraph">
+            <p>
+              Una definición de trabajo puede tener múltiples instancias, cada una con diferentes parámetros. 
+              Una ejecución de trabajo es un intento de ejecutar una instancia de trabajo. El tiempo de 
+              ejecución por lotes mantiene información sobre instancias de trabajos y ejecuciones de trabajos, 
+              como se describe en 
+              <a href="batch-processing006.html#BCGIBGFC">Comprobación del Estado de un Trabajo</a>.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BABBFGEF">
+          <h3 id="batch-and-exit-status">Lotes y Estados de Salida</h3>
+          <div class="paragraph">
+            <p>
+              El estado de los trabajos, pasos, divisiones y flujos se representa en el tiempo de ejecución 
+              del lote como un valor de estado del lote. Los valores de estado del lote se enumeran en la 
+              <a href="#BCGJBGDF">Tabla 58-1</a>. Se representan como cadenas.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p><a id="sthref267"></a><a id="BCGJBGDF"></a></p>
+          </div>
+          <div class="paragraph">
+            <p><strong>Tabla 58-1 Valores de estado de lote</strong></p>
+          </div>
+          <table class="tableblock frame-all grid-all" style="width: 50%;">
+            <colgroup>
+              <col style="width: 30%;">
+              <col style="width: 70%;">
+            </colgroup>
+            <tbody>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><strong>Valor</strong></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><strong>Descripción</strong></p></td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>STARTING</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">El trabajo se ha enviado al tiempo de ejecución por lotes.</p></td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>STARTED</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">El trabajo se está ejecutando.</p></td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>STOPPING</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">Se ha solicitado la detención del trabajo.</p></td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>STOPPED</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">El trabajo se ha detenido.</p></td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>FAILED</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">El trabajo terminó de ejecutarse debido a un error.</p></td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>COMPLETED</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">El trabajo terminó de ejecutarse correctamente.</p></td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>ABANDONED</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">El trabajo fue marcado como abandonado.</p></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="paragraph">
+            <p>
+              Las aplicaciones Java EE pueden enviar trabajos y acceder al estado del lote de un trabajo 
+              mediante la interfaz <code>JobOperator</code>, como se describe en 
+              <a href="batch-processing006.html#BCGCAHCB">
+                Envío de Trabajos al Tiempo de Ejecución de Lote</a>. Los archivos de definición de trabajos 
+              pueden hacer referencia a valores de estado de lotes mediante el Lenguaje de Especificación 
+              de Trabajos (JSL, en inglés), como se describe en 
+              <a href="batch-processing004.html#BCGDDBBG">
+                Uso del Lenguaje de Especificación de Trabajos</a>. Los artefactos por lotes pueden acceder 
+              a los valores de estado de los lotes mediante objetos de contexto, como se describe en 
+              <a href="batch-processing005.html#BCGCJEEF">
+                Uso de los Objetos de Contexto del Tiempo de Ejecución de Batch</a>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para los flujos, el estado del lote es el de su último paso. Para particiones, el estado del 
+              lote es el siguiente:
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  <code>COMPLETED</code>: Si todos sus flujos tienen un estado de lote de 
+                  <code>COMPLETED</code>
+                </p>
+              </li>
+              <li>
+                <p><code>FAILED</code>: si algún flujo tiene un estado de lote de <code>FAILED</code></p>
+              </li>
+              <li>
+                <p>
+                  <code>STOPPED</code>: si algún flujo tiene un estado de lote de <code>STOPPED</code>, y 
+                  ningún flujo tiene un estado de lote de <code>FAILED</code>
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              El tiempo de ejecución del lote establece el estado del lote para trabajos, pasos, divisiones y 
+              flujos. Los trabajos, pasos, divisiones y flujos también tienen un estado de salida, que es un 
+              valor definido por el usuario basado en el estado del lote. Puede establecer el estado de salida 
+              dentro de los artefactos por lotes o en el archivo de definición de trabajo. Puede acceder al 
+              estado de salida de la misma manera que al estado del lote, descrito anteriormente. El valor 
+              predeterminado para el estado de salida es el mismo que el estado del lote.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="batch-processing001.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="batch-processing003.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

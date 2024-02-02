@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Lección: Implementaciones Personalizadas de Colección (Los Tutoriales de Java&trade; &gt; Colecciones)</title>
+        <meta name="description" content="Este tutorial de Java sobre colecciones describe los interfaces, implementaciones, y
+              algoritmos en el marco de trabajo de Colecciones de Java" />
+        <meta name="keywords" content="programacion java , aprender java, codigo de ejemplo de java, colecciones de java,
+              set, list, queue, map, array, arraylist" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+    </head>
+    <body>
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="MainFlow_wide">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Colecciones
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;
+                <a href="../index.html" target="_top">Colecciones</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="../algorithms/index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../interoperability/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Lección: Implementaciones Personalizadas de Colección</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Muchos programadores nunca necesitarán implementar sus propias clases <code>Collection</code>.
+                    Puede ir bastante lejos utilizando las implementaciones descritas en las secciones anteriores 
+                    de este capítulo. Sin embargo, algún día podría querer escribir su propia implementación. Es 
+                    bastante fácil de hacer esto con la ayuda de las implementaciones abstractas proporcionadas por 
+                    la plataforma Java. Antes de que describamos <em>como</em> escribir una implementación, describiremos
+                    porqué podría querer escribir una.
+                </p>
+                <h2>Razones para Escribir una Implementación</h2>
+                <p>
+                    La lista siguiente ilustra la clase de <code>Collection</code>s personalizadas que podría querer
+                    implementar. No pretende ser exhautiva:
+                </p>
+                <ul>
+                    <li>
+                        <b>Persistente</b>: Todas las implementaciones incorporadas de <code>Collection</code> residen en la
+                        memoria principal y desaparecen cuando el programa termina. Si quiere una colección que estará presente la
+                        próxima vez que el programa empieza, puede implementarla construyendo una cobertura sobre una base de datos
+                        externa. Tal colección podría ser simultáneamente accesible por múltiples programas.
+                    </li>
+                    <li>
+                        <b>Específica de la Aplicación</b>: Esta es una categoría muy amplia. Un ejemplo es un <code>Map</code>
+                        no modificable conteniendo datos de telemetría en tiempo real. Las claves podrían representar ubicaciones,
+                        y los valores podrían ser leídos desde los sensores en esas ubicaciones en respuesta a la operación
+                        <code>get</code>.
+                    </li>
+                    <li>
+                        <b>De propósito especial, alto rendimiento</b>: Muchas estructuras de datos toman ventaja del uso
+                        restringido para ofrecer un rendimiento mejor del que es posible con implementaciones de propósito general.
+                        Por ejemplo, considere una <code>List</code> que contiene series largas de valores de elementos idénticos.
+                        Dichas listas, que se producen con frecuencia en el procesamiento de texto, se pueden <em>configurar en 
+                            tamaño en tiempo de ejecución</em> &mdash; las ejecuciones se pueden representar como un solo objeto que
+                        contiene el elemento repetido y el número de repeticiones consecutivas. Este ejemplo es interesante porque
+                        intercambia dos aspectos del rendimiento: requiere menos espacio pero más tiempo que una
+                        <code>ArrayList</code>.
+                    </li>
+                    <li>
+                        <b>De alto rendimiento, de propósito general</b>: Los diseñadores de Marcos de trabajo de Colecciones de
+                        Java intentan ofrecer las mejores implementaciones de propósito general para cada interfaz, pero muchas,
+                        muchas estructuras de datos podrían haber sido usadas, y unas nuevas son inventadas cada día. ¡Tal vez
+                        puedas pensar en algo más rápido!
+                    </li>
+                    <li>
+                        <b>Funcionalidad mejorada</b>: Supongamos que necesita una implementación eficiente de bag (también
+                        conocida como un <em>multiset</em>): un <code>Collection</code> que ofrece controles de contención de
+                        tiempo constante al tiempo que permite elementos duplicados. Es razonablemente sencillo implementar dicha
+                        colección sobre un <code>HashMap</code>.
+                    </li>
+                    <li>
+                        <b>Conveniencia</b>: Es posible que desee implementaciones adicionales que ofrecen conveniencias más allá de
+                        las ofrecidas por la plataforma Java. Por ejemplo, con frecuencia puede necesitar instancias de
+                        <code>List</code> que representen un rango contiguo de <code>Integer</code>s.
+                    </li>
+                    <li>
+                        <b>Adaptador</b>: Supongamos que está utilizando una IPA heredada que tiene su propia IPA de colecciones ad
+                        hoc. Puede escribir una implementación de adaptador que permita que estas colecciones operen en el
+                        Marco de Trabajo de Colecciones de Java. Una <em>implementación de adaptador</em> es una capa fina que
+                        envuelve objetos de un tipo y los hace comportarse como objetos de otro tipo al traducir operaciones en este
+                        último tipo en operaciones en el anterior.
+                    </li>
+                </ul>
+                <h2>Cómo Escribir una Implementación Personalizada</h2>
+                <p>
+                    Escribir una implementación personalizada es sorprendentemente fácil. El Marco de Trabajo de Colecciones de
+                    Java ofrece implementaciones abstractas diseñadas expresamente para facilitar las implmentaciones
+                    personalizadas. Empezaremos con el siguiente ejemplo de una implementación de 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/Arrays.html#asList-T...-">
+                        <code>Arrays.asList</code></a>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+public static &lt;T&gt; List&lt;T&gt; asList(T[] a) {
+    return new MyArrayList&lt;T&gt;(a);
+}
+
+private static class MyArrayList&lt;T&gt; extends AbstractList&lt;T&gt; {
+
+    private final T[] a;
+
+    MyArrayList(T[] array) {
+        a = array;
+    }
+
+    public T get(int index) {
+        return a[index];
+    }
+
+    public T set(int index, T element) {
+        T oldValue = a[index];
+        a[index] = element;
+        return oldValue;
+    }
+
+    public int size() {
+        return a.length;
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Por extraño que parezca, esto está muy cerca de la implementación que está contenida en
+                    <code>java.util.Arrays</code>. ¡Es así de simple! Usted proporciona un constructor y los métodos
+                    <code>get</code>, <code>set</code>, y <code>size</code>, y <code>AbstractList</code> hace todo el resto.
+                    Obtiene el <code>ListIterator</code>, las operaciones masivas, las operaciones de búsqueda, el cómputo del
+                    código hash, la comparación y la representación de cadenas de forma gratuita.
+                </p>
+                <p>
+                    Suponga que quiere hacer la implementación un poco más rápida. La documentación de la IPA para las
+                    implementaciones abstractas describe precisamente cómo es implementado cada método, así que conocerá qué
+                    métodos sobreescribir para obtener el rendimiento que quiere. El rendimiento de la implementación precedente
+                    está bien, pero puede ser mejorado un poquito. En particular, el método <code>toArray</code> itera sobre la
+                    <code>List</code>, copiando un elemento a la vez. Dada la representación interna, es mucho más rápido y más
+                    sensato simplemente clonar el conjunto.
+                </p>
+                <div class="codeblock">
+                    <pre>
+public Object[] toArray() {
+    return (Object[]) a.clone();
+}
+                    </pre>
+                </div>
+                <p>
+                    Con la adición de esta sobreescritura y algunas más similares, esta implementación es exactamente la que se 
+                    encuentra en <code>java.util.Arrays</code>. En interés de la divulgación completa, es un poco más difícil usar
+                    otras implementaciones abstractas porque tendrás que escribir tu propio iterador, pero todavía no es tan
+                    difícil.
+                </p>
+                <p>
+                    La lista siguiente resume las implementaciones abstractas:
+                </p>
+                <ul>
+                    <li>
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/AbstractCollection.html">
+                            <code>AbstractCollection</code></a> &mdash; una <code>Collection</code> que no es un <code>Set</code>
+                        ni una <code>List</code>. Como mínimo, debe proporcionar los métodos <code>iterator</code> y
+                        <code>size</code>.
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/AbstractSet.html">
+                            <code>AbstractSet</code></a> &mdash; un <code>Set</code>; el uso es idéntico a
+                        <code>AbstractCollection</code>.
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/AbstractList.html">
+                            <code>AbstractList</code></a> &mdash; una <code>List</code> respaldada por un almacén de datos de acceso
+                        aleatorio, como una matriz. Como mínimo, debe proporcionar los métodos de
+                        <code>acceso posicional</code> (<code>get</code> y, opcionalmente, <code>set</code>,
+                        <code>remove</code>, y <code>add</code>) y el método <code>size</code>. La clase abstracta cuida de
+                        <code>listIterator</code> (e <code>iterator</code>).
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/AbstractSequentialList.html">
+                            <code>AbstractSequentialList</code></a> &mdash; una <code>List</code> respaldada por un almacen de
+                        datos de acceso secuencia, tal como una lista enlazada. Como mínimo, debe suministrar los métodos
+                        <code>listIterator</code> y <code>size</code>. La clase abstracta se cuida de los métodos de acceso
+                        posicional. (Esto es lo contrario de <code>AbstractList</code>).
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/AbstractQueue.html">
+                            <code>AbstractQueue</code></a> &mdash; Como mínimo, debe proporicionar los métodos <code>offer</code>,
+                        <code>peek</code>, <code>poll</code>, y <code>size</code> y un <code>iterator</code> que soporta
+                        <code>remove</code>.
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/util/AbstractMap.html">
+                            <code>AbstractMap</code></a> &mdash; Un <code>Map</code>. Como mínimo debe suministrar la vista
+                        <code>entrySet</code>. Esta es implementada típicamente con la clase <code>AbstractSet</code>. Si el
+                        <code>Map</code> es modificable, debe también suministrar el método <code>put</code>.
+                    </li>
+                </ul>
+                <p>
+                    El proceso de escribir una implementación personalizada a continuación:
+                </p>
+                <ol>
+                    <li>
+                        Elija la implementación apropiada de clase abstracta de la lista anterior.
+                    </li>
+                    <li>
+                        Suministre implementaciones para todos los métodos abstractos de la clase. Si su colección personalizada va
+                        a ser modificable, tendrá que sobreescribir uno o más de los métodos concretos también. La documentación de
+                        la IPA para la implementación de la clase abstracta le indicará que métodos sobreescribir.
+                    </li>
+                    <li>
+                        Compruebe y, si es necesario, depure la implementación. Ahora tiene una implementación de colección personalizada
+                        funcional.
+                    </li>
+                    <li>
+                        Si está preocupado sobre el rendimiento, lea la documentación de la IPA de la implementación de la clase 
+                        abstracta en todos los métodos cuyas implementaciones ha heredado. Si cualquiera parece demasiado lenta, 
+                        sobreescríbala. Si sobreescribe algunos métodos, asegúrese de medir el rendimiento del método antes y 
+                        después de la sobreescritura. La cantidad de esfuerzo que aplica en ajustar el rendimiento debe ser una
+                        función de cuánto uso obtendrá la implementación y cuán crítico para el rendimiento es su uso. (A menudo
+                        este paso se omite mejor).
+                    </li>
+                </ol>
+            </div>
+            <div class="NavBit">
+                <a href="../algorithms/index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a href="../interoperability/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Lección Anterior<br />
+            <b>Página siguiente:</b> Interoperabilidad
+        </div>
+    </body>
+</html> 

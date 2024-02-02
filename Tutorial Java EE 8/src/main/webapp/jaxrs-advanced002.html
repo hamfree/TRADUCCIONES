@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Validar los Datos del Recurso con Validación de Bean</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jaxrs-advanced001.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jaxrs-advanced003.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BABCJEDF">
+      <h2 id="validating-resource-data-with-bean-validation">
+        Validar los Datos del Recurso con Validación de Bean
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            JAX-RS soporta la Validación de Beans para verificar clases de recursos JAX-RS. Este apoyo 
+            consiste en:
+          </p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>Adición de anotaciones de restricciones a los parámetros del método de recursos</p>
+            </li>
+            <li>
+              <p>
+                Garantizar que los datos de la entidad sean válidos cuando la entidad se pasa como parámetro
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p><a href="#CIHJAFGI">Usando Anotaciones de Restricción en los Métodos de Recurso</a></p>
+            </li>
+            <li>
+              <p><a href="#CIHFDCBI">Validar los Datos de la Entidad</a></p>
+            </li>
+            <li>
+              <p><a href="#CIHCHEFH">Manejo de la Excepción de Validación y Códigos de Respuesta</a></p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="CIHJAFGI">
+          <h3 id="using-constraint-annotations-on-resource-methods">
+            Usando Anotaciones de Restricción en los Métodos de Recurso
+          </h3>
+          <div class="paragraph">
+            <p>
+              Las anotaciones de restricciones de Validación de Beans se pueden aplicar a los parámetros de un 
+              recurso. El servidor validará los parámetros y pasará o lanzará una 
+              <code>javax.validation.ValidationException</code>.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@POST
+@Path("/createUser")
+@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+public void createUser(@NotNull @FormParam("username") String username,
+                       @NotNull @FormParam("firstName") String firstName,
+                       @NotNull @FormParam("lastName") String lastName,
+                       @Email @FormParam("email") String email) {
+    ...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              En el ejemplo anterior, la restricción integrada <code>@NotNull</code> se aplica a los campos de 
+              formulario <code>username</code>, <code>firstName</code> y <code>lastName</code> . Otra 
+              restricción incorporada <code>@Email</code> valida que la dirección de correo electrónico 
+              proporcionada por el campo de formulario <code>email</code> tenga el formato correcto.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Las restricciones también se pueden aplicar a campos dentro de una clase de recurso.</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Path("/createUser")
+public class CreateUserResource {
+  @NotNull
+  @FormParam("username")
+  private String username;
+  @NotNull
+  @FormParam("firstName")
+  private String firstName;
+  @NotNull
+  @FormParam("lastName")
+  private String lastName;
+  @Email
+  @FormParam("email")
+  private String email;
+  ...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              En el ejemplo anterior, las mismas restricciones que se aplicaron a los parámetros del método en 
+              el ejemplo anterior se aplican a los campos de clase. El comportamiento es el mismo en ambos 
+              ejemplos.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las restricciones también se pueden aplicar a las propiedades JavaBeans de una clase de recurso 
+              agregando las anotaciones de restricción al método getter.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Path("/createuser")
+public class CreateUserResource {
+  private String username;
+  @FormParam("username")
+  public void setUsername(String username) {
+    this.username = username;
+  }
+  @NotNull
+  public String getUsername() {
+    return username;
+  }
+  ...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las restricciones también se pueden aplicar a nivel de clase de recurso. En el siguiente 
+              ejemplo, <code>@PhoneRequired</code> es una restricción definida por el usuario que garantiza 
+              que un usuario ingrese al menos un número de teléfono. Es decir, <code>homePhone</code> o 
+              <code>mobilePhone</code> pueden ser nulos, pero no ambos.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Path("/createUser")
+@PhoneRequired
+public class CreateUserResource {
+  @FormParam("homePhone")
+  private Phone homePhone;
+  @FormParam("mobilePhone")
+  private Phone mobilePhone;
+  ...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="CIHFDCBI">
+          <h3 id="validating-entity-data">Validar los Datos de la Entidad</h3>
+          <div class="paragraph">
+            <p>
+              Las clases que contienen anotaciones de restricciones de validación se pueden usar en parámetros 
+              de método en una clase de recursos. Para validar estas clases de entidad, use la anotación 
+              <code>@Valid</code> en el parámetro del método. Por ejemplo, la siguiente clase es una clase 
+              definida por el usuario que contiene restricciones de validación estándar y definidas por el 
+              usuario.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@PhoneRequired
+public class User {
+  @NotNull
+  private String username;
+  private Phone homePhone;
+  private Phone mobilePhone;
+  ...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>Esta clase de entidad se utiliza como parámetro para un método de recursos.</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Path("/createUser")
+public class CreateUserResource {
+  ...
+  @POST
+  @Consumers(MediaType.APPLICATION_XML)
+  public void createUser(@Valid User user) {
+    ...
+  }
+  ...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              La anotación <code>@Valid</code> garantiza que la clase de entidad se valide en tiempo de 
+              ejecución. Las restricciones adicionales definidas por el usuario también pueden desencadenar la 
+              validación de una entidad.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Path("/createUser")
+public class CreateUserResource {
+  ...
+  @POST
+  @Consumers(MediaType.APPLICATION_XML)
+  public void createUser(@ActiveUser User user) {
+    ...
+  }
+  ...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              En el ejemplo anterior, la restricción <code>@ActiveUser</code> definida por el usuario se 
+              aplica a la clase <code>User</code> además de <code>@PhoneRequired</code> y 
+              <code>@ Restricciones NotNull</code> definidas dentro de la clase de entidad.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Si un método de recurso devuelve una clase de entidad, la validación puede desencadenarse 
+              aplicando <code>@Valid</code> o cualquier otra anotación de restricción definida por el usuario 
+              al método de recurso.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Path("/getUser")
+public class GetUserResource {
+  ...
+  @GET
+  @Path("{username}")
+  @Produces(MediaType.APPLICATION_XML)
+  @ActiveUser
+  @Valid
+  public User getUser(@PathParam("username") String username) {
+    // encuentra el Usuario
+    return user;
+  }
+  ...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Como en el ejemplo anterior, la restricción <code>@ActiveUser</code> se aplica a la clase de 
+              entidad devuelta, así como las restricciones <code>@PhoneRequired</code> y 
+              <code>@NotNull</code> definidas dentro la clase de entidad.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="CIHCHEFH">
+          <h3 id="validation-exception-handling-and-response-codes">
+            Manejo de la Excepción de Validación y Códigos de Respuesta
+          </h3>
+          <div class="paragraph">
+            <p>
+              Si se lanza una <code>javax.validation.ValidationException</code> o cualquier subclase de 
+              <code>ValidationException</code> excepto <code>ConstraintValidationException</code>, el tiempo 
+              de ejecución de JAX-RS responderá a la solicitud del cliente con un código de estado HTTP 500 
+              (Error interno del servidor).
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Si se lanza una <code>ConstraintValidationException</code>, el tiempo de ejecución de JAX-RS 
+              responderá al cliente con uno de los siguientes códigos de estado HTTP:
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  <code>500</code> (Error interno del servidor) si se lanzó la excepción al validar un tipo de 
+                  retorno de método
+                </p>
+              </li>
+              <li>
+                <p><code>400</code> (Solicitud incorrecta) en todos los demás casos</p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jaxrs-advanced001.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jaxrs-advanced003.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

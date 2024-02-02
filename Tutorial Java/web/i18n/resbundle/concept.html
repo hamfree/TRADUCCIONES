@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Sobre la Clase ResourceBundle (Los Tutoriales de Java&trade; &gt; Internacionalización &gt; 
+            Aislando Datos de una Localización Específica)
+        </title>
+        <meta name="description" content="Este tutorial de internacionalización de Java describe la configuración regional, 
+              aislando datos específicos de la configuración regional, formateando datos, nombre de dominio internacionalizado e 
+              identificador de recursos" />
+        <meta name="keywords" content="java programming, learn java, java sample code, i18n, internationalization, locale, text
+              formatting" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Aislando Datos de una Localización Específica</a></div>
+                <div class="nolinkAHEAD">Sobre la Clase ResourceBundle</div>
+                <div class="linkAHEAD"><a href="prepare.html">Preparándose para Utilizar un ResourceBundle</a></div>
+                <div class="linkAHEAD"><a href="propfile.html">Respaldando un ResourceBundle con Ficheros de Propiedades</a></div>
+                <div class="linkAHEAD"><a href="list.html">Usando un ListResourceBundle</a></div>
+                <div class="linkAHEAD"><a href="control.html">Personalizando la Carga de un Resource Bundle</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Internacionalización<br />
+                <b>Lección:</b> Aislando Datos de una Localización Específica
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Internacionalización</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Aislando Datos de una Localización Específica</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="prepare.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Sobre la Clase ResourceBundle</h1>
+            </div>
+            <div id="PageContent">
+                <h2>
+                    Cómo se Relaciona un ResourceBundle con un Locale
+                </h2>
+                <p>
+                    Conceptualmente cada <code>ResourceBundle</code> es un conjunto de subclases relacionadas que comparten el 
+                    mismo nombre de base. La lista que sigue muestra un conjunto de subclases relacionadas. 
+                    <code>ButtonLabel</code> es el nombre base. Los caracteres que siguen al nombre base indican el código de 
+                    idioma, el código de país, y la variante de un <code>Locale</code>. <code>ButtonLabel_en_GB</code>, por 
+                    ejemplo, coincide con el <code>Locale</code> especificado por el código de idioma para el inglés 
+                    (<code>en</code>) y el código de país para Gran Bretaña (<code>GB</code>).
+                </p>
+                <div class="codeblock">
+                    <pre>
+ButtonLabel
+ButtonLabel_de
+ButtonLabel_en_GB
+ButtonLabel_fr_CA_UNIX
+                    </pre>
+                </div>
+                <p>
+                    Para seleccionar el <code>ResourceBundle</code> apropiado, invoque el método 
+                    <code>ResourceBundle.getBundle</code>. El ejemplo siguiente seleciona el <code>ResourceBundle</code> 
+                    <code>ButtonLabel</code> para el <code>Locale</code> que coincide con el idioma francés, el país de Canadá, y 
+                    la plataforma UNIX.
+                </p>
+                <div class="codeblock">
+                    <pre>
+Locale currentLocale = new Locale("fr", "CA", "UNIX");
+ResourceBundle introLabels = ResourceBundle.getBundle(
+                                 "ButtonLabel", currentLocale);
+                    </pre>
+                </div>
+                <p>
+                    Si un clase <code>ResourceBundle</code> para el <code>Locale</code> especificado no existe, 
+                    <code>getBundle</code> intenta encontrar la coincidencia más cercana. Por ejemplo, si 
+                    <code>ButtonLabel_fr_CA_UNIX</code> es la clase deseada y el <code>Locale</code> predeterminado es 
+                    <code>en_US</code>, <code>getBundle</code> buscará clases en el orden siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+ButtonLabel_fr_CA_UNIX
+ButtonLabel_fr_CA
+ButtonLabel_fr
+ButtonLabel_en_US
+ButtonLabel_en
+ButtonLabel
+                    </pre>
+                </div>
+                <p>
+                    Note que <code>getBundle</code> busca clases basados en el <code>Locale</code> predeterminado antes de que 
+                    seleccione la clase base (<code>ButtonLabel)</code>. Si <code>getBundle</code> falla en encontrar una 
+                    coincidencia en la lista precedente de clases, lanza una <code>MissingResourceException</code>. Para evitar 
+                    lanzar esta excepción, siempre debe proporcionar una clase base sin sufijos.
+                </p>
+                <h2>
+                    Las Subclases ListResourceBundle y PropertyResourceBundle
+                </h2>
+                <p>
+                    La clase abstracta <code>ResourceBundle</code> tiene dos subclases: <code>PropertyResourceBundle</code> y 
+                    <code>ListResourceBundle</code>.
+                </p>
+                <p>
+                    Un <code>PropertyResourceBundle</code> está respaldado por un fichero de propiedades. Un fichero de propiedades 
+                    es un fichero de texto plano que contiene texto traducible. Los ficheros de propiedades no son parte del código 
+                    fuente de Java, y sólo pueden contener valores para objetos <code>String</code>. Si necesita almacenar otros 
+                    tipos de objetos, use en su lugar un <code>ListResourceBundle</code>. La sección 
+                    <a href="propfile.html">Respaldando un ResourceBundle con Ficheros de Propiedades</a> le muestra cómo usar un 
+                    <code>PropertyResourceBundle</code>.
+                </p>
+                <p>
+                    La clase <code>ListResourceBundle</code> gestiona los recursos con una lista apropiada. Cada 
+                    <code>ListResourceBundle</code> está respaldada por un fichero class. Puede almacenar cualquier objeto 
+                    específico de configuración regional en una <code>ListResourceBundle</code>. Para agregar soporte para un 
+                    <code>Locale</code> adicional, cree otro fichero fuente y compílelo en un fichero class. La sección 
+                    <a href="list.html">Usando un ListResourceBundle</a> tiene un ejemplo de código que puede encontrar útil.
+                </p>
+                <p>
+                    La clase <code>ResourceBundle</code> es flexible. Si coloca primero sus objetos <code>String</code> específicos 
+                    de configuración regional en un <code>PropertyResourceBundle</code> y después más tarde decide usar 
+                    <code>ListResourceBundle</code> en su lugar, no hay impacto en su código. Por ejemplo, la siguiente llamada a 
+                    <code>getBundle</code> recuperará un <code>ResourceBundle</code> para el <code>Locale</code> apropiado, ya sea 
+                    que <code>ButtonLabel</code> esté respaldado por una clase o por un fichero de propiedades:
+                </p>
+                <div class="codeblock">
+                    <pre>
+ResourceBundle introLabels = ResourceBundle.getBundle(
+                                 "ButtonLabel", currentLocale);
+                    </pre>
+                </div>
+                <h2>
+                    Pares Clave-Valor
+                </h2>
+                <p>
+                    Los objetos <code>ResourceBundle</code> contienen una matriz de pares clave-valor. Usted especifica la clave, 
+                    la cual debe ser un <code>String</code>, cuando quiere recuperar el valor desde el <code>ResourceBundle</code>. 
+                    El valor es el objeto específico de configuración regional. Las claves en el ejemplo siguiente son las cadenas 
+                    <code>OkKey</code> y <code>CancelKey</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+class ButtonLabel_en extends ListResourceBundle {
+    // English version
+    public Object[][] getContents() {
+        return contents;
+    }
+    static final Object[][] contents = {
+        {&quot;OkKey&quot;, &quot;OK&quot;},
+        {&quot;CancelKey&quot;, &quot;Cancel&quot;},
+    };
+}
+                    </pre>
+                </div>
+                <p>
+                    Para recuperar la <code>String</code> <code>OK</code> desde el <code>ResourceBundle</code>, debe especificar la 
+                    clave apropiada cuando invoca <code>getString</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+String okLabel = ButtonLabel.getString(&quot;OkKey&quot;);
+                    </pre>
+                </div>
+                <p>
+                    Un fichero de propiedades contiene pares clave-valor. La clave está al lado izquierdo del signo igual, y el 
+                    valor está a la derecha. Cada par está en una línea separada. Los valores pueden sólo representar objetos 
+                    <code>String</code>. El ejemplo siguiente muestra los contenidos de un fichero de propiedades llamado 
+                    <code>ButtonLabel.properties</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+OkKey = OK
+CancelKey = Cancel
+                    </pre>
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="prepare.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Aislando Datos de una Localización Específica<br />
+            <b>Página siguiente:</b> Preparándose para Utilizar un ResourceBundle
+        </div>
+    </body>
+</html> 

@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Trabajando con Texto Bidireccional (Los Tutoriales de Java&trade; &gt; Gráficos 2D &gt; Trabajando con la IPA de Texto)
+        </title>
+        <meta name="description" content="Este tutorial de Java 2D describe gráficos 2D, geometría, IPA de texto, imágenes, 
+              impresión, temas 2D avanzados." />
+        <meta name="keywords" content="java programming, learn java, java sample code, java 2d" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Trabajando con la IPA de Texto</a></div>
+                <div class="linkAHEAD"><a href="fontconcepts.html">Conceptos de Fuentes</a></div>
+                <div class="linkAHEAD"><a href="textlayoutconcepts.html">Conceptos de Diseño del Texto</a></div>
+                <div class="linkAHEAD"><a href="fonts.html">Fuentes Físicas y Lógicas</a></div>
+                <div class="linkAHEAD"><a href="measuringtext.html">Midiendo Texto</a></div>
+                <div class="linkAHEAD"><a href="advanced.html">Visualización Avanzada de Texto</a></div>
+                <div class="linkBHEAD"><a href="renderinghints.html">Visualizando Texto Suavizado Usando Consejos de Renderizado</a></div>
+                <div class="linkBHEAD"><a href="textattributes.html">Usando Atributos de Texto para Estilizar el Texto</a></div>
+                <div class="linkBHEAD"><a href="drawmulstring.html">Dibujando Múltiples Líneas de Texto</a></div>
+                <div class="nolinkBHEAD">Trabajando con Texto Bidireccional</div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Gráficos 2D<br />
+                <b>Lección:</b> Trabajando con la IPA de Texto<br />
+                <b>Sección:</b> Advanced Text Display
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Gráficos 2D</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Trabajando con la IPA de Texto</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="drawmulstring.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../images/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Trabajando con Texto Bidireccional</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    En esta sección se explica cómo trabajar con texto bidireccional con clases en los paquetes 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/package-summary.html"><code>java.awt</code></a> y 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/package-summary.html">
+                        <code>java.awt.font</code></a>. Estas clases le permiten dibujar texto con estilo en cualquier idioma o 
+                    escritura compatible con el Estándar Unicode: un sistema de codificación de caracteres global para manejar 
+                    diversos lenguajes modernos, clásicos e históricos. Al dibujar texto, se debe tener en cuenta la dirección 
+                    en la que se lee el texto para que todas las palabras de la cadena se muestren correctamente. Estas clases 
+                    mantienen la dirección del texto y lo dibujan correctamente sin importar si la cadena va de izquierda a 
+                    derecha, de derecha a izquierda o ambas (bidireccional). El texto bidireccional presenta problemas 
+                    interesantes para colocar correctamente los signos de intercalación, ubicar con precisión las selecciones y 
+                    mostrar correctamente varias líneas. Además, el texto bidireccional y de derecha a izquierda presenta 
+                    problemas similares para mover el cursor en la dirección correcta en respuesta a las pulsaciones de las 
+                    teclas de flecha derecha e izquierda.
+                </p>
+                <p>
+                    Los siguientes temas están cubiertos:
+                </p>
+                <ul>
+                    <li><a href="#ordering_text">Ordenar Texto</a></li>
+                    <li><a href="#manipulating_bidirectional_text">Manipulación de Texto Bidireccional</a>
+                        <ul>
+                            <li><a href="#displaying_carets">Visualización de Signos de Intercalación</a></li>
+                            <li><a href="#moving_carets">Moviendo Signos de Intercalación</a></li>
+                            <li><a href="#hit_testing">Prueba de Colisiones</a></li>
+                            <li><a href="#highlighting_selections">Destacando Selecciones</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#performing_text_layout_in_a_java_application">
+                            Realización de Diseño de Texto en una Aplicación Java</a>
+                    </li>
+                    <li><a href="#managing_text_layout">Administrar el Diseño de Texto con la Clase TextLayout</a>
+                        <ul>
+                            <li><a href="#laying_out_text">Diseñar Texto con la Clase TextLayout</a></li>
+                            <li>
+                                <a href="#displaying_dual_carets">
+                                    Visualización de Cuidadores Duales con la Clase de Diseño de Texto</a>
+                            </li>
+                            <li><a href="#moving_the_caret">Mover el Signo de Intercalación con la Clase TextLayout</a></li>
+                            <li><a href="#textlayout_hit_testing">Prueba de Colisión con la Clase TextLayout</a></li>
+                            <li><a href="#textlayout_highlighting_selections">Resaltado de Selecciones con la Clase TextLayout</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <p>
+                    Si planea trabajar con componentes Swing, consulte
+                    <a class="TutorialLink" target="_top" href="../../i18n/text/bidi.html">
+                        Trabajando con Texto Bidireccional con la Clase JTextComponent</a> y 
+                    <a class="TutorialLink" target="_top" href="../../uiswing/components/text.html">
+                        Usando Componentes de Texto</a> para más información.
+                </p>
+                <h2>
+                    <a id="ordering_text">Ordenar Texto</a>
+                </h2>
+                <p>
+                    Java SE almacena texto en la memoria en orden lógico, que es el orden en el que se leen y escriben los 
+                    caracteres y las palabras. El orden lógico no es necesariamente el mismo que el orden visual, que es el orden en 
+                    el que se muestran los glifos correspondientes.
+                </p>
+                <p>
+                    El orden visual de un sistema de escritura debe mantenerse en texto bidireccional incluso cuando los idiomas 
+                    están mezclados. Esto se ilustra en la siguiente figura, que muestra una frase árabe incrustada en una oración 
+                    en inglés.
+                </p>
+                <p>
+                    <b>Nota:</b> En este ejemplo y en los siguientes, el texto en árabe y hebreo se representa con letras mayúsculas 
+                    y los espacios con guiones bajos. Cada ilustración contiene dos partes: una representación de los caracteres 
+                    almacenados en la memoria (los caracteres en orden lógico) seguida de una representación de cómo se muestran 
+                    esos caracteres (los caracteres en orden visual). Los números debajo de los cuadros de caracteres indican los 
+                    desplazamientos de inserción.
+                </p>
+                <div class="centrado">
+                    <img src="../../figures/2d/text/fig44.gif" width="582" height="167" 
+                         alt="Frase árabe incrustada en una oración en inglés" />
+                </div>
+                <p>
+                    Aunque son parte de una oración en inglés, las palabras en árabe se muestran en el orden de escritura árabe, de 
+                    derecha a izquierda. Debido a que la palabra árabe en cursiva está lógicamente después del árabe en texto sin 
+                    formato, está visualmente a la izquierda del texto sin formato.
+                </p>
+                <p>
+                    Cuando se muestra una línea con una mezcla de texto de izquierda a derecha y de derecha a izquierda, la 
+                    <em>dirección de la base</em> es significativa. La dirección base es el orden del guión del sistema de 
+                    escritura predominante. Por ejemplo, si el texto es principalmente en inglés con algo de árabe incrustado, la 
+                    dirección base es de izquierda a derecha. Si el texto es principalmente árabe con algo de inglés o números 
+                    incrustados, entonces la dirección base es de derecha a izquierda.
+                </p>
+                <p>
+                    La dirección base determina el orden en el que se muestran los segmentos de texto con una dirección común. En el 
+                    ejemplo que se muestra en la figura anterior, la dirección de la base es de izquierda a derecha. Hay tres 
+                    ejecuciones direccionales en este ejemplo: el texto en inglés al principio de la oración va de izquierda a 
+                    derecha, el texto en árabe va de derecha a izquierda y el punto va de izquierda a derecha.
+                </p>
+                <p>
+                    Los gráficos suelen estar integrados en el flujo de texto. Estos gráficos en línea se comportan como glifos en 
+                    términos de cómo afectan el flujo de texto y el ajuste de línea. Estos gráficos en línea deben colocarse 
+                    utilizando el mismo algoritmo de diseño bidireccional para que aparezcan en la ubicación adecuada en el flujo de 
+                    caracteres.
+                </p>
+                <p>
+                    Java SE usa el 
+                    <a class="OutsideLink" target="_blank"
+                       href="http://unicode.org/reports/tr9/">Algoritmo Bidireccional de Unicode</a>, que es un algoritmo que se 
+                    usa  para ordenar glifos dentro de una línea, determinando así la direccionalidad de los textos 
+                    bidireccionales. En la mayoría de los casos, no es necesario incluir información adicional para que este 
+                    algoritmo obtenga el orden de visualización correcto.
+                </p>
+                <h2>
+                    <a id="manipulating_bidirectional_text">Manipulación de Texto Bidireccional</a>
+                </h2>
+                <p>
+                    Para permitir que el usuario edite texto bidireccional, debe poder hacer lo siguiente:
+                </p>
+                <ul>
+                    <li><a href="#displaying_carets">Visualización de Signos de Intercalación</a></li>
+                    <li><a href="#moving_carets">Moviendo Signos de Intercalación</a></li>
+                    <li><a href="#hit_testing">Prueba de Colisiones</a></li>
+                    <li><a href="#highlighting_selections">Destacando Selecciones</a></li>
+                </ul>
+                <h3>
+                    <a id="displaying_carets">Visualización de Signos de Intercalación</a>
+                </h3>
+                <p>
+                    En el texto editable, se utiliza un <em>signo de intercalación</em> para representar gráficamente el punto de 
+                    inserción actual, la posición en el texto donde se insertarán los nuevos caracteres. Normalmente, un símbolo de 
+                    intercalación se muestra como una barra vertical intermitente entre dos glifos. Los nuevos caracteres se 
+                    insertan y se muestran en la ubicación del símbolo de intercalación.
+                </p>
+                <p>
+                    Calcular la posición del símbolo de intercalación puede resultar complicado, especialmente para el texto 
+                    bidireccional. Los desplazamientos de inserción en los límites direccionales tienen dos posibles posiciones de 
+                    intercalación porque los dos glifos que corresponden al desplazamiento del carácter no se muestran uno junto al 
+                    otro. Esto se ilustra en la siguiente figura. En esta figura, los signos de intercalación se muestran como 
+                    corchetes para indicar el glifo al que corresponde el símbolo de intercalación.
+                </p>
+                <div class="centrado">
+                    <img src="../../figures/2d/text/fig79.gif" width="582" height="143" alt="Signos de Intercalación Duales" />
+                </div>
+                <p>
+                    El desplazamiento de 8 caracteres corresponde a la ubicación después del guión bajo y antes de la <em>A</em>. 
+                    Si el usuario ingresa un carácter árabe, su glifo se muestra a la derecha (antes) de la <em>A</em>; si el 
+                    usuario ingresa un carácter en inglés, su glifo se muestra a la derecha (después) del guión bajo.
+                </p>
+                <p>
+                    Para manejar esta situación, algunos sistemas muestran signos de intercalación dobles, un intercalado fuerte 
+                    (primario) y un intercalado débil (secundario). El signo de intercalación fuerte indica dónde se mostrará un 
+                    carácter insertado cuando la dirección de ese carácter sea la misma que la dirección base del texto. El signo de 
+                    intercalación débil muestra dónde se mostrará un carácter insertado cuando la dirección del carácter sea 
+                    opuesta a la dirección base.
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a>
+                    admite automáticamente signos de intercalación dobles.
+                </p>
+                <p>
+                    Cuando trabaja con texto bidireccional, no puede simplemente agregar los anchos de los glifos antes de un 
+                    desplazamiento de carácter para calcular la posición del signo de intercalación. Si lo hiciera, el símbolo de 
+                    intercalación se dibujaría en el lugar incorrecto, como se muestra en la siguiente figura:
+                </p>
+                <div class="centrado">
+                    <img src="../../figures/2d/text/fig610.gif" width="582" height="143" 
+                         alt="Signo de Intercalación Dibujado Incorrectamente" />
+                </div>
+                <p>
+                    Para que el signo de intercalación esté correctamente posicionado, es necesario agregar los anchos de los 
+                    glifos a la izquierda del desplazamiento y tener en cuenta el contexto actual. A menos que se tenga en cuenta el 
+                    contexto, las métricas de glifos no coincidirán necesariamente con la visualización. (El contexto puede afectar 
+                    qué glifos se utilizan).
+                </p>
+                <h3>
+                    <a id="moving_carets">Moviendo Signos de Intercalación</a>
+                </h3>
+                <p>
+                    Todos los editores de texto permiten al usuario mover el cursor con las teclas de flecha. Los usuarios esperan 
+                    que el cursor se mueva en la dirección de la tecla de flecha presionada. En texto de izquierda a derecha, mover 
+                    el desplazamiento de inserción es simple: la tecla de flecha derecha aumenta el desplazamiento de inserción en 
+                    uno y la tecla de flecha izquierda lo reduce en uno. En texto bidireccional o en texto con ligaduras, este 
+                    comportamiento haría que el símbolo de intercalación saltara a través de glifos en los límites de dirección y 
+                    se moviera en la dirección inversa dentro de diferentes recorridos direccionales.
+                </p>
+                <p>
+                    Para mover el símbolo de intercalación sin problemas a través del texto bidireccional, debe tener en cuenta la 
+                    dirección de la ejecución del texto. No puede simplemente incrementar el desplazamiento de inserción cuando se 
+                    presiona la tecla de flecha derecha y disminuirlo cuando se presiona la tecla de flecha izquierda. Si el 
+                    desplazamiento de inserción actual está dentro de una serie de caracteres de derecha a izquierda, la tecla de 
+                    flecha derecha debería disminuir el desplazamiento de inserción y la tecla de flecha izquierda debería 
+                    aumentarlo.
+                </p>
+                <p>
+                    Mover el símbolo de intercalación a través de un límite direccional es aún más complicado. La siguiente figura 
+                    ilustra lo que sucede cuando se cruza un límite direccional cuando el usuario está navegando con la tecla de 
+                    flecha. Pasar tres posiciones a la derecha en el texto mostrado corresponde a moverse a las compensaciones de 
+                    caracteres 7, 19, luego 18.
+                </p>
+                <div class="centrado">
+                    <img src="../../figures/2d/text/fig1211.gif" width="582" height="162" 
+                         alt="Movimiento del signo de intercalación" />
+                </div>
+                <p>
+                    Ciertos glifos nunca deben tener un signo de intercalación entre ellos; en cambio, el símbolo de intercalación 
+                    debería moverse como si los glifos representaran un solo carácter. Por ejemplo, nunca debe haber un signo de 
+                    intercalación entre una <em>o</em> y una diéresis si están representadas por dos caracteres separados.
+                </p>
+                <p>
+                    La clae 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a>
+                    proporciona métodos (
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html#getNextRightHit-int-">
+                        <code>getNextRightHit</code></a> y 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html#getNextLeftHit-int-">
+                        <code>getNextLeftHit</code></a>) que le permiten mover fácilmente el símbolo de intercalación sin problemas 
+                    a través del texto bidireccional.
+                </p>
+                <h3>
+                    <a id="hit_testing">Prueba de Colisiones</a>
+                </h3>
+                <p>
+                    A menudo, una ubicación en el espacio del dispositivo debe convertirse en un desplazamiento de texto. Por 
+                    ejemplo, cuando un usuario hace clic con el mouse en un texto seleccionable, la ubicación del mouse se convierte 
+                    en un desplazamiento de texto y se usa como un extremo del rango de selección. Lógicamente, esto es lo 
+                    contrario de colocar un signo de intercalación.
+                </p>
+                <p>
+                    Cuando trabaja con texto bidireccional, una única ubicación visual en la pantalla puede corresponder a dos 
+                    desplazamientos diferentes en el texto de origen, como se muestra en la siguiente figura:
+                </p>
+                <div class="centrado">
+                    <img src="../../figures/2d/text/fig912.gif" width="582" height="142" 
+                         alt="Prueba de texto bidireccional de colisión" />
+                </div>
+                <p>
+                    Debido a que una sola ubicación visual puede corresponder a dos desplazamientos diferentes, probar el texto 
+                    bidireccional no es solo una cuestión de medir el ancho de los glifos hasta que se encuentra el glifo en la 
+                    ubicación correcta y luego asignar esa posición a un desplazamiento de carácter. Detectar el lado del impacto 
+                    ayuda a distinguir entre las dos alternativas.
+                </p>
+                <p>
+                    Puede realizar la comprobación de colisiones usando 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html#hitTestChar-float-float-">
+                        <code>TextLayout.hitTestChar</code></a>. La información de colisión se encapsula en un objeto 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextHitInfo.html">
+                        <code>TextHitInfo</code></a> e incluye información sobre el lado en el que fue la colisión.
+                </p>
+                <h3>
+                    <a id="highlighting_selections">Destacando Selecciones</a>
+                </h3>
+                <p>
+                    Un rango seleccionado de caracteres se representa gráficamente mediante una región resaltada, un área en la que 
+                    los glifos se muestran con video inverso o contra un color de fondo diferente.
+                </p>
+                <p>
+                    Las regiones resaltadas, como los signos de intercalación, son más complicadas para el texto bidireccional que 
+                    para el texto unidireccional. En el texto bidireccional, es posible que un rango contiguo de caracteres no tenga 
+                    una región resaltada contigua cuando se muestre. Por el contrario, una región resaltada que muestre un rango de 
+                    glifos visualmente contiguo podría no corresponder a un solo rango contiguo de caracteres.
+                </p>
+                <p>
+                    Esto da como resultado dos estrategias para resaltar selecciones en texto bidireccional:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <em>Resaltado lógico</em>: Con el resaltado lógico, los caracteres seleccionados son siempre contiguos 
+                            en el modelo de texto, y la región resaltada puede ser no contigua. El siguiente es un ejemplo de 
+                            resaltado lógico:
+                        </p>
+                        <p class="centrado">
+                            <img src="../../figures/2d/text/fig1013.gif" width="582" height="162" 
+                                 alt="Ilustración de resaltado lógico (caracteres contiguos)" />
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <em>Resaltado visual</em>: con el resaltado visual, puede haber más de un rango de caracteres 
+                            seleccionados, pero la región resaltada siempre es contigua. El siguiente es un ejemplo de resaltado 
+                            visual:
+                        </p>
+                        <p class="centrado">
+                            <img src="../../figures/2d/text/fig1114.gif" width="582" height="162" 
+                                 alt="Ilustración de resaltado visual (región de resaltado contigua)" />
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    El resaltado lógico es más sencillo de implementar, ya que los caracteres seleccionados siempre son contiguos 
+                    en el texto.
+                </p>
+                <p>
+                    El ejemplo 
+                    <a class="SourceLink" target="_blank" href="examples/SelectionSample.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/SelectionSample.java'); return false;">
+                        <code>SelectionSample.java</code>
+                    </a> demuestra el resaltado lógico:
+                </p>
+                <div class="centrado">
+                    <img src="../../figures/2d/text/selection-sample.jpg" width="400" height="250" 
+                         alt="Selection Sample; demonstration of logical highlighting" />
+                </div>
+                <h2>
+                    <a id="performing_text_layout_in_a_java_application">Realización de Diseño de Texto en una Aplicación Java</a>
+                </h2>
+                <p>
+                    Dependiendo de la IPA de Java que utilice, puede tener tanto control sobre el diseño del texto como necesite:
+                </p>
+                <ul>
+                    <li>
+                        <p>Si solo desea mostrar un bloque de texto o necesita un control de texto editable, puede usar
+                            <a class="APILink" target="_blank" 
+                               href="https://docs.oracle.com/javase/8/docs/api/javax/swing/text/JTextComponent.html">
+                                <code>JTextComponent</code></a>, que realizará el diseño del texto por usted.
+                            <a class="APILink" target="_blank"
+                               href="https://docs.oracle.com/javase/8/docs/api/javax/swing/text/JTextComponent.html">
+                                <code>JTextComponent</code></a> está diseñado para satisfacer las necesidades de la mayoría de las 
+                            aplicaciones internacionales y admite texto bidireccional Para obtener más información sobre
+                            <a class="APILink" target="_blank" 
+                               href="https://docs.oracle.com/javase/8/docs/api/javax/swing/text/JTextComponent.html">
+                                <code>JTextComponent</code></a>, vea 
+                            <a class="TutorialLink" target="_top" href="../../i18n/text/bidi.html">Trabajando con Texto 
+                                Bidireccional con la Clase JTextComponent</a> y 
+                            <a class="TutorialLink" target="_top"
+                               href="../../uiswing/components/text.html">Usando Componentes de Texto</a> para más información.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Si desea mostrar una cadena de texto simple, puede llamar al método
+                            <a class="APILink" target="_blank" 
+                               href="https://docs.oracle.com/javase/8/docs/api/java/awt/Graphics2D.html#drawString-java.text.AttributedCharacterIterator-int-int-">
+                                <code>Graphics2D.drawString</code></a> y deje que Java 2D diseñe la cadena por usted. También 
+                            puede usar
+                            <a class="APILink" target="_blank"
+                               href="https://docs.oracle.com/javase/8/docs/api/java/awt/Graphics2D.html#drawString-java.text.AttributedCharacterIterator-int-int-">
+                                <code>Graphics2D.drawString</code></a> para representar cadenas con estilo y cadenas que contienen 
+                            texto bidireccional. Para obtener más información sobre cómo renderizar texto a través de
+                            <a class="APILink" target="_blank" 
+                               href="https://docs.oracle.com/javase/8/docs/api/java/awt/Graphics2D.html">
+                                <code>Graphics2D</code></a>, vea 
+                            <a class="TutorialLink" target="_top" href="index.html">Trabajando con la IPA de Texto</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Si desea implementar sus propias rutinas de edición de texto, puede utilizar
+                            <a class="APILink" target="_blank"
+                               href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html">
+                                <code>TextLayout</code></a> para administrar el diseño del texto, el resaltado y la detección de 
+                            visitas. Las facilidades proporcionadas por
+                            <a class="APILink" target="_blank" 
+                               href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html">
+                                <code>TextLayout</code></a> maneja los casos más comunes, incluidas las cadenas de texto con fuentes 
+                            mixtas, idiomas mezclados y texto bidireccional. Para obtener más información sobre el uso de 
+                            TextLayout, consulte
+                            <a href="#managing_text_layout">Administrar el diseño del texto</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Si desea un control total sobre cómo se forma y posiciona el texto, puede construir sus propias 
+                            instancias  de 
+                            <a class="APILink" target="_blank"
+                               href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/GlyphVector.html">
+                                <code>GlyphVector</code></a> usando la clase 
+                            <a class="APILink" target="_blank" 
+                               href="https://docs.oracle.com/javase/8/docs/api/java/awt/Font.html"><code>Font</code></a> Y luego 
+                            presentarlas a través de la clase 
+                            <a class="APILink" target="_blank" 
+                               href="https://docs.oracle.com/javase/8/docs/api/java/awt/Graphics2D.html">
+                                <code>Graphics2D</code></a>.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Por lo general, no es necesario que realice usted mismo las operaciones de diseño de texto. Para la mayoría de 
+                    las aplicaciones,
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/swing/text/JTextComponent.html">
+                        <code>JTextComponent</code></a> es la mejor solución para mostrar texto estático y editable. Sin embargo,
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/swing/text/JTextComponent.html">
+                        <code>JTextComponent</code></a> no admite la visualización de signos de intercalación dobles o selecciones 
+                    no contiguas en texto bidireccional. Si su aplicación requiere estas características, o si prefiere 
+                    implementar sus propias rutinas de edición de texto, puede usar el IPA de diseño de texto Java 2D.
+                </p>
+                <h2>
+                    <a id="managing_text_layout">Administrar el Diseño de Texto con la Clase TextLayout</a>
+                </h2>
+                <p>
+                    La clase 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html">
+                        <code>TextLayout</code></a> admite texto que contiene varios estilos y caracteres de diferentes sistemas de 
+                    escritura, incluidos el árabe y el hebreo. (El árabe y el hebreo son particularmente difíciles de mostrar 
+                    porque debe remodelar y reordenar el texto para lograr una representación aceptable).
+                </p>
+                <p>
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html">
+                        <code>TextLayout</code></a> simplifica el proceso de visualización y medición de texto incluso si está 
+                    trabajando con texto solo en inglés. Mediante el uso de 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a>,
+                    puede lograr una tipografía de alta calidad sin esfuerzo adicional.
+                </p>
+                <p>
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a> 
+                    está diseñada para que no haya un impacto significativo en el rendimiento cuando se utiliza para mostrar texto 
+                    simple y unidireccional. Hay una sobrecarga de procesamiento adicional cuando
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a> 
+                    se utiliza para mostrar texto en árabe o hebreo. Sin embargo, normalmente es del orden de microsegundos por 
+                    carácter y está dominado por la ejecución del código de dibujo normal.
+                </p>
+                <p>
+                    La clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a>
+                    gestiona el posicionamiento y el orden de los glifos por usted. Puedes usar
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a> 
+                    para hacer lo siguiente:
+                </p>
+                <ul>
+                    <li><a href="#laying_out_text">Diseñar Texto con la Clase TextLayout</a></li>
+                    <li><a href="#displaying_dual_carets">Visualización de Cuidadores Duales con la Clase TextLayout</a></li>
+                    <li><a href="#moving_the_caret">Mover el Signo de Intercalación con la Clase TextLayout</a></li>
+                    <li><a href="#textlayout_hit_testing">Comprobación de Colisiones con la Clase TextLayout</a></li>
+                    <li><a href="#textlayout_highlighting_selections">Resaltado de Selecciones con la Clase TextLayout</a></li>
+                </ul>
+                <h3>
+                    <a id="laying_out_text">Diseñar Texto con la Clase TextLayout</a>
+                </h3>
+                <p>
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a>
+                    presenta automáticamente el texto, incluido el texto bidireccional, con la forma y el orden correctos. Para dar 
+                    forma y ordenar correctamente los glifos que representan una línea de texto,
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a>
+                    debe conocer el contexto completo del texto:
+                </p>
+                <ul>
+                    <li>
+                        Si el texto cabe en una sola línea, como una etiqueta de una sola palabra para un botón o una línea en un 
+                        cuadro de diálogo, puede construir un
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html">
+                            <code>TextLayout</code></a> directamente del texto.
+                    </li>
+                    <li>
+                        Si tiene más texto del que puede caber en una sola línea o desea dividir el texto de una sola línea en 
+                        segmentos con pestañas, no puede construir un
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html">
+                            <code>TextLayout</code></a> directamente. Debe usar un
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/LineBreakMeasurer.html">
+                            <code>LineBreakMeasurer</code></a> para proporcionar suficiente contexto. Ver
+                        <a class="TutorialLink" target="_top" 
+                           href="drawmulstring.html">Dibujando Múltiples Líneas de Texto</a> para más información.
+                    </li>
+                </ul>
+                <p>
+                    La dirección base del texto normalmente se establece mediante un atributo (estilo) en el texto. Si falta ese 
+                    atributo,
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a> 
+                    sigue el algoritmo bidireccional Unicode y deriva la dirección base de los caracteres iniciales en el párrafo.
+                </p>
+                <h3>
+                    <a id="displaying_dual_carets">Visualización de Cuidadores Duales con la Clase TextLayout</a>
+                </h3>
+                <p>
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a>
+                    mantiene información de intercalación como la intercalación
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/Shape.html"><code>Shape</code></a>, posición y 
+                    ángulo. Puede utilizar esta información para mostrar fácilmente a los cuidadores en texto unidireccional y 
+                    bidireccional. Cuando dibuja cuidadores para texto bidireccional, utilizar 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a>
+                    asegura que los signos de intercalación se colocarán correctamente.
+                </p>
+                <p>
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a>
+                    proporciona <code>Shapes</code> de intercalación predeterminada y admite automáticamente intercalaciones dobles. 
+                    Para glifos en cursiva y oblicuos,
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a> 
+                    produce signos de intercalación en ángulo, como se muestra en la siguiente figura. Estas posiciones de 
+                    intercalación también se utilizan como límites entre los glifos para resaltar y realizar pruebas, lo que ayuda 
+                    a producir una experiencia de usuario coherente.
+                </p>
+                <div class="centrado">
+                    <img src="../../figures/2d/text/fig85.gif" width="250" height="77" alt="Caracteres angulares" />
+                </div>
+                <p>
+                    Dado un desplazamiento de inserción, el método 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html#getCaretShapes-int-">
+                        <code>getCaretShapes</code></a> devuelve una mariz de dos elementos de objetos 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/Shape.html"><code>Shape</code></a>: el elemento 0 
+                    contiene el signo de intercalación fuerte y el elemento 1 contiene el signo de intercalación débil, si 
+                    existe. Para mostrar signos de intercalación dobles, simplemente dibuje ambos objetos 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/Shape.html"><code>Shape</code></a>; los signos de 
+                    intercalación se representarán automáticamente en las posiciones correctas.
+                </p>
+                <p>
+                    Si desea utilizar signos de intercalación personalizados, puede recuperar la posición y el ángulo de los 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a>
+                    y dibujarlos usted mismo.
+                </p>
+                <p>
+                    El ejemplo 
+                    <a class="SourceLink" target="_blank" href="examples/HitTestSample.java"
+                       onclick="showCode('../../displayCode.html', 'examples/HitTestSample.java'); return false;">
+                        <code>HitTestSample.java</code></a> demuestra los signos de intercalación dobles.
+                </p>
+                <p>
+                    Un clic en la <em>o</em> al lado de la <em>o</em> hacia los registros de texto hebreo en los que el usuario 
+                    final hizo clic después de la <em>o</em>, que es parte de el texto en inglés. Esto coloca el signo de 
+                    intercalación débil (negro) junto a la <em>o</em> y el signo de intercalación fuerte (rojo) frente a la 
+                    <em>H</em>:
+                </p>
+                <div class="centrado">
+                    <img src="../../figures/2d/text/hit-test-sample-before-o.jpg" width="400" height="250"
+                         alt="Muestra de prueba de acierto, haga clic en la 'o' en el lado del texto hebreo" />
+                </div>
+                <p>
+                    Un clic en el espacio a la derecha de <em>o</em> registra que el usuario final hizo clic en el espacio, que es 
+                    parte del texto hebreo. Esto coloca el signo de intercalación fuerte (rojo) junto a la <em>o</em> y el signo de 
+                    intercalación débil (negro) frente a la <em>H</em>:
+                </p>
+                <div class="centrado">
+                    <img src="../../figures/2d/text/hit-test-sample-after-o.jpg" width="400" height="250"
+                         alt="Muestra de prueba de acierto, hizo clic en el espacio a la derecha de la 'o'" />
+                </div>
+                <h3>
+                    <a id="moving_the_caret">Mover el Signo de Intercalación con la Clase TextLayout</a>
+                </h3>
+                <p>
+                    También puede utilizar la clase 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a>
+                    para determinar el desplazamiento de inserción resultante cuando un usuario presiona la tecla de flecha 
+                    izquierda o derecha. Dado un objeto <code>TextHitInfo</code> que representa el desplazamiento de inserción 
+                    actual, el método 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html#getNextRightHit-java.awt.font.TextHitInfo-">
+                        <code>getNextRightHit</code></a> devuelve un objeto 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextHitInfo.html">
+                        <code>TextHitInfo</code></a> que representa el desplazamiento de inserción correcto si se presiona la tecla 
+                    de flecha derecha. El método 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html#getNextLeftHit-java.awt.font.TextHitInfo-">
+                        <code>getNextLeftHit</code></a> proporciona la misma información para la tecla de flecha izquierda.
+                </p>
+                <p>
+                    El siguiente extracto de la muestra
+                    <a class="SourceLink" target="_blank" href="examples/ArrowKeySample.java"
+                       onclick="showCode('../../displayCode.html', 'examples/ArrowKeySample.java'); return false;">
+                        <code>ArrowKeySample.java</code></a> demuestra cómo determinar el desplazamiento de inserción resultante 
+                    cuando un usuario presiona la tecla de flecha izquierda o derecha:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public class ArrowKeySample extends JPanel implements KeyListener {
+
+  // ...
+
+  private static void createAndShowGUI() {
+    // Crea y configura la ventana.
+    ArrowKey demo = new ArrowKey();
+    frame = new JFrame("Arrow Key Sample");
+    frame.addKeyListener(demo);
+    // ...
+  }
+
+  private void handleArrowKey(boolean rightArrow) {
+    TextHitInfo newPosition;
+    if (rightArrow) {
+      newPosition = textLayout.getNextRightHit(insertionIndex);
+    } else {
+      newPosition = textLayout.getNextLeftHit(insertionIndex);
+    }
+
+    // getNextRightHit() / getNextLeftHit() devolverá nulo si
+    // no hay una posición de intercalación a la derecha (izquierda) del
+    // posición actual.
+    if (newPosition != null) {
+      // Actualiza insertionIndex.
+      insertionIndex = newPosition.getInsertionIndex();
+      // Vuelva a pintar el componente para que se muestren los nuevos signos de intercalación.
+      frame.repaint();
+    }
+  }
+
+  // ...
+
+  @Override
+  public void keyPressed(KeyEvent e) {
+    int keyCode = e.getKeyCode();
+    if (keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_RIGHT) {
+      handleArrowKey(keyCode == KeyEvent.VK_RIGHT);
+    }
+  }
+}
+                    </pre>
+                </div>
+                <h3>
+                    <a id="textlayout_hit_testing">Comprobación de Colisiones con la Clase TextLayout</a>
+                </h3>
+                <p>
+                    La clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html">
+                        <code>TextLayout</code></a> proporciona un mecanismo simple para probar el texto. El método 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html#hitTestChar-float-float-">
+                        <code>hitTextChar</code></a> toma las coordenadas <em>x</em> e <em>y</em> del ratón como argumentos y 
+                    devuelve un objeto 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextHitInfo.html">
+                        <code>TextHitInfo</code></a>. El objeto 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextHitInfo.html">
+                        <code>TextHitInfo</code></a> contiene el desplazamiento de inserción para la posición especificada y el lado 
+                    en el que estaba el hit. El desplazamiento de inserción es el desplazamiento más cercano al acierto: si el 
+                    acierto sobrepasa el final de la línea, se devuelve el desplazamiento al final de la línea.
+                </p>
+                <p>
+                    El siguiente extracto de
+                    <a class="SourceLink" target="_blank" href="examples/HitTestSample.java"
+                       onclick="showCode('../../displayCode.html', 'examples/HitTestSample.java'); return false;">
+                        <code>HitTestSample.java</code></a> recupera el desplazamiento de un clic del ratón:
+                </p>
+                <div class="codeblock">
+                    <pre>
+private class HitTestMouseListener extends MouseAdapter {
+    public void mouseClicked(MouseEvent e) {
+      Point2D origin = computeLayoutOrigin();
+      // Calcula la ubicación del clic del ratón relativa a
+      // origen de textLayout.
+      float clickX = (float) (e.getX() - origin.getX());
+      float clickY = (float) (e.getY() - origin.getY());
+      // Obtiene la posición del carácter del clic del mouse.
+      TextHitInfo currentHit = textLayout.hitTestChar(clickX, clickY);
+      insertionIndex = currentHit.getInsertionIndex();
+      // Vuelva a pintar el componente para que se muestren los nuevos signos de intercalación.
+      repaint();
+    }
+  }
+                    </pre>
+                </div>
+                <h3>
+                    <a id="textlayout_highlighting_selections">Resaltado de Selecciones con la Clase TextLayout</a>
+                </h3>
+                <p>
+                    Puede obtener un 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/Shape.html"><code>Shape</code></a> que representa la 
+                    región destacada del 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a>.
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a>
+                    toma en cuenta automáticamente el contexto al calcular las dimensiones de la región resaltada.
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html"><code>TextLayout</code></a>
+                    admite el resaltado tanto lógico como visual.
+                </p>
+                <p>
+                    El siguiente extracto de
+                    <a class="SourceLink" target="_blank" href="examples/SelectionSample.java"
+                       onclick="showCode('../../displayCode.html', 'examples/SelectionSample.java'); return false;">
+                        <code>SelectionSample.java</code></a>  muestra una forma de mostrar texto resaltado:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public void paint(Graphics g) {
+
+    // ...
+
+    boolean haveCaret = anchorEnd == activeEnd;
+
+    if (!haveCaret) {
+      // Recupera la región resaltada para el rango de selección.
+      Shape highlight = 
+          textLayout.getLogicalHighlightShape(anchorEnd, activeEnd);
+      // Llena la región resaltada con el color resaltado.
+      graphics2D.setColor(HIGHLIGHT_COLOR);
+      graphics2D.fill(highlight);
+    }
+
+    // ...
+
+  }
+
+  // ...
+
+  private class SelectionMouseMotionListener extends MouseMotionAdapter {
+    public void mouseDragged(MouseEvent e) {
+      Point2D origin = computeLayoutOrigin();
+      // Calcula la ubicación del mouse en relación con
+      // origen de textLayout.
+      float clickX = (float) (e.getX() - origin.getX());
+      float clickY = (float) (e.getY() - origin.getY());
+      // Obtiene la posición del carácter de la ubicación del mouse.
+      TextHitInfo position = textLayout.hitTestChar(clickX, clickY);
+      int newActiveEnd = position.getInsertionIndex();
+      // Si newActiveEnd es diferente de activeEnd, actualiza activeEnd
+      // y vuelve a pintar el panel para que se muestre la nueva selección. 
+      if (activeEnd != newActiveEnd) {
+        activeEnd = newActiveEnd;
+        frame.repaint();
+      }
+    }
+  }
+
+  private class SelectionMouseListener extends MouseAdapter {
+    public void mousePressed(MouseEvent e) {
+      Point2D origin = computeLayoutOrigin();
+      // Calcule la ubicación del mouse en relación con
+      // el origen de TextLayout.
+      float clickX = (float) (e.getX() - origin.getX());
+      float clickY = (float) (e.getY() - origin.getY());
+      // Establece el ancla y los extremos activos de la selección
+      // a la posición del carácter de la ubicación del mouse.
+      TextHitInfo position = textLayout.hitTestChar(clickX, clickY);
+      anchorEnd = position.getInsertionIndex();
+      activeEnd = anchorEnd;
+      // Vuelve a pintar el panel para que se muestre la nueva selección.
+      frame.repaint();
+    }
+  }
+
+                    </pre>
+                </div>
+                <p>
+                    El método <code>SelectionMouseListener.mousePressed</code> especifica la variable <code>anchorEnd</code>, que es 
+                    la posición en el texto donde se hizo clic con el mouse. El método 
+                    <code>SelectionMouseMotionListener.mouseDragged</code> especifica la variable <code>activeEnd</code>, que es la 
+                    posición en el texto a donde se arrastró el mouse. El método <code>paint</code> recupera un objeto 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/Shape.html"><code>Shape</code></a> que representa el 
+                    texto seleccionado (el texto entre las posiciones <code>anchorEnd</code> y <code>activeEnd</code>). El 
+                    método <code>paint</code> luego llena el objeto 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/awt/Shape.html"><code>Shape</code></a> con el color de 
+                    resaltado.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="drawmulstring.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../images/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Dibujando Múltiples Líneas de Texto<br />
+            <b>Página siguiente:</b> Working with Images
+        </div>
+    </body>
+</html> 

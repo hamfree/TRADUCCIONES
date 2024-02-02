@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            La Clase HighScore (Los Tutoriales de Java&trade; &gt; Características de Seguridad en Java SE &gt; Implementando su 
+            Propio Permiso)
+        </title>
+        <meta name="description" content="Este tutorial de seguridad de Java describe el uso de firmas digitales, claves y servicios 
+              de criptografía" />
+        <meta name="keywords" content="programación java, aprender java, código ejemplo java, seguridad java, criptografía, firma 
+              digital, verificación firma, código de firma" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Implementando su Propio Permiso</a></div>
+                <div class="linkAHEAD"><a href="game.html">ExampleGame</a></div>
+                <div class="nolinkAHEAD">La Clase HighScore</div>
+                <div class="linkAHEAD"><a href="perm.html">La Clase HighScorePermission</a></div>
+                <div class="linkAHEAD"><a href="policy.html">Un Ejemplo del Fichero de Políticas</a></div>
+                <div class="linkAHEAD"><a href="together.html">Poniéndolo Todo Junto</a></div>
+                <div class="linkBHEAD"><a href="chris.html">Pasos para el Desarrollador de HighScore (Chris)</a></div>
+                <div class="linkBHEAD"><a href="terry.html">Pasos para el Desarrollador de ExampleGame (Terry)</a></div>
+                <div class="linkBHEAD"><a href="kim.html">Pasos para un Usuario Ejecutando ExampleGame (Kim)</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Características de Seguridad en Java SE<br />
+                <b>Lección:</b> Implementando su Propio Permiso
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Características de Seguridad en Java SE</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Implementando su Propio Permiso</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="game.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="perm.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>La Clase HighScore</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    La clase <code>HighScore</code> almacena y protege el acceso a la puntuación más alta del usuario para 
+                    <code>ExampleGame</code> (y cualquier otro juego que lo llame). Por simplicidad, esta clase salva el valor de 
+                    puntuación más alta en un archivo, llamado <code>.highscore</code>, en el directorio de inicio del usuario. Sin 
+                    embargo, antes de permitir que <code>ExampleGame</code> recupere o actualize el valor de puntuación más alta del 
+                    usuario, esta clase comprueba para asegurarse de que el usuario ha otorgado a <code>ExampleGame</code> permiso 
+                    para acceder a la puntuación más alta en su archivo de políticas de seguridad.
+                </p>
+                <h2>
+                    Comprobando que <code>ExampleGame</code> tiene el HighScorePermission
+                </h2>
+                <p>
+                    Para comprobar si <code>ExampleGame</code> tiene o no permiso para acceder a la puntuación más alta del usuario, 
+                    la clase <code>HighScore</code> debe:
+                </p>
+                <ol>
+                    <li>
+                        Llamar a <code>System.getSecurityManager()</code> para obtener el gestor de seguridad actualmente instalado.
+                    </li>
+                    <li>
+                        Si el resultado no es nulo (p.e., <i>hay</i> un gestor de seguridad, en lugar de que el llamador sea una 
+                        aplicación sin restricciones), entonces 
+                        <ol>
+                            <li>Construye un objeto <code>HighScorePermission</code>, y</li>
+                            <li>
+                                Llama al método <code>checkPermission</code> del gestor de seguridad, y le pasa el objeto nuevo 
+                                construído <code>HighScorePermission</code>.
+                            </li>
+                        </ol>
+                    </li>
+                </ol>
+                <p>
+                    Aquí está el código:
+                </p>
+                <div class="codeblock">
+                    <pre>
+SecurityManager sm = System.getSecurityManager();
+if (sm != null) {
+    sm.checkPermission(
+        new HighScorePermission(gameName));
+}
+                    </pre>
+                </div>
+                <p>
+                    El método <code>checkPermission</code> esencialmente pregunta al gestor de seguridad si <code>ExampleGame</code> 
+                    tiene el <code>HighScorePermission</code> especificado. En otras palabras, pregunta al gestor de seguridad si 
+                    <code>ExampleGame</code> tiene permiso para actualizar el valor de puntuación más alta del usuario para el 
+                    juego especificado (<code>ExampleGame</code>). El marco de trabajo de seguridad subyacente consultará la 
+                    política de seguridad del usuario para ver si <code>ExampleGame</code> tiene este permiso.
+                </p>
+                <h2>
+                    El Código de HighScore
+                </h2>
+                <p>
+                    <a class="SourceLink" target="_blank" href="examples/com/scoredev/scores/HighScore.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/com/scoredev/scores/HighScore.java'); return false;">
+                        <code>Aquí</code></a> está el código fuente completo para la clase <code>HighScore</code>.
+                </p>
+                <p>
+                    Nota: Las llamadas al método <code>doPrivileged</code> se usan para habilitar a <code>HighScore</code> a acceder 
+                    temporalmente a los recursos que están disponibles para este pero que no están disponibles para el código que 
+                    lo llama (<code>ExampleGame</code>). Por ejemplo, se espera que el archivo de políticas otorgará a 
+                    <code>HighScore</code> permiso para acceder al archivo <code>.highscore</code> en el directorio de inicio del 
+                    usuario, pero no otorgará este permiso a juegos, tales como <code>ExampleGame</code>.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="game.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="perm.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> ExampleGame<br />
+            <b>Página siguiente:</b> La Clase HighScorePermission
+        </div>
+    </body>
+</html> 

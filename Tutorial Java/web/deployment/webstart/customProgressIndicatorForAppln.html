@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Visualizando un Indicador de Progreso de Carga Personalizado (Los Tutoriales de Java&trade; &gt; Implantación 
+            &gt; Java Web Start)
+        </title>
+        <meta name="description" content="Este tutorial Java de despliegue describe el desarrollo e implantación de applets,
+              aplicaciones Java Web Star, aplicaciones richas de Internet, y herramientas JAR relacionadas" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java applet, java web start, rich internet
+              application, RIA, jar, plugin, plug-in" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Java Web Start</a></div>
+                <div class="linkAHEAD"><a href="developing.html">Desarrollando una Aplicación Java Web Start</a></div>
+                <div class="linkBHEAD"><a href="retrievingResources.html">Recuperando Recursos</a></div>
+                <div class="linkAHEAD"><a href="deploying.html">Desplegando una Aplicación Java Web Start</a></div>
+                <div class="linkBHEAD"><a href="settingUpWebServerMimeType.html">Configurando un Servidor Web</a></div>
+                <div class="nolinkAHEAD">Visualizando un Indicador de Progreso de Carga Personalizado</div>
+                <div class="linkAHEAD"><a href="running.html">Ejecutando una Aplicación Java Web Start</a></div>
+                <div class="linkAHEAD"><a href="security.html">Java Web Start y la Seguridad</a></div>
+                <div class="linkAHEAD"><a href="problems.html">Problemas Comunes en Java Web Start</a></div>
+                <div class="linkQUESTIONS"><a href="QandE/questions.html">Preguntas y Ejercicios</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Implantación<br />
+                <b>Lección:</b> Java Web Start
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Implantación</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Java Web Start</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="settingUpWebServerMimeType.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="running.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Visualizando un Indicador de Progreso de Carga Personalizado</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Una aplicación Java Web Start puede visualizar un indicador personalizado de progreso de carga que muestra el
+                    progreso de la descarga de los recursos de la aplicación.
+                </p>
+                <p>
+                    Considere la aplicación Tiempo y la clase <code>CustomProgress</code> para entender cómo implementar un
+                    indicador personalizado de progreso de carga para una aplicación Java Web Start. Con el propósito de demostrar
+                    una descarga grande y prolongada, este fichero JAR de la aplicación Java Web Start ha sido artificialmente
+                    inflado y el archivo <code>customprogress_webstart.jnlp</code> especifica archivos JAR adicionales como
+                    recursos.
+                </p>
+                <h2>
+                    Desarrollar un Indicador Personalizado de Progreso de Carga
+                </h2>
+                <p>
+                    Para desarrollar un indicador personalizado de progreso de carga para su aplicación Java Web Start, cree una
+                    clase que implemente el interfaz
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/jre/api/javaws/jnlp/javax/jnlp/DownloadServiceListener.html">
+                        <code>DownloadServiceListener</code></a>.
+                </p>
+                <p>
+                    El constructor de la clase de indicador de progreso de carga no debe tener ningún parámetro.
+                </p>
+                <div class="codeblock">
+                    <pre>
+import javax.jnlp.DownloadServiceListener;
+import java.awt.Container;
+import java.applet.AppletStub;
+import netscape.javascript.*;
+// ...
+public class <b>CustomProgress
+        implements DownloadServiceListener</b> {   
+    JFrame frame = null;
+    JProgressBar progressBar = null;
+    boolean uiCreated = false;
+
+    public CustomProgress() {
+    }
+...
+}    
+                    </pre>
+                </div>
+                <p>
+                    El trozo de código siguiente muestra cómo construir la IU para el indicador de progreso de carga:
+                </p>
+                <div class="codeblock">
+                    <pre>
+private void create() {
+    JPanel top = createComponents();
+    frame = new JFrame(); // top level custom progress
+                          // indicator UI
+    frame.getContentPane().add(top,
+                               BorderLayout.CENTER);
+    frame.setBounds(300,300,400,300);
+    frame.pack();
+    updateProgressUI(0);
+}
+
+private JPanel createComponents() {
+    JPanel top = new JPanel();
+    top.setBackground(Color.WHITE);
+    top.setLayout(new BorderLayout(20, 20));
+ 
+    String lblText =
+        "&lt;html&gt;&lt;font color=green size=+2" +
+        "&gt;KDJ Documentation&lt;/font&gt;&lt;br/&gt; " +
+        "The one-stop shop for Java enlightenment! &lt;br/&gt;&lt;/html&gt;";
+    JLabel lbl = new JLabel(lblText);
+    top.add(lbl, BorderLayout.NORTH);
+    ...
+    progressBar = new JProgressBar(0, 100);
+    progressBar.setValue(0);
+    progressBar.setStringPainted(true);
+    top.add(progressBar, BorderLayout.SOUTH);
+
+    return top;
+}
+                    </pre>
+                </div>
+                <p>
+                    Cree y actualize el indicador en los métodos siguientes basados en el argumento <code>overallPercent</code>.
+                    Estos métodos son invocados regularmente por el software de Java Web Start para comunicar el progreso de la
+                    descarga de la aplicación. El software de Java Web Start enviará siempre un mensaje cuando la descarga y la
+                    validación de los recursos se complete al 100%.
+                </p>
+                <div class="codeblock">
+                    <pre>
+public void <b>progress</b>(URL url, String version, long readSoFar,
+                     long total, int overallPercent) {        
+    updateProgressUI(overallPercent);
+
+}
+
+public void <b>upgradingArchive</b>(java.net.URL url,
+                  java.lang.String version,
+                  int patchPercent,
+                  int overallPercent) {
+    updateProgressUI(overallPercent);
+}
+
+public void <b>validating</b>(java.net.URL url,
+            java.lang.String version,
+            long entry,
+            long total,
+            int overallPercent) {
+    updateProgressUI(overallPercent);
+}
+
+private void <b>updateProgressUI</b>(int overallPercent) {
+    if (overallPercent > 0 &amp;&amp; overallPercent &lt; 99) {
+        if (!uiCreated) {
+            uiCreated = true;
+            // crea el IU del indicador de progreso
+            // personalizado solo si hay mas trabajo que hacer,
+            // significa que overallPercent &gt; 0 y
+            // &lt; 100. Esto previene el flaseo cuando
+            // la RIA es cargada desde cache
+            create();
+        }
+        progressBar.setValue(overallPercent);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                frame.setVisible(true);
+            }
+        });
+    } else {
+         // oculta el marco cuando overallPercent está
+        // por encima de 99
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                frame.setVisible(false);
+                frame.dispose();
+            }
+        });
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Compile la clase del indicador de progreso de carga y construya un fichero JAR con todos los recursos necesarios
+                    para visualizar el indicador de progreso de carga. Incluya el fichero
+                    <code>&lt;su directorio EEJ&gt;/lib/javaws.jar</code> en su <code>classpath</code> para habilitar la
+                    compilación.
+                </p>
+                <p>
+                    La clase del indicador de progreso de carga está ahora lista para usar. El próximo paso es especificar este
+                    fichero JAR del indicador de progreso de carga como su indicador de progreso para la aplicación Java Web Start.
+                </p>
+                <h2>
+                    Especificar un Indicador Personalizado de Progreso de Carga para una Aplicación Java Web Start
+                </h2>
+                <p>
+                    Para especificar un indicador personalizado de progreso de carga para una aplicación Java Web Start, incluya la
+                    información siguiente en el fichero JNLP de la aplicación:
+                </p>
+                <ul>
+                    <li>
+                        etiqueta <code>jar</code> con el atributo <code>download=&quot;progress&quot;</code>
+                    </li>
+                    <li>
+                        atributo <code>progress-class</code> con el nombre completamente cualificado de la clase del progreso de
+                        carga personalizado.
+                    </li>
+                </ul>
+                <p>
+                    El trozo de código siguiente del fichero
+                    <a class="SourceLink" target="_blank" 
+                       href="https://docs.oracle.com/javase/tutorialJWS/samples/deployment/customprogress_webstartJWSProject/customprogress_webstart.jnlp"
+                       onclick="showCode('../../displayCode.html',
+                                   'https://docs.oracle.com/javase/tutorialJWS/samples/deployment/customprogress_webstartJWSProject/customprogress_webstart.jnlp'); return false;">
+                        <code>customprogress_webstart.jnlp</code></a> visualiza el uso de los atributos
+                    <code>download=&quot;progress&quot;</code> y <code>progress-class</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;jnlp spec="1.0+" codebase=
+  "https://docs.oracle.com/javase/tutorialJWS/samples/deployment" 
+   href="customprogress_webstartJWSProject/customprogress_webstart.jnlp"&gt;
+  &lt;!-- ... --&gt;
+  &lt;resources&gt;
+    &lt;j2se version="1.7+"/&gt;
+    &lt;jar href=
+      "webstart_AppWithCustomProgressIndicator/webstart_AppWithCustomProgressIndicator.jar" /&gt;
+    &lt;jar href=
+      "webstart_CustomProgressIndicator/webstart_CustomProgressIndicator.jar"
+         <b>download="progress"</b> /&gt;
+    &lt;jar href=
+      "webstart_AppWithCustomProgressIndicator/lib/IconDemo.jar" /&gt;
+    &lt;jar href=
+      "webstart_AppWithCustomProgressIndicator/lib/SplitPaneDemo.jar" /&gt;
+    &lt;jar href=
+      "webstart_AppWithCustomProgressIndicator/lib/SplitPaneDemo2.jar" /&gt;
+    &lt;jar href=
+      "webstart_AppWithCustomProgressIndicator/lib/TextBatchPrintingDemo.jar" /&gt;
+    &lt;jar href=
+      "webstart_AppWithCustomProgressIndicator/lib/ToolBarDemo.jar" /&gt;
+    &lt;jar href=
+      "webstart_AppWithCustomProgressIndicator/lib/ToolBarDemo2.jar" /&gt;
+    &lt;jar href=
+      "webstart_AppWithCustomProgressIndicator/lib/SwingSet2.jar" /&gt;
+  &lt;/resources&gt;
+  &lt;application-desc 
+      main-class="customprogressindicatordemo.Main"
+      <b>progress-class</b>="customprogressindicator.CustomProgress"
+  /&gt;
+  &lt;!-- ... --&gt;
+&lt;/jnlp&gt;
+                    </pre>
+                </div>
+                <p>
+                    Despliegue la aplicación Java Web Start en una página web. Abra
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/dist/webstart_AppWithCustomProgressIndicator/JavaWebStartAppPage.html"
+                       onclick="showCode('../../displayCode.html', 'examples/dist/webstart_AppWithCustomProgressIndicator/JavaWebStartAppPage.html');
+                           return false;">
+                        <code>JavaWebStartAppPage.html</code></a> en un navegador web para ver el indicador de progreso de carga
+                    para la aplicación Tiempo.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Note:</strong> &nbsp;Para ver el ejemplo apropiadamente, necesita instalar al menos la versión
+                    <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">Java SE Development Kit (KDJ) 6
+                        update 18</a>.
+                    <hr />
+                </div>
+                <div class="note">
+                    <hr /><strong>Nota:</strong>&nbsp;Si ha visto esta aplicación Java Web Start antes, limpie su cache usando el
+                    Panel de Control de Java antes de ver la aplicación de nuevo. No podrá ver un indicador de progreso para una
+                    aplicación previamente almacenada en caché.
+                    <hr />
+                </div>
+                <div class="note">
+                    <hr /><strong>Nota:</strong> &nbsp;Si no ve el ejemplo ejecutarse, es posible que necesite habilitar el
+                    intérprete de JavaScript en su navegador de forma que el script de las Herramientas de Despliegue pueda
+                    funcionar adecuadamente.
+                    <hr />
+                </div>
+                <p>
+                    <a class="TutorialLink" target="_top"
+                       href="examplesIndex.html#AppWithCustomProgressIndicator">Descargar código fuente</a> para el ejemplo
+                    <em>Aplicación Java Web Start Con Indicador Personalizado de Progreso de Carga</em> para experimentar más.
+                </p>
+                <p>
+                    Vea el tema
+                    <a class="TutorialLink" target="_top"
+                       href="../doingMoreWithRIA/customizeRIALoadingExperience.html">Personalizando la Experiencia de Carga</a> para
+                    más información sobre la personalización de la experiencia de carga de aplicaciones ricas de Internet (RIA, en
+                    inglés).
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="settingUpWebServerMimeType.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="running.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos
+                            <a href="../../information/cpyr.html">avisos legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Configurando un Servidor Web<br />
+            <b>Página siguiente:</b> Ejecutando una Aplicación Java Web Start
+        </div>
+    </body>
+</html> 

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Manteniendo el Estado del Cliente</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="servlets008.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="servlets010.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BNAGM">
+      <h2 id="maintaining-client-state">Manteniendo el Estado del Cliente</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Muchas aplicaciones requieren que una serie de solicitudes de un cliente se asocien entre sí. Por 
+            ejemplo, una aplicación web puede guardar el estado del carrito de compras de un usuario en todas 
+            las solicitudes. Las aplicaciones basadas en web son responsables de mantener dicho estado, 
+            llamado sesión, porque HTTP no tiene estado. Para admitir aplicaciones que necesitan mantener el 
+            estado, la tecnología Java Servlet proporciona una API para administrar sesiones y permite varios 
+            mecanismos para implementar sesiones.
+          </p>
+        </div>
+        <div class="sect2" id="BNAGN">
+          <h3 id="accessing-a-session">Accediendo una Sesión</h3>
+          <div class="paragraph">
+            <p>
+              Las sesiones están representadas por un objeto <code>HttpSession</code>. Accede a una sesión 
+              llamando al método <code>getSession</code> de un objeto de solicitud. Este método devuelve la 
+              sesión actual asociada con esta solicitud; o, si la solicitud no tiene una sesión, este método 
+              crea una.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BNAGO">
+          <h3 id="associating-objects-with-a-session">Asociando Objetos con una Sesión</h3>
+          <div class="paragraph">
+            <p>
+              Puede asociar atributos con valor de objeto con una sesión por nombre. Dichos atributos son 
+              accesibles para cualquier componente web que pertenezca al mismo contexto web y esté manejando 
+              una solicitud que sea parte de la misma sesión.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Recuerde que su aplicación puede notificar el contexto web y los objetos de escucha de sesión de 
+              los eventos del ciclo de vida del servlet 
+              (<a href="servlets002.html#BNAFJ">Gestionando los Eventos del Ciclo de Vida de un Servlet</a>). 
+              También puede notificar a los objetos ciertos eventos relacionados con su asociación con una 
+              sesión, como los siguientes.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  Cuando el objeto se agrega o elimina de una sesión. Para recibir esta notificación, su 
+                  objeto debe implementar la interfaz 
+                  <code>javax.servlet.http.HttpSessionBindingListener</code>.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Cuándo se pasivará o activará la sesión a la que se adjunta el objeto. Una sesión se 
+                  desactivará o activará cuando se mueva entre máquinas virtuales o se guarde y restaure desde 
+                  un almacenamiento persistente. Para recibir esta notificación, su objeto debe implementar la 
+                  interfaz <code>javax.servlet.http.HttpSessionActivationListener</code>.
+                </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="sect2" id="BNAGQ">
+          <h3 id="session-management">Gestión de Sesión</h3>
+          <div class="paragraph">
+            <p>
+              Debido a que un cliente HTTP no tiene forma de indicar que ya no necesita una sesión, cada 
+              sesión tiene un tiempo de espera asociado para que se puedan reclamar sus recursos. Se puede 
+              acceder al período de tiempo de espera utilizando los métodos 
+              <code>getMaxInactiveInterval</code> y <code>setMaxInactiveInterval</code> de una sesión.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  Para asegurarse de que no se agote el tiempo de espera de una sesión activa, debe acceder 
+                  periódicamente a la sesión utilizando métodos de servicio, ya que esto restablece el 
+                  contador de tiempo de vida de la sesión.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Cuando finaliza una interacción con un cliente en particular, utiliza el método 
+                  <code>invalidate</code> de la sesión para invalidar una sesión en el lado del servidor y 
+                  eliminar los datos de la sesión.
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="sect3" id="sthref100">
+            <h4 id="to-set-the-timeout-period-using-netbeans-ide">
+              Para Establecer el Período de Tiempo de Espera Usando el EID NetBeans
+            </h4>
+            <div class="paragraph">
+              <p>
+                Para establecer el período de tiempo de espera en el descriptor de implementación utilizando 
+                el EID de NetBeans, siga estos pasos.
+              </p>
+            </div>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>Abra el proyecto si aún no lo ha hecho.</p>
+                </li>
+                <li>
+                  <p>Expanda el nodo de su proyecto en la pestaña Proyectos.</p>
+                </li>
+                <li>
+                  <p>Expanda los nodos Páginas Web y WEB-INF que se encuentran bajo el nodo del proyecto.</p>
+                </li>
+                <li>
+                  <p>Haga doble clic <code>web.xml</code>.</p>
+                </li>
+                <li>
+                  <p>Haz clic en General en la parte superior del editor.</p>
+                </li>
+                <li>
+                  <p>En el campo Tiempo de Espera de la Sesión, ingrese un valor entero.</p>
+                  <div class="paragraph">
+                    <p>
+                      El valor entero representa la cantidad de minutos de inactividad que deben pasar antes 
+                      de que se agote el tiempo de espera de la sesión.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="BNAGR">
+          <h3 id="session-tracking">Seguimiento de Sesiones</h3>
+          <div class="paragraph">
+            <p>
+              Para asociar una sesión con un usuario, un contenedor web puede usar varios métodos, todos los 
+              cuales implican pasar un identificador entre el cliente y el servidor. El identificador se puede 
+              mantener en el cliente como una cookie, o el componente web puede incluir el identificador en 
+              cada URL que se devuelve al cliente.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Si su aplicación utiliza objetos de sesión, debe asegurarse de que el seguimiento de la sesión 
+              esté habilitado haciendo que la aplicación reescriba las URL cada vez que el cliente desactive 
+              las cookies. Para ello, llame al método <code>encodeURL(URL)</code> de la respuesta en todas las 
+              URL devueltas por un servlet. Este método incluye el ID de sesión en la URL solo si las cookies 
+              están deshabilitadas; de lo contrario, el método devuelve la URL sin cambios.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="servlets008.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="servlets010.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

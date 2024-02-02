@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Un Ejemplo de Bean de Sesión Singleton: counter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="ejb-basicexamples002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="ejb-basicexamples004.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GIPVI">
+      <h2 id="a-singleton-session-bean-example-counter">Un Ejemplo de Bean de Sesión Singleton: counter</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>El ejemplo de <code>count</code> demuestra cómo crear un bean de sesión singleton.</p>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p><a href="#GIPVC">Creando un Bean de Sesión Singleton</a></p>
+            </li>
+            <li>
+              <p><a href="#GIPXL">La Arquitectura del Ejemplo counter</a></p>
+            </li>
+            <li>
+              <p><a href="#GIPVL">Ejecutando el Ejemplo counter</a></p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="GIPVC">
+          <h3 id="creating-a-singleton-session-bean">Creando un Bean de Sesión Singleton</h3>
+          <div class="paragraph">
+            <p>
+              La anotación <code>javax.ejb.Singleton</code> se utiliza para especificar que la clase de 
+              implementación del enterprise bean es un bean de sesión singleton:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Singleton
+public class SingletonBean { ... }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="sect3" id="GIPPQ">
+            <h4 id="initializing-singleton-session-beans">Inicializando Beans de Sesión Singleton</h4>
+            <div class="paragraph">
+              <p>
+                El contenedor EJB es responsable de determinar cuándo inicializar una instancia de bean de 
+                sesión singleton a menos que la clase de implementación del bean de sesión singleton esté 
+                anotada con la anotación <code>javax.ejb.Startup</code>. En este caso, a veces llamado 
+                inicialización temprana, el contenedor EJB debe inicializar el bean de sesión singleton al 
+                iniciar la aplicación. El bean de sesión singleton se inicializa antes de que el contenedor 
+                EJB entregue solicitudes de cliente a cualquier enterprise bean de la aplicación. Esto permite 
+                que el bean de sesión singleton realice, por ejemplo, tareas de inicio de aplicaciones.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                El siguiente bean de sesión singleton almacena el estado de una aplicación y se inicializa 
+                tempranamente:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Startup
+@Singleton
+public class StatusBean {
+  private String status;
+  @PostConstruct
+  void init {
+    status = "Ready";
+  }
+  ...
+}
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                A veces, se utilizan múltiples beans de sesión singleton para inicializar datos para una 
+                aplicación y, por lo tanto, deben inicializarse en un orden específico. En estos casos, 
+                utilice la anotación <code>javax.ejb.DependsOn</code> para declarar las dependencias de inicio 
+                del bean de sesión singleton. El atributo <code>value</code> de la anotación 
+                <code>@DependsOn</code> es una o más cadenas que especifican el nombre del bean de sesión 
+                singleton de destino. Si se especifica más de un bean singleton dependiente en 
+                <code>@DependsOn</code>, el orden en que se enumeran no es necesariamente el orden en que el 
+                contenedor EJB inicializará los beans de sesión singleton de destino.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                El siguiente bean de sesión singleton, <code>PrimaryBean</code>, debe iniciarse primero:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Singleton
+public class PrimaryBean { ... }
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>El <code>SecondaryBean</code> depende de <code>PrimaryBean</code>:</p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Singleton
+@DependsOn("PrimaryBean")
+public class SecondaryBean { ... }
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                Esto garantiza que el contenedor EJB inicializará <code>PrimaryBean</code> antes que 
+                <code>SecondaryBean</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                El siguiente bean de sesión singleton, <code>TertiaryBean</code>, depende de 
+                <code>PrimaryBean</code> y <code>SecondaryBean</code>:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Singleton
+@DependsOn({"PrimaryBean", "SecondaryBean"})
+public class TertiaryBean { ... }
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                <code>SecondaryBean</code> requiere explícitamente que <code>PrimaryBean</code> se inicialice 
+                antes de que se inicialice, a través de su propia anotación <code>@DependsOn</code>. En este 
+                caso, el contenedor EJB primero inicializará <code>PrimaryBean</code>, luego 
+                <code>SecondaryBean</code> y finalmente <code>TertiaryBean</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Sin embargo, si <code>SecondaryBean</code> no dependiera explícitamente de 
+                <code>PrimaryBean</code>, el contenedor EJB puede inicializar primero <code>PrimaryBean</code> 
+                o <code>SecondaryBean</code>. Es decir, el contenedor EJB podría inicializar los singletons en 
+                el siguiente orden: <code>SecondaryBean</code>, <code>PrimaryBean</code>, 
+                <code>TertiaryBean</code>.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="GIPSZ">
+            <h4 id="managing-concurrent-access-in-a-singleton-session-bean">
+              Gestionando el Acceso Concurrente en un Bean de Sesión Singleton
+            </h4>
+            <div class="paragraph">
+              <p>
+                Los beans de sesión Singleton están diseñados para acceso concurrente, situaciones en las que 
+                muchos clientes necesitan acceder a una única instancia de un bean de sesión al mismo tiempo. 
+                El cliente de un singleton solo necesita una referencia a un singleton para invocar cualquier 
+                método de negocio expuesto por el singleton y no necesita preocuparse por ningún otro cliente 
+                que pueda estar invocando simultáneamente métodos de negocio en el mismo singleton.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Al crear un bean de sesión singleton, el acceso simultáneo a los métodos de negocio del 
+                singleton se puede controlar de dos maneras: simultaneidad administrada por contenedor y 
+                simultaneidad administrada por bean.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                La anotación <code>javax.ejb.ConcurrencyManagement</code> se usa para especificar 
+                simultaneidad administrada por contenedor o por bean para el singleton. Con 
+                <code>@ConcurrencyManagement</code>, un atributo de tipo debe establecerse en 
+                <code>javax.ejb.ConcurrencyManagementType.CONTAINER</code> o 
+                <code>javax.ejb.ConcurrencyManagementType.BEAN</code>. Si no hay ninguna anotación 
+                <code>@ConcurrencyManagement</code> en la clase de implementación singleton, se utiliza el 
+                contenedor EJB predeterminado de simultaneidad gestionada por contenedor.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>Simultaneidad Gestionada por Contenedor</p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Si un singleton utiliza simultaneidad gestionada por contenedor, el contenedor EJB controla el 
+                acceso del cliente a los métodos de negocio del singleton. La anotación 
+                <code>javax.ejb.Lock</code> y un tipo <code>javax.ejb.LockType</code> se utilizan para 
+                especificar el nivel de acceso de los métodos de negocio del singleton o métodos 
+                <code>@Timeout</code >. Los tipos enumerados <code>LockType</code> son <code>READ</code> y 
+                <code>WRITE</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Anote el método de negocio o de tiempo de espera de un singleton con 
+                <code>@Lock(LockType.READ)</code> si se puede acceder o compartir el método simultáneamente 
+                con muchos clientes. Anote el método de negocio o de tiempo de espera con 
+                <code>@Lock(LockType.WRITE)</code> si el bean de sesión singleton debe bloquearse para otros 
+                clientes mientras un cliente llama a ese método. Normalmente, la anotación 
+                <code>@Lock(LockType.WRITE)</code> se utiliza cuando los clientes modifican el estado del 
+                singleton.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Anotar una clase singleton con <code>@Lock</code> especifica que todos los métodos de negocio 
+                y cualquier método de tiempo de espera del singleton usarán el tipo de bloqueo especificado a 
+                menos que establezcan explícitamente el tipo de bloqueo con una anotación <code>@Lock</code> a
+                nivel de método. Si no hay ninguna anotación <code>@Lock</code> en la clase singleton, el tipo 
+                de bloqueo predeterminado, <code>@Lock(LockType.WRITE)</code>, se aplica a todos los métodos 
+                de negocio y de tiempo de espera.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                El siguiente ejemplo muestra cómo usar las anotaciones <code>@ConcurrencyManagement</code>, 
+                <code>@Lock(LockType.READ)</code> y <code>@Lock(LockType.WRITE)</code> para un singleton que 
+                usa simultaneidad administrada por contenedor.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Aunque, de forma predeterminada, los singletons usan simultaneidad administrada por 
+                contenedor, la anotación <code>@ConcurrencyManagement(CONTAINER)</code> se puede agregar en el 
+                nivel de clase del singleton para establecer explícitamente el tipo de administración de 
+                simultaneidad:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
+@Singleton
+public class ExampleSingletonBean {
+  private String state;
+  @Lock(LockType.READ)
+  public String getState() {
+    return state;
+  }
+  @Lock(LockType.WRITE)
+  public void setState(String newState) {
+    state = newState;
+  }
+}
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                Muchos clientes pueden acceder al método <code>getState</code> al mismo tiempo porque está 
+                anotado con <code>@Lock(LockType.READ)</code>. Sin embargo, cuando se llama al método 
+                <code>setState</code>, todos los métodos en <code>ExampleSingletonBean</code> se bloquearán 
+                para otros clientes porque <code>setState</code> está anotado con 
+                <code>@ Bloquear(LockType.WRITE)</code>. Esto evita que dos clientes intenten cambiar 
+                simultáneamente la variable <code>state</code> de <code>ExampleSingletonBean</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Los métodos <code>getData</code> y <code>getStatus</code> en el siguiente singleton son de 
+                tipo <code>READ</code>, y el método <code>setStatus</code> es de tipo <code>WRITE</code>:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Singleton
+@Lock(LockType.READ)
+public class SharedSingletonBean {
+  private String data;
+  private String status;
+  public String getData() {
+    return data;
+  }
+  public String getStatus() {
+    return status;
+  }
+  @Lock(LockType.WRITE)
+  public void setStatus(String newStatus) {
+    status = newStatus;
+  }
+}
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                Si un método es de tipo de bloqueo <code>WRITE</code>, el acceso del cliente a todos los 
+                métodos del singleton se bloquea hasta que el cliente actual finaliza su llamada al método o 
+                se agota el tiempo de espera de acceso. Cuando se agota el tiempo de espera de acceso, el 
+                contenedor EJB lanza una excepción <code>javax.ejb.ConcurrentAccessTimeoutException</code>. La 
+                anotación <code>javax.ejb.AccessTimeout</code> se utiliza para especificar el número de 
+                milisegundos antes de que se agote el tiempo de espera de acceso. Si se agrega a nivel de 
+                clase de un singleton, <code>@AccessTimeout</code> especifica el valor de tiempo de espera de 
+                acceso para todos los métodos en el singleton a menos que un método anule explícitamente el 
+                valor predeterminado con su propia anotación <code>@AccessTimeout</code> .
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                La anotación <code>@AccessTimeout</code> se puede aplicar a los métodos 
+                <code>@Lock(LockType.READ)</code> y <code>@Lock(LockType.WRITE)</code>. La anotación 
+                <code>@AccessTimeout</code> tiene un elemento obligatorio, <code>value</code>, y un elemento 
+                opcional, <code>unit</code>. De forma predeterminada, el <code>value</code> se especifica en 
+                milisegundos. Para cambiar la unidad <code>value</code>, establezca <code>unit</code> en una 
+                de las constantes <code>java.util.concurrent.TimeUnit</code>: <code>NANOSECONDS</code>, 
+                <code>MICROSECONDS</code>, <code>MILLISECONDS</code>, o <code>SECONDS</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                El siguiente singleton tiene un valor de tiempo de espera de acceso predeterminado de 
+                120.000 milisegundos o 2 minutos. El método <code>doTediousOperation</code> anula el tiempo de 
+                espera de acceso predeterminado y establece el valor en 360.000 milisegundos o 6 minutos:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Singleton
+@AccessTimeout(value=120000)
+public class StatusSingletonBean {
+  private String status;
+  @Lock(LockType.WRITE)
+  public void setStatus(String new Status) {
+    status = newStatus;
+  }
+  @Lock(LockType.WRITE)
+  @AccessTimeout(value=360000)
+  public void doTediousOperation {
+    ...
+  }
+}
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                El siguiente singleton tiene un valor de tiempo de espera de acceso predeterminado de 60 
+                segundos, especificado mediante la constante <code>TimeUnit.SECONDS</code>:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Singleton
+@AccessTimeout(value=60, unit=TimeUnit.SECONDS)
+public class StatusSingletonBean { ... }
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>Simultaneidad Gestionada por Beans</p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Los singleton que utilizan simultaneidad gestionada por beans permiten el acceso simultáneo 
+                total a todos los métodos de negocio y de tiempo de espera en el singleton. El desarrollador 
+                del singleton es responsable de garantizar que el estado del singleton esté sincronizado en 
+                todos los clientes. Los desarrolladores que crean singletons con simultaneidad gestionada por 
+                beans pueden utilizar las primitivas de sincronización del lenguaje de programación Java, como 
+                <code>synchronization</code> y <code>volatile</code>, para evitar errores durante el acceso 
+                simultáneo.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Agregue una anotación <code>@ConcurrencyManagement</code> con el tipo establecido en 
+                <code>ConcurrencyManagementType.BEAN</code> en el nivel de clase del singleton para 
+                especificar la concurrencia administrada por beans:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@ConcurrencyManagement(ConcurrencyManagementType.BEAN)
+@Singleton
+public class AnotherSingletonBean { ... }
+                  </code>
+                </pre>
+              </div>
+            </div>
+          </div>
+          <div class="sect3" id="GIPVD">
+            <h4 id="handling-errors-in-a-singleton-session-bean">
+              Gestionando Errores en un Bean de Sesión Singleton
+            </h4>
+            <div class="paragraph">
+              <p>
+                Si un bean de sesión singleton encuentra un error cuando lo inicializa el contenedor EJB, esa 
+                instancia de singleton se destruirá.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                A diferencia de otros enterprise beans, una vez que se inicializa una instancia de bean de 
+                sesión singleton, no se destruye si los métodos de negocio o de ciclo de vida del singleton 
+                provocan excepciones en el sistema. Esto garantiza que se utilice la misma instancia singleton 
+                durante todo el ciclo de vida de la aplicación.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GIPXL">
+          <h3 id="the-architecture-of-the-counter-example">La Arquitectura del Ejemplo counter</h3>
+          <div class="paragraph">
+            <p>
+              El ejemplo de <code>counter</code> consta de un bean de sesión singleton, 
+              <code>CounterBean</code>, y una interfaz web JavaServer Faces Facelets.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              <code>CounterBean</code> es un singleton simple con un método, <code>getHits</code>, que 
+              devuelve un número entero que representa el número de veces que se ha accedido a una página web. 
+              Aquí está el código de <code>CounterBean</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+package javaeetutorial.counter.ejb;
+import javax.ejb.Singleton;
+/**
+ * CounterBean es un simple bean de sesión singleton que registra el número
+ * de visitas a una página web.
+ */
+@Singleton
+public class CounterBean {
+    private int hits = 1;
+    // Incrementa y devuelve el número de visitas.
+    public int getHits() {
+        return hits++;
+    }
+}
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              La anotación <code>@Singleton</code> marca <code>CounterBean</code> como un bean de sesión 
+              singleton. <code>CounterBean</code> utiliza una vista local sin interfaz.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              <code>CounterBean</code> utiliza los valores de metadatos predeterminados del contenedor EJB 
+              para singletons para simplificar la codificación de la clase de implementación de singleton. No 
+              hay ninguna anotación <code>@ConcurrencyManagement</code> en la clase, por lo que se aplica el 
+              acceso predeterminado de simultaneidad administrado por contenedor. No hay ninguna anotación 
+              <code>@Lock</code> en la clase o el método de negocio, por lo que el valor predeterminado de 
+              <code>@Lock(WRITE)</code> se aplica al único método de negocio, <code>getHits</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La siguiente versión de <code>CounterBean</code> es funcionalmente equivalente a la versión 
+              anterior:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+package javaeetutorial.counter.ejb;
+import javax.ejb.Singleton;
+import javax.ejb.ConcurrencyManagement;
+import static javax.ejb.ConcurrencyManagementType.CONTAINER;
+import javax.ejb.Lock;
+import javax.ejb.LockType.WRITE;
+/**
+ * CounterBean es un simple bean de sesión singleton que registra el número
+ * de visitas a una página web.
+ */
+@Singleton
+@ConcurrencyManagement(CONTAINER)
+public class CounterBean {
+    private int hits = 1;
+    // Incrementa y devuelve el número de visitas.
+    @Lock(WRITE)
+    public int getHits() {
+        return hits++;
+    }
+}
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El front-end web de <code>counter</code> consta de un bean gestionado JavaServer Faces, 
+              <code>Count.java</code>, que utilizan los archivos Facelets XHTML <code>template.xhtml</code> y 
+            <code>index.xhtml</code>. El bean administrado <code>Count</code> de JavaServer Faces obtiene 
+            una referencia a <code>CounterBean</code> a través de la inyección de dependencia. 
+            <code>Count</code> define una propiedad de  JavaBeans <code>hitCount</code>. Cuando se llama al 
+            método getter <code>getHitCount</code> desde los archivos XHTML, se llama al método 
+            <code>getHits</code> de <code>CounterBean</code> para devolver el número actual de visitas a la 
+            página.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Aquí está la clase de bean gestionado <code>Count</code>:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Named
+@ConversationScoped
+public class Count implements Serializable {
+    @EJB
+    private CounterBean counterBean;
+    private int hitCount;
+    public Count() {
+        this.hitCount = 0;
+    }
+    public int getHitCount() {
+        hitCount = counterBean.getHits();
+        return hitCount;
+    }
+    public void setHitCount(int newHits) {
+        this.hitCount = newHits;
+    }
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los archivos <code>template.xhtml</code> y <code>index.xhtml</code> se utilizan para representar 
+              una vista de Facelets que muestra el número de visitas a esa vista. El archivo 
+              <code>index.xhtml</code> utiliza una instrucción de lenguaje de expresión, 
+              <code>#{count.hitCount}</code>, para acceder a la propiedad <code>hitCount</code> del bean 
+              gestionado <code>Count</code>. Aquí está el contenido de <code>index.xhtml</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;html lang="es"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"&gt;
+    &lt;ui:composition template="/template.xhtml"&gt;
+        &lt;ui:define name="title"&gt;
+            Esta página ha sido accedida #{count.hitCount} veces.
+        &lt;/ui:define&gt;
+        &lt;ui:define name="body"&gt;
+            ¡Hurra!
+        &lt;/ui:define&gt;
+    &lt;/ui:composition&gt;
+&lt;/html&gt;
+              </code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GIPVL">
+          <h3 id="running-the-counter-example">Ejecutando el Ejemplo counter</h3>
+          <div class="paragraph">
+            <p>
+              Puede usar el EID NetBeans o Maven para compilar, empaquetar, implementar y ejecutar el ejemplo 
+              de <code>counter</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Aquí se tratan los siguientes temas:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p><a href="#GIPXT">Para Ejecutar el Ejemplo counter Usando el EID NetBeans</a></p>
+              </li>
+              <li>
+                <p><a href="#GIPZW">Para Ejecutar el Ejemplo counter Usando Maven</a></p>
+              </li>
+            </ul>
+          </div>
+          <div class="sect3" id="GIPXT">
+            <h4 id="to-run-the-counter-example-using-netbeans-ide">
+              Para Ejecutar el Ejemplo counter Usando el EID NetBeans
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Asegúrese de que el servidor GlassFish se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                  </p>
+                </li>
+                <li>
+                  <p>En el menú Archivo, elija Abrir proyecto.</p>
+                </li>
+                <li>
+                  <p>In the Open Project dialog box, navigate to:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/ejb
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Seleccione la carpeta <code>counter</code>.</p>
+                </li>
+                <li>
+                  <p>Haga clic en Abrir proyecto.</p>
+                </li>
+                <li>
+                  <p>
+                    En la pestaña Proyectos, haga clic con el botón derecho en el proyecto 
+                    <code>counter</code> y seleccione Ejecutar.
+                  </p>
+                  <div class="paragraph">
+                    <p>
+                      Un navegador web abrirá la URL <code>http://localhost:8080/counter</code>, que muestra 
+                      el número de visitas.
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <p>Vuelva a cargar la página para ver el incremento del conteo de visitas.</p>
+                </li>
+              </ol>
+            </div>
+          </div>
+          <div class="sect3" id="GIPZW">
+            <h4 id="to-run-the-counter-example-using-maven">Para Ejecutar el Ejemplo counter Usando Maven</h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Asegúrese de que el servidor GlassFish se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                  </p>
+                </li>
+                <li>
+                  <p>En una ventana de terminal, vaya a:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/ejb/counter/
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Ingrese el siguiente comando:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+mvn install
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      Esto creará e implementará <code>counter</code> en su instancia del servidor GlassFish.
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <p>En un navegador web, ingrese la siguiente URL:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+http://localhost:8080/counter
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Vuelva a cargar la página para ver el incremento del conteo de visitas.</p>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="ejb-basicexamples002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="ejb-basicexamples004.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

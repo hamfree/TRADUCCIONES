@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Proporcionando Servicios de Audio Sampleado (Los Tutoriales de Java&trade; &gt; Sonido)
+        </title>
+        <meta name="description" content="" />
+        <meta name="keywords" content="java programming, learn java, java sample code, " />
+        <link rel="stylesheet" href="../indice.css" type="text/css"/>
+        <script src="../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkAHEAD"><a href="sampled-overview.html">Descripción del Paquete Sampled</a></div>
+                <div class="linkAHEAD"><a href="accessing.html">Accediendo a los Recursos del Sistema de Audio</a></div>
+                <div class="linkAHEAD"><a href="playing.html">Reproducción de Audio</a></div>
+                <div class="linkAHEAD"><a href="capturing.html">Grabando Audio</a></div>
+                <div class="linkAHEAD"><a href="controls.html">Procesando Audio con Controles</a></div>
+                <div class="linkAHEAD"><a href="converters.html">Usando Ficheros y Convertidores de Formato</a></div>
+                <div class="linkAHEAD"><a href="overview-MIDI.html">Descripción del Paquete MIDI</a></div>
+                <div class="linkAHEAD"><a href="accessing-MIDI.html">Accediendo a los Recursos del Sistema MIDI</a></div>
+                <div class="linkAHEAD"><a href="MIDI-messages.html">Transmitiendo y Recibiendo Mensajes MIDI</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-intro.html">Introducción a los Secuenciadores</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-methods.html">Utilizando Métodos del Secuenciador</a></div>
+                <div class="linkAHEAD"><a href="MIDI-seq-adv.html">Usando Características Avanzadas del Secuenciador</a></div>
+                <div class="linkAHEAD"><a href="MIDI-synth.html">Sintetizando Sonido</a></div>
+                <div class="linkAHEAD"><a href="SPI-intro.html">Introducción a los Interfaces de los Proveedores de Servicio</a></div>
+                <div class="nolinkAHEAD">Proporcionando Servicios de Audio Sampleado</div>
+                <div class="linkAHEAD"><a href="SPI-providing-MIDI.html">Proporcionando Servicios MIDI</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Sonido
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="./index.html" target="_top">Sonido</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="SPI-intro.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="SPI-providing-MIDI.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Proporcionando Servicios de Audio Sampleado</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Como sabe, la IPA de Sonido de Java incluye dos paquetes, <code>javax.sound.sampled.spi</code> y 
+                    <code>javax.sound.midi.spi</code>, que definen las clases abstractas que son utilizadas por los desarrolladores 
+                    de los servicios de sonido. Al implementar e instalar una subclase de una de estas clases abstractas, un 
+                    proveedor de servicio registra el nuevo servicio, extendiendo la funcionalidad del sistema en tiempo de 
+                    ejecución. Esta página le indica cómo utilizar el paquete <code>javax.sound.sampled.spi</code> para proporcionar 
+                    nuevos servicios para manejar el audio muestreado.
+                </p>
+                <p></p>
+                <p>
+                    Hay cuatro clases abstractas en el paquete <code>javax.sound.sampled.spi</code>, representando cuatro tipos 
+                    diferentes de servicios que puede proporcionar al sistema de audio muestrado:
+                </p>
+                <ul>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/spi/AudioFileWriter.html">
+                            <code>AudioFileWriter</code></a> proporciona servicios de escritura de archivos de sonido. Estos 
+                        servicios hacen posible que un programa de aplicación escriba un flujo de datos de audio a un archivo de 
+                        un tipo particular.
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/spi/AudioFileReader.html">
+                            <code>AudioFileReader</code></a> proporciona sevicios de lectura de archivos. Estos servicios permiten a 
+                        un programa de aplicación determinar las características de un archivo de sonido y obtener una secuencia 
+                        a partir de la cual se pueden leer los datos de audio del archivo.
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/spi/FormatConversionProvider.html">
+                            <code>FormatConversionProvider</code></a> proporciona servicios para convertir formatos de datos de 
+                        audio. Estos servicios permiten a un programa de aplicación traducir flujos de audio de un formato de 
+                        audio a otro.
+                    </li>
+                    <li>
+                        <a class="APILink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/spi/MixerProvider.html">
+                            <code>MixerProvider</code></a> proporciona la gestión de una clase particular de mezclador. Este 
+                        mecanismo permite que un programa de aplicación obtenga información y acceda a instancias de un tipo 
+                        determinado de mezclador.
+                        <p></p>
+                    </li>
+                </ul>
+                <p>
+                    Para recapitular discusiones anteriores, los proveedores de servicios pueden ampliar la funcionalidad del 
+                    sistema de tiempo de ejecución. Una clase SPI típica tiene dos tipos de métodos: los que responden a consultas 
+                    sobre los tipos de servicios disponibles de un proveedor en particular y los que realizan el nuevo servicio 
+                    directamente o devuelven instancias de objetos que realmente brindan el servicio. El mecanismo de proveedor de 
+                    servicios del entorno de ejecución proporciona <em>registro</em> de los servicios instalados con el sistema de 
+                    audio y <em>administración</em> de las nuevas clases de proveedores de servicios.
+                </p>
+                <p>
+                    En esencia, existe un doble aislamiento de las instancias de servicio del desarrollador de la aplicación. Un 
+                    programa de aplicación nunca crea directamente instancias de los objetos de servicio, como mezcladores o 
+                    convertidores de formato, que necesita para sus tareas de procesamiento de audio. El programa tampoco solicita 
+                    directamente estos objetos a las clases SPI que los administran. El programa de aplicación realiza solicitudes 
+                    al objeto <code>AudioSystem</code> en el paquete <code>javax.sound.sampled</code>, y <code>AudioSystem</code> a 
+                    su vez usa los objetos SPI para procesarlos. consultas y solicitudes de servicio.
+                </p>
+                <p>
+                    La existencia de nuevos servicios de audio puede ser completamente transparente tanto para el usuario como para 
+                    el programador de la aplicación. Todas las referencias de aplicaciones son a través de objetos estándar del 
+                    paquete <code>javax.sound.sampled</code>, principalmente <code>AudioSystem</code>, y el manejo especial que los 
+                    nuevos servicios pueden proporcionar a menudo está completamente oculto.
+                </p>
+                <p>
+                    En esta descripción, continuaremos la convención previa de referirnos a las nuevas subclases SPI por nombres 
+                    como <code>AcmeMixer</code> y <code>AcmeMixerProvider</code>.
+                </p>
+                <p></p>
+                <h2>
+                    Proporcionar Servicios de Escritura de Ficheros de Audio
+                </h2>
+                <p>
+                    Empecemos con <code>AudioFileWriter</code>, una de las clases SPI más simples..
+                </p>
+                <p>
+                    Una subclase que implementa los métodos de <code>AudioFileWriter</code> debe proporcionar implementaciones de 
+                    un conjunto de métodos para manejar consultas sobre los formatos de archivo y tipos de archivo admitidos por la 
+                    clase, así como proporcionar métodos que realmente escriben un flujo de datos de audio proporcionado en un 
+                    <code>File</code> o <code>OutputStream</code>.
+                </p>
+                <p>
+                    <code>AudioFileWriter</code> incluye dos métodos que tienen implementaciones concretas en la clase base:
+                </p>
+                <div class="codeblock">
+                    <pre>
+boolean isFileTypeSupported(AudioFileFormat.Type fileType) 
+boolean isFileTypeSupported(AudioFileFormat.Type fileType, AudioInputStream stream) 
+                    </pre>
+                </div>
+                <p>
+                    El primero de estos métodos informa a la persona que llama si este escritor de archivos puede escribir archivos 
+                    de sonido del tipo especificado. Este método es una consulta general, devolverá <code>true</code> si el escritor 
+                    del archivo puede escribir ese tipo de archivo, asumiendo que el escritor del archivo recibe los datos de audio 
+                    adecuados. Sin embargo, la capacidad de escribir un archivo puede depender del formato de los datos de audio 
+                    específicos que se entregan al escritor del archivo. Es posible que un escritor de archivos no admita todos los 
+                    formatos de datos de audio o que la restricción sea impuesta por el formato de archivo en sí. (No todos los 
+                    tipos de datos de audio se pueden escribir en todos los tipos de archivos de sonido). El segundo método es más 
+                    específico, entonces, pregunta si un <code>AudioInputStream</code> en particular se puede escribir en un tipo de 
+                    archivo en particular.
+                </p>
+                <p>
+                    Generalmente, no necesitará sobreescribir estos dos métodos concretos. Cada uno es simplemente un contenedor que 
+                    invoca uno de los otros dos métodos de consulta e itera sobre los resultados devueltos. Estos otros dos métodos 
+                    de consulta son abstractos y, por lo tanto, deben implementarse en la subclase:
+                </p>
+                <div class="codeblock">
+                    <pre>
+abstract AudioFileFormat.Type[] getAudioFileTypes() 
+abstract AudioFileFormat.Type[] getAudioFileTypes(AudioInputStream stream) 
+                    </pre>
+                </div>
+                <p>
+                    Estos métodos corresponden directamente a los dos anteriores. Cada uno devuelve una matriz de todos los tipos de 
+                    archivos admitidos, todos los que son compatibles en general, en el caso del primer método, y todos los que son 
+                    compatibles con una secuencia de audio específica, en el caso del segundo método. Una implementación típica del 
+                    primer método podría simplemente devolver una matriz que inicializa el constructor del escritor de archivos. Una 
+                    implementación del segundo método podría probar el objeto <code>AudioFormat</code> de la secuencia para ver si 
+                    es un formato de datos compatible con el tipo de archivo solicitado.
+                </p>
+                <p>
+                    The final two methods of <code>AudioFileWriter</code> do the actual file-writing work:
+                </p>
+                <div class="codeblock">
+                    <pre>
+abstract int write(AudioInputStream stream, 
+     AudioFileFormat.Type fileType, java.io.File out) 
+abstract int write(AudioInputStream stream, 
+     AudioFileFormat.Type fileType, java.io.OutputStream out) 
+                    </pre>
+                </div>
+                <p>
+                    Estos métodos escriben un flujo de bytes que representan los datos de audio en el flujo o archivo especificado 
+                    por el tercer argumento. Los detalles de cómo se hace esto dependen de la estructura del tipo de archivo 
+                    especificado. El método <code>write</code> debe escribir el encabezado del archivo y los datos de audio de la 
+                    manera prescrita para los archivos de sonido de este formato (ya sea un tipo estándar de archivo de sonido o uno 
+                    nuevo, posiblemente propietario).
+                </p>
+                <h2>
+                    Proporcionar Servicios de Lectura de Ficheros de Audio
+                </h2>
+                <p>
+                    La clase <code>AudioFileReader</code> consta de seis métodos abstractos que su subclase necesita implementar; en 
+                    realidad, dos métodos sobrecargados diferentes, cada uno de los cuales puede tomar un <code>File</code>, 
+                    <code>URL</code>, o argumento <code>InputStream</code>. El primero de estos métodos sobrecargados acepta 
+                    consultas sobre el formato de archivo de un archivo especificado:
+                </p>
+                <div class="codeblock">
+                    <pre>
+abstract AudioFileFormat getAudioFileFormat(java.io.File file) 
+abstract AudioFileFormat getAudioFileFormat(java.io.InputStream stream) 
+abstract AudioFileFormat getAudioFileFormat(java.net.URL url) 
+                    </pre>
+                </div>
+                <p>
+                    Una implementación típica del método <code>getAudioFileFormat</code> lee y analiza el encabezado del archivo de 
+                    sonido para determinar su formato de archivo. Consulte la descripción de la clase AudioFileFormat para ver qué 
+                    campos deben leerse del encabezado y consulte la especificación del tipo de archivo en particular para descubrir 
+                    cómo analizar el encabezado.
+                </p>
+                <p>
+                    Debido a que el llamador que proporciona una secuencia como argumento para este método espera que el método no 
+                    altere la secuencia, el lector de archivos generalmente debe comenzar marcando la secuencia. Después de leer 
+                    hasta el final del encabezado, debería restablecer la transmisión a su posición original.
+                </p>
+                <p>
+                    El otro método <code>AudioFileReader</code> sobrecargado proporciona servicios de lectura de archivos, al 
+                    devolver un AudioInputStream desde el cual se pueden leer los datos de audio del archivo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+abstract AudioInputStream getAudioInputStream(java.io.File file) 
+abstract AudioInputStream getAudioInputStream(java.io.InputStream stream) 
+abstract AudioInputStream getAudioInputStream(java.net.URL url) 
+                    </pre>
+                </div>
+                <p>
+                    Normalmente, una implementación de <code>getAudioInputStream</code> devuelve un <code>AudioInputStream</code> 
+                    enrollado al comienzo del fragmento de datos del archivo (después del encabezado), listo para leer. Sin embargo, 
+                    sería concebible que un lector de archivos devuelva un <code>AudioInputStream</code> cuyo formato de audio 
+                    representa un flujo de datos que de alguna manera se descodifica a partir de lo que está contenido en el 
+                    archivo. Lo importante es que el método devuelve una secuencia formateada desde la que se pueden leer los datos 
+                    de audio contenidos en el archivo. El <code>AudioFormat</code> encapsulado en el objeto 
+                    <code>AudioInputStream</code> devuelto informará a la persona que llama sobre el formato de datos de la 
+                    transmisión, que suele ser, pero no necesariamente, el mismo que el formato de datos del archivo en sí.
+                </p>
+                <p>
+                    Generalmente, la secuencia devuelta es una instancia de <code>AudioInputStream</code>; es poco probable que 
+                    alguna vez necesite subclasificar <code>AudioInputStream</code>.
+                </p>
+                <p></p>
+                <h2>
+                    Proporcionar Servicios de Conversiones de Formato
+                </h2>
+                <p>
+                    Una subclase <code>FormatConversionProvider</code> transforma un <code>AudioInputStream</code> que tiene un 
+                    formato de datos de audio en uno que tiene otro formato. El primer flujo (entrada) se denomina flujo 
+                    <em>fuente</em> y el último flujo (salida) se denomina flujo <em>destino</em>. Recuerde que un 
+                    <code>AudioInputStream</code> contiene un <code>AudioFormat</code>, y el <code>AudioFormat</code> a su vez 
+                    contiene un tipo particular de codificación de datos, representado por un <code>AudioFormat.Encoding</code>. El 
+                    formato y la codificación en el flujo de origen se denominan formato de origen y codificación de origen, y los 
+                    del flujo de destino también se denominan formato de destino y codificación de destino.
+                </p>
+                <p>
+                    El trabajo de conversión se realiza en el método abstracto sobrecargado de 
+                    <code>FormatConversionProvider</code> llamado <code>getAudioInputStream</code>. La clase también tiene métodos 
+                    de consulta abstractos para conocer todos los formatos y codificaciones de origen y destino admitidos. Existen 
+                    métodos de envoltura concretos para realizar consultas sobre una conversión específica.
+                </p>
+                <p>
+                    Las dos variantes de <code>getAudioInputStream</code> son:
+                </p>
+                <div class="codeblock">
+                    <pre>
+abstract AudioInputStream getAudioInputStream(AudioFormat.Encoding targetEncoding, 
+     AudioInputStream sourceStream) 
+                    </pre>
+                </div>
+                <p>
+                    y
+                </p>
+                <div class="codeblock">
+                    <pre>
+abstract AudioInputStream getAudioInputStream(AudioFormat targetFormat, 
+     AudioInputStream sourceStream) 
+                    </pre>
+                </div>
+                <p>
+                    Estos difieren en el primer argumento, según si el llamador está especificando un formato de destino completo o 
+                    solo la codificación del formato.
+                </p>
+                <p>
+                    Una implementación típica de <code>getAudioInputStream</code> funciona al devolver una nueva subclase de 
+                    <code>AudioInputStream </code>que envuelve el <code>AudioInputStream</code> original (fuente) y aplica una 
+                    conversión de formato de datos a sus datos cada vez que se invoca un método <code>read</code>. Por ejemplo, 
+                    considere el caso de una nueva subclase <code>FormatConversionProvider</code> llamada <code>AcmeCodec</code>, 
+                    que funciona con una nueva subclase <code>AudioInputStream</code> llamada <code>AcmeCodecStream</code>.
+                </p>
+                <p>
+                    La implementación del segundo método <code>getAudioInputStream</code> de <code>AcmeCodec</code> puede ser:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public AudioInputStream getAudioInputStream
+      (AudioFormat outputFormat, AudioInputStream stream) {
+        AudioInputStream cs = null;
+        AudioFormat inputFormat = stream.getFormat();
+        if (inputFormat.matches(outputFormat) ) {
+            cs = stream;
+        } else {
+            cs = (AudioInputStream)
+                (new AcmeCodecStream(stream, outputFormat));
+            tempBuffer = new byte[tempBufferSize];
+        }
+        return cs;
+    }
+                    </pre>
+                </div>
+                <p>
+                    La conversión de formato real tiene lugar en los nuevos métodos <code>read</code> del 
+                    <code>AcmeCodecStream</code> devuelto, una subclase de <code>AudioInputStream</code>. Nuevamente, los programas 
+                    de aplicación que acceden a este <code>AcmeCodecStream</code> devuelto simplemente operan en él como un 
+                    <code>AudioInputStream</code> y no necesitan conocer los detalles de su implementación.
+                </p>
+                <p>
+                    Los otros métodos de un <code>FormatConversionProvider</code> permiten consultas sobre las codificaciones y 
+                    formatos de entrada y salida que admite el objeto. Los siguientes cuatro métodos, al ser abstractos, deben 
+                    implementarse:
+                </p>
+                <div class="codeblock">
+                    <pre>
+abstract AudioFormat.Encoding[] getSourceEncodings() 
+abstract AudioFormat.Encoding[] getTargetEncodings() 
+abstract AudioFormat.Encoding[] getTargetEncodings(
+    AudioFormat sourceFormat) 
+abstract  AudioFormat[] getTargetFormats(
+    AudioFormat.Encoding targetEncoding, 
+    AudioFormat sourceFormat) 
+                    </pre>
+                </div>
+                <p>
+                    Como en los métodos de consulta de la clase <code>AudioFileReader</code> descritos anteriormente, estas 
+                    consultas generalmente se manejan verificando los datos privados del objeto y, para los dos últimos métodos, 
+                    comparándolos con los argumentos.
+                </p>
+                <p>
+                    Los cuatro métodos restantes de <code>FormatConversionProvider</code> son concretos y, por lo general, no es 
+                    necesario sobreescribirlos:
+                </p>
+                <div class="codeblock">
+                    <pre>
+boolean isConversionSupported(
+    AudioFormat.Encoding targetEncoding,
+    AudioFormat sourceFormat) 
+boolean isConversionSupported(AudioFormat targetFormat, 
+    AudioFormat sourceFormat) 
+boolean isSourceEncodingSupported(
+    AudioFormat.Encoding sourceEncoding) 
+boolean isTargetEncodingSupported(
+    AudioFormat.Encoding targetEncoding) 
+                    </pre>
+                </div>
+                <p>
+                    Al igual que con <code>AudioFileWriter.isFileTypeSupported()</code>, la implementación predeterminada de cada 
+                    uno de estos métodos es esencialmente un contenedor que invoca uno de los otros métodos de consulta e itera 
+                    sobre los resultados devueltos.
+                </p>
+                <h2>
+                    Proporcionar Nuevos Tipos de Mezcladores
+                </h2>
+                <p>
+                    Como su nombre lo indica, un <code>MixerProvider</code> proporciona instancias de mezcladores. Cada subclase 
+                    concreta de <code>MixerProvider</code> actúa como una fábrica para los objetos <code>Mixer</code> utilizados por 
+                    un programa de aplicación. Por supuesto, definir un nuevo <code>MixerProvider</code> solo tiene sentido si 
+                    también se definen una o más implementaciones nuevas de la interfaz <code>Mixer</code>. Como en el ejemplo 
+                    <code>FormatConversionProvider</code> anterior, donde nuestro método <code>getAudioInputStream</code> devolvió 
+                    una subclase de <code>AudioInputStream</code> que realizó la conversión, nuestra nueva clase 
+                    <code>AcmeMixerProvider</code> tiene un método <code>getMixer</code> que devuelve una instancia de otra nueva 
+                    clase que implementa la interfaz <code>Mixer</code>. Llamaremos a la última clase <code>AcmeMixer</code>. En 
+                    particular, si el mezclador se implementa en hardware, el proveedor puede admitir solo una instancia estática 
+                    del dispositivo solicitado. Si es así, debería devolver esta instancia estática en respuesta a cada invocación 
+                    de <code>getMixer</code>.
+                </p>
+                <p>
+                    Dado que <code>AcmeMixer</code> admite la interfaz <code>Mixer</code>, los programas de aplicación no requieren 
+                    ninguna información adicional para acceder a su funcionalidad básica. Sin embargo, si <code>AcmeMixer</code> 
+                    admite una funcionalidad no definida en la interfaz de <code>Mixer</code>, y el proveedor desea que esta 
+                    funcionalidad extendida sea accesible para los programas de aplicación, el mezclador debe, por supuesto, 
+                    definirse como un clase pública con métodos públicos adicionales y bien documentados, de modo que un programa 
+                    que desee hacer uso de esta funcionalidad extendida pueda importar <code>AcmeMixer</code> y convertir el objeto 
+                    devuelto por <code>getMixer</code> a este tipo.
+                </p>
+                <p>
+                    Los otros dos métodos de <code>MixerProvider</code> son:
+                </p>
+                <div class="codeblock">
+                    <pre>
+abstract Mixer.Info[] getMixerInfo() 
+                    </pre>
+                </div>
+                <p>
+                    y
+                </p>
+                <div class="codeblock">
+                    <pre>
+boolean isMixerSupported(Mixer.Info info) 
+                    </pre>
+                </div>
+                <p>
+                    Estos métodos permiten que el sistema de audio determine si esta clase de proveedor en particular puede producir 
+                    un dispositivo que necesita un programa de aplicación. En otras palabras, el objeto <code>AudioSystem</code> 
+                    puede iterar sobre todos los <code>MixerProviders</code> instalados para ver cuáles, si los hay, pueden 
+                    suministrar el dispositivo que el programa de aplicación ha solicitado del <code>AudioSystem</code>. El método 
+                    <code>getMixerInfo</code> devuelve una matriz de objetos que contienen información sobre los tipos de 
+                    mezcladores disponibles en este objeto proveedor. El sistema puede pasar estos objetos de información, junto con 
+                    los de otros proveedores, a un programa de aplicación.
+                </p>
+                <p>
+                    Un solo <code>MixerProvider</code> puede proporcionar más de un tipo de mezclador. Cuando el sistema invoca el 
+                    método <code>getMixerInfo</code> del <code>MixerProvider</code>, obtiene una lista de objetos de información que 
+                    identifican los diferentes tipos de mezcladores que admite este proveedor. El sistema puede entonces invocar 
+                    <code>MixerProvider.getMixer(Mixer.Info)</code> para obtener cada mezclador de interés.
+                </p>
+                <p>
+                    Su subclase necesita implementar <code>getMixerInfo</code>, ya que es abstracto. El método 
+                    <code>isMixerSupported</code> es concreto y generalmente no necesita ser anulado. La implementación 
+                    predeterminada simplemente compara el <code>Mixer.Info</code> proporcionado con cada uno en la matriz devuelta 
+                    por <code>getMixerInfo</code>.
+                </p>
+                <p>&nbsp;</p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="SPI-intro.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="SPI-providing-MIDI.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Introducción a los Interfaces de los Proveedores de Servicio<br />
+            <b>Página siguiente:</b> Proporcionando Servicios MIDI
+        </div>
+    </body>
+</html> 

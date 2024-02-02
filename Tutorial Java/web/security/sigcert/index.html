@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Lección: IPA y Herramientas usadas para Código Seguro e Intercambio de Ficheros (Los Tutoriales de Java&trade; &gt; 
+            Características de Seguridad en Java SE)
+        </title>
+        <meta name="description" content="Este tutorial de seguridad de Java describe el uso de firmas digitales, claves y servicios 
+              de criptografía" />
+        <meta name="keywords" content="programación java, aprender java, código ejemplo java, seguridad java, criptografía, firma 
+              digital, verificación firma, código de firma" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body>
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="MainFlow_wide">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Características de Seguridad en Java SE
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Características de Seguridad en Java SE</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="../tour2/index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../toolsign/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Lección: IPA y Herramientas usadas para Código Seguro e Intercambio de Ficheros</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Esta lección explica porqué se necesitan las firmas digitales, los certificados, y almacenes de claves. La 
+                    lección también compara el uso de las herramientas contra la IPA de Seguridad del KDJ con respecto a la 
+                    generación de firmas. 
+                    Este uso de herramientas se demuestra en las dos lecciones siguientes, 
+                    <a class="TutorialLink" target="_top" href="../toolsign/index.html">
+                        Firmando Código y Dándole Permisos</a> e
+                    <a class="TutorialLink" target="_top" href="../toolfilex/index.html">
+                        Intercambio de Ficheros</a>. El uso de la IPA se demuestra en la lección 
+                    <a class="TutorialLink" target="_top" href="../apisign/index.html">
+                        Generación y Verificación de Firmas</a>.
+                </p>
+                <p>
+                    Esta lección contiene las secciones siguientes
+                </p>
+                <ul>
+                    <li><a href="#Intro">Seguridad de Códigos y Documentos</a></li>
+                    <li><a href="#Notes">Notas sobre Herramientas e IPA</a></li>
+                    <li><a href="#IPA">Uso de la IPA de Seguridad del KDJ para Firmar Documentos</a></li>
+                    <li><a href="#Tools">Uso de las Herramientas para Firmar Código o Documentos</a></li>
+                </ul>
+                <h2>
+                    <a id="Intro">Seguridad de Códigos y Documentos</a>
+                </h2>
+                <p>
+                    Si envía un documento importante (o documentos) electrónicamente a alguien , o un applet o aplicación para
+                    ejecutar, el destinatario necesita una forma de verificar que el documento o el código provino de usted y no fue 
+                    modificado en tránsito (por ejemplo, por un usuario malintencionado que lo intercepta). Las firmas digitales, 
+                    certificados, y almacenes de claves ayudan a garantizar la seguridad de los ficheros que envía.
+                </p>
+                <h3>
+                    <a id="Sigs">Firmas Digitales</a>
+                </h3>
+                <p>
+                    La idea básica en el uso de firmas digitales es la siguiente.
+                </p>
+                <ol>
+                    <li>
+                        Usted &quot;firma&quot; el documento o código usando una de sus <b>claves privadas</b>, que puede generar 
+                        usando <code>keytool</code> o métodos de la IPA de Seguridad. Es decir, usted genera una firma digital para 
+                        el documento o código, usando la herramienta <code>jarsigner</code> o métodos de la IPA de Seguridad.
+                    </li>
+                    <li>
+                        Envía su documento firmado a su destinatario.
+                    </li>
+                    <li>
+                        También le proporciona a su destinatario su <b>clave pública</b>. Esta clave pública se corresponde con la 
+                        clave privada que usó originalmente para generar la firma.
+                    </li>
+                    <li>
+                        Su destinatario usa su clave pública para verificar que su documento provino de ustes y no fue modificado 
+                        antes de que llegara a él/ella.
+                    </li>
+                </ol>
+                <p>
+                    Un destinatario necesita asegurarse de que su clave pública <i>en sí misma</i> es auténtica antes de que él/ella 
+                    puedan usarla para verificar que su firma es auténtica. Por lo tanto, usted habitualmente proporciona un 
+                    <b>certificado</b>  que contiene su clave pública junto con la clave de una <b>Autoridad de Certificación</b> 
+                    que puede dar fe de la autenticidad de su clave. Vea la siguiente sección para obtener los detalles.
+                </p>
+                <p>
+                    Para más información sobre la terminología y conceptos de firma y verificación, y una explicación posterior de 
+                    los beneficios, vea la sección 
+                    <a class="TutorialLink" target="_top" href="../../deployment/jar/signing.html">Firmando Ficheros JAR</a> de la 
+                    lección &quot;Los Programas de Empaquetado en Archivos JAR&quot;.
+                </p>
+                <h3>
+                    Certificados
+                </h3>
+                <p>
+                    Un certificado contiene:
+                </p>
+                <ul>
+                    <li>Una clave pública.</li>
+                    <li>
+                        La información de &quot;nombre distinguido&quot; de la entidad (persona, compañía, etc) cuyo certificado es.
+                        Esta entidad se denomina <i>sujeto</i>, o <i>propietario</i> del certificado. La información de nombre 
+                        distinguido incluye los atributos siguientes (o un subconjunto): el nombre de la entidad, unidad 
+                        organizacional, organización, ciudad o localidad, estado o provincia, y código de país.
+                    </li>
+                    <li>
+                        Una firma digital. Un certificado está firmado por una entidad, el <i>emisor</i>, para dar fe de que la 
+                        clave pública adjunta es la clave pública real de otra entidad, el <i>propietario</i>.
+                    </li>
+                    <li>La información de nombre distinguido para el firmante (emisor).</li>
+                </ul>
+                <p>
+                    Una forma que tiene un destinatario para comprobar si un certificado es válido es verificar su firma digital, 
+                    usando la clave públicoa del emisor (firmante). Esa clave puede estar almacenada a sí misma dentro de otro 
+                    certificado cuya firma puede también ser verificada usando la clave pública de del emisor del siguiente 
+                    certificado, y esa clave puede <i>también</i> almacenarse en <i>otro</i> certificado, etc. Puede parar de hacer 
+                    comprobaciones cuando alcance una clave pública en la que usted ya confíe y usarla para verificar la firma del 
+                    certificado correspondiente.
+                </p>
+                <p>
+                    Si el destinatario no puede establecer una cadena de confianza, entonces él/ella puede calcular las 
+                    <b>huellas(s) digital(es)</b> del certificado, usando el comando <code>-import</code> o <code>-printcert</code> 
+                    de <code>keytool</code>. Una huella digital es una número relativamente corto que identifica el certificado de 
+                    manera única y confiable. (Técnicamente, la huella digital es un valor hash (función resumen) de la información 
+                    del certificado, usando una función de resumen de mensaje (<b>Nota del Traductor:</b> message digest, en 
+                    inglés)).  El destinatario puede entonces telefonear al propietario del certificado y comparar los valores de 
+                    huella digital del certificado recibido con el certificado que fue enviado. Si las huellas digitales son las 
+                    mismas, los certificados son los mismos.
+                </p>
+                <p>
+                    Así usted puede asegurar que un certificado no fue modificado en tránsito. Otra posible incertidumbre al 
+                    trabajar con certificados es la identidad del remitente. Algunas veces un certificado es <b>autofirmado</b>, 
+                    es decir, firmado usando la clave privada correspondiente a la clave pública en el certificado; el emisor es el 
+                    mismo que el sujeto.
+                </p>
+                <p>
+                    Autofirmar un certificado es útil para desarrollar y comprobar una aplicación. Sin embargo, antes de 
+                    desplegarla a los usuarios, obtenga un certificado de una tercera parte confiable, denominada como una 
+                    autoridad de certificación (AC). Para hacer eso, usted envía una petición de certificado autofirmado (CSR) a la 
+                    AC. La AC verifica que la firma en el CSR y su identidad, quizás comprobando su licencia de conducción u otra 
+                    información. Luego, la AC garantiza que usted es el propietario de la clave pública al emitir un certificado y 
+                    firmarlo con su propia clave privada (la de la AC). Cualquiera que confíe en la clave pública de la AC emisora 
+                    ahora puede verificar la firma en el certificado. En muchos casos la propia AC emisora puede tener un 
+                    certificado de una AC superior en la jerarquía de AC, lo que lleva a una <b>cadena de certificados</b>.
+                </p>
+                <p>
+                    Los certificados de las entidades en las que confía están habitualmente importadas dentro de su almacén de 
+                    claves como &quot;<b>certificados de confianza</b>.&quot; La clave pública en cada certificado puede entonces 
+                    ser utilizada para verificar las firmas generadas usando la clave privada correspondiente. Tales verificaciones 
+                    pueden ser llevadas a cabo por:
+                </p>
+                <ul>
+                    <li>la herramienta <code>jarsigner</code> (si el documento/código y firma aparecen en un archivo JAR),</li>
+                    <li>métodos de la IPA, o</li>
+                    <li>
+                        el sistema en tiempo de ejecución, cuando se intenta un acceso a un recurso y un archivo de políticas 
+                        especifica que se permite el acceso al recurso para el código que intenta el acceso si su firma es 
+                        auténtica. Los ficheros class del código y la firma deben estar en un archivo JAR.
+                    </li>
+                </ul>
+                <p>
+                    Si está enviando código firmado o documentos a otros, necesita proporcionales el certificado que contiene la 
+                    clave pública correspondiente a la clave privada usada para firmar el código/documento. El comando 
+                    <code>-export</code> de <code>keytool</code> o métodos de la IPA pueden exportar su certificado desde su 
+                    almacén de claves a un archivo, que puede entonces ser enviado a cualquiera que lo necesite. Una persona que 
+                    reciba el certificado puede importarlo dentro de su almacén de claves como un certificado de confianza, usando, 
+                    por ejemplo, los métodos de la IPA o el comando <code>-import</code> de <code>keytool</code>.
+                </p>
+                <p>
+                    Si usa la herramienta <code>jarsigner</code> para generar una firma para un archivo JAR, la herramienta 
+                    recupera su certificado y su cadena de certificados de soporte de su almacén de claves. La herramienta luego los 
+                    almacena, junto con la firma, en el archivo JAR.
+                </p>
+                <h3>
+                    <a id="Keystores">Almacenes de Claves</a>
+                </h3>
+                <p>
+                    Las claves privadas y sus certificados de clave pública asociados se almacenan en bases de datos protegidas por 
+                    contraseña llamados <b>almacenes de claves</b>. Un almacén de claves puede contener dos tipos de entradas: las 
+                    entradas de certificados de confianza descritas arriba, y entradas de llave/certificado, cada una conteniendo 
+                    una clave pridad y su correspondiente certificado de clave pública. Cada entrada en el almacén de claves se 
+                    identifica por un <em>alias</em>.
+                </p>
+                <p>
+                    El propietario de un almacén de claves puede tener muchas llaves en el almacén de claves, accedidas mediante 
+                    aliases diferentes. Por lo general, un alias recibe el nombre de un rol particular en el que el propietario del 
+                    almacén de claves usa la clave asociada. Un alias también peude identificar el propósito de la llave o clave. 
+                    Por ejemplo, el alias <code>signPersonalEmail</code> podría ser utilizado para identificar un entrada de almacén 
+                    de claves cuya clave privada se usa para firmar correo eléctronico personal, y el alias 
+                    <code>signJarFiles</code> podría ser usado para identificar una entrada cuya clave privada se usa para firmar 
+                    archivos JAR.
+                </p>
+                <p>
+                    La herramienta <code>keytool</code> se puede usar para 
+                </p>
+                <ul>
+                    <li>Crear claves privadas y sus certificados de clave pública asociados</li>
+                    <li>Emitir solicitudes de certificado, que envía a la autoridad de certificación apropiada</li>
+                    <li>Importar respuestas de certificado, obtenidas de la autoridad de certificación que contactó</li>
+                    <li>Importar certificados de clave pública pertenecientes a otras partes como certificados de confianza</li>
+                    <li>Gestionar su almacén de claves</li>
+                </ul>
+                <p>
+                    Los métodos de la IPA pueden también utilzarse para acceder y modificar un almacén de claves.
+                </p>
+                <h2>
+                    <a id="Notes">Notas sobre Herramientas e IPA</a>
+                </h2>
+                <p>
+                    Tenga en cuenta lo siguiente respecto al uso de las herramientas y la IPA relacionada con firmas digitales.
+                </p>
+                <ul>
+                    <li>
+                        Puede usar la IPA de Seguridad del KDJ, herramientaas, o una combinación para generar claves y firmas e 
+                        importar certificados. Puede usar esas características de la  IPA o herramienta para intercambiar de forma 
+                        segura documentos con otros.
+                    </li>
+                    <li>
+                        Para usar las <i>herramientas</i> para el intercambio de documetnos, el(los) documento(s) deben ser 
+                        colocados en un fichero JAR (<b>Nota del Traductor:</b> Java ARchive, en inglés), que puede ser creado 
+                        por la herramienta <code>jar</code>. Un archivo JAR es una buena forma de encapsular múltiples ficheros en 
+                        un solo lugar. Cuando se &quot;firma&quot; un archivo, los bytes de firma digital resultante necesitan ser 
+                        almacenados en alguna parte. Cuando se firma un archivo JAR, la firma puede ir dentro del propio archivo 
+                        JAR. Esto es lo que ocurre cuando usa la herramienta <code>jarsigner</code> para firmar un archivo JAR.
+                    </li>
+                    <li>
+                        Si usted está creando código de applet que firmará, necesita ser colocado en un archivo JAR. Lo mismo es 
+                        verdad si está creando código de una aplicación que puede ser restringida similarmente al ejecutarla con 
+                        un gestor de seguridad. La razón de que necesite el archivo JAR es que cuando un archivo de políticas 
+                        especifica que al código firmado por una entidad particular se le permite una o más operaciones, tales como 
+                        leer o escribir un fichero específico, se espera que el código venga de un archivo JAR firmado. (El término 
+                        &quot;código firmado&quot; es una forma abreviada de decir &quot;código en un fichero class que aparece en 
+                        un archivo JAR que fue firmado.&quot;)
+                    </li>
+                    <li>
+                        Para que el sistema en tiempo de ejecución compruebe una firma de código, la persona/organzación que 
+                        ejecutará el código primero necesita importar dentro de su almacén de claves un certificado que 
+                        autentifique la clave pública correspondiente a la clave privada usada para firmar el código.
+                    </li>
+                    <li>
+                        Para que la herramienta <code>jarsigner</code> verifique la autenticidad de una firma de archivo JAR, la 
+                        persona/organización que recibió el archivo JAR primero necesita importar dentro de su almacén de claves un 
+                        certificado autenticando la clave pública correspondiente a la clave privada usada para firmar el código.
+                    </li>
+                    <li>En este momento no hay IPA para la creación de certificados.</li>
+                </ul>
+                <h2>
+                    <a id="IPA">Uso de la IPA de Seguridad del KDJ para Firmar Documentos</a>
+                </h2>
+                <p>
+                    <a class="TutorialLink" target="_top" href="../apisign/index.html">Generar y Verificar Firmas</a> le muestra 
+                    cómo usasr la IPA de Seguridad del KDJ para firmar documentos. La lección muestra que un programa, ejecutado por 
+                    la persona que tiene el documento original, podría 
+                </p>
+                <ul>
+                    <li>generar las claves,</li>
+                    <li>generar una firma digital para los datos usando la clave privada, y </li>
+                    <li>exportar la clave pública y la firma a archivos.</li>
+                </ul>
+                <p>
+                    Luego muestra un ejemplo de otro programa, ejecutado por el destinatario de los datos, firma, y clave pública. 
+                    Muestra cómo el programa 
+                </p>
+                <ul>
+                    <li>Importa la clave pública</li>
+                    <li>Verifica la autenticidad de la firma.</li>
+                </ul>
+                <p>
+                    Esta lección también le muestra formas alternativas de importar y proporcionar claves, incluyendo certificados.
+                </p>
+                <h2>
+                    <a id="Tools">Uso de las Herramientas para Firmar Código o Documentos</a>
+                </h2>
+                <p>
+                    La lección 
+                    <a class="TutorialLink" target="_top" href="../toolsign/index.html">Firmando Código y Dándole Permisos</a>
+                    le muestra cómo usar las herramientas de Seguridad de Java para colocar su código dentro de un archivo JAR, 
+                    firmarlo, y exportar su clave pública. Luego muestra como su destinatario puede usar las mismas herramientas 
+                    de Java para importar su certificado de clave pública y después agregar una entrada a un archivo de políticas 
+                    que otorgarán a su código el permiso que necesita para acceder a los recursos del sistema controlados por su 
+                    destinatario.
+                </p>
+                <p>
+                    La lección <a class="TutorialLink" target="_top" href="../toolfilex/index.html">Intercambio de Ficheros</a> le 
+                    muestra cómo usar las herramientas de seguridad de Java par firmar un documetno y luego exportar el certificado 
+                    de clave pública para la clave pública usando <code>keytool</code> que corresponde a la clave privada usada para 
+                    firmar ese documento usando <code>keytool</code>. Después muestra cómo su destinatario puede verificar su firma 
+                    instalando su certificado de clave pública y después usar la herramienta <code>jarsigner</code> para verificar 
+                    su firma.
+                </p>
+                <p>
+                    Estas dos lecciones tienen mucho en común. En ambos casos, los dos primeros pasos para el código o el remitente 
+                    del documento van a:
+                </p>
+                <ul>
+                    <li>Crear un archivo JAR que contiene el documento o ficheros classs, usando la herramienta <code>jar</code>.</li>
+                    <li>
+                        Generar claves (si estas aún no existen), usando el comando <code>-genkey</code>  de <code>keytool</code>.
+                    </li>
+                </ul>
+                <p>
+                    Los siguientes dos pasos son opcionales:
+                </p>
+                <ul>
+                    <li>
+                        Use el comando <code>-certreq</code> de <code>keytool</code>; después envíe la petición de certificado 
+                        resultante a una autoridad de certificación (AC) como VeriSign.
+                    </li>
+                    <li>
+                        Use el comando <code>-import</code> de <code>keytool</code> para importar la respuesta de la AC.
+                    </li>
+                </ul>
+                <p>
+                    Se requieren los dos pasos siguientes:
+                </p>
+                <ul>
+                    <li>
+                        Firme el archivo JAR, usando la herramienta <code>jarsigner</code> y la clave privada generada anteriormente.
+                    </li>
+                    <li>
+                        Exporte el certificado de clave pública, usando el comando <code>-export</code> de <code>keytool</code>. 
+                        Luego proporcione el archivo JAR firmado y el certificado al destinatario.
+                    </li>
+                </ul>
+                <p>
+                    En ambos casos, el destinatario del archivo JAR firmado y el certificado debe importar el certificado como un 
+                    certificaddo de confiazan, usando el comando <code>-import</code> de <code>keytool</code>. <code>keytool</code> 
+                    intentará construir una cadena de confiazna desde certificado a importar a un certificado de confianza ya 
+                    existente en el almacén de claves. Si eso falla, <code>keytool</code> visualizará la huella digital del 
+                    certificado y le preguntará para verificarla.
+                </p>
+                <p>
+                    Si lo que se envió fue un código, el receptor también necesita modificar un archivo de política para permitir 
+                    que los recursos requeridos accedan al código firmado por la clave privada correspondiente a la clave pública en 
+                    el certificado importado. La <b>Herramienta de Políticas</b> se puede usar para hacer esto.
+                </p>
+                <p>
+                    Si lo que fue enviado fue uno o más documentos, el remitente necesita verificar la autenticidad de la firma del 
+                    archivo JAR, usando la herramienta <code>jarsigner</code>.
+                </p>
+                <p>
+                    Esta lección describe los dos pasos opcionales. Los otros pasos se cubren en las dos lecciones siguientes, 
+                    <a class="TutorialLink" target="_top" href="../toolsign/index.html">Firmando Código y Dándole Permisos</a> y 
+                    <a class="TutorialLink" target="_top" href="../toolfilex/index.html">Intercambio de Archivos</a> .
+                </p>
+                <h3>
+                    <a id="GenCSR">Generar una Petición de Firmado de Certificado (CSR) para un Certificado de Clave Pública</a>
+                </h3>
+                <p>
+                    Cuando se usa <code>keytool</code> para generar pares de clave pública/privada, crea una entrada de  almacén de 
+                    claves conteniendo una clave privada y un certificado autofirmado para la clave pública. (Es decir, el 
+                    certificado está formado usando la clave privada correspondiente). Esto es adecuado cuando desarrollo y prueba 
+                    una aplicación.
+                </p>
+                <p>
+                    Sin embargo, es más probable que otros confíen en un certificado si está firmado por una autoridad de 
+                    certificación (AC).  Para obtener un certificado firmado por una AC, primero genere una petición de firmado de 
+                    certificado (CSR), a travmés de un comando como el siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+keytool -certreq -alias <i>alias</i> -file <i>csrFile</i> 
+                    </pre>
+                </div>
+                <p>
+                    Aquí <i>alias</i> se usa para acceder a la entrada del almacen de claves que contiene la clave privada y el 
+                    certificado de clave pública, y <i>csrFile</i> especifica el nombre que se usa para el CSR creado para este 
+                    comando.
+                </p>
+                <p>
+                    Después envíe este fichero a una AC, tal como VeriSign, Inc. La AC le autentifica, el peticionario 
+                    (&quot;sujeto&quot;), y después firma y devuelve un certificado autenticando su clave pública. Firmando el 
+                    certificado, la AC garantiza que usted es el propietario de la clave pública.
+                </p>
+                <p>
+                    En algunos casos, la AC devolverá una cadena de certificados, cada uno autenticando la clave pública del 
+                    firmante del certificado previo en la cadena.
+                </p>
+                <h3>
+                    Importar la Respuesta de una AC
+                </h3>
+                <p>
+                    Después de enviar una petición de firmado de certificado (CSR) a una autoridad de certificación (AC), necesita 
+                    reemplazar el certificado autofirmado original en su almacén de claves con una cadena de certificados importando 
+                    el certificado (o cadena de certificados) devueltos a usted por la AC.
+                </p>
+                <p>
+                    Pero primero necesita una entrada de &quot;certificado de confianza&quot; en su almacén de claves (o en el 
+                    archivo almacén de claves <code>cacerts</code> , descrito abajo) que autentica la clave pública de la <i>AC</i>. 
+                    Con tal entrada se puede verificar la firma de la AC. Es decir, la firma de la AC en el certificado, o en el 
+                    certificado final en la cadena que la AC le envía a usted en respuesta a su CSR, pueda ser verificada.
+                </p>
+                <h3>
+                    <a id="ImportCA">Importar un Certificado de una AC como un &quot;Certificado de Confianza&quot;</a>
+                </h3>
+                <p>
+                    Antes de que importe la respuesta de certificado desde la AC, necesita uno o más &quot;certificados de 
+                    confianza&quot; en su almacén de claves o en el archivo <code>cacerts</code>.
+                </p>
+                <ul>
+                    <li>
+                        Si la respuesta de certificado es una cadena de certificados, simplemente necesita el certificado superior 
+                        de la cadena -- el certificado &quot;raíz&quot; de la AC que autentifica esa clave pública de la AC.
+                    </li>
+                    <li>
+                        Si la respuesta de certificado es un certificado único, necesita un certificado para la AC emisora (
+                        If the certificate reply is a single certificate, you need a certificate for the issuing CA (la que lo 
+                        firmó). Si ese certificado no está autofirmado, necesita un certificado para su firmante, etc, hasta un 
+                        certificado &quot;raíz&quot; autofirmado de la AC.
+                    </li>
+                </ul>
+                <p>
+                    El archivo <code>cacerts</code> representa un almacén de claves de todo el sistema con certificados de AC. 
+                    Este archivo residen en el directorio de propiedades de seguridad del EEJ, 
+                    <code><i>java.home</i>/lib/security</code>, donde <i>java.home</i> es el directorio de instalación del EEJ.
+                </p>
+                <hr />
+                <p>
+                    <b>IMPORTANTE: Verifique Su Archivo <code>cacerts</code></b><br />
+                    Ya que usted confía en las ACs en el archivo <code>cacerts</code> como entidades para firmar y emitir 
+                    certificados a otras entidades, debe gestionar el archivo <code>cacerts</code> cuidadosamente. El archivo 
+                    <code>cacerts</code> debe contener solo certificados de las ACs en las que confíe. Es responsabilidad suya 
+                    verificar los certificados raíz de confianza de la AC empaquetada en el archivo <code>cacerts</code> y tomar
+                    sus propias decisiones de confianza. Para eliminar un certificado de AC en el que no confíe del archivo 
+                    <code>cacerts</code>, use la opción de borrado del comando <code>keytool</code>. Puede encontrar el archivo 
+                    <code>keytool</code> en el directorio de instalación del EEJ. Contacte con su administrador de sistemas si no 
+                    tiene permisos para editar este archivo.<br />
+                </p>
+                <hr />
+                <p>
+                    El archivo <code>cacerts</code> contiene varios certificados de AC de confianza. Si envió su CSR a uno de estos
+                    proveedores de confianza (como VeriSign), no necesitará importar el certificado raíz del proveedor como un 
+                    certificado de confianza en su almacén de claves; puede ir a la <a href="#ImportReply">siguiente</a> sección 
+                    para ver cómo importar la respuesta de certficado de una AC.
+                </p>
+                <p>
+                    Un certificado de una AC está habitualmente autofirmada o firmada por otra AC, en cuyo caso también necesita 
+                    un certificado que autentique esa clave pública de AC. Supong que la compañía ABC, Inc., es una AC y que usted 
+                    obtiene un archivo llamado <code>ABCCA.cer</code>, supuestamente un certificado autofirmado de ABC, que 
+                    autentica la clave pública de esa AC.
+                </p>
+                <p>
+                    ¡Debe ser muy cuidadoso para asegurarse que el certificado es válido antes de importarlo como un certificado 
+                    &quot;de confianza&quot;! Véalo primero (usando el comando <code>-printcert</code> de <code>keytool</code> o el 
+                    comando <code>-import</code> de <code>keytool</code> sin la opción <code>-noprompt</code>), y asegúrese de que 
+                    las huellas digitales del certificado visualizado coinciden con las esperadas. Puede llamar a la persona que 
+                    envió el certificado y comparar las huellas digitales que ve usted con las que ellos muestran o que un 
+                    repositorio seguro de claves públicas muestra. Solo si las huellas digitales son iguales está garantizado que el 
+                    certificado no ha sido reemplazado en tránsito con el certificado de algún otro (por ejemplo, el de un atacante).
+                    Si se produjera un ataque de este tipo y no verificara el certificado antes de importarlo, terminaría confiando 
+                    en todo lo que el atacante haya firmado.
+                </p>
+                <p>
+                    Si usted confía que el certificado es válido, puede agregarlo a su almacén de claves a través de un comando 
+                    como el siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+keytool -import -alias <i>alias</i> -file ABCCA.cer -keystore <i>storefile</i> 
+                    </pre>
+                </div>
+                <p>
+                    Este comando crea una entrada de &quot;certificado de confiazna&quot; en el almacén de claves cuyo nombre es el 
+                    que especificó en <i>storefile</i>. La entrada contiene los datos del fichero <code>ABCCA.cer</code>, y se le 
+                    asignó el alias especificado.
+                </p>
+                <h3>
+                    <a id="ImportReply">Importación de la Respuesta del Certificado de la AC</a>
+                </h3>
+                <p>
+                    Una vez ha importado el certificado de confianza requerido, como se describió en la sección anterior, o ya 
+                    están en su almacén de claves o en el archivo <code>cacerts</code>, puede importar la respuesta de certificado 
+                    y por lo tanto reemplazar su certificado autofirmado con una cadena de certificados. Esta cadena será la 
+                    devuelta  por la AC en respuesta a su petición (si la respuesta de la AC es una cadena) o una construida (si la 
+                    respuesta de la AC es un certificado único) usando la respuesta del certificado y los certificados de confianza 
+                    que ya están disponibles en el almacén de claves o en el almacén de claves del archivo <code>cacerts</code>.
+                </p>
+                <p>
+                    Como ejemeplo, suponga que envió su petición de firmado de certificado a VeriSign. Puede después importar la 
+                    respueta a través de lo siguiente, que asume que el certificado devuelto está en el fichero especificado por 
+                    <i>certReplyFile</i>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+keytool -import -trustcacerts
+    -keystore <i>storefile</i>
+    -alias <i>alias </i>
+    -file <i>certReplyFile</i> 
+                    </pre>
+                </div>
+                <p>
+                    Teclee este comando en una sola línea.
+                </p>
+                <p>
+                    Las respuesta de certificado es validada usando los certificados de confianza del almacén de claves y 
+                    opcionalmente usando los certificados configurados en el almacén de claves del archivo <code>cacerts</code> (si 
+                    la opción <code>-trustcacerts</code> se especifica). Cada certificado en la cadena se verifica, usando el 
+                    certificado en el siguiente nivel superior en la cadena. Necesita confiar solo en el certificado de más alto 
+                    nivel &quot;raíz&quot; de la AC en la cadena. Si aún no confia en el certificado de más alto nivel, 
+                    <code>keytool</code> visualizará la huella digital de ese certificado y le preguntará si quiere confiar en él.
+                </p>
+                <p>
+                    La nueva cadena de certificados de la entrada (por <i>alias</i>) especificada reemplaza el viejo certificado 
+                    (o cadena) asociada con esta entrada. La vieja cadena puede ser reemplazada solo si una <i>keypass</i> válida, 
+                    si se proporciona la contraseña utilizada para proteger la clave privada de la entrada. Si no se proporciona 
+                    una contraseña y si la contraseña de la clave privada es diferente de la contraseña del almacén de claves, se 
+                    le pregunta al usuario por ella.
+                </p>
+                <p>
+                    Para información más detalla sobre la generación de CSRs y la importación de respuestas de certificados, vea la 
+                    documentación de <code>keytool</code>:
+                </p>
+                <ul>
+                    <li>
+                        <a class="OutsideLink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/technotes/tools/windows/keytool.html">
+                            documentación de keytool con ejemplos en Windows</a>
+                    </li>
+                    <li>
+                        <a class="OutsideLink" target="_blank"
+                           href="https://docs.oracle.com/javase/8/docs/technotes/tools/unix/keytool.html">
+                            documentación de keytool con ejemplos en UNIX</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="../tour2/index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../toolsign/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Lección Anterior<br />
+            <b>Página siguiente:</b> Firmando Código y Dándole Permisos
+        </div>
+    </body>
+</html> 

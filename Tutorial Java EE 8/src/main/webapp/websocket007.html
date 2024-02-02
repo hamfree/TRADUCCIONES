@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Uso de Codificadores y Decodificadores</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="websocket006.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="websocket008.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BABGADFG">
+      <h2 id="using-encoders-and-decoders">Uso de Codificadores y Decodificadores</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            El IPA de Java para WebSocket brinda soporte para convertir mensajes WebSocket y tipos 
+            personalizados de Java utilizando codificadores y decodificadores. Un codificador toma un objeto 
+            Java y produce una representación que se puede transmitir como un mensaje WebSocket; por ejemplo, 
+            los codificadores suelen producir representaciones JSON, XML o binarias. Un decodificador realiza 
+            la función inversa; lee un mensaje WebSocket y crea un objeto Java.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Este mecanismo simplifica las aplicaciones WebSocket, porque desvincula la lógica comercial de la 
+            serialización y deserialización de objetos.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>
+                <a href="#CIHBIGBI">
+                  Implementando Codificadores Para Convertir Objetos Java en Mensajes de WebSocket</a>
+              </p>
+            </li>
+            <li>
+              <p>
+                <a href="#CIHGDJFG">
+                  Implementando Decodificadores Para Convertir Mensajes de WebSocket en Objetos Java</a>
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="CIHBIGBI">
+          <h3 id="implementing-encoders-to-convert-java-objects-into-websocket-messages">
+            Implementando Codificadores Para Convertir Objetos Java en Mensajes de WebSocket
+          </h3>
+          <div class="paragraph">
+            <p>
+              A continuación, se muestra el procedimiento para implementar y utilizar codificadores en puntos 
+              finales.
+            </p>
+          </div>
+          <div class="olist arabic">
+            <ol class="arabic">
+              <li>
+                <p>Implemente una de las siguientes interfaces:</p>
+                <div class="ulist">
+                  <ul>
+                    <li>
+                      <p><code>Encoder.Text&lt;T&gt;</code> para mensajes de texto</p>
+                    </li>
+                    <li>
+                      <p><code>Encoder.Binary&lt;T&gt;</code> para mensajes binarios</p>
+                      <div class="paragraph">
+                        <p>
+                          Estas interfaces especifican el método <code>encode</code>. Implemente una clase de 
+                          codificador para cada tipo de Java personalizado que desee enviar como un mensaje 
+                          WebSocket.
+                        </p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <p>
+                  Agregue los nombres de sus implementaciones de codificador al parámetro opcional 
+                  <code>encoders</code> de la anotación <code>ServerEndpoint</code>.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Utilice el método <code>sendObject(Object data)</code> de las interfaces 
+                  <code>RemoteEndpoint.Basic</code> o <code>RemoteEndpoint.Async</code> para enviar sus 
+                  objetos como mensajes. El contenedor busca un codificador que coincida con su tipo y lo usa 
+                  para convertir el objeto en un mensaje WebSocket.
+                </p>
+              </li>
+            </ol>
+          </div>
+          <div class="paragraph">
+            <p>
+              Por ejemplo, si tiene dos tipos de Java (<code>MessageA</code> y <code>MessageB</code>) que 
+              desea enviar como mensajes de texto, implemente el <code>Encoder.Text&lt;MessageA&gt;</code> y 
+              <code>Encoder.Text&lt;MessageB&gt;</code> de la siguiente manera:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public class MessageATextEncoder implements Encoder.Text&lt;MessageA&gt; {
+   @Override
+   public void init(EndpointConfig ec) { }
+   @Override
+   public void destroy() { }
+   @Override
+   public String encode(MessageA msgA) throws EncodeException {
+      // Accede a las propiedades de msgA y convierte a texto JSON...
+      return msgAJsonString;
+   }
+}
+              </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Implemente <code>Encoder.Text&lt;MessageB&gt;</code> de manera similar. Luego, agregue el 
+              parámetro <code>encoders</code> a la anotación <code>ServerEndpoint</code> de la siguiente 
+              manera:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@ServerEndpoint(
+   value = "/myendpoint",
+   encoders = { MessageATextEncoder.class, MessageBTextEncoder.class }
+)
+public class EncEndpoint { ... }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Ahora, puede enviar objetos <code>Message</code> y <code>Message</code> como mensajes WebSocket 
+              usando el método <code>sendObject</code> de la siguiente manera:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+MessageA msgA = new MessageA(...);
+MessageB msgB = new MessageB(...);
+session.getBasicRemote.sendObject(msgA);
+session.getBasicRemote.sendObject(msgB);
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Como en este ejemplo, puede tener más de un codificador para mensajes de texto y más de un 
+              codificador para mensajes binarios. Al igual que los puntos finales, las instancias del 
+              codificador están asociadas con una y solo una conexión WebSocket y un par, por lo que solo hay 
+              un subproceso que ejecuta el código de una instancia del codificador en un momento dado.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="CIHGDJFG">
+          <h3 id="implementing-decoders-to-convert-websocket-messages-into-java-objects">
+            Implementando Decodificadores Para Convertir Mensajes de WebSocket en Objetos Java
+          </h3>
+          <div class="paragraph">
+            <p>
+              A continuación se muestra el procedimiento para implementar y utilizar decodificadores en puntos 
+              finales.
+            </p>
+          </div>
+          <div class="olist arabic">
+            <ol class="arabic">
+              <li>
+                <p>Implemente una de las siguientes interfaces:</p>
+                <div class="ulist">
+                  <ul>
+                    <li>
+                      <p><code>Decoder.Text&lt;T&gt;</code> para mensajes de texto</p>
+                    </li>
+                    <li>
+                      <p><code>Decoder.Binary&lt;T&gt;</code> para mensajes binarios</p>
+                      <div class="paragraph">
+                        <p>
+                          Estas interfaces especifican los métodos <code>willDecode</code> y 
+                          <code>decode</code>.
+                        </p>
+                      </div>
+                      <table class="tableblock frame-all grid-all spread">
+                        <colgroup>
+                          <col style="width: 100%;">
+                        </colgroup>
+                        <tbody>
+                          <tr>
+                            <td class="tableblock halign-left valign-top">
+                              <div>
+                                <div class="paragraph">
+                                  <p>Nota:</p>
+                                </div>
+                                <div class="paragraph">
+                                  <p>
+                                    A diferencia de los codificadores, puede especificar como máximo un 
+                                    decodificador para mensajes binarios y un decodificador para mensajes de 
+                                    texto.
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <p>
+                  Agregue los nombres de las implementaciones de su decodificador al parámetro opcional 
+                  <code>decoders</code> de la anotación <code>ServerEndpoint</code>.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Utilice la anotación <code>OnMessage</code> en el punto final para designar un método que 
+                  tome su tipo de Java personalizado como parámetro. Cuando el extremo recibe un mensaje que 
+                  puede ser decodificado por uno de los decodificadores que especificó, el contenedor llama al 
+                  método anotado con <code>@OnMessage</code> que toma su tipo de Java personalizado como 
+                  parámetro si este método existe.
+                </p>
+              </li>
+            </ol>
+          </div>
+          <div class="paragraph">
+            <p>
+              Por ejemplo, si tiene dos tipos de Java (<code>MessageA</code> y <code>MessageB</code>) que 
+              desea enviar y recibir como mensajes de texto, defínalos para que amplíen una clase común 
+              (<code>Mensaje</code>). Debido a que solo puede definir un decodificador para mensajes de texto, 
+              implemente un decodificador para la clase <code>Message</code> de la siguiente manera:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public class MessageTextDecoder implements Decoder.Text&lt;Message&gt; {
+   @Override
+   public void init(EndpointConfig ec) { }
+   @Override
+   public void destroy() { }
+   @Override
+   public Message decode(String string) throws DecodeException {
+      // Lee el mensaje...
+      if ( /* el mensaje es un mensaje A */ )
+         return new MessageA(...);
+      else if ( /* el mensaje es un mensaje B */ )
+         return new MessageB(...);
+   }
+   @Override
+   public boolean willDecode(String string) {
+      // Determine si el mensaje se puede convertir en un 
+      // objeto de MessageA o en un objeto de MessageB...
+      return canDecode;
+   }
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Luego, agregue el parámetro <code>decoder</code> a la anotación <code>ServerEndpoint</code> de 
+              la siguiente manera:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@ServerEndpoint(
+   value = "/myendpoint",
+   encoders = { MessageATextEncoder.class, MessageBTextEncoder.class },
+   decoders = { MessageTextDecoder.class }
+)
+public class EncDecEndpoint { ... }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Ahora, defina un método en la clase de punto final que reciba los objetos <code>MessageA</code> 
+              y <code>MessageB</code> de la siguiente manera:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@OnMessage
+public void message(Session session, Message msg) {
+   if (msg instanceof MessageA) {
+      // Recibimos un objeto MessageA...
+   } else if (msg instanceof MessageB) {
+      // Recibimos un objeto MessageB...
+   }
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Al igual que los puntos finales, las instancias del decodificador están asociadas con una y solo 
+              una conexión WebSocket y un par, por lo que solo hay un subproceso que ejecuta el código de una 
+              instancia del decodificador en un momento dado.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="websocket006.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="websocket008.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

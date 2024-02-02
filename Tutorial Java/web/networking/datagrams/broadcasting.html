@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Difusion a Varios Destinatarios (Los Tutoriales de Java&trade; &gt; Personalizando la Red &gt; Todo Sobre los 
+            Datagramas)
+        </title>
+        <meta name="description" content="Este tutorial de Java sobre redes describe las capacidades de red de la plataforma Java, 
+              trabajando con URL, sockets, datagramas y cookies." />
+        <meta name="keywords" content="java programming, learn java, java sample code, java networking, java url, java socket,
+              datagram, java cookie" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Todo Sobre los Datagramas</a></div>
+                <div class="linkAHEAD"><a href="definition.html">¿Qué es un Datagrama?</a></div>
+                <div class="linkAHEAD"><a href="clientServer.html">Escribiendo un Cliente y Servidor de Datagramas</a></div>
+                <div class="nolinkAHEAD">Difusion a Varios Destinatarios</div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Personalizando la Red<br />
+                <b>Lección:</b> Todo Sobre los Datagramas
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Personalizando la Red</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Todo Sobre los Datagramas</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="clientServer.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../nifs/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Difusion a Varios Destinatarios</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Además de <code>DatagramSocket</code>, el cual permite a los programas enviarse paquetes entre ellos, java.net 
+                    incluye una clase llamada <code>MulticastSocket</code>. Esta clase de socket se utiliza en el lado del cliente 
+                    para escuchar paquetes que el servidor retransmite a múltiples clientes.
+                </p>
+                <p>
+                    Reescribamos el servidor de citas de forma que retransmita <code>DatagramPacket</code>s a múltiples recipientes.
+                    En vez de enviar citas a un cliente específico que hace una petición, el nuevo servidor ahora necesita 
+                    retransmitir cita en intervalos regulares. El cliente necesita ser modificado de forma que escuche pasivamente 
+                    por las citas y hace eso con un <code>MulticastSocket</code>.
+                </p>
+                <p>
+                    Este ejemplo se compone de tres clases que son modificaciones de las tres clases del ejemplo anterior:
+                    <a class="SourceLink" target="_blank" href="examples/MulticastServer.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/MulticastServer.java'); return false;">
+                        <code>MulticastServer</code></a>,
+                    <a class="SourceLink" target="_blank" href="examples/MulticastServerThread.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/MulticastServerThread.java'); return false;">
+                        <code>MulticastServerThread</code></a>, y
+                    <a class="SourceLink" target="_blank" href="examples/MulticastClient.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/MulticastClient.java'); return false;">
+                        <code>MulticastClient</code></a>. Esta discusión destaca las partes interesantes de estas clases.
+                </p>
+                <p>
+                    Aquí está la nueva versión del programa principal del servidor. Las diferencias entre este código y la versión 
+                    previa, <code>QuoteServer</code>, se muestran en negrita:
+                </p>
+                <div class="codeblock">
+                    <pre>
+import java.io.*;
+
+public class <strong>MulticastServer</strong> {
+    public static void main(String[] args) throws IOException {
+        new <strong>MulticastServerThread</strong>().start();
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Básicamente, el servidor obtuvo un nombre nuevo y crea un <code>MulticastServerThread</code> en vez de un 
+                    <code>QuoteServerThread</code>. Ahora veamos <code>MulticastServerThread</code> el cual contiene el corazón 
+                    del servidor. Aquí está su declaración de clase:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public class MulticastServerThread extends QuoteServerThread {
+    // ...
+}
+                    </pre>
+                </div>
+                <p>
+                    Hemos hecho esta clase una subclase de <code>QuoteServerThread</code> de forma que puede usar el constructor, y 
+                    heredar alguna variable miembro y el método <code>getNextQuote</code>. Recuerde que 
+                    <code>QuoteServerThread</code> crea un <code>DatagramSocket</code> vinculado al puerto 4445 y abre el fichero 
+                    de citas. El número de puerto del <code>DatagramSocket</code> no importa realmente en este ejemplo porque el 
+                    cliente nunca envía nada al servidor.
+                </p>
+                <p>
+                    El único método explícitamente implementado en <code>MulticastServerThread</code> es su método <code>run</code>.
+                    Las diferencias entre éste método <code>run</code> y el de <code>QuoteServerThread</code> se muestran en 
+                    negrita:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public void run() {
+    while (moreQuotes) {
+        try {
+            byte[] buf = new byte[256];
+            <strong>// don't wait for request...just send a quote</strong>
+
+            String dString = null;
+            if (in == null)
+                dString = new Date().toString();
+            else
+                dString = getNextQuote();
+            buf = dString.getBytes();
+
+            <strong>InetAddress group = InetAddress.getByName("203.0.113.0");</strong>
+            DatagramPacket packet;
+            packet = new DatagramPacket(buf, buf.length, <strong>group, 4446</strong>);
+            socket.send(packet);
+
+            try {
+                sleep((long)Math.random() * FIVE_SECONDS);
+            } 
+            catch (InterruptedException e) { }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            moreQuotes = false;
+        }
+    }
+    socket.close();
+}
+                    </pre>
+                </div>
+                <p>
+                    El cambio interesante es cómo se construyó el <code>DatagramPacket</code>, en particular, la 
+                    <code>InetAddress</code> y el puerto usados para construir el <code>DatagramPacket</code>. Recuerde que el 
+                    ejemplo previo recuperó la <code>InetAddress</code> y el número de puerto desde el paquete enviado al servidor 
+                    desde el cliente. Esto fue porque el servidor necesitaba responder directamente al cliente. Ahora, el servidor 
+                    necesita las direcciones de múltiples clientes. Así esta vez tanto la <code>InetAddress</code> como el número 
+                    de puerto están codificados a mano.
+                </p>
+                <p>
+                    El número de puerto codificado a mano es 4446 (el cliente debe tener un <code>MulticastSocket</code> vinculado 
+                    a este puerto). La <code>InetAddress</code> codificada a mano del <code>DatagramPacket</code> es 
+                    &quot;203.0.113.0&quot; y es un identificador de grupo (en lugar de la dirección de Internet de la máquina en 
+                    la que se ejecuta un solo cliente). Esta dirección particular fue elegida arbitrariamente desde las reservadas 
+                    para este propósito.
+                </p>
+                <p>
+                    Creado de esta forma, el <code>DatagramPacket</code> está destinado para todos los clientes que escucha en el 
+                    número de puerto 4446 y son miembros del grupo &quot;203.0.113.0&quot;.
+                </p>
+                <p>
+                    Para escuchar en el puerto número 4446, el nuevo programa cliente simplemente creó su 
+                    <code>MulticastSocket</code> con ese número de puerto. Para convertirse en un miembro del grupo 
+                    &quot;203.0.113.0&quot;, el cliente llama al método <code>joinGroup</code> de <code>MulticastSocket</code> con 
+                    la <code>InetAddress</code> que identifica el grupo. Ahora, el cliente está configurado para recibir 
+                    <code>DatagramPacket</code>s destinados para el puerto y grupo especificados. Aquí está el código relevante del 
+                    nuevo programa cliente (el cual fue también reescrito para recibir pasivamente las citas en vez de solicitarlas 
+                    activamente). Las sentencias en negrita son las que interactuan con el <code>MulticastSocket</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<strong>MulticastSocket socket = new MulticastSocket(4446);
+InetAddress group = InetAddress.getByName("203.0.113.0");
+socket.joinGroup(group);</strong>
+
+DatagramPacket packet;
+for (int i = 0; i &lt; 5; i++) {
+    byte[] buf = new byte[256];
+    packet = new DatagramPacket(buf, buf.length);
+    <strong>socket.receive(packet);</strong>
+
+    String received = new String(packet.getData());
+    System.out.println("Quote of the Moment: " + received);
+}
+
+<strong>socket.leaveGroup(group);</strong>
+socket.close();
+                    </pre>
+                </div>
+                <p>
+                    Note que el servidor usa un <code>DatagramSocket</code> para retransmitir el paquete recibido por el cliente 
+                    a través de un <code>MulticastSocket</code>. Alternativamente, podría haber usado un 
+                    <code>MulticastSocket</code>. El socket usado por el servidor para enviar el <code>DatagramPacket</code> no es 
+                    importante. Lo que es importante cuando se retransmiten paquetes es la información de direccionamiento 
+                    contenida en el <code>DatagramPacket</code>, y el socket usado por el cliente para escucharlo.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Intente esto:</strong>&nbsp;
+                    <p>
+                        Ejecute el <code>MulticastServer</code> y varios clientes. Observe cómo todos los clientes obtienen las 
+                        mismas citas.
+                    </p>
+                    <hr />
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="clientServer.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../nifs/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Escribiendo un Cliente y Servidor de Datagramas<br />
+            <b>Página siguiente:</b> Programmatic Access to Network Parameters
+        </div>
+    </body>
+</html> 

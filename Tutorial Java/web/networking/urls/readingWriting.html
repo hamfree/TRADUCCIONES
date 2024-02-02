@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Leyendo de y Escribiendo a una URLConnection (Los Tutoriales de Java&trade; &gt; Personalizando la Red &gt; Trabajando 
+            con URLs)
+        </title>
+        <meta name="description" content="Este tutorial de Java sobre redes describe las capacidades de red de la plataforma Java, 
+              trabajando con URL, sockets, datagramas y cookies." />
+        <meta name="keywords" content="java programming, learn java, java sample code, java networking, java url, java socket,
+              datagram, java cookie" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Trabajando con URLs</a></div>
+                <div class="linkAHEAD"><a href="definition.html">¿Qué es una URL?</a></div>
+                <div class="linkAHEAD"><a href="creatingUrls.html">Creando una URL</a></div>
+                <div class="linkAHEAD"><a href="urlInfo.html">Analizando una URL</a></div>
+                <div class="linkAHEAD"><a href="readingURL.html">Leyendo Directamente de una URL</a></div>
+                <div class="linkAHEAD"><a href="connecting.html">Conectando a una URL</a></div>
+                <div class="nolinkAHEAD">Leyendo de y Escribiendo a una URLConnection</div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Personalizando la Red<br />
+                <b>Lección:</b> Trabajando con URLs
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Personalizando la Red</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Trabajando con URLs</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="connecting.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../sockets/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Leyendo de y Escribiendo a una URLConnection</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    La clase <code>URLConnection</code> contiene muchos métodos que le permitien comunicar con la URL a través de 
+                    la red. <code>URLConnection</code> es una clase centrada en HTTP; esto es, muchos de sus métodos son útiles 
+                    sólo cuando está trabajando con URLs de HTTP. Sin embargo, la mayoría de los protocolos URL le permiten leer y 
+                    escribir a la conexión. Esta sección describe ambas funciones.
+                </p>
+                <h2>
+                    Leer de una URLConnection
+                </h2>
+                <p>
+                    El programa siguiente realiza la misma función que el programa <code>URLReader</code> mostrado en 
+                    <a class="TutorialLink" target="_top" href="readingURL.html">Leyendo Directamente de una URL</a>.
+                </p>
+                <p>
+                    Sin embargo, en vez de obtener un flujo de entrada directamente desde la URL, este programa explícitamente 
+                    recupera un objeto <code>URLConnection</code> y obtiene un flujo de entrada desde la conexión. La conexión es 
+                    abierta implícitamente al llamar a <code>getInputStream</code>. Entonces, como <code>URLReader</code>, este 
+                    programa crea un <code>BufferedReader</code> a partir del flujo de entrada y lee de él. Las sentencias en 
+                    negrita resaltan las diferencias entre este ejemplo y el anterior:
+                </p>
+                <div class="codeblock">
+                    <pre>
+import java.net.*;
+import java.io.*;
+
+public class <strong>URLConnectionReader</strong> {
+    public static void main(String[] args) throws Exception {
+        URL oracle = new URL("http://www.oracle.com/");
+        <strong>URLConnection yc = oracle.openConnection();</strong>
+        BufferedReader in = new BufferedReader(new InputStreamReader(
+                                    <strong>yc.getInputStream()</strong>));
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) 
+            System.out.println(inputLine);
+        in.close();
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    La salida desde este programa es idéntica a la salida del programa que abre un flujo directamente desde la URL. 
+                    Puede utilizar cualquiera de las dos formas para leer desde una URL. Sin embargo, leer desde un 
+                    <code>URLConnection</code> en vez de leer directamente de una URL podría ser más útil. Esto es porque puede 
+                    usar el objeto <code>URLConnection</code> para otras tareas (como escribir a la URL) al mismo tiempo.
+                </p>
+                <p>
+                    De nuevo, si el programa se cuelga o ve un mensaje de error, puede tener que establecer la máquina proxy de 
+                    forma que el programa pueda encontrar el servidor de Oracle.
+                </p>
+                <h2>
+                    Escribir a un URLConnection
+                </h2>
+                <p>
+                    Muchas páginas HTML contienen <em>formularios</em> &mdash; campos de texto y otros objetos del IGU que le 
+                    permiten introducir datos para enviar al servidor. Después de que teclea la información requerida e inicia la 
+                    consulta pulsando un botón, su navegador web escribe los datos a la URL a través de la red. En el otro extremo 
+                    el servidor recibe los datos, los procesa, y después le envía una respuesta, usualmente en la forma de una 
+                    nueva página HTML.
+                </p>
+                <p>
+                    Muchos de estos formularios HTML usan el MÉTODO POST de HTTP para enviar datos al servidor. Así escribir a una 
+                    URL es a menudo llamado <em>publicar a una URL</em>. El servidor reconoce la petición POST y lee los datos 
+                    enviados desde el cliente.
+                </p>
+                <p>
+                    Para que un programa Java interactúe con un proceso del lado del servidor simplemente debe ser capaz de 
+                    escribir a una URL, proporcionando así datos al servidor. Puede hacer esto siguiendo estos pasos:
+                </p>
+                <ol>
+                    <li>
+                        Crear un <code>URL</code>.
+                    </li>
+                    <li>
+                        Recuperar el objeto <code>URLConnection</code>.
+                    </li>
+                    <li>
+                        Establece la capacidad de salida en el <code>URLConnection</code>.
+                    </li>
+                    <li>
+                        Abre una conexión al recurso.
+                    </li>
+                    <li>
+                        Obtiene un flujo de salida desde la conexión.
+                    </li>
+                    <li>
+                        Escribe al flujo de salida.
+                    </li>
+                    <li>
+                        Cierra el flujo de salida.
+                    </li>
+                </ol>
+                <p>
+                    Aquí tiene un pequeño <code>servlet</code> llamado 
+                    <a class="SourceLink" target="_blank" href="examples/ReverseServlet.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/ReverseServlet.java'); return false;">
+                        <code>ReverseServlet</code></a> (o si usted prefiere un script <a href="examples/backwards">cgi-bin</a>). 
+                        Puede usar este servlet para comprobar el siguiente programa de ejemplo.
+                </p>
+                <p>
+                    El servlet que se ejecuta en un contenedor lee desde su InputStream, da la vuelta a la cadena, y la escribe a 
+                    su OutputStream. El servlet requiere la entrada en la forma <code>string=string_to_reverse</code>, donde 
+                    <code>string=string_to_reverse</code> es la cadena cuyos caracteres que usted quiere visulaizados en orden 
+                    inverso.
+                </p>
+                <p>
+                    Aquí tiene un programa de ejemplo que ejecuta el <code>ReverseServlet</code> en la red a través de un 
+                    <code>URLConnection</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+import java.io.*;
+import java.net.*;
+
+public class Reverse {
+    public static void main(String[] args) throws Exception {
+
+        if (args.length != 2) {
+            System.err.println(&quot;Usage:  java Reverse &quot;
+                + &quot;http://&lt;location of your servlet/script&gt;&quot;
+                + &quot; string_to_reverse&quot;);
+            System.exit(1);
+        }
+
+        String stringToReverse = URLEncoder.encode(args[1], &quot;UTF-8&quot;);
+
+        URL url = new URL(args[0]);
+        URLConnection connection = url.openConnection();
+        connection.setDoOutput(true);
+
+        OutputStreamWriter out = new OutputStreamWriter(
+                                         connection.getOutputStream());
+        out.write(&quot;string=&quot; + stringToReverse);
+        out.close();
+
+        BufferedReader in = new BufferedReader(
+                                    new InputStreamReader(
+                                    connection.getInputStream()));
+        String decodedString;
+        while ((decodedString = in.readLine()) != null) {
+            System.out.println(decodedString);
+        }
+        in.close();
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Examinemos el programa y veamos como funciona. Primero, el programa procesa sus argumentos de línea de 
+                    comandos:
+                </p>
+                <div class="codeblock">
+                    <pre>
+if (args.length != 2) {
+    System.err.println("Usage:  java Reverse "
+        + "http://<em>&lt;location of your servlet/script&gt;</em>"
+        + " string_to_reverse");
+    System.exit(1);
+}       
+
+String stringToReverse = URLEncoder.encode(args[1], "UTF-8");
+                    </pre>
+                </div>
+                <p>
+                    Estas sentencias se aseguran de que el usuario proporciona dos y sólo dos argumentos de línea de comandos al 
+                    programa. Los argumentos de la línea de comandos son la ubicación de <code>ReverseServlet</code> y la cadena 
+                    que será invertida. Puede contener espacios u otros caracteres no alfanuméricos. Estos caracteres deben ser 
+                    codificados porque la cadena se procesa en su camino hacia el servidor. Los métodos de la clase 
+                    <code>URLEncoder</code> codifican los caracteres.
+                </p>
+                <p>
+                    A continuación, el programa crea el objeto <code>URL</code>, y establece la conextión de forma que pueda 
+                    escribir en ella:
+                </p>
+                <div class="codeblock">
+                    <pre>
+URL url = new URL(args[0]);
+URLConnection connection = url.openConnection();
+connection.setDoOutput(true);
+                    </pre>
+                </div>
+                <p>
+                    El programa entonces crea un flujo de salida en la conexión y abre un <code>OutputStreamWriter</code> en él:
+                </p>
+                <div class="codeblock">
+                    <pre>
+OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
+                    </pre>
+                </div>
+                <p>
+                    Si la URL no soporta salida, el método <code>getOutputStream</code> lanza una 
+                    <code>UnknownServiceException</code>. Si la URL soporta salida, entonces este método devuelve un flujo de 
+                    salida que está conectado al flujo de entrada de la URL en el lado del servidor &mdash; la salida del cliente 
+                    es la entrada del servidor.
+                </p>
+                <p>
+                    A continuación, el programa escribe la información requerida en el flujo de salida y cierra el flujo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+out.write("string=" + stringToReverse);
+out.close();
+                    </pre>
+                </div>
+                <p>
+                    Este código escribe al flujo de salida usando el método <code>write</code>. Así puede ver que escribir datos a 
+                    una URL es tan fácil como escribir datos a un flujo. Los datos escritos en el flujo de salida en el lado 
+                    cliente es la entrada para el servlet en el lado servidor. El programa <code>Reverse</code> construye la 
+                    entrada en el formato requerido por el script anteponiendo <code>string=</code> a la cadena codificada que 
+                    será invertida.
+                </p>
+                <p>
+                    El servlet lee la información que usted escribe, realiza una operación de inversión sobre el valor de la cadena, 
+                    y entonces se la envía de vuelta. Ahora necesita leer la cadena que el servidor ha enviado de vuelta. El 
+                    programa <code>Reverse</code> hace esto de esta manera:
+                </p>
+                <div class="codeblock">
+                    <pre>
+BufferedReader in = new BufferedReader(
+                            new InputStreamReader(
+                            connection.getInputStream()));
+String decodedString;
+while ((decodedString = in.readLine()) != null) {
+    System.out.println(decodedString);
+}
+in.close();
+                    </pre>
+                </div>
+                <p>
+                    Si su <code>ReverseServlet</code> está ubicado en <code>http://example.com/servlet/ReverseServlet</code>, 
+                    entonces cuando ejecute el programa <code>Reverse</code> usando 
+                </p>
+                <div class="codeblock">
+                    <pre>
+http://example.com/servlet/ReverseServlet "Reverse Me"
+                    </pre>
+                </div>
+                <p>
+                    Con el argumento (incluyendo las dobles comillas), debería ver esta salida:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Reverse Me
+ reversed is: 
+eM esreveR
+                    </pre>
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="connecting.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../sockets/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Conectando a una URL<br />
+            <b>Página siguiente:</b> All About Sockets
+        </div>
+    </body>
+</html> 

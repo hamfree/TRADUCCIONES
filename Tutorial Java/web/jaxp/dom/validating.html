@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Validando con Schema XML (Los Tutoriales de Java&trade; &gt; IPA de Java para Procesado de XML (JAXP) &gt; 
+            Modelo de Objetos del Documento)
+        </title>
+        <meta name="description" content="Este tutorial de Java JAXP describe la IPA de Java para el procesado de XML (jaxp), XSLT, 
+              SAX, y tópicos de XML relacionados" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jaxp, xml, xslt, sax" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Modelo de Objetos del Documento</a></div>
+                <div class="linkAHEAD"><a href="when.html">Cuando Usar DOM</a></div>
+                <div class="linkAHEAD"><a href="readingXML.html">Leyendo Datos XML en un DOM</a></div>
+                <div class="nolinkAHEAD">Validando con Schema XML</div>
+                <div class="linkAHEAD"><a href="info.html">Información Adicional</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> IPA de Java para Procesado de XML (JAXP)<br />
+                <b>Lección:</b> Modelo de Objetos del Documento
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">IPA de Java para Procesado de XML (JAXP)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Modelo de Objetos del Documento</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="readingXML.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="info.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Validando con Schema XML</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Esta sección mira el proceso de la validación de Esquema XML. Aunque un tratamiento completo del Esquema XML 
+                    está más allá del alcance de este tutorial, esta sección le muestra los pasos a tomar para validar un documento 
+                    XML usando una definición de Esquema XML. (Para aprender más sobre Esquema XML, puede revisar el tutorial en 
+                    línea, 
+                    <a class="OutsideLink" target="_blank" href="http://www.w3.org/TR/xmlschema-0/">XML Schema Part 0: Primer</a>.
+                    Al final de esta sección, también aprenderá cómo usar una definición de Esquema XML para validar un documento 
+                    que contiene elementos de múltiples espacios de nombres.
+                </p>
+                <p>
+                    <a id="ggegv"></a>
+                </p>
+                <h2>Descripción General del Proceso de Validación</h2>
+                <p>
+                    Para recibir notificaciones de errores de validación en un documento XML, debe cumplirse lo siguiente:
+                </p>
+                <ul>
+                    <li>
+                        La factoría debe configurarse, y establecerse el manejador de errores apropiado.
+                    </li>
+                    <li>
+                        El documento debe estar asociado con al menos un esquema, y posiblemente más.
+                    </li>
+                </ul>
+                <p>
+                    <a id="ggehg"></a>
+                </p>
+                <h2>
+                    Configurar la Factoría <code>DocumentBuilder</code>
+                </h2>
+                <p>
+                    Es útil comenzar por definir las constantes que usará al configurar la factoría. Estas son las mismas 
+                    constantes que define cuando usa Esquema XML para el análisis SAX, y se declaran al principio del programa de 
+                    ejemplo <code>DOMEcho</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+static final String JAXP_SCHEMA_LANGUAGE =
+    "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+static final String W3C_XML_SCHEMA =
+    "http://www.w3.org/2001/XMLSchema";
+                    </pre>
+                </div>
+                <p>
+                    A continuación, configure un <code>DocumentBuilderFactory</code> para generar un analizador de validación que 
+                    tenga en cuenta el espacio de nombres y utilice el Esquema XML. Esto se hace llamando al método 
+                    <code>setValidating</code> en la instancia <code>dbf</code> del tipo <code>DocumentBuilderFactory</code>, que 
+                    fue creada en <a class="TutorialLink" target="_top" href="readingXML.html">Instanciar la Factoría</a>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+// ...
+
+dbf.setNamespaceAware(true);
+dbf.setValidating(dtdValidate || xsdValidate);
+
+if (xsdValidate) {
+    try {
+        dbf.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
+    }
+    catch (IllegalArgumentException x) {
+        System.err.println("Error: JAXP DocumentBuilderFactory attribute " 
+                           + "not recognized: " + JAXP_SCHEMA_LANGUAGE);
+        System.err.println("Check to see if parser conforms to JAXP spec.");
+        System.exit(1);
+    }
+}
+
+// ...
+                    </pre>
+                </div>
+                <p>
+                    Ya que los analizadores que cumplen con JAXP no tienen en cuenta los espacios de nombre de forma 
+                    predeterminada, es necesario establecer la propiedad par que la validación de esquema funcione. También 
+                    establece un atributo de la factoría para especificar el lenguaje que el analizador usa. (Para el análisis SAX, 
+                    por otro lado, establece una propiedad en el analizador generado por la factoría).
+                </p>
+                <p>
+                    <a id="ggegr"></a>
+                </p>
+                <h2>
+                    Asociar un Documento con un Esquema
+                </h2>
+                <p>
+                    Ahora que el programa está listo para validar con una definición de Esquema XML, sólo es necesario asegurarse 
+                    de que el doucumento XML está asociado (al menos) con uno. Hay dos formas de hacer eso:
+                </p>
+                <ul>
+                    <li>
+                        Con una declaración de esquema en el documento XML
+                    </li>
+                    <li>
+                        Especificando el/los esquema(s) a usar en la aplicación
+                    </li>
+                </ul>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> Cuando la aplicación especifica el/los esquema(s) a usar, se sobreescribe cualquier 
+                    declaración de esquema en el documento.
+                </p>
+                <hr />
+                <p>
+                    Para especificar la definición de esquema en el documento, debe crear un XML como este:
+                </p>
+                <p>
+                    <code>&lt;<i>documentRoot</i> xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; 
+                        xsi:noNamespaceSchemaLocation=&#39;<i>YourSchemaDefinition.xsd</i>&#39;&gt; [...]</code>
+                </p>
+                <p>
+                    El primer atributo define el prefijo del espacio de nombres de XML (<code>xmlns</code>), <code>xsi</code>, que 
+                    significa &quot;instancia de Esquema XML&quot;. La segunda línea especifica el esquema a usar para los 
+                    elementos en el documento que no tienen un prefijo de espacio de nombres, es decir, para los elementos que 
+                    normalmente define en cualquier documento XML simple y sin complicaciones. (Verá como tratar con múltiples 
+                    espacios de nombres en la siguiente sección).
+                </p>
+                <p>
+                    Puede también especificar el fichero de esquema en la aplicación, que es el caso para <code>DOMEcho</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+static final String JAXP_SCHEMA_SOURCE =
+    "http://java.sun.com/xml/jaxp/properties/schemaSource";
+        
+// ...
+
+dbf.setValidating(dtdValidate || xsdValidate);
+if (xsdValidate) {
+    // ...    
+}
+
+if (schemaSource != null) {
+    dbf.setAttribute(JAXP_SCHEMA_SOURCE, new File(schemaSource));
+}
+                    </pre>
+                </div>
+                <p>
+                    Aquí, también, hay mecanismos a su disposición que le permitirán especificar múltiples esquemas. Echaremos un 
+                    vistazo a los siguientes.
+                </p>
+                <p>
+                    <a id="ggeht"></a>
+                </p>
+                <h2>
+                    Validación con Múltiples Espacios de Nombres
+                </h2>
+                <p>
+                    Los espacios de nombres le permiten combinar elementos que sirven a diferentes propósitos en el mismo documento 
+                    sin tener que preocuparse por el solapado de nombres.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> El material descrito en esta sección también aplica a la validación cuando se usa un 
+                    analizador SAX. Lo está viendo aquí, porque en este punto ha aprendido bastante sobre espacios de nombres para 
+                    que la descripción tenga sentido.
+                </p>
+                <hr />
+                <p>
+                    Para idear un ejemplo, considere un conjunto de datos XML que realiza un segumiento de los datos del personal. 
+                    El conjunto de datos puede incluir información de un formulario de declaración de impuestos como también 
+                    infromación del formulario de contratación del emepleado, con ambos elementos llamados <code>form</code> en sus 
+                    respectivos esquemas.
+                </p>
+                <p>
+                    Si se define un prefijo para un espacio de nombres de impuestos, y otro prefjo definido para el espacio de 
+                    nombres de contratación, entonces los datos del personal podrían incluir segmentos como el siguiente.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;employee id="...">
+  &lt;name>....&lt;/name>
+  &lt;tax:form>
+     ...w2 tax form data...
+  &lt;/tax:form>
+  &lt;hiring:form>
+     ...employment history, etc....
+  &lt;/hiring:form>
+&lt;/employee>
+                    </pre>
+                </div>
+                <p>
+                    Los contenidos del elemento <code>tax:form</code> será obviamente diferentes de los contenidos del elemento 
+                    <code>hiring:form</code> y deben ser validados de forma diferente.
+                </p>
+                <p>
+                    Dese cuenta, también, que en este ejemplo hay un espacio de nombres predeterminado a los que los nombres de 
+                    elemento no cualificados <code>employee</code> y <code>name</code> pertenecen. Para que el documento sea 
+                    apropiadamente validado, el esquema para ese espacio de nombres debe ser declarado, como también los esquemas 
+                    para los espacios de nombres <code>tax</code> y <code>hiring</code>.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota &mdash;</b> El espacio de nombres predeterminado es en realidad un espacio de nombres específico. Se 
+                    define como el &quot;espacio de nombres que no tiene nombre&quot; Así no puede simplemente usar un espacio de 
+                    nombres como predeterminado esta semana y otro espacio de nombres como predeterminado más adelante. Este 
+                    &quot;espacio de nombres sin nombre&quot; (o &quot;espacio de nombres nulo&quot;) es como el número cero.
+                    No tiene ningún valor hablar de (sin nombre), pero aún está definido con precisión. Por lo tanto, un espacio de 
+                    nombres que sí tiene un nombre nunca se puede utilizar como el espacio de nombres predeterminado.
+                </p>
+                <hr />
+                <p>
+                    Cuando se analiza, cada elemento del conjunto de datos se validará con el esquema apropiado, siempre que esos 
+                    esquemas hayan sido declarados. De nuevo, los esquemas pueden ser declarados o cmo parte del conjunto de datos 
+                    XML o en el programa. (Es también posible mezclar las declaraciones). Sin embargo, en general, es una buena 
+                    idea mantener todas las declaraciones juntas en un lugar).
+                </p>
+                <p>
+                    <a id="ggegq"></a>
+                </p>
+                <h2>
+                    Declarar los Esquemas en el Conjunto de Datos de XML
+                </h2>
+                <p>
+                    Para declarar los esquemas a usar para el ejemplo precedente en el conjunto de datos, el código XML debería 
+                    parecerse a algo como lo siguiente.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;documentRoot
+  xmlns:xsi=
+  "http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation=
+    "employeeDatabase.xsd"
+  xsi:schemaLocation=
+  "http://www.irs.gov.example.com/ 
+   fullpath/w2TaxForm.xsd
+   http://www.ourcompany.example.com/ 
+   relpath/hiringForm.xsd"
+  xmlns:tax=
+    "http://www.irs.gov.example.com/"
+  xmlns:hiring=
+    "http://www.ourcompany.example.com/"
+>
+                    </pre>
+                </div>
+                <p>
+                    La declaración <code>noNamespaceSchemaLocation</code> es algo que ha visto antes, como son las dos últimas 
+                    entradas, que definen los prefijos del espacio de nombres <code>tax</code> y <code>hiring</code>. Lo que es 
+                    nuevo es la entrada en el medio, que define las ubicaciones de los esquemas a usar para cada espacio de nombres 
+                    referenciados en el documento.
+                </p>
+                <p>
+                    La declaración <code>xsi:schemaLocation</code> consiste de pares de entradas, donde la primera entrada en cada 
+                    para es una URI completamente cualificada que especifica el espacio de nombres, y la segunda entrada contiene 
+                    una ruta completa o una ruta relativa a la definición del esquema. En general, se recomiendan las rutas 
+                    completamente cualificadas. De esa forma, sólo una copia del esquema tenderá a existir.
+                </p>
+                <p>
+                    Dese cuenta de que no puede usar los prefijos de espacio de nombres cuando define las ubicaciones del esquema. 
+                    La declaración <code>xsi:schemaLocation</code> entiende sólo de nombres de espacio de nombres y no lo prefijos.
+                </p>
+                <p>
+                    <a id="ggehq"></a>
+                </p>
+                <h2>
+                    Declarar los Esquemas en la Aplicación
+                </h2>
+                <p>
+                    Para declarar los esquemas equivalentes en la aplicación, el código debería parecerse a algo como lo siguiente.
+                </p>
+                <div class="codeblock">
+                    <pre>
+static final String employeeSchema = "employeeDatabase.xsd";
+static final String taxSchema = "w2TaxForm.xsd";
+static final String hiringSchema = "hiringForm.xsd";
+
+static final String[] schemas = {
+    employeeSchema,
+    taxSchema, 
+    hiringSchema,
+};
+
+static final String JAXP_SCHEMA_SOURCE =
+    "http://java.sun.com/xml/jaxp/properties/schemaSource";
+
+// ...
+
+DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+    
+// ...
+
+factory.setAttribute(JAXP_SCHEMA_SOURCE, schemas);
+                    </pre>
+                </div>
+                <p>
+                    Aquí, la matriz de cadenas que apunta a las definiciones de esquema (los ficheros <code>.xsd</code>) se pasan 
+                    como argumento al método <code>factory.setAttribute</code>. Dese cuenta de las diferencias de cuando estaba 
+                    declarando los esquemas a usar como parte del conjunto de datos XML.
+                </p>
+                <ul>
+                    <li>
+                        No hay declaración especial para el esquema (sin nombre) predeterminado.
+                    </li>
+                    <li>
+                        No especifica el nombre del espacio de nombres. En vez de eso, solo da punteros a los ficheros 
+                        <code>.xsd</code>.
+                    </li>
+                </ul>
+                <p>
+                    Para hacer las asignaciones de espacio de nombres, el analizador lee los ficheros<code>.xsd</code>, y encuentra 
+                    en ellos el nombre del espacio de nombres objeto que aplicará. Ya que los ficheros se especifican con URIs, el 
+                    analizador puede usar un <code>EntityResolver</code> (si uno ha sido definido) para encontrar una copia local 
+                    del esquema.
+                </p>
+                <p>
+                    Si la definición de esquema no define un espacio de nombres objetivo, entonces se aplica el espacio de nombres 
+                    predeterminado (sin nombre, o nulo). Así, en nuestro ejemplo, esperaría ver estas declaraciones de espacio de 
+                    nombres de destino en los esquemas:
+                </p>
+                <ul>
+                    <li>
+                        Una cadena que apunta a la URI del esquema
+                    </li>
+                    <li>
+                        Un <code>InputStream</code> con los contenidos del esquema
+                    </li>
+                    <li>
+                        Un <code>InputSource</code> de SAX
+                    </li>
+                    <li>
+                        Un Fichero
+                    </li>
+                    <li>
+                        Una matriz de Objets, cada uno de los cuales es uno de los tipos definidos aquí
+                    </li>
+                </ul>
+                <p>
+                    Una matriz de Objects sólo puede ser utilizada cuando el lenguaje del esquema tien la habilidad de ensamblar un 
+                    esquema en tiempo de ejecución. Además, cuando se pasa una matriz de Objects es ilegal tener dos esquemas 
+                    que compartan el mismo espacio de nombres.
+                </p>
+                <p>
+                    <a id="ggege"></a>
+                </p>
+                <h2>
+                    Ejecutar el Ejemplo <code>DOMEcho</code> con Validación de Esquema
+                </h2>
+                <p>
+                    Para ejecutar el ejemplo <code>DOMEcho</code> con validación de esquema, siga los pasos de debajo.
+                </p>
+                <ol>
+                    <li>
+                        <b>Navegue al directorio <code>samples</code>.</b>
+                        <code>% cd <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.</code>
+                    </li>
+                    <li>
+                        <b>Compile la clase de ejemplo, usando la ruta de clases que acaba de fijar.</b><code>% javac dom/*</code>
+                    </li>
+                    <li>
+                        <b>Ejecute el programa <code>DOMEcho</code> sobre un fichero XML, especificando validación de esquema.</b>
+                        <p>
+                            Elija uno de los ficheros XML en el directorio <code>data</code> y ejecute el programa 
+                            <code>DOMEcho</code> sobre este con la opción <code>-xsd</code> especificada. Aquí, nosotros hemos 
+                            elegido ejecutar el programa con el fichero <code>personal-schema.xml</code>
+                        </p>
+                        <code>% java dom/DOMEcho -xsd data/personal-schema.xml</code>
+                        <p>
+                            Como vió en 
+                            <a class="TutorialLink" target="_top" href="readingXML.html#geswk">Configurar la Factoría</a>, la 
+                            opción <code>-xsd</code> le indica a <code>DOMEcho</code> que realize validación contra el esquema XML 
+                            que está definido en el fichero <code>personal-schema.xml</code>. En este caso, el esquema es el 
+                            fichero <code>personal.xsd</code>, el cual está también ubicado en el directorio 
+                            <code>sample/data</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <b>Abra <code>personal-schema.xml</code> en un editor de texto y elimine la declaración de esquema.</b>
+                        <p>
+                            Elimine lo siguiente de la etiqueta de apertura <code>&lt;personnel&gt;</code>.
+                        </p>
+                        <code>xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:noNamespaceSchemaLocation=&#39;personal.xsd&#39;</code>
+                        <p>
+                            No olvide salvar el fichero.
+                        </p>
+                    </li>
+                    <li>
+                        <b>Ejecute <code>DOMEcho</code> de nuevo, especificando la opción <code>-xsd</code> una vez más.</b>
+                        <code>% java dom/DOMEcho -xsd data/personal-schema.xml</code>
+                        <p>
+                            Esta vez, verá un flujo de errores.
+                        </p>
+                    </li>
+                    <li>
+                        <b>Ejecute <code>DOMEcho</code> una vez más, esta vez especificando la opción <code>-xsdss</code> y 
+                            especificando el fichero de definición de esquema.</b>
+                        <p>
+                            Como vió en 
+                            <a class="TutorialLink" target="_top" href="readingXML.html#geswk">Configurar la Factoría</a>, la 
+                            opción <code>-xsdss</code> le dice a <code>DOMEcho</code> que realize validación contra una definición 
+                            de esquema XML que se especifica cuando el programa se ejecuta. Una vez de nuevo, use el fichero 
+                            <code>personal.xsd</code>.
+                        </p>
+                        <code>% java dom/DOMEcho -xsdss data/personal.xsd data/personal-schema.xml</code>
+                        <p>
+                            Verá la misma salida que antes, significando que el fichero XML ha sido correctamente validado contra 
+                            el esquema.
+                        </p>
+                    </li>
+                </ol>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="readingXML.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="info.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Leyendo Datos XML en un DOM<br />
+            <b>Página siguiente:</b> Información Adicional
+        </div>
+    </body>
+</html> 

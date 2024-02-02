@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Consideraciones de Seguridad de los WebSocket</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jsf-ws005.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-ws007.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1">
+      <h2 id="websocket-security-considerations">Consideraciones de Seguridad de los WebSocket</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Si el WebSocket se declara en una página que está restringida a usuarios registrados solo con un 
+            rol específico, es posible que desee agregar la URL de solicitud de protocolo de enlace push al 
+            conjunto de URL restringidas.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            La URL de solicitud de protocolo de enlace push se compone del prefijo URI, 
+            <code>/javax.faces.push/</code>, seguido del nombre del canal. En el ejemplo de seguridad 
+            administrada por contenedor, que ya ha restringido una página de ejemplo, 
+            <code>/user/foo.xhtml</code>, a usuarios registrados con el rol de ejemplo, <code>USER</code>, en 
+            el patrón de URL de ejemplo, <code>/user/*</code>, en <code>web.xml</code>, consulte a 
+            continuación:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;security-constraint&gt;
+  &lt;web-resource-collection&gt;
+    &lt;web-resource-name&gt;Restrict access to role USER.
+    &lt;/web-resource-name&gt;
+    &lt;url-pattern&gt;/user/*&lt;/url-pattern&gt;
+  &lt;/web-resource-collection&gt;
+  &lt;auth-constraint&gt;
+    &lt;role-name&gt;USER&lt;/role-name&gt;
+  &lt;/auth-constraint&gt;
+&lt;/security-constraint&gt;
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Si la página, <code>/user/foo.xhtml</code>, contiene 
+            <code>&lt;f:websocket channel="foo"&gt;</code>, entonces debe agregar una restricción en el patrón 
+            de URL de la solicitud de protocolo de enlace push de <code>/javax.faces.push/foo</code>, como se 
+            muestra a continuación:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;security-constraint&gt;
+  &lt;web-resource-collection&gt;
+    &lt;web-resource-name&gt;Restrict access to role USER.
+    &lt;/web-resource-name&gt;
+    &lt;url-pattern&gt;/user/*&lt;/url-pattern&gt;
+    &lt;url-pattern&gt;/javax.faces.push/foo&lt;/url-pattern&gt;
+  &lt;/web-resource-collection&gt;
+  &lt;auth-constraint&gt;
+    &lt;role-name&gt;USER&lt;/role-name&gt;
+  &lt;/auth-constraint&gt;
+&lt;/security-constraint&gt;
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Como seguridad adicional, particularmente para aquellos canales públicos que no pueden ser 
+            restringidos por restricciones de seguridad, la etiqueta <code>f:websocket</code> registrará todos 
+            los canales declarados previamente en la sesión HTTP actual, y se verificará cualquier solicitud 
+            de apertura de WebSocket entrante. para saber si coincide con estos canales en la sesión HTTP 
+            actual. Si el canal es desconocido (por ejemplo, adivinado o suplantado al azar por los usuarios 
+            finales o reconectado manualmente después de que caduque la sesión), el WebSocket se cerrará 
+            inmediatamente con el código de motivo de cierre, <code>CloseCodes.VIOLATED_POLICY (1008)</code >. 
+            Además, cuando se destruye la sesión HTTP, todas las sesiones y los canales de ámbito de vista que 
+            todavía están abiertos se cerrarán explícitamente desde el lado del servidor con el código de 
+            motivo de cierre, <code>CloseCodes.NORMAL_CLOSURE (1000)</code>. Solo los sockets del ámbito de la 
+            aplicación permanecen abiertos y aún se puede acceder a ellos desde el servidor, incluso cuando la 
+            sesión o la vista asociada con la página en el lado del cliente haya expirado.
+          </p>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jsf-ws005.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-ws007.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

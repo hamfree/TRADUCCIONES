@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Escritura de Aplicaciones JMS Más Avanzadas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jms-examples003.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jms-examples005.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GIWFH">
+      <h2 id="writing-more-advanced-jms-applications">Escritura de Aplicaciones JMS Más Avanzadas</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Los siguientes ejemplos muestran cómo utilizar algunas de las funciones más avanzadas de la IPA de 
+            JMS: suscripciones y transacciones duraderas.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p><a href="#BNCGG">Uso de Suscripciones Duraderas</a></p>
+            </li>
+            <li>
+              <p><a href="#BNCGJ">Uso de Transacciones Locales</a></p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="BNCGG">
+          <h3 id="using-durable-subscriptions">Uso de Suscripciones Duraderas</h3>
+          <div class="paragraph">
+            <p>
+              El ejemplo de <code>durablesubscriptionexample</code> muestra cómo funcionan las suscripciones 
+              duraderas no compartidas. Demuestra que una suscripción duradera continúa existiendo y 
+              acumulando mensajes incluso cuando no hay un consumidor activo en ella.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El ejemplo consta de dos módulos, una aplicación <code>durableconsumer</code> que crea una 
+              suscripción duradera y consume mensajes, y una aplicación <code>unsubscriber</code> que le 
+              permite darse de baja de la suscripción duradera una vez que haya terminado de ejecutar la 
+              aplicación <code>durableconsumer</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para obtener información sobre suscripciones duraderas, consulte 
+              <a href="jms-concepts003.html#BNCGD">Creación de Suscripciones Duraderas</a>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El cliente principal, <code>DurableConsumer.java</code>, se encuentra en el directorio 
+              <code>_tut-install_/examples/jms/durablesubscriptionexample/durableconsumer</code>/.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El ejemplo utiliza una fábrica de conexiones, <code>jms/DurableConnectionFactory</code>, que 
+              tiene un ID de cliente.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El cliente <code>DurableConsumer</code> crea un <code>JMSContext</code> utilizando la fábrica de 
+              conexiones. Luego detiene el <code>JMSContext</code>, llama a <code>createDurableConsumer</code> 
+              para crear una suscripción duradera y un consumidor sobre el tema especificando un nombre de 
+              suscripción, registra un detector de mensajes e inicia el <code>JMSContext</code> de nuevo. La 
+              suscripción se crea solo si aún no existe, por lo que el ejemplo se puede ejecutar 
+              repetidamente:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+try (JMSContext context = durableConnectionFactory.createContext();) {
+    context.stop();
+    consumer = context.createDurableConsumer(topic, "MakeItLast");
+    listener = new TextListener();
+    consumer.setMessageListener(listener);
+    context.start();
+    ...
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>Para enviar mensajes al tema, ejecuta el cliente <code>producer</code>.</p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El ejemplo <code>unsubscriber</code> contiene un cliente <code>Unsubscriber</code> muy simple, 
+              que crea un <code>JMSContext</code> en la misma fábrica de conexiones y luego llama al 
+              <code>unsubscribe</code> método, especificando el nombre de la suscripción:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+try (JMSContext context = durableConnectionFactory.createContext();) {
+    System.out.println("Unsubscribing from durable subscription");
+    context.unsubscribe("MakeItLast");
+} ...
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="sect3" id="sthref206">
+            <h4 id="to-create-resources-for-the-durable-subscription-example">
+              Para Crear Recursos para el Ejemplo de Suscripción Duradera
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Asegúrese de que se haya iniciado el servidor GlassFish (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                  </p>
+                </li>
+                <li>
+                  <p>En una ventana de comandos, vaya al ejemplo <code>durableconsumer</code>.</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+cd tut-install/jms/durablesubscriptionexample/durableconsumer
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Cree los recursos usando el comando <code>asadmin add-resources</code>:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+asadmin add-resources src/main/setup/glassfish-resources.xml
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      El resultado del comando informa sobre la creación de un grupo de conexiones de conector 
+                      y un recurso de conector.
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <p>Verificar la creación de los recursos:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+asadmin list-jms-resources
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      Además de los recursos que creó para los ejemplos simples, el comando enumera la nueva 
+                      fábrica de conexiones:
+                    </p>
+                  </div>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+jms/MyQueue
+jms/MyTopic
+jms/__defaultConnectionFactory
+jms/DurableConnectionFactory
+Command list-jms-resources executed successfully.
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+          <div class="sect3" id="GJSCI">
+            <h4 id="to-run-the-durable-subscription-example">
+              Para Ejecutar el Ejemplo de Suscripción Duradera
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>En una ventana de terminal, vaya al siguiente directorio:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/jms/durablesubscriptionexample/
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    Cree los ejemplos de <code>consumidor duradero</code> y <code>cancelar suscripción</code>:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+mvn install
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Vaya al directorio <code>durableconsumer</code>:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+cd durableconsumer
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Para ejecutar el cliente, ingrese el siguiente comando:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+appclient -client target/durableconsumer.jar
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>El cliente crea el consumidor duradero y luego espera los mensajes:</p>
+                  </div>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+Creating consumer for topic
+Starting consumer
+To end program, enter Q or q, then &lt;return&gt;
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    En otra ventana de terminal, ejecuta el cliente <code>Producer</code> y envía algunos 
+                    mensajes al tema:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+cd tut-install/examples/jms/simple/producer
+appclient -client target/producer.jar topic 3
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    Después de que el cliente <code>DurableConsumer</code> reciba los mensajes, ingrese 
+                    <code>q</code> o <code>Q</code> para salir del programa. En este punto, el cliente se ha 
+                    comportado como cualquier otro consumidor asíncrono.
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Ahora, mientras el cliente <code>DurableConsumer</code> no se está ejecutando, utilice el 
+                    cliente <code>Producer</code> para enviar más mensajes:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+appclient -client target/producer.jar topic 2
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      Si no existiera una suscripción duradera, estos mensajes se perderían, porque 
+                      actualmente no se está ejecutando ningún consumidor sobre el tema. Sin embargo, la 
+                      suscripción duradera aún está activa y conserva los mensajes.
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    Vuelva a ejecutar el cliente <code>DurableConsumer</code>. Inmediatamente recibe los 
+                    mensajes que se enviaron mientras estaba inactivo:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+Creating consumer for topic
+Starting consumer
+To end program, enter Q or q, then &lt;return&gt;
+Reading message: This is message 1 from producer
+Reading message: This is message 2 from producer
+Message is not a TextMessage
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Introduzca <code>q</code> o <code>Q</code> para salir del programa.</p>
+                </li>
+              </ol>
+            </div>
+          </div>
+          <div class="sect3" id="sthref207">
+            <h4 id="to-run-the-unsubscriber-example">Para Ejecutar el Ejemplo Unsubscriber</h4>
+            <div class="paragraph">
+              <p>
+                Una vez que haya terminado de ejecutar el cliente <code>DurableConsumer</code>, ejecute el 
+                ejemplo <code>unsubscriber</code> para cancelar la suscripción duradera.
+              </p>
+            </div>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>En una ventana de terminal, vaya al siguiente directorio:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/jms/durablesubscriptionexample/unsubscriber
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Para ejecutar el cliente <code>Unsubscriber</code>, ingresa el siguiente comando:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+appclient -client target/unsubscriber.jar
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>El cliente informa que se está dando de baja de la suscripción duradera.</p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="BNCGJ">
+          <h3 id="using-local-transactions">Uso de Transacciones Locales</h3>
+          <div class="paragraph">
+            <p>
+              El ejemplo <code>transactedexample</code> demuestra el uso de transacciones locales en una 
+              aplicación cliente JMS. También demuestra el uso del patrón de mensajes de solicitud/respuesta 
+              descrito en <a href="jms-concepts004.html#BNCGB">Creación de Destinos Temporales</a>, aunque 
+              utiliza destinos permanentes en lugar de temporales. El ejemplo consta de tres módulos, 
+              <code>genericsupplier</code>, <code>retailer</code> y <code>vendor</code>, que se pueden 
+              encontrar en tut-install`/examples/jms/ directorio transactedexample/`. El código fuente se 
+              puede encontrar en los árboles <code>src/main/java/javaeetutorial</code> para cada módulo. Los 
+              módulos <code>genericsupplier</code> y <code>retailer</code> contienen cada uno una sola clase, 
+              <code>genericsupplier/GenericSupplier.java</code> y <code>retailer/Retailer.java</code> , 
+              respectivamente. El módulo <code>vendor</code> es más complejo y contiene cuatro clases: 
+              <code>vendor/Vendor.java</code>, <code>vendor/VendorMessageListener.java</code>, 
+              <code>vendor/Order .java</code> y <code>vendor/SampleUtilities.java</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El ejemplo muestra cómo usar una cola y un tema en una sola transacción y cómo pasar un 
+              <code>JMSContext</code> a la función constructora de un detector de mensajes. El ejemplo 
+              representa una aplicación de comercio electrónico muy simplificada en la que se producen las 
+              siguientes acciones.
+            </p>
+          </div>
+          <div class="olist arabic">
+            <ol class="arabic">
+              <li>
+                <p>
+                  Un minorista (<code>retailer/src/main/java/javaeetutorial/retailer/Retailer.java</code>) 
+                  envía un <code>MapMessage</code> a la cola de pedidos de un proveedor, ordena una cantidad 
+                  de computadoras y espera la respuesta del vendedor:
+                </p>
+                <div class="listingblock">
+                  <div class="content">
+                    <pre class="prettyprint highlight">
+                      <code class="language-oac_no_warn" data-lang="oac_no_warn">
+outMessage = context.createMapMessage();
+outMessage.setString("Item", "Computer(s)");
+outMessage.setInt("Quantity", quantity);
+outMessage.setJMSReplyTo(retailerConfirmQueue);
+context.createProducer().send(vendorOrderQueue, outMessage);
+System.out.println("Retailer: ordered " + quantity + " computer(s)");
+orderConfirmReceiver = context.createConsumer(retailerConfirmQueue);
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <p>
+                  El proveedor (<code>vendor/src/main/java/javaeetutorial/retailer/Vendor.java</code>) recibe 
+                  el mensaje de pedido del minorista y envía un mensaje de pedido al tema de pedido del 
+                  proveedor en una transacción. Esta transacción JMS utiliza una sola sesión, por lo que puede 
+                  combinar una recepción de una cola con un envío a un tema. Aquí está el código que usa la 
+                  misma sesión para crear un consumidor para una cola:
+                </p>
+                <div class="listingblock">
+                  <div class="content">
+                    <pre class="prettyprint highlight">
+                      <code class="language-oac_no_warn" data-lang="oac_no_warn">
+vendorOrderReceiver = session.createConsumer(vendorOrderQueue);
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+                <div class="paragraph">
+                  <p>
+                    El siguiente código recibe el mensaje entrante, envía un mensaje saliente y confirma el 
+                    <code>JMSContext</code>. El procesamiento de mensajes se ha eliminado para mantener la 
+                    secuencia simple:
+                  </p>
+                </div>
+                <div class="listingblock">
+                  <div class="content">
+                    <pre class="prettyprint highlight">
+                      <code class="language-oac_no_warn" data-lang="oac_no_warn">
+inMessage = vendorOrderReceiver.receive();
+// Process the incoming message and format the outgoing
+// message
+...
+context.createProducer().send(supplierOrderTopic, orderMessage);
+...
+context.commit();
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+                <div class="paragraph">
+                  <p>Para simplificar, solo hay dos proveedores, uno para CPU y otro para discos duros.</p>
+                </div>
+              </li>
+              <li>
+                <p>
+                  Cada proveedor 
+                  (<code>genericsupplier/src/main/java/javaeetutorial/retailer/GenericSupplier.java</code>) 
+                  recibe el pedido del tema del pedido, verifica su inventario y luego envía los artículos 
+                  pedidos a la cola nombrada en el campo <code>JMSReplyTo</code> del mensaje de pedido. Si no 
+                  tiene suficiente del artículo en stock, el proveedor envía lo que tiene. La recepción 
+                  síncrona del tema y el envío a la cola tienen lugar en una transacción JMS:
+                </p>
+                <div class="listingblock">
+                  <div class="content">
+                    <pre class="prettyprint highlight">
+                      <code class="language-oac_no_warn" data-lang="oac_no_warn">
+receiver = context.createConsumer(SupplierOrderTopic);
+...
+inMessage = receiver.receive();
+if (inMessage instanceof MapMessage) {
+    orderMessage = (MapMessage) inMessage;
+} ...
+// Process message
+outMessage = context.createMapMessage();
+// Add content to message
+context.createProducer().send(
+         (Queue) orderMessage.getJMSReplyTo(),
+         outMessage);
+// Display message contents
+context.commit();
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <p>
+                  El vendedor recibe las respuestas de los proveedores desde su cola de confirmación y 
+                  actualiza el estado del pedido. Los mensajes son procesados por un detector de mensajes 
+                  asíncrono, <code>VendorMessageListener</code>; este paso muestra el uso de transacciones JMS 
+                  con un detector de mensajes:
+                </p>
+                <div class="listingblock">
+                  <div class="content">
+                    <pre class="prettyprint highlight">
+                      <code class="language-oac_no_warn" data-lang="oac_no_warn">
+MapMessage component = (MapMessage) message;
+...
+int orderNumber = component.getInt("VendorOrderNumber");
+Order order = Order.getOrder(orderNumber).processSubOrder(component);
+context.commit();
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <p>
+                  Cuando se procesan todas las respuestas pendientes para un pedido determinado, el detector 
+                  de mensajes del proveedor envía un mensaje para notificar al minorista si puede cumplir con 
+                  el pedido:
+                </p>
+                <div class="listingblock">
+                  <div class="content">
+                    <pre class="prettyprint highlight">
+                      <code class="language-oac_no_warn" data-lang="oac_no_warn">
+Queue replyQueue = (Queue) order.order.getJMSReplyTo();
+MapMessage retailerConfirmMessage = context.createMapMessage();
+// Format the message
+context.createProducer().send(replyQueue, retailerConfirmMessage);
+context.commit();
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <p>El minorista recibe el mensaje del vendedor:</p>
+                <div class="listingblock">
+                  <div class="content">
+                    <pre class="prettyprint highlight">
+                      <code class="language-oac_no_warn" data-lang="oac_no_warn">
+inMessage = (MapMessage) orderConfirmReceiver.receive();
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+                <div class="paragraph">
+                  <p>
+                    Luego, el minorista hace un segundo pedido por el doble de computadoras que en el primer 
+                    pedido, por lo que estos pasos se ejecutan dos veces.
+                  </p>
+                </div>
+              </li>
+            </ol>
+          </div>
+          <div class="paragraph">
+            <p>La <a href="#BNCGK">Figura 49-1</a> ilustra estos pasos.</p>
+          </div>
+          <div id="BNCGK" class="paragraph">
+            <div class="title"><strong>Figura 49-1 Transacciones: Ejemplo de Cliente JMS</strong></div>
+            <p>
+              <span class="image">
+                <img src="img/javaeett_dt_034.png" alt="Diagrama de pasos en el ejemplo de transacción">
+              </span>
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Todos los mensajes utilizan el tipo de mensaje <code>MapMessage</code>. Las recepciones 
+              síncronas se utilizan para la recepción de todos los mensajes, excepto cuando el proveedor 
+              procesa las respuestas de los proveedores. Estas respuestas se procesan de forma asincrónica y 
+              demuestran cómo usar transacciones dentro de un detector de mensajes.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              A intervalos aleatorios, el cliente <code>Vendor</code> genera una excepción para simular un 
+              problema de base de datos y provocar una reversión.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Todos los clientes excepto <code>Minorista</code> usan contextos de transacciones.</p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El ejemplo usa tres colas llamadas <code>jms/AQueue</code>, <code>jms/BQueue</code> y 
+              <code>jms/CQueue</code>, y un tema llamado <code>jms/OTopic</code>.
+            </p>
+          </div>
+          <div class="sect3" id="sthref209">
+            <h4 id="to-create-resources-for-the-transactedexample-example">
+              Para Crear Recursos para el Ejemplo transactedexample
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Asegúrese de que se haya iniciado el servidor GlassFish (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                  </p>
+                </li>
+                <li>
+                  <p>En una ventana de comandos, vaya al ejemplo de <code>genericsupplier</code>:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+cd tut-install/jms/transactedexample/genericsupplier
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Cree los recursos usando el comando <code>asadmin add-resources</code>:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+asadmin add-resources src/main/setup/glassfish-resources.xml
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Verificar la creación de los recursos:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+asadmin list-jms-resources
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      Además de los recursos que creó para los ejemplos simples y el ejemplo de suscripción 
+                      duradera, el comando enumera los cuatro nuevos destinos:
+                    </p>
+                  </div>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+jms/MyQueue
+jms/MyTopic
+jms/AQueue
+jms/BQueue
+jms/CQueue
+jms/OTopic
+jms/__defaultConnectionFactory
+jms/DurableConnectionFactory
+Command list-jms-resources executed successfully.
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+          <div class="sect3" id="GJSHA">
+            <h4 id="to-run-the-transactedexample-clients">Para Ejecutar los Clientes transactedexample</h4>
+            <div class="paragraph">
+              <p>
+                Necesitará cuatro ventanas de terminal para ejecutar los clientes. Asegúrese de iniciar los 
+                clientes en el orden correcto.
+              </p>
+            </div>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>En una ventana de terminal, vaya al siguiente directorio:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/jms/transactedexample/
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Para compilar y empaquetar todos los módulos, ingrese el siguiente comando:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+mvn install
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Vaya al directorio <code>genericsupplier</code>:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+cd genericsupplier
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p><a id="BABFCGBI"></a></p>
+                  <div class="paragraph">
+                    <p>Use el siguiente comando para iniciar el cliente del proveedor de CPU:</p>
+                  </div>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+appclient -client target\genericsupplier.jar CPU
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>Después de algunos resultados iniciales, el cliente informa lo siguiente:</p>
+                  </div>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+Starting CPU supplier
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>En una segunda ventana de terminal, vaya al directorio <code>genericsupplier</code>:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+cd tut-install/examples/jms/transactedexample/genericsupplier
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Use el siguiente comando para iniciar el cliente del proveedor del disco duro:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+appclient -client target\genericsupplier.jar HD
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>Después de algunos resultados iniciales, el cliente informa lo siguiente:</p>
+                  </div>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+Starting Hard Drive supplier
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>En una tercera ventana de terminal, vaya al directorio <code>vendor</code>:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+cd tut-install/examples/jms/transactedexample/vendor
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Utilice el siguiente comando para iniciar el cliente <code>Vendor</code>:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+appclient -client target\vendor.jar
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>Después de algunos resultados iniciales, el cliente informa lo siguiente:</p>
+                  </div>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+Starting vendor
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>En otra ventana de terminal, vaya al directorio <code>retailer</code>:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+cd tut-install/examples/jms/transactedexample/retailer
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p><a id="BABBIHCE"></a></p>
+                  <div class="paragraph">
+                    <p>
+                      Utilice un comando como el siguiente para ejecutar el cliente <code>Retailer</code>. El 
+                      argumento especifica el número de computadoras a pedir:
+                    </p>
+                  </div>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+appclient -client target/retailer.jar 4
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      Después de algunos resultados iniciales, el cliente <code>Retailer</code> informa algo 
+                      como lo siguiente. En este caso, la primera orden se llena, pero la segunda no:
+                    </p>
+                  </div>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+Retailer: Quantity to be ordered is 4
+Retailer: Ordered 4 computer(s)
+Retailer: Order filled
+Retailer: Placing another order
+Retailer: Ordered 8 computer(s)
+Retailer: Order not filled
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      El cliente <code>Vendor</code> informa algo como lo siguiente, indicando en este caso 
+                      que puede enviar todas las computadoras en el primer orden, pero no en el segundo:
+                    </p>
+                  </div>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+Vendor: Retailer ordered 4 Computer(s)
+Vendor: Ordered 4 CPU(s) and hard drive(s)
+  Vendor: Committed transaction 1
+Vendor: Completed processing for order 1
+Vendor: Sent 4 computer(s)
+  Vendor: committed transaction 2
+Vendor: Retailer ordered 8 Computer(s)
+Vendor: Ordered 8 CPU(s) and hard drive(s)
+  Vendor: Committed transaction 1
+Vendor: Completed processing for order 2
+Vendor: Unable to send 8 computer(s)
+  Vendor: Committed transaction 2
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      El proveedor de CPU informa algo como lo siguiente. En este caso, es capaz de enviar 
+                      todas las CPU para ambos pedidos:
+                    </p>
+                  </div>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+CPU Supplier: Vendor ordered 4 CPU(s)
+CPU Supplier: Sent 4 CPU(s)
+  CPU Supplier: Committed transaction
+CPU Supplier: Vendor ordered 8 CPU(s)
+CPU Supplier: Sent 8 CPU(s)
+  CPU Supplier: Committed transaction
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      El proveedor del disco duro informa algo como lo siguiente. En este caso, tiene escasez 
+                      de discos duros para el segundo pedido:
+                    </p>
+                  </div>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+Hard Drive Supplier: Vendor ordered 4 Hard Drive(s)
+Hard Drive Supplier: Sent 4 Hard Drive(s)
+  Hard Drive Supplier: Committed transaction
+Hard Drive Supplier: Vendor ordered 8 Hard Drive(s)
+Hard Drive Supplier: Sent 1 Hard Drive(s)
+  Hard Drive Supplier: Committed transaction
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    Repita los pasos <a href="#BABFCGBI">4</a> a <a href="#BABBIHCE">10</a> tantas veces como 
+                    desee. Ocasionalmente, el proveedor informará de una excepción que provoca una reversión:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+Vendor: JMSException occurred: javax.jms.JMSException: Simulated
+database concurrent access exception
+  Vendor: Rolled back transaction 1
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    Una vez que termine de ejecutar los clientes, puede eliminar los recursos de destino 
+                    mediante los siguientes comandos:
+                  </p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+asadmin delete-jms-resource jms/AQueue
+asadmin delete-jms-resource jms/BQueue
+asadmin delete-jms-resource jms/CQueue
+asadmin delete-jms-resource jms/OTopic
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jms-examples003.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jms-examples005.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

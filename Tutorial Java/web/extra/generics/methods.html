@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Métodos Genéricos (Los Tutoriales de Java&trade; &gt; Extras &gt; Genéricos)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe los genéricos, la IPA del modo de pantalla completo, y 
+              los recursos relacionados con la certificación de Java" />
+        <meta name="keywords" content="programación en java, aprender java, ejemplos de código java, genéricos de java, IPA del modo
+              de pantalla completa, certificación" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Genéricos</a></div>
+                <div class="linkAHEAD"><a href="intro.html">Introducción</a></div>
+                <div class="linkAHEAD"><a href="simple.html">Definiendo Genéricos Simples</a></div>
+                <div class="linkAHEAD"><a href="subtype.html">Genéricos y Subtipado</a></div>
+                <div class="linkAHEAD"><a href="wildcards.html">Los Comodines</a></div>
+                <div class="nolinkAHEAD">Métodos Genéricos</div>
+                <div class="linkAHEAD"><a href="legacy.html">Interoperando con Código Heredado</a></div>
+                <div class="linkAHEAD"><a href="fineprint.html">La Letra Pequeña</a></div>
+                <div class="linkAHEAD"><a href="literals.html">Clases Literales como Objetos de Tipo en Tiempo de Ejecución</a></div>
+                <div class="linkAHEAD"><a href="morefun.html">Más Diversión con Comodines</a></div>
+                <div class="linkAHEAD"><a href="convert.html">Convirtiendo Código Heredado para Usar Genéricos</a></div>
+                <div class="linkAHEAD"><a href="acknowledgements.html">Agradecimientos</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Extras<br />
+                <b>Lección:</b> Genéricos
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Extras</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Genéricos</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="wildcards.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="legacy.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Métodos Genéricos</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Considere escribir un método que tome una matriz de objetos y una colección y ponga todos los objetos en la 
+                    matriz en la colección. Aquí hay un primer intento:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>static void</b> fromArrayToCollection(Object[] a, Collection&lt;?&gt; c) {
+    <b>for</b> (Object o : a) { 
+        c.add(o); // <i>error en tiempo de compilación</i>
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Por ahora, habrá aprendido a evitar el error de principiante de intentar usar 
+                    <code>Collection&lt;Object&gt;</code> como el tipo de parámetro de la colección. Puede o no haber reconocido que 
+                    usar <code>Collection&lt;?&gt;</code> tampoco va a funcionar. Recuerde que no puede simplemente insertar objetos 
+                    dentro de una colección de tipo desconocido.
+                </p>
+                <p>
+                    La forma de tratar con estos problemas es usar <i>métodos genéricos</i>. Al igual que las declaraciones de 
+                    tipo, las declaraciones de métodos pueden ser genéricas&mdash;esto es, parametrizadas por uno o más parámetros 
+                    de tipo.
+                </p>
+                <div class="codeblock"><pre>
+<b>static</b> &lt;T&gt; <b>void</b> fromArrayToCollection(T[] a, Collection&lt;T&gt; c) {
+    <b>for</b> (T o : a) {
+        c.add(o); // <i>Correcto</i>
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Podemos llamar a este método con cualquier clase de colección cuyo tipo de elemento sea un supertipo del tipo 
+                    de elemento de la matriz.
+                </p>
+                <div class="codeblock">
+                    <pre>
+Object[] oa = new Object[100];
+Collection&lt;Object&gt; co = new ArrayList&lt;Object&gt;();
+
+// <i>T inferido como Object</i>
+fromArrayToCollection(oa, co); 
+
+String[] sa = new String[100];
+Collection&lt;String&gt; cs = new ArrayList&lt;String&gt;();
+
+// <i>T inferido como String</i>
+fromArrayToCollection(sa, cs);
+
+// <i>T  inferido como Object</i>
+fromArrayToCollection(sa, co);
+
+Integer[] ia = new Integer[100];
+Float[] fa = new Float[100];
+Number[] na = new Number[100];
+Collection&lt;Number&gt; cn = new ArrayList&lt;Number&gt;();
+
+// <i>T  inferido como Number</i>
+fromArrayToCollection(ia, cn);
+
+// <i>T  inferido como Number</i>
+fromArrayToCollection(fa, cn);
+
+// <i>T  inferido como Number</i>
+fromArrayToCollection(na, cn);
+
+// <i>T  inferido como Object</i>
+fromArrayToCollection(na, co);
+
+// <i>Error en tiempo de compilación</i>
+fromArrayToCollection(na, cs);
+                    </pre>
+                </div>
+                <p>
+                    Dese cuenta de que no tenemos que pasar un tipo de argumento real a un método genérico. El compilador infiere 
+                    el tipo de argumentos por nosotros, basado en los tipos de los argumentos reales. Generalmente inferirá el tipo 
+                    de argumento más específico que hará que la llamada sea correcta.
+                </p>
+                <p>
+                    Una cuestión que surge es: ¿cuándo debo usar métodos genéricos, y cuándo debo usar comodines?
+                    Para entender la respuesta, examinemos unos pocos métotos de las librerías de <code>Collection</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>interface</b> Collection&lt;E&gt; {
+    <b>public boolean</b> containsAll(Collection&lt;?&gt; c);
+    <b>public boolean</b> addAll(Collection&lt;? <b>extends E</b>&gt; c);
+}
+                    </pre>
+                </div>
+                <p>
+                    Podríamos haber usado métodos genéricos aquí en su lugar:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>interface</b> Collection&lt;E&gt; {
+    <b>public</b> &lt;T&gt; <b>boolean</b> containsAll(Collection&lt;T&gt; c);
+    <b>public</b> &lt;T <b>extends</b> E&gt; <b>boolean</b> addAll(Collection&lt;T&gt; c);
+    // <i>¡Oye, las variables de tipo también pueden tener límites!</i>
+}
+                    </pre>
+                </div>
+                <p>
+                    Sin embargo, tanto en <code>containsAll</code> como <code>addAll</code>,el parámetro de tipo <code>T</code> se 
+                    usa sólo una vez. El tipo de retorno no depende del parámetro de tipo, ni tampoco de cualquier otro argumento 
+                    del método (en este caso, sólo hay un argumento). Esto nos dice que el tipo del argumento se está usando para el 
+                    polimorfismo; su único efecto es permitir que se use una variedad de tipos reales de argumentos en diferentes 
+                    sitios de invocación. Si ese es el caso, uno debe usar comodines. Los comodines están diseñados para soportar 
+                    subtipos flexible, que es lo que estamos intentando expresar aquí.
+                </p>
+                <p>
+                    Los métodos genéricos permiten que los parámetros de tipo sean usados para expresar dependencias entre los tipos
+                    de uno o más argumentos a un método y/o su tipo de retorno. Si no hay tal dependencia, un método genérico no 
+                    debería ser usado.
+                </p>
+                <p>
+                    Es posible utilizar métodos genéricos y comodines en tándem. Aquí tiene el método 
+                    <code>Collections.copy()</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>class</b> Collections {
+    <b>public static</b> &lt;T&gt; <b>void</b> copy(List&lt;T&gt; dest, List&lt;? <b>extends</b> T&gt; src) {
+    ...
+}
+                    </pre>
+                </div>
+                <p>
+                    Tenga en cuenta la dependencia entre los tipos de los dos parámetros. Cualquier objeto copiado desde la lista 
+                    origen, <code>src</code>, debe ser asignable al tipo de elemento <code>T</code> de la lista de destino, 
+                    <code>dst</code>. Así el tipo de elemento de <code>src</code> puede ser cualquier subtipo de 
+                    <code>T</code>&mdash;a nosotros no nos importa cuál. La firma de <code>copy</code> expresa la dependencia 
+                    usando un parámetro de Tipo, pero usa un comodín para el tipo del elemento del segundo parámetro.
+                </p>
+                <p>
+                    Podríamos haber escrito la firma para este método de otra forma, sin usar comodines:
+                    
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>class</b> Collections {
+    <b>public static</b> &lt;T, S <b>extends</b> T&gt; <b>void</b> copy(List&lt;T&gt; dest, List&lt;S&gt; src) {
+    ...
+}
+                    </pre>
+                </div>
+                <p>
+                    Esto está bien, pero mientras el primer parámetro de tipo es usado tanto en el tipo de <code>dst</code> y en el 
+                    límite del segundo parámetro de tipo, <code>S</code>, <code>S</code> en sí mismo es usado sólo una vez, en el 
+                    tipo de <code>src</code>&mdash;nada más depende de él. Esto es un signo de que podemos reemplazar 
+                    <code>S</code> con un comodín. Usar comodines es más claro y conciso que declarar explícitamente los parámetros 
+                    de tipo, y, por lo tanto, debe preferirse siempre que sea posible.
+                </p>
+                <p>
+                    Los comodines también tienen la ventaja de que pueden usarse fuera de las firmas de los métodos, como los tipos 
+                    de los campos, variables locales y matrices. Aquí tiene un ejemplo.
+                </p>
+                <p>
+                    Volviendo a nuestro problema de dibujar figuras, suponga que queremos mantener una historia de las peticiones 
+                    de dibujado. Podemos mantener la historia en una variable estática dentro de la clase <code>Shape</code>, y 
+                    hacer que <code>drawAll()</code> almacene su argumento entrante en el campo de historia.
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>static</b> List&lt;List&lt;? extends Shape&gt;&gt; 
+    history = new ArrayList&lt;List&lt;? extends Shape&gt;&gt;();
+
+<b>public void</b> drawAll(List&lt;? <b>extends</b> Shape&gt; shapes) {
+    history.addLast(shapes);
+    <b>for</b> (Shape s: shapes) {
+        s.draw(<b>this</b>);
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Finalmente, de nuevo tomemos nota de la convención de nomenclatura usada para los parámetros de tipo. Usamos 
+                    <code>T</code> para tipo, siempre que no haya nada más específico sobre el tipo para distinguirlo. Esto es a 
+                    menudo el caso en los métodos genéricos. Si hay varios parámetros de tipos, podríamos usar letras que sean 
+                    vecinas a <code>T</code> en el alfabeto, tales como <code>S</code>. Si un método genérico aparece dentro de una 
+                    clase genérica, es una buena idea evitar usar los mismos nombres para los parámetros de tipo del método y de la 
+                    clase, para evitar confusiones. Lo mismo aplica a las clases genéricas anidadas.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="wildcards.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="legacy.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos
+                            <a href="../../information/cpyr.html">avisos legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Los Comodines<br />
+            <b>Página siguiente:</b> Interoperando con Código Heredado
+        </div>
+    </body>
+</html> 

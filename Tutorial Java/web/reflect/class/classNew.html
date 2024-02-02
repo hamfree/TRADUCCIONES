@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Recuperando Objetos de la Clase (Los Tutoriales de Java&trade; &gt; La IPA de Reflexión &gt; Clases)
+        </title>
+        <meta name="description" content="Este tutorial de reflexión de Java describe el uso de la reflexión para acceder y 
+              manipular clases, campos, métodos y constructores" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java reflection" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Clases</a></div>
+                <div class="nolinkAHEAD">Recuperando Objetos de la Clase</div>
+                <div class="linkAHEAD"><a href="classModifiers.html">Examinando Modificadores de Clases y Tipos</a></div>
+                <div class="linkAHEAD"><a href="classMembers.html">Descubriendo Miembros de Clases</a></div>
+                <div class="linkAHEAD"><a href="classTrouble.html">Solución de Problemas</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> La IPA de Reflexión<br />
+                <b>Lección:</b> Clases
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">La IPA de Reflexión</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Clases</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="classModifiers.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Recuperando Objetos de la Clase</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    El punto de entrada para todas las operaciones de reflexión es 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html">
+                        <code>java.lang.Class</code></a>. Con la excepción de 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/ReflectPermission.html">
+                        <code>java.lang.reflect.ReflectPermission</code></a>, ninguna de las clases en 
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/package-summary.html">
+                        <code>java.lang.reflect</code></a> tiene constructores públicos. Para obtener estas clases, es necesario 
+                    invocar los métodos apropiados en 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html"><code>Class</code></a>. Hay varias 
+                    formas de obtener una 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html">
+                        <code>Class</code></a> dependiendo de si el código tiene acceso a un objeto, el nombre de clase, un tipo, o 
+                    una 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html">
+                        <code>Class</code></a> existente.
+                </p>
+                <h2>
+                    Object.getClass()
+                </h2>
+                <p>
+                    Si una instancia de un objeto está disponible, entonces la forma más simplete de obtener su 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html"><code>Class</code></a> es invocar a
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#getClass--">
+                        <code>Object.getClass()</code></a>. Por supuesto, esto solo funciona para tipos referencia porque todos 
+                    heredan de 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html">
+                        <code>Object</code></a>. A continuación se muestran algunos ejemplos.
+                </p>
+                <div class="codeblock">
+                    <pre>
+Class c = "foo".getClass();
+                    </pre>
+                </div>
+                <p>
+                    Devuelve la 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html"><code>Class</code></a> para 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html"><code>String</code></a>
+                </p>
+                <div class="codeblock">
+                    <pre>
+Class c = System.console().getClass();
+                    </pre>
+                </div>
+                <p>
+                    Hay una única consola asociada con la máquina virtual que es devuelta por el método <code>static</code> 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/System.html#console--">
+                        <code>System.console()</code></a>. El valor devuelto por 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#getClass--">
+                        <code>getClass()</code></a> es la 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html"><code>Class</code></a> 
+                    correspondiente a 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/io/Console.html"><code>java.io.Console</code></a>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+enum E { A, B }
+Class c = A.getClass();
+                    </pre>
+                </div>
+                <p>
+                    <code>A</code> es una instancia de la enumeración <code>E</code>; por lo tanto 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#getClass--"><code>getClass()</code></a> 
+                    devuelve la <a class="APILink" target="_blank" 
+                                   href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html"><code>Class</code></a> 
+                    correspondiente al tipo de enumeración <code>E</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+byte[] bytes = new byte[1024];
+Class c = bytes.getClass();
+                    </pre>
+                </div>
+                <p>
+                    Ya que las matrices son 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html"><code>Objects</code></a>, es también 
+                    posible invocar 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#getClass--"><code>getClass()</code></a> 
+                    en una instancia de una matriz. La 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html">
+                        <code>Class</code></a> devuelta corresponde a una matriz con el tipo de componente <code>byte</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+import java.util.HashSet;
+import java.util.Set;
+
+Set&lt;String&gt; s = new HashSet&lt;String&gt;();
+Class c = s.getClass();
+                    </pre>
+                </div>
+                <p>
+                    En este caso, 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/util/Set.html">
+                        <code>java.util.Set</code></a> es una interfaz a un objeto del tipo 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/HashSet.html"><code>java.util.HashSet</code></a>. 
+                    El valore devuelto por 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#getClass--"><code>getClass()</code></a> 
+                    es la clase correspondiente a 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/util/HashSet.html"><code>java.util.HashSet</code></a>.
+                </p>
+                <h2>
+                    La Sintaxis de .class
+                </h2>
+                <p>
+                    Si el tipo está disponible pero no hay instancia entonces es posible obtener una 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html"><code>Class</code></a> agregando 
+                    <code>&quot;.class&quot;</code> al nombre del tipo. Esta es también la forma más fácil de obtener la 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html"><code>Class</code></a> para un tipo 
+                    primitivo.
+                </p>
+                <div class="codeblock">
+                    <pre>
+boolean b;
+Class c = b.getClass();   // error en tiempo de compilación
+
+Class c = boolean.class;  // correcto
+                    </pre>
+                </div>
+                <p>
+                    Dese cuenta que la sentencia <code>boolean.getClass()</code> produciría un error en tiempo de compilación 
+                    porque un <code>boolean</code> es un tipo primitivo y no se puede desreferenciar. La sintaxis 
+                    <code>.class</code> devuelve la 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html">
+                        <code>Class</code></a> correspondiente al tipo <code>boolean</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+Class c = java.io.PrintStream.class;
+                    </pre>
+                </div>
+                <p>
+                    La variable <code>c</code> será la 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html">
+                        <code>Class</code></a> correspondiente al tipo 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/io/PrintStream.html">
+                        <code>java.io.PrintStream</code></a>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+Class c = int[][][].class;
+                    </pre>
+                </div>
+                <p>
+                    La sintaxis <code>.class</code> se puede usar para recuperar una 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html"><code>Class</code></a> correspondiente
+                    a una matriz multi-dimensional de un tipo dado.
+                </p>
+                <h2>
+                    Class.forName()
+                </h2>
+                <p>
+                    Si el nombre completamente cualificado de una clase está disponble, es posible obtener la correspondiente 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html">
+                        <code>Class</code></a> usando el método estático
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#forName-java.lang.String-">
+                        <code>Class.forName()</code></a>. Este no puede utilizarse para los tipos primitivos. La sintaxis para los 
+                    nombres de las clases de matriz se describen en 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getName--">
+                        <code>Class.getName()</code></a>. Esta sintaxis es aplicable para referencias y tipos primitivos.
+                </p>
+                <div class="codeblock">
+                    <pre>
+Class c = Class.forName("com.duke.MyLocaleServiceProvider");
+                    </pre>
+                </div>
+                <p>
+                    Esta sentencia creará una clase a partir del nombre completamente cualificado proporcionado.
+
+                </p>
+                <div class="codeblock">
+                    <pre>
+Class cDoubleArray = Class.forName("[D");
+
+Class cStringArray = Class.forName("[[Ljava.lang.String;");
+                    </pre>
+                </div>
+                <p>
+                    La variable <code>cDoubleArray</code> contendrá la
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html">
+                        <code>Class</code></a> correspondiente a una matriz del tipo primitivo <code>double</code> (p.e. la misma 
+                    como <code>double[].class</code>). La variable <code>cStringArray</code> contendrá la 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html">
+                        <code>Class</code></a> correspondiente a una matriz bidimensional de 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">
+                        <code>String</code></a> (p.e. idéntica a <code>String[][].class</code>).
+                </p>
+                <h2>
+                    Campo TYPE para Envolturas de Tipo Primitivo
+                </h2>
+                <p>
+                    La sintaxis <code>.class</code> es una forma preferida y más conveniente para obtener la 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html">
+                        <code>Class</code></a> para un tipo primitivo; sin embargo hay otra forma de adquirir la 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html">
+                        <code>Class</code></a>. Cada uno de los tipos primitivos y <code>void</code> tiene una clase envoltorio en 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/package-summary.html"><code>java.lang</code></a> 
+                    que se usa para la conversión de tipos primitivos a tipos referencia. Cada clase envoltorio contiene un campo 
+                    llamado <code>TYPE</code> que es igual a la 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html"><code>Class</code></a> para el tipo 
+                    primitivo que está siendo encapsulado.
+                </p>
+                <div class="codeblock">
+                    <pre>
+Class c = Double.TYPE;
+                    </pre>
+                </div>
+                <p>
+                    Hay una clase 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Double.html">
+                        <code>java.lang.Double</code></a> que se usa para envolver el tipo primitivo 
+                    <code>double</code> siempre que se requiera un 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html">
+                        <code>Object</code></a>. El valor de 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Double.html#TYPE">
+                        <code>Double.TYPE</code></a> es idéntico al de <code>double.class</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+Class c = Void.TYPE;
+                    </pre>
+                </div>
+                <p>
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Void.html#TYPE">
+                        <code>Void.TYPE</code></a> es idéntico a <code>void.class</code>.
+                </p>
+                <h2>
+                    Métodos que Devuelven Clases
+                </h2>
+                <p>
+                    Hay varias IPA de Reflexión que devuelven clases pero estas sólo pueden ser accedidas si una 
+                    <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html">
+                        <code>Class</code></a> ha sido ya obtenida de forma directa o indirecta.
+                </p>
+                <dl>
+                    <dt>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getSuperclass--">
+                            <code>Class.getSuperclass()</code></a>
+                    </dt>
+                    <dd>
+                        Devuelve la clase superior a la clase dada.
+                        <div class="codeblock">
+                            <pre>
+Class c = javax.swing.JButton.class.getSuperclass();
+                            </pre>
+                        </div>
+                        La super clase de 
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/swing/JButton.html">
+                            <code>javax.swing.JButton</code></a> es
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/javax/swing/AbstractButton.html">
+                            <code>javax.swing.AbstractButton</code></a>.
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getClasses--">
+                            <code>Class.getClasses()</code></a>
+                    </dt>
+                    <dd>
+                        Devuelve todas las clases públicas, interfaces, y enumeraciones qeu son miembros de la clase incluyendo 
+                        miembros heredados.
+                        <div class="codeblock">
+                            <pre>
+Class&lt;?&gt;[] c = Character.class.getClasses();
+                            </pre>
+                        </div>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/lang/Character.html"><code>Character</code></a> 
+                        contiene dos clases miembro
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/lang/Character.Subset.html">
+                            <code>Character.Subset</code></a> y 
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/lang/Character.UnicodeBlock.html">
+                            <code>Character.UnicodeBlock</code></a>.
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getDeclaredClasses--">
+                            <code>Class.getDeclaredClasses()</code></a>
+                    </dt>
+                    <dd>
+                        Devuelve todas las interfaces de clases, y enumeraciones que están explícitamente declaradas en esta clase.
+                        <div class="codeblock">
+                            <pre>
+Class&lt;?&gt;[] c = Character.class.getDeclaredClasses();
+                            </pre>
+                        </div>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/lang/Character.html"><code>Character</code></a> 
+                        contiene dos miembros públicos que son clases 
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/lang/Character.Subset.html">
+                            <code>Character.Subset</code></a> y
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/lang/Character.UnicodeBlock.html">
+                            <code>Character.UnicodeBlock</code></a> y una clase privada <code>Character.CharacterCache</code>.
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getDeclaringClass--">
+                            <code>Class.getDeclaringClass()</code></a><br/>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Field.html#getDeclaringClass--">
+                            <code>java.lang.reflect.Field.getDeclaringClass()</code></a><br/>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html#getDeclaringClass--">
+                            <code>java.lang.reflect.Method.getDeclaringClass()</code></a><br/>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Constructor.html#getDeclaringClass--">
+                            <code>java.lang.reflect.Constructor.getDeclaringClass()</code></a>
+                    </dt>
+                    <dd>
+                        Devuelven la 
+                        <a class="APILink" target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html">
+                            <code>Class</code></a> en la cual esos miembros fueron declarados. Las 
+                        <a class="OutsideLink" target="_blank" 
+                           href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-15.html#jls-15.9.5">
+                            Declaraciones de Clases Anónimas</a> no tendrán una clase declarante pero tendrán una clase que las 
+                        encierra o envuelve.
+                        <div class="codeblock">
+                            <pre>
+import java.lang.reflect.Field;
+
+Field f = System.class.getField("out");
+Class c = f.getDeclaringClass();
+                            </pre>
+                        </div>
+                        El campo 
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/lang/System.html#out"><code>out</code></a> está 
+                        declarado en 
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/lang/System.html"><code>System</code></a>.
+                        <div class="codeblock">
+                            <pre>
+public class MyClass {
+    static Object o = new Object() {
+        public void m() {} 
+    };
+    static Class&lt;c&gt; = o.getClass().getEnclosingClass();
+}
+                            </pre>
+                        </div>
+                        La clase declarante de la clase anónima definida por <code>o</code> es <code>null</code>.
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getEnclosingClass--">
+                            <code>Class.getEnclosingClass()</code></a>
+                    </dt>
+                    <dd>
+                        Devuelve la clase de la clase que la encierra inmediatamente.
+                        <div class="codeblock">
+                            <pre>
+Class c = Thread.State.class().getEnclosingClass();
+                            </pre>
+                        </div>
+                        La clase que encierra a la enumeración 
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.State.html">
+                            <code>Thread.State</code></a> es
+                        <a class="APILink" target="_blank" 
+                           href="https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.html"><code>Thread</code></a>.
+                        <div class="codeblock">
+                            <pre>
+public class MyClass {
+    static Object o = new Object() { 
+        public void m() {} 
+    };
+    static Class&lt;c&gt; = o.getClass().getEnclosingClass();
+}
+                            </pre>
+                        </div>
+                        La clase anónima definida por <code>o</code> está encerrada por <code>MyClass</code>.
+                    </dd>
+                </dl>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="classModifiers.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Clases<br />
+            <b>Página siguiente:</b> Examinando Modificadores de Clases y Tipos
+        </div>
+    </body>
+</html> 

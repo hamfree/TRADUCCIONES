@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Procesamiento Asincrónico</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="servlets011.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="servlets013.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BEIGCFDF">
+      <h2 id="asynchronous-processing">Procesamiento Asincrónico</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Los contenedores web en los servidores de aplicaciones normalmente usan un subproceso de servidor 
+            por solicitud del cliente. En condiciones de carga pesada, los contenedores necesitan una gran 
+            cantidad de subprocesos para atender todas las solicitudes de los clientes. Las limitaciones de 
+            escalabilidad incluyen quedarse sin memoria o agotar el conjunto de subprocesos del contenedor. 
+            Para crear aplicaciones web escalables, debe asegurarse de que ningún subproceso asociado con una 
+            solicitud esté inactivo, de modo que el contenedor pueda usarlos para procesar nuevas solicitudes.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Hay dos escenarios comunes en los que un subproceso asociado con una solicitud puede estar 
+            inactivo.
+          </p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>
+                El subproceso debe esperar a que un recurso esté disponible o procesar datos antes de generar 
+                la respuesta. Por ejemplo, una aplicación puede necesitar consultar una base de datos o 
+                acceder a datos desde un servicio web remoto antes de generar la respuesta.
+              </p>
+            </li>
+            <li>
+              <p>
+                El subproceso debe esperar un evento antes de generar la respuesta. Por ejemplo, una 
+                aplicación puede tener que esperar un mensaje JMS, nueva información de otro cliente o nuevos 
+                datos disponibles en una cola antes de generar la respuesta.
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div class="paragraph">
+          <p>
+            Estos escenarios representan operaciones de bloqueo que limitan la escalabilidad de las 
+            aplicaciones web. El procesamiento asíncrono se refiere a la asignación de estas operaciones de 
+            bloqueo a un nuevo subproceso y el retorno del subproceso asociado con la solicitud inmediatamente 
+            al contenedor.
+          </p>
+        </div>
+        <div class="sect2" id="sthref103">
+          <h3 id="asynchronous-processing-in-servlets">Procesamiento Asincrónico en los Servlets</h3>
+          <div class="paragraph">
+            <p>
+              Java EE proporciona soporte de procesamiento asíncrono para servlets y filtros. Si un servlet o 
+              un filtro alcanza una operación potencialmente bloqueante al procesar una solicitud, puede 
+              asignar la operación a un contexto de ejecución asíncrona y devolver el hilo asociado con la 
+              solicitud inmediatamente al contenedor sin generar una respuesta. La operación de bloqueo se 
+              completa en el contexto de ejecución asincrónica en un subproceso diferente, que puede generar 
+              una respuesta o enviar la solicitud a otro servlet.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para habilitar el procesamiento asíncrono en un servlet, establezca el parámetro 
+              <code>asyncSupported</code> en <code>true</code> en la anotación <code>@WebServlet</code> de la 
+              siguiente manera:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@WebServlet(urlPatterns={"/asyncservlet"}, asyncSupported=true)
+public class AsyncServlet extends HttpServlet { ... }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              La clase <code>javax.servlet.AsyncContext</code> proporciona la funcionalidad que necesita para 
+              realizar el procesamiento asíncrono dentro de los métodos de servicio. Para obtener una 
+              instancia de <code>AsyncContext</code>, llame al método <code>startAsync()</code> en el objeto 
+              de solicitud de su método de servicio; por ejemplo:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public void doGet(HttpServletRequest req, HttpServletResponse resp) {
+   ...
+   AsyncContext acontext = req.startAsync();
+   ...
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Esta llamada pone la solicitud en modo asíncrono y garantiza que la respuesta no se confirme 
+              después de salir del método de servicio. Debe generar la respuesta en el contexto asíncrono 
+              después de que se complete la operación de bloqueo o enviar la solicitud a otro servlet.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              <a href="#BEICFIEC">La Tabla 18-3</a> describe la funcionalidad básica proporcionada por la 
+              clase <code>AsyncContext</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p><a id="sthref104"></a><a id="BEICFIEC"></a></p>
+          </div>
+          <div class="paragraph">
+            <p><strong>Tabla 18-3 Funcionalidad Proporcionada por la Clase AsyncContext</strong></p>
+          </div>
+          <table class="tableblock frame-all grid-all" style="width: 90%;">
+            <colgroup>
+              <col style="width: 22.2222%;">
+              <col style="width: 77.7778%;">
+            </colgroup>
+            <tbody>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><strong>Firma del Método</strong></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><strong>Descripción</strong></p></td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>void start(Runnable run)</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <div>
+                    <div class="paragraph">
+                      <p>
+                        El contenedor proporciona un subproceso diferente en el que se puede procesar la 
+                        operación de bloqueo.
+                      </p>
+                    </div>
+                    <div class="paragraph">
+                      <p>
+                       Proporcione código para la operación de bloqueo como una clase que implementa la 
+                       interfaz <code>Runnable</code>. Puede proporcionar esta clase como una clase interna al 
+                       llamar al método <code>start</code> o usar otro mecanismo para pasar la instancia de 
+                       <code>AsyncContext</code> a su clase.
+                      </p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>ServletRequest getRequest()</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <div>
+                    <div class="paragraph">
+                      <p>
+                        Devuelve la solicitud utilizada para inicializar este contexto asíncrono. En el 
+                        ejemplo anterior, la solicitud es la misma que en el método de servicio.
+                      </p>
+                    </div>
+                    <div class="paragraph">
+                      <p>
+                        Puede usar este método dentro del contexto asíncrono para obtener parámetros de la 
+                        solicitud.
+                      </p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>ServletResponse getResponse()</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <div>
+                    <div class="paragraph">
+                      <p>
+                        Devuelve la respuesta utilizada para inicializar este contexto asíncrono. En el 
+                        ejemplo anterior, la respuesta es la misma que en el método de servicio.
+                      </p>
+                    </div>
+                    <div class="paragraph">
+                      <p>
+                        Puede usar este método dentro del contexto asíncrono para escribir en la respuesta con 
+                        los resultados de la operación de bloqueo.
+                      </p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>void complete()</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <div>
+                    <div class="paragraph">
+                      <p>
+                        Completa la operación asíncrona y cierra la respuesta asociada con este contexto 
+                        asíncrono.
+                      </p>
+                    </div>
+                    <div class="paragraph">
+                      <p>
+                        Llamar a este método después de escribir en el objeto de respuesta dentro del contexto 
+                        asíncrono.
+                      </p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>void dispatch(String path)</code></p>
+                </td>
+                <td class="tableblock halign-left valign-top">
+                  <div>
+                    <div class="paragraph">
+                      <p>Envía los objetos de solicitud y respuesta a la ruta dada.</p>
+                    </div>
+                    <div class="paragraph">
+                      <p>
+                        Utilice este método para que otro servlet escriba en la respuesta después de que se 
+                        complete la operación de bloqueo.
+                      </p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sect2" id="sthref105">
+          <h3 id="waiting-for-a-resource">Esperando por un Recurso</h3>
+          <div class="paragraph">
+            <p>
+              Esta sección demuestra cómo usar la funcionalidad proporcionada por la clase 
+              <code>AsyncContext</code> para el siguiente caso de uso:
+            </p>
+          </div>
+          <div class="olist arabic">
+            <ol class="arabic">
+              <li>
+                <p>Un servlet recibe un parámetro de una solicitud GET.</p>
+              </li>
+              <li>
+                <p>
+                  El servlet utiliza un recurso, como una base de datos o un servicio web, para recuperar 
+                  información basada en el valor del parámetro. El recurso puede ser lento a veces, por lo que 
+                  esta puede ser una operación de bloqueo.
+                </p>
+              </li>
+              <li>
+                <p>El servlet genera una respuesta utilizando el resultado del recurso.</p>
+              </li>
+            </ol>
+          </div>
+          <div class="paragraph">
+            <p>El siguiente código muestra un servlet básico que no utiliza procesamiento asíncrono:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@WebServlet(urlPatterns={"/syncservlet"})
+public class SyncServlet extends HttpServlet {
+   private MyRemoteResource resource;
+   @Override
+   public void init(ServletConfig config) {
+      resource = MyRemoteResource.create("config1=x,config2=y");
+   }
+   @Override
+   public void doGet(HttpServletRequest request,
+                     HttpServletResponse response) {
+      response.setContentType("text/html;charset=UTF-8");
+      String param = request.getParameter("param");
+      String result = resource.process(param);
+      /* ... imprimir a la respuesta ... */
+   }
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>El siguiente código muestra el mismo servlet usando procesamiento asíncrono:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@WebServlet(urlPatterns={"/asyncservlet"}, asyncSupported=true)
+public class AsyncServlet extends HttpServlet {
+   /* ... Mismas variables y método de inicio que en SyncServlet ... */
+   @Override
+   public void doGet(HttpServletRequest request,
+                     HttpServletResponse response) {
+      response.setContentType("text/html;charset=UTF-8");
+      final AsyncContext acontext = request.startAsync();
+      acontext.start(new Runnable() {
+         public void run() {
+            String param = acontext.getRequest().getParameter("param");
+            String result = resource.process(param);
+            HttpServletResponse response = acontext.getResponse();
+            /* ... imprimir a la respuesta ... */
+            acontext.complete();
+   }
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              <code>AsyncServlet</code> agrega <code>asyncSupported=true</code> a la anotación 
+              <code>@WebServlet</code>. El resto de las diferencias están dentro del método de servicio.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  <code>request.startAsync()</code> hace que la solicitud se procese de forma asíncrona; la 
+                  respuesta no se envía al cliente al final del método de servicio.
+                </p>
+              </li>
+              <li>
+                <p>
+                  <code>acontext.start(new Runnable() {&#8230;&#8203;})</code> obtiene un nuevo hilo del 
+                  contenedor.
+                </p>
+              </li>
+              <li>
+                <p>
+                  El código dentro del método <code>run()</code> de la clase interna se ejecuta en el nuevo 
+                  hilo. La clase interna tiene acceso al contexto asíncrono para leer parámetros de la 
+                  solicitud y escribir en la respuesta. Llamar al método <code>complete()</code> del contexto 
+                  asincrónico confirma la respuesta y la envía al cliente.
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              El método de servicio de <code>AsyncServlet</code> regresa inmediatamente y la solicitud se 
+              procesa en el contexto asíncrono.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="servlets011.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="servlets013.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

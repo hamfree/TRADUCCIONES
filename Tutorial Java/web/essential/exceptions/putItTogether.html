@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Poniéndolo Todo Junto (Los Tutoriales de Java&trade; &gt; Clases Esenciales &gt; Excepciones)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe las excepciones, la entrada/salida básica, concurrencia,
+              expresiones regulares, y el entorno de la plataforma" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java exception, java input output, java
+              threads, java regex, regular expressions, path, classpath, environment variable" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper  clearfix">       
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div> 
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Excepciones</a></div>
+                <div class="linkAHEAD"><a href="definition.html">¿Qué es una Excepción?</a></div>
+                <div class="linkAHEAD"><a href="catchOrDeclare.html">La Captura o la Especificación del Requisito</a></div>
+                <div class="linkAHEAD"><a href="handling.html">Capturando y Manejando Excepciones</a></div>
+                <div class="linkBHEAD"><a href="try.html">El Bloque try</a></div>
+                <div class="linkBHEAD"><a href="catch.html">Los Bloques catch</a></div>
+                <div class="linkBHEAD"><a href="finally.html">El Bloque finally</a></div>
+                <div class="linkBHEAD"><a href="tryResourceClose.html">La Sentencia try-with-resources</a></div>
+                <div class="nolinkBHEAD">Poniéndolo Todo Junto</div>
+                <div class="linkAHEAD"><a href="declaring.html">Especificando las Excepciones Lanzadas por un Método</a></div>
+                <div class="linkAHEAD"><a href="throwing.html">Cómo Lanzar Excepciones</a></div>
+                <div class="linkBHEAD"><a href="chained.html">Excepciones Encadenadas</a></div>
+                <div class="linkBHEAD"><a href="creating.html">Creando Clases Exception</a></div>
+                <div class="linkAHEAD"><a href="runtime.html">Excepciones No Comprobadas &mdash; La Controversia</a></div>
+                <div class="linkAHEAD"><a href="advantages.html">Ventajas de las Excepciones</a></div>
+                <div class="linkAHEAD"><a href="summary.html">Sumario</a></div>
+                <div class="linkQUESTIONS"><a href="QandE/questions.html">Preguntas y Ejercicios</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Clases Esenciales<br />
+                <b>Lección:</b> Excepciones<br />
+                <b>Sección:</b> Capturando y Manejando Excepciones
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Clases Esenciales</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Excepciones</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="tryResourceClose.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="declaring.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Poniéndolo Todo Junto</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Las secciones previas describieron cómo construir los bloques de código <code>try</code>, <code>catch</code>, y
+                    <code>finally</code> para el método <code>escribeLista</code> en la clase <code>ListaDeNumeros</code>.
+                    Ahora, recorramos el código e investiguemos qué puede ocurrir.
+                </p>
+                <p>
+                    Cuando todos los componentes son puestos juntos, el método <code>escribeLista</code> se ve como el siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public void escribeLista() {
+    PrintWriter salida = null;
+
+    try {
+        System.salida.println("Entrando" + " sentencia try");
+
+        salida = new PrintWriter(new FileWriter("FicheroSalida.txt"));
+        for (int i = 0; i &lt; TAMAÑO; i++) {
+            salida.println("Valor en: " + i + " = " + lista.get(i));
+        }
+    } catch (IndexOutOfBoundsException e) {
+        System.err.println("Capturada IndexOutOfBoundsException: "
+                           +  e.getMessage());
+                                 
+    } catch (IOException e) {
+        System.err.println("Capturada IOException: " +  e.getMessage());
+                                 
+    } finally {
+        if (salida != null) {
+            System.salida.println("Cerrando PrintWriter");
+            salida.close();
+        } 
+        else {
+            System.salida.println("PrintWriter no abierto");
+        }
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Como se mención previamente, éste bloque <code>try</code> del método  tiene tres diferentes posibilidades al
+                    terminar, aquí tiene dos de ellas.
+                </p>
+                <ol>
+                    <li>
+                        El ćodigo en la sentencia <code>try</code> falla y lanza una excepción. Esto podría ser una
+                        <code>IOException</code> causada por la sentencia <code>new FileWriter</code> o una
+                        <code>IndexOutOfBoundsException</code> causada por un valor incorrecto de índice en el bucle
+                        <code>for</code>.
+                    </li>
+                    <li>
+                        Todo tiene éxito y la sentencia <code>try</code> termina normalmente.
+                    </li>
+                </ol>
+                <p>
+                    Echemos un vistazo a qué ocurre en el método <code>escribeLista</code> durante estas dos posibilidades al
+                    terminar.
+                </p>
+                <h2>Escenario 1: Una Excepción Ocurre</h2>
+                <p>
+                    La sentencia que crea un <code>FileWriter</code> puede fallar por una variedad de razones. Por ejemplo, el
+                    constructor para <code>FileWriter</code> lanza <code>IOException</code> si el programa no puede crear o escribir
+                    al fichero indicado.
+                </p>
+                <p>
+                    Cuando <code>FileWriter</code> lanza una <code>IOException</code>, el sistema de tiempo de ejecución
+                    inmediatamente para la ejecución del bloque <code>try</code>; las llamadas de método que se ejecutan no son
+                    completadas. El sistema en tiempo de ejecución entonces comienza a buscar en la parte superior de la pila de 
+                    llamadas del método por un manejador de excepción apropiado. En este ejemplo, cuando ocurre 
+                    <code>IOException</code> , el constructor de <code>FileWriter</code> está en lo alto de la pila de llamadas. Sin
+                    embargo, el constructor de <code>FileWriter</code> no tiene un manejador de excepción apropiado, por lo que el
+                    sistema en tiempo de ejecución comprueba el siguiente método &mdash; el método <code>escribeLista</code> &mdash;
+                    en la pila de llamadas del método.
+                    El método <code>escribeLista</code> tiene dos manejadores de excepciones: uno para <code>IOException</code>
+                    y otro para <code>IndexOutOfBoundsException</code>.
+                </p>
+                <p>
+                    El sistema en tiempo de ejecución comprueba los manejadores de <code>escribeLista</code> en el orden en el cual
+                    aparecen después de la sentencia <code>try</code>. El argumento del primer manejador de excepción es
+                    <code>IndexOutOfBoundsException</code>. Este no coincide con el tipo de la excepción lanzada, así que el sistema
+                    de tiempo de ejecución comprueba el siguiente manejador de excepción  &mdash; <code>IOException</code>. Este
+                    coincide el tipo de excepción que fue lanzado, así que el sistema en tiempo de ejecución finaliza su búsqueda de 
+                    un manejador de excepciones apropiado. Ahora que el sistema en ejecución ha encontrado un manejador apropiado, 
+                    el código en ese bloque <code>catch</code> es ejecutado.
+                </p>
+                <p>
+                    Después de que el manejador de excepción se ejecuta, el sistema de tiempo de ejecución pasa el control al bloque
+                    <code>finally</code>. El código en el bloque <code>finally</code> se ejecuta independientemente de la excepción
+                    capturada encima de él. En este escenario, el <code>FileWriter</code> no fue abierto nunca y no necesita ser
+                    cerrado. Después de que el bloque <code>finally</code> termina la ejecución, el programa continúa con la primera
+                    sentencia después del bloque <code>finally</code>.
+                </p>
+                <p>
+                    Aquí está la salida completa del programa <code>ListaDeNumeros</code> que aparece cuando una
+                    <code>IOException</code> es lanzada.
+                </p>
+                <div class="codeblock">
+                    <pre>
+Entrando sentencia try
+Capturada IOException: FicheroSalida.txt
+PrintWriter no abierto
+                    </pre>
+                </div>
+                <p>
+                    El código en negrita en el siguiente listado muestra las sentencias que son ejecutadas durante este escenario:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public void escribeLista() {
+   <b>PrintWriter salida = null;
+
+    try {
+        System.salida.println("Entrando sentencia try");
+        salida = new PrintWriter(new FileWriter("FicheroSalida.txt"));</b>
+        for (int i = 0; i &lt; TAMAÑO; i++)
+            salida.println("Valor en: " + i + " = " + lista.get(i));
+                               
+    } catch (IndexOutOfBoundsException e) {
+        System.err.println("Capturada IndexOutOfBoundsException: "
+                           + e.getMessage());
+                                 
+    } <b>catch (IOException e) {
+        System.err.println("Capturada IOException: " + e.getMessage());
+    } finally {
+        if (salida != null) {</b>
+            System.salida.println("Cerrando PrintWriter");
+            salida.close();
+        } 
+        <b>else {
+            System.salida.println("PrintWriter no abierto");
+        }</b>
+    }
+}
+                    </pre>
+                </div>
+                <h2>Escenario 2: El Bloque try Termina Normalmente</h2>
+                <p>
+                    En este escenario, todas las sentencias dentro del alcance del bloque <code>try</code> se ejecutan
+                    correctamente y no lanzan excepciones. La ejecución cae al final del bloque <code>try</code>, y el sistema en
+                    tiempo de ejecución pasa el control al bloque <code>finally</code>. Ya que todo fue correcto, el
+                    <code>PrintWriter</code> es abierto cuando el control alcanza el bloque <code>finally</code>, el cual cierra el
+                    <code>PrintWriter</code>. De nuevo, despueś de que el bloque <code>finally</code> termina su ejecución, el
+                    programa continúa con la primera sentencia después del bloque <code>finally</code>.
+                </p>
+                <p>
+                    Aquí está la salida del programa <code>ListaDeNumeros</code> cuando no son lanzadas excepciones.
+                </p>
+                <div class="codeblock">
+                    <pre>
+Entrando sentencia try
+Cerrando PrintWriter
+                    </pre>
+                </div>
+                <p>
+                    El código en negrita en el siguiente ejemplo muestra lase sentencias que fueron ejecutadas durante este
+                    escenario.
+                </p>
+                <div class="codeblock">
+                    <pre>
+public void escribeLista() {
+    <b>PrintWriter salida = null;
+    try {
+        System.salida.println("Entrando sentencia try");
+        salida = new PrintWriter(new FileWriter("FicheroSalida.txt"));
+        for (int i = 0; i &lt; TAMAÑO; i++)
+            salida.println("Valor en: " + i + " = " + lista.get(i));
+                  
+    }</b> catch (IndexOutOfBoundsException e) {
+        System.err.println("Capturada IndexOutOfBoundsException: "
+                           + e.getMessage());
+
+    } catch (IOException e) {
+        System.err.println("Capturada IOException: " + e.getMessage());
+                                 
+    } <b>finally {
+        if (salida != null) {
+            System.salida.println("Cerrando PrintWriter");
+            salida.close();
+        }</b> 
+        else {
+            System.salida.println("PrintWriter no abierto");
+        }
+    }
+}
+                    </pre>
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="tryResourceClose.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="declaring.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">
+                                Su uso de ésta
+                            </a>
+                            página y todo el material en las páginas bajo el anuncio &quot;Los Tutoriales de Java&quot; está sujeto
+                            a estos
+                            <a href="../../information/cpyr.html">
+                                avisos legales
+                            </a>
+                            .
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs
+                            </a>
+                            .
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión
+                            </a>
+                            .
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página Anterior:</b> La Sentencia try-with-resources<br />
+            <b>Página Siguiente:</b> Especificando las Excepciones Lanzadas por un Método
+        </div>
+    </body>
+</html>

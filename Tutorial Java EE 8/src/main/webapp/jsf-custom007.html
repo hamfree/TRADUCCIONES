@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Implementando un Oyente de Evento</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jsf-custom006.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-custom008.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BNAUT">
+      <h2 id="implementing-an-event-listener">Implementando un Oyente de Evento</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            La tecnología JavaServer Faces admite eventos de acción y eventos de cambio de valor para 
+            componentes.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Los eventos de acción ocurren cuando el usuario activa un componente que implementa 
+            <code>javax.faces.component.ActionSource</code>. Estos eventos están representados por la clase 
+            <code>javax.faces.event.ActionEvent</code>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Los eventos de cambio de valor ocurren cuando el usuario cambia el valor de un componente que 
+            implementa <code>javax.faces.component.EditableValueHolder</code>. Estos eventos están 
+            representados por la clase <code>javax.faces.event.ValueChangeEvent</code>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Una forma de manejar eventos es implementar las clases de escucha apropiadas. Las clases de 
+            escucha que manejan los eventos de acción en una aplicación deben implementar la interfaz 
+            <code>javax.faces.event.ActionListener</code>. De manera similar, los oyentes que manejan los 
+            eventos de cambio de valor deben implementar la interfaz 
+            <code>javax.faces.event.ValueChangeListener</code>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Esta sección explica cómo implementar las dos clases de escucha.</p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Para manejar eventos generados por componentes personalizados, debe implementar un detector de 
+            eventos y un controlador de eventos y poner en cola manualmente el evento en el componente. 
+            Consulte 
+            <a href="jsf-custom008.html#BNAWD">Gestionando Eventos para Componentes Personalizados</a> para 
+            obtener más información.
+          </p>
+        </div>
+        <table class="tableblock frame-all grid-all spread">
+          <colgroup>
+            <col style="width: 100%;">
+          </colgroup>
+          <tbody>
+            <tr>
+              <td class="tableblock halign-left valign-top">
+                <div>
+                  <div class="paragraph">
+                    <p>Nota:</p>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      No es necesario crear una implementación de <code>ActionListener</code> para manejar un 
+                      evento que resulta únicamente en la navegación a una página y no realiza ningún otro 
+                      procesamiento específico de la aplicación. Consulte 
+                      <a href="jsf-develop003.html#BNAVC">Escribiendo un método para manejar la navegación</a> 
+                      para obtener información sobre cómo administrar la navegación de la página.
+                    </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="sect2" id="BNAUU">
+          <h3 id="implementing-value-change-listeners">Implementando Oyentes de Cambio de Valor</h3>
+          <div class="paragraph">
+            <p>
+              Una implementación de <code>javax.faces.event.ValueChangeListener</code> debe incluir un método 
+              <code>processValueChange(ValueChangeEvent)</code>. Este método procesa el evento de cambio de 
+              valor especificado y es invocado por la implementación de JavaServer Faces cuando ocurre el 
+              evento de cambio de valor. La instancia <code>ValueChangeEvent</code> almacena los valores 
+              nuevos y antiguos del componente que disparó el evento.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              En el caso de estudio de Duke's Bookstore, la implementación del oyente <code>NameChanged</code> 
+              se registra en el componente <code>name</code> <code>UIInput</code> en la  página 
+              <code>bookcashier.xhtml</code>. Este oyente almacena en el alcance de la sesión el nombre que el 
+              usuario ingresó en el campo correspondiente al componente de nombre.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El <code>bookreceipt.xhtml</code> posteriormente recupera el nombre del alcance de la sesión:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;h:outputFormat title="thanks"
+                value="#{bundle.ThankYouParam}"&gt;
+    &lt;f:param value="#{sessionScope.name}"/&gt;
+&lt;/h:outputFormat&gt;
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Cuando se carga la página <code>bookreceipt.xhtml</code>, muestra el nombre dentro del mensaje:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+"Gracias, {0}, por comprarnos sus libros."
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>Esta es parte de la implementación del oyente <code>NameChanged</code>:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+public class NameChanged extends Object implements ValueChangeListener {
+    @Override
+    public void processValueChange(ValueChangeEvent event)
+            throws AbortProcessingException {
+        if (null != event.getNewValue()) {
+            FacesContext.getCurrentInstance().getExternalContext().
+                getSessionMap().put("name", event.getNewValue());
+        }
+    }
+}
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Cuando el usuario ingresa el nombre en el campo, se genera un evento de cambio de valor y se 
+              invoca el método <code>processValueChange(ValueChangeEvent)</code> de la implementación del 
+              oyente <code>NameChanged</code>. Este método primero obtiene el ID del componente que disparó el 
+              evento del objeto <code>ValueChangeEvent</code> y coloca el valor, junto con un nombre de 
+              atributo, en el mapa de sesión de la instancia <code> FacesContext </code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              <a href="jsf-page-core002.html#BNATA">
+                Registrando un Oyente Value-Change en un Componente
+              </a> explica cómo registrar este oyente en un componente.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BNAUV">
+          <h3 id="implementing-action-listeners">Implementando Oyentes de Acción</h3>
+          <div class="paragraph">
+            <p>
+              Una implementación de <code>javax.faces.event.ActionListener</code> debe incluir un método 
+              <code>processAction(ActionEvent)</code>. El método <code>processAction(ActionEvent)</code> 
+              procesa el evento de acción especificado. La implementación de JavaServer Faces invoca el método 
+              <code>processAction(ActionEvent)</code> cuando ocurre el <code>ActionEvent</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El caso de estudio de Duke's Bookstore utiliza dos implementaciones de 
+              <code>ActionListener</code>, <code>LinkBookChangeListener</code> y 
+              <code>MapBookChangeListener</code>. Consulte 
+              <a href="jsf-custom008.html#BNAWD">Gestionando Eventos para Componentes Personalizados</a> para 
+              obtener detalles sobre <code>MapBookChangeListener</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              <a href="jsf-page-core002.html#BNATB">Registrando un Oyente Action en un Componente</a> explica 
+              cómo registrar este oyente en un componente.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jsf-custom006.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-custom008.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

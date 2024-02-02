@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>
+      El Ejemplo producermethods: Usando un Método de Producer para Elegir una Implementación de Bean
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="cdi-adv-examples002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="cdi-adv-examples004.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GKHPY">
+      <h2 id="the-producermethods-example-using-a-producer-method-to-choose-a-bean-implementation">
+        El Ejemplo producermethods: Usando un Método de Producer para Elegir una Implementación de Bean
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            El ejemplo de <code>producermethods</code> muestra cómo usar un método de productor para elegir 
+            entre dos beans en tiempo de ejecución, como se describe en 
+            <a href="cdi-adv003.html#GKGKV">Usando Métodos de Producer, Campos de Producer, y Métodos de 
+              Disposer en Aplicaciones CDI</a>. Es muy similar al ejemplo de <code>encoder</code> descrito en 
+              <a href="cdi-adv-examples002.html#GKHPU">El Ejemplo de codificador: uso de Alternativas</a>. El 
+              ejemplo incluye la misma interfaz y dos implementaciones de la misma, un bean administrado, una 
+              página Facelets y archivos de configuración. También contiene un tipo de calificador. Cuando lo 
+              ejecuta, no necesita editar el archivo <code>beans.xml</code> y volver a implementar la 
+              aplicación para cambiar su comportamiento.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p><a href="#GKHRO">Componentes del Ejemplo producermethods</a></p>
+            </li>
+            <li>
+              <p><a href="#GKHQE">Ejecutando el Ejemplo producermethods</a></p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="GKHRO">
+          <h3 id="components-of-the-producermethods-example">Componentes del Ejemplo producermethods</h3>
+          <div class="paragraph">
+            <p>
+              Los componentes de <code>producermethods</code> son muy parecidos a los de <code>encoder</code>, 
+              con algunas diferencias significativas.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Ninguna implementación del bean <code>Coder</code> está anotada como <code>@Alternative</code>, 
+              y no hay ningún archivo <code>beans.xml</code> porque no es necesario.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La página Facelets y el bean administrado, <code>CoderBean</code>, tienen una propiedad 
+              adicional, <code>coderType</code>, que permite al usuario especificar en tiempo de ejecución qué 
+              implementación usar. Además, el bean administrado tiene un método productor que selecciona la 
+              implementación utilizando un tipo de calificador, <code>@Chosen</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El bean declara dos constantes que especifican si el tipo de codificador es la implementación de 
+              prueba o la implementación que realmente cambia letras:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"
+                   ><code class="language-oac_no_warn" data-lang="oac_no_warn">
+    private final static int TEST = 1;
+    private final static int SHIFT = 2;
+    private int coderType = SHIFT; // valor por defecto
+              </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El método productor, anotado con <code>@Produces</code> y <code>@Chosen</code> así como 
+              <code>@RequestScoped</code> (para que dure solo la duración de una sola solicitud y respuesta), 
+              devuelve una de las dos implementaciones según el <code>coderType</code> proporcionado por el 
+              usuario.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">    
+    @Produces
+    @Chosen
+    @RequestScoped
+    public Coder getCoder() {
+        switch (coderType) {
+            case TEST:
+                return new TestCoderImpl();
+            case SHIFT:
+                return new CoderImpl();
+            default:
+                return null;
+        }
+    }
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Finalmente, el bean administrado inyecta la implementación elegida, especificando el mismo 
+              calificador que devuelve el método productor para resolver ambigüedades:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+    @Inject
+    @Chosen
+    @RequestScoped
+    Coder coder;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              La página Facelets contiene instrucciones modificadas y un par de opciones cuyo valor 
+              seleccionado se asigna a la propiedad <code>coderBean.coderType</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+    &lt;h2&gt;String Encoder&lt;/h2&gt;
+        &lt;p&gt;Seleccione Prueba o Cambio, escriba una cadena y un número entero, luego haga clic en
+            Codificar.&lt;/p&gt;
+        &lt;p&gt;Si selecciona Prueba, el bean TestCoderImpl mostrará los
+            valores de argumento.&lt;/p&gt;
+        &lt;p&gt;Si selecciona Shift, el bean CoderImpl devolverá una cadena que
+            cambia las letras de la cadena original por el valor que especifique.
+            El valor debe estar entre 0 y 26.&lt;/p&gt;
+        &lt;h:form id="encodeit"&gt;
+            &lt;h:selectOneRadio id="coderType"
+                              required="true"
+                              value="#{coderBean.coderType}"&gt;
+                &lt;f:selectItem
+                    itemValue="1"
+                    itemLabel="Prueba"/&gt;
+                &lt;f:selectItem
+                    itemValue="2"
+                    itemLabel="Letras de cambio"/&gt;
+            &lt;/h:selectOneRadio&gt;
+            ...
+              </code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GKHQE">
+          <h3 id="running-the-producermethods-example">Ejecutando el Ejemplo producermethods</h3>
+          <div class="paragraph">
+            <p>
+              Puede usar el EID NetBeans o Maven para compilar, empaquetar, implementar y ejecutar la 
+              aplicación <code>producermethods</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Aquí se tratan los siguientes temas:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  <a href="#GKHPE">
+                    Para Construir, Empaquetar, y Desplegar el Ejemplo producermethods Usando el EID NetBeans
+                  </a>
+                </p>
+              </li>
+              <li>
+                <p>
+                  <a href="#GKHPS">
+                    Para Construir, Empaquetar, y Desplegar el Ejemplo producermethods Usando Maven
+                  </a>
+                </p>
+              </li>
+              <li>
+                <p><a href="#GKHQG">Para Ejecutar el Ejemplo producermethods</a></p>
+              </li>
+            </ul>
+          </div>
+          <div class="sect3" id="GKHPE">
+            <h4 id="to-build-package-and-deploy-the-producermethods-example-using-netbeans-ide">
+              Para Construir, Empaquetar, y Desplegar el Ejemplo producermethods Usando el EID NetBeans
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Asegúrese de que se haya iniciado el Servidor GlassFish (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                  </p>
+                </li>
+                <li>
+                  <p>En el menú Archivo, elija Abrir proyecto.</p>
+                </li>
+                <li>
+                  <p>En el cuadro de diálogo Abrir proyecto, vaya a:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/cdi
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Seleccione la carpeta <code>producermethods</code>.</p>
+                </li>
+                <li>
+                  <p>Haga clic en Abrir proyecto.</p>
+                </li>
+                <li>
+                  <p>
+                    En la pestaña Proyectos, haga clic con el botón derecho en el proyecto 
+                    <code>producermethods</code> y seleccione Build.
+                  </p>
+                  <div class="paragraph">
+                    <p>
+                      Este comando compila y empaqueta la aplicación en un archivo WAR, 
+                      <code>producermethods.war</code>, ubicado en el directorio <code>target</code> y luego 
+                      lo implementa en el Servidor GlassFish.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+          <div class="sect3" id="GKHPS">
+            <h4 id="to-build-package-and-deploy-the-producermethods-example-using-maven">
+              Para Construir, Empaquetar, y Desplegar el Ejemplo producermethods Usando Maven
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Asegúrese de que el Servidor GlassFish se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                  </p>
+                </li>
+                <li>
+                  <p>En una ventana de terminal, vaya a:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/cdi/producermethods/
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Ingrese el siguiente comando para implementar la aplicación:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+mvn install
+                      </code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      Este comando compila y empaqueta la aplicación en un archivo WAR, 
+                      <code>producermethods.war</code>, ubicado en el directorio <code>target</code> y luego 
+                      lo implementa en el Servidor GlassFish.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+          <div class="sect3" id="GKHQG">
+            <h4 id="to-run-the-producermethods-example">Para Ejecutar el Ejemplo producermethods</h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>En un navegador web, ingrese la siguiente URL:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+http://localhost:8080/producermethods
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    En la página Codificador de cadenas, seleccione la opción Probar o Cambiar letras, ingrese 
+                    una cadena y el número de letras para cambiar y luego haga clic en Codificar.
+                  </p>
+                  <div class="paragraph">
+                    <p>
+                      Según su selección, la línea Resultado muestra la cadena codificada o los valores de 
+                      entrada que especificó.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="cdi-adv-examples002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="cdi-adv-examples004.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

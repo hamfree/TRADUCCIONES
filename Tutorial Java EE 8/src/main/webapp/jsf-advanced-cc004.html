@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>La Aplicación de Ejemplo compositecomponentexample</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jsf-advanced-cc003.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-custom.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GKHVN">
+      <h2 id="the-compositecomponentexample-example-application">
+        La Aplicación de Ejemplo compositecomponentexample
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            La aplicación <code>compositecomponentexample</code> crea un componente compuesto que acepta un 
+            nombre (o cualquier otra cadena). El componente interactúa con un bean administrado que calcula si 
+            las letras del nombre, si se convierten en valores numéricos, suman un número primo. El 
+            componente muestra la suma de los valores de las letras e informa si es primo o no.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            La aplicación <code>compositecomponentexample</code> tiene un archivo de componente compuesto, una 
+            página de uso y un bean gestionado.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            El código fuente de esta aplicación se encuentra en el directorio 
+            tut-install`/examples/web/jsf/compositecomponentexample/`.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p><a href="#GKHUU">El Archivo de Componente Compuesto</a></p>
+            </li>
+            <li>
+              <p><a href="#GKHVX">La Página de Uso</a></p>
+            </li>
+            <li>
+              <p><a href="#GKHVQ">El Bean Gestionado</a></p>
+            </li>
+            <li>
+              <p><a href="#GLECV">Ejecutando el Ejemplo compositecomponentexample</a></p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="GKHUU">
+          <h3 id="the-composite-component-file">El Archivo de Componente Compuesto</h3>
+          <div class="paragraph">
+            <p>
+              El archivo de componente compuesto es un archivo XHTML, 
+              <code>/web/resources/ezcomp/PrimePanel.xhtml</code>. Tiene una sección 
+              <code>composite:interface</code> que declara las etiquetas del nombre y un botón de comando. 
+              También declara un bean gestionado, que define las propiedades del nombre.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;composite:interface&gt;
+    &lt;composite:attribute name="namePrompt"
+                         default="Name, word, or phrase: "/&gt;
+    &lt;composite:attribute name="calcButtonText" default="Calculate"/&gt;
+    &lt;composite:attribute name="calcAction"
+                         method-signature="java.lang.String action()"/&gt;
+    &lt;composite:attribute name="primeBean"/&gt;
+    &lt;composite:editableValueHolder name="nameVal" targets="form:name"/&gt;
+&lt;/composite:interface&gt;
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              La implementación del componente compuesto acepta el valor de entrada para la propiedad 
+              <code>name</code> del bean gestionado. La etiqueta <code>h:outputStylesheet</code> especifica la 
+              hoja de estilo como un recurso reubicable. Luego, la implementación especifica el formato de la 
+              salida, utilizando las propiedades del bean gestionado, así como el formato de los mensajes de 
+              error. El valor de la suma se procesa solo después de que se haya calculado, y el informe de si 
+              la suma es prima o no se procesa solo si el valor de entrada está validado.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;composite:implementation&gt;
+    &lt;h:form id="form"&gt;
+        &lt;h:outputStylesheet library="css" name="default.css"
+                            target="head"/&gt;
+        &lt;h:panelGrid columns="2" role="presentation"&gt;
+            &lt;h:outputLabel for="name"
+                           value="#{cc.attrs.namePrompt}"/&gt;
+            &lt;h:inputText id="name"
+                         size="45"
+                         value="#{cc.attrs.primeBean.name}"
+                         required="true"/&gt;
+        &lt;/h:panelGrid&gt;
+        &lt;p&gt;
+            &lt;h:commandButton id="calcButton"
+                             value="#{cc.attrs.calcButtonText}"
+                             action="#{cc.attrs.calcAction}"&gt;
+                &lt;f:ajax execute="name" render="outputGroup"/&gt;
+            &lt;/h:commandButton&gt;
+        &lt;/p&gt;
+
+       &lt;h:panelGroup id="outputGroup" layout="block"&gt;
+            &lt;p&gt;
+                &lt;h:outputText id="result" style="color:blue"
+                              rendered="#{cc.attrs.primeBean.totalSum gt 0}"
+                              value="Sum is #{cc.attrs.primeBean.totalSum}" /&gt;
+            &lt;/p&gt;
+            &lt;p&gt;
+                &lt;h:outputText id="response" style="color:blue"
+                              value="#{cc.attrs.primeBean.response}"
+                              rendered="#{!facesContext.validationFailed}"/&gt;
+                &lt;h:message id="errors1"
+                           showSummary="true"
+                           showDetail="false"
+                           style="color: #d20005;
+                           font-family: 'New Century Schoolbook', serif;
+                           font-style: oblique;
+                           text-decoration: overline"
+                           for="name"/&gt;
+            &lt;/p&gt;
+        &lt;/h:panelGroup&gt;
+    &lt;/h:form&gt;
+&lt;/composite:implementation&gt;
+              </code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GKHVX">
+          <h3 id="the-using-page">La Página de Uso</h3>
+          <div class="paragraph">
+            <p>
+              La página de uso en esta aplicación de ejemplo, <code>web/index.xhtml</code>, es un archivo 
+              XHTML que invoca el archivo de componente compuesto <code>PrimePanel.xhtml</code> junto con el 
+              bean gestionado. Valida la entrada del usuario.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;div id="compositecomponent"&gt;
+    &lt;ez:PrimePanel primeBean="#{primeBean}"
+                   calcAction="#{primeBean.calculate}"&gt;
+    &lt;/ez:PrimePanel&gt;
+&lt;/div&gt;
+              </code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GKHVQ">
+          <h3 id="the-managed-bean">El Bean Gestionado</h3>
+          <div class="paragraph">
+            <p>
+              El bean gestionado, <code>PrimeBean.java</code>, define un método llamado 
+              <code>calculate</code>, que realiza los cálculos en la cadena de entrada y establece las 
+              propiedades en consecuencia. El bean primero crea una matriz de números primos. Calcula la suma 
+              de las letras de la cadena, con <code>'a'</code> igual a 1 y <code>'z'</code> igual a 26, y 
+              determina si el valor se puede encontrar en la matriz de números primos. Una letra mayúscula en 
+              la cadena de entrada tiene el mismo valor que su equivalente en minúscula.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El bean especifica el tamaño mínimo y máximo de la cadena <code>name</code>, que se aplica 
+              mediante la restricción de Validación de Beans <code>@Size</code>. El bean usa la anotación 
+              <code>@Model</code>, un atajo para <code>@Named</code> y <code>@RequestScoped</code>, como se 
+              describe en el Paso <a href="webapp003.html#CHDCABHC">7</a> de 
+              <a href="webapp003.html#GJWTV">Para Ver el Módulo Web hello1 Usando el EID NetBeans</a>.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Model
+public class PrimeBean implements Serializable {
+    ...
+    @Size(min=1, max=45)
+    private String name;
+    ...
+
+    public String calculate() {
+        ...
+    }
+}
+              </code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="GLECV">
+          <h3 id="running-the-compositecomponentexample-example">
+            Ejecutando el Ejemplo compositecomponentexample
+          </h3>
+          <div class="paragraph">
+            <p>
+              Puede usar el EID NetBeans o Maven para construir, empaquetar, implementar y ejecutar el ejemplo 
+              <code>compositecomponentexample</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Aquí se tratan los siguientes temas:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p><a href="#GKHVC">
+                    Para Construir, Empaquetar, y Desplegar el Ejemplo compositecomponentexample Usando el EID 
+                    NetBeans
+                  </a>
+                </p>
+              </li>
+              <li>
+                <p>
+                  <a href="#GLEAE">
+                    Para Construir, Empaquetar, y Desplegar el Ejemplo compositecomponentexample Usando Maven
+                  </a>
+                </p>
+              </li>
+              <li>
+                <p><a href="#GLEEU">Para Ejecutar el Ejemplo compositecomponentexample</a></p>
+              </li>
+            </ul>
+          </div>
+          <div class="sect3" id="GKHVC">
+            <h4 id="to-build-package-and-deploy-the-compositecomponentexample-example-using-netbeans-ide">
+              Para Construir, Empaquetar, y Desplegar el Ejemplo compositecomponentexample Usando el EID 
+              NetBeans
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Asegúrese de que el Servidor GlassFish se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                  </p>
+                </li>
+                <li>
+                  <p>En el menú Archivo, elija Abrir proyecto.</p>
+                </li>
+                <li>
+                  <p>En el cuadro de diálogo Abrir proyecto, navegue hasta:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/web/jsf
+                      </code></pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Seleccione la carpeta <code>compositecomponentexample</code>.</p>
+                </li>
+                <li>
+                  <p>Haga clic en Abrir proyecto.</p>
+                </li>
+                <li>
+                  <p>
+                    En la pestaña Proyectos, haga clic con el botón derecho en el proyecto 
+                    <code>compositecomponentexample</code> y seleccione Compilar.
+                  </p>
+                  <div class="paragraph">
+                    <p>Este comando crea e implementa la aplicación.</p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+          <div class="sect3" id="GLEAE">
+            <h4 id="to-build-package-and-deploy-the-compositecomponentexample-example-using-maven">
+              Para Construir, Empaquetar, y Desplegar el Ejemplo compositecomponentexample Usando Maven
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Asegúrese de que el Servidor GlassFish se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Arrancando y Parando el Servidor GlassFish</a>).
+                  </p>
+                </li>
+                <li>
+                  <p>En una ventana de terminal, vaya a:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/web/jsf/compositecomponentexample/
+                      </code></pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Ingrese el siguiente comando para construir e implementar la aplicación:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+mvn install
+                      </code></pre>
+                    </div>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+          <div class="sect3" id="GLEEU">
+            <h4 id="to-run-the-compositecomponentexample-example">
+              Para Ejecutar el Ejemplo compositecomponentexample
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>En un navegador web, ingrese la siguiente URL:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+http://localhost:8080/compositecomponentexample
+                      </code></pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>
+                    En la página que aparece, ingrese una cadena en el campo Nombre, palabra o frase, luego 
+                    haga clic en Calcular.
+                  </p>
+                  <div class="paragraph">
+                    <p>
+                      La página informa la suma de las letras y si la suma es prima. Se informa un error de 
+                      validación si no se ingresa ningún valor o si la cadena contiene más de 45 caracteres.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jsf-advanced-cc003.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-custom.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

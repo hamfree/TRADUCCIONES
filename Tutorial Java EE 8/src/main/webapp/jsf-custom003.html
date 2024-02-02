@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Entendiendo el Ejemplo Image Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jsf-custom002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-custom004.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GLPCB">
+      <h2 id="understanding-the-image-map-example">Entendiendo el Ejemplo Image Map</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            La librería de Duke incluye un componente de mapa de imágenes personalizado en la página 
+            <code>index.xhtml</code>. Este mapa de imágenes muestra una selección de seis títulos de libros. 
+            Cuando el usuario hace clic en uno de los títulos de un libro en el mapa de imágenes, la 
+            aplicación accede a una página que muestra el título del libro seleccionado, así como información 
+            sobre un libro destacado. La página permite al usuario agregar un libro (o ninguno) al carrito de 
+            compras.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p><a href="#GLPBD">¿Porqué Usar la Tecnología JavaServer Faces para Implementar un Image Map?</a></p>
+            </li>
+            <li>
+              <p><a href="#GLPEM">Comprender el HTML Renderizado</a></p>
+            </li>
+            <li>
+              <p><a href="#GLPCD">Entendiendo la Página de Facelets</a></p>
+            </li>
+            <li>
+              <p><a href="#GLPBO">Configurando el Modelo de Datos</a></p>
+            </li>
+            <li>
+              <p><a href="#GLPEL">Resumen de las clases de la aplicación Image Map</a></p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="GLPBD">
+          <h3 id="why-use-javaserver-faces-technology-to-implement-an-image-map">
+            ¿Porqué Usar la Tecnología JavaServer Faces para Implementar un Image Map?
+          </h3>
+          <div class="paragraph">
+            <p>
+              La tecnología JavaServer Faces es un marco ideal para implementar este tipo de mapa de imágenes 
+              porque puede realizar el trabajo que debe realizarse en el servidor sin necesidad de crear un 
+              mapa de imágenes del lado del servidor.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              En general, los mapas de imágenes del lado del cliente se prefieren a los mapas de imágenes del 
+              lado del servidor por varias razones. Una razón es que el mapa de imágenes del lado del cliente 
+              permite que el navegador proporcione información inmediata cuando un usuario coloca el mouse 
+              sobre un punto de acceso. Otra razón es que los mapas de imágenes del lado del cliente funcionan 
+              mejor porque no requieren viajes de ida y vuelta al servidor. Sin embargo, en algunas 
+              situaciones, es posible que su mapa de imágenes necesite acceder al servidor para recuperar 
+              datos o cambiar la apariencia de los controles que no son de formulario, tareas que un mapa de 
+              imágenes del lado del cliente no puede realizar.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Debido a que el componente personalizado del mapa de imágenes utiliza la tecnología JavaServer 
+              Faces, tiene lo mejor de ambos estilos de mapas de imágenes: puede manejar las partes de la 
+              aplicación que deben realizarse en el servidor mientras permite que las otras partes de la 
+              aplicación se realicen en el lado del cliente.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="GLPEM">
+          <h3 id="understanding-the-rendered-html">Comprender el HTML Renderizado</h3>
+          <div class="paragraph">
+            <p>
+              Aquí hay una versión abreviada del formulario que forma parte de la página HTML que la 
+              aplicación necesita representar:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;form id="j_idt13" name="j_idt13" method="post"
+        action="/dukesbookstore/index.xhtml" ...&gt;
+    ...
+    &lt;img id="j_idt13:mapImage"
+         src="/dukesbookstore/javax.faces.resource/book_all.jpg?ln=images"
+         alt="Choose a Book from our Catalog"
+         usemap="#bookMap" /&gt;
+    ...
+    &lt;map name="bookMap"&gt;
+       &lt;area alt="Duke"
+          coords="67,23,212,268"
+          shape="rect"
+          onmouseout="document.forms[0]['j_idt13:mapImage'].src='resources/images/book_all.jpg'"
+          onmouseover="document.forms[0]['j_idt13:mapImage'].src='resources/images/book_201.jpg'"
+          onclick="document.forms[0]['bookMap_current'].value='Duke'; document.forms[0].submit()"
+       /&gt;
+    ...
+       &lt;input type="hidden" name="bookMap_current"&gt;
+    &lt;/map&gt;
+    ...
+&lt;/form&gt;
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              La etiqueta <code>img</code> asocia una imagen (<code>book_all.jpg</code>) con el mapa de imagen 
+              al que se hace referencia en el valor del atributo <code>usemap</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La etiqueta <code>map</code> especifica el mapa de la imagen y contiene un conjunto de etiquetas 
+              <code>area</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Cada etiqueta <code>area</code> especifica una región del mapa de imagen. Los atributos 
+              <code>onmouseover</code>, <code>onmouseout</code> y <code>onclick</code> definen qué código 
+              JavaScript se ejecuta cuando ocurren estos eventos. Cuando el usuario mueve el mouse sobre una 
+              región, la función <code>onmouseover</code> asociada con la región muestra el mapa con esa 
+              región resaltada. Cuando el usuario mueve el mouse fuera de una región, la función 
+              <code>onmouseout</code> vuelve a mostrar la imagen original. Si el usuario hace clic en una 
+              región, la función <code>onclick</code> establece el valor de la etiqueta <code>input</code> en 
+              el ID del área seleccionada y envía la página.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La etiqueta <code>input</code> representa un control oculto que almacena el valor del área 
+              actualmente seleccionada entre los intercambios cliente-servidor para que las clases de 
+              componentes del lado del servidor puedan recuperar el valor.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los objetos del lado del servidor recuperan el valor de <code>bookMap_current</code> y 
+              establecen la configuración regional en la instancia 
+              <code>javax.faces.context.FacesContext</code> de acuerdo con la región que se seleccionó.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="GLPCD">
+          <h3 id="understanding-the-facelets-page">Entendiendo la Página de Facelets</h3>
+          <div class="paragraph">
+            <p>
+              A continuación, se muestra una forma abreviada de la página Facelets que utiliza el componente 
+              de mapa de imagen para generar la página HTML que se muestra en la sección anterior. Utiliza 
+              etiquetas personalizadas <code>bookstore:map</code> y <code>bookstore:area</code> para 
+              representar los componentes personalizados:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;h:form&gt;
+    ...
+        &lt;h:graphicImage id="mapImage"
+                        name="book_all.jpg"
+                        library="images"
+                        alt="#{bundle.ChooseBook}"
+                        usemap="#bookMap" /&gt;
+        &lt;bookstore:map id="bookMap"
+                       current="map1"
+                       immediate="true"
+                       action="bookstore"&gt;
+            &lt;f:actionListener
+                type="dukesbookstore.listeners.MapBookChangeListener" /&gt;
+            &lt;bookstore:area id="map1" value="#{Book201}"
+                            onmouseover="resources/images/book_201.jpg"
+                            onmouseout="resources/images/book_all.jpg"
+                            targetImage="mapImage" /&gt;
+            &lt;bookstore:area id="map2" value="#{Book202}"
+                            onmouseover="resources/images/book_202.jpg"
+                            onmouseout="resources/images/book_all.jpg"
+                            targetImage="mapImage"/&gt;
+            ...
+        &lt;/bookstore:map&gt;
+    ...
+&lt;/h:form&gt;
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El atributo <code>alt</code> de la etiqueta <code>h:graphicImage</code> se asigna a la cadena 
+              localizada <code>"Elija un libro de nuestro catálogo"</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La etiqueta <code>f:actionListener</code> dentro de la etiqueta <code>bookstore:map</code> 
+              apunta a una clase de escucha para un evento de acción. El método <code>processAction</code> del 
+              oyente coloca la ID del libro para el área de mapa seleccionada en el mapa de sesión. La forma 
+              en que se maneja este evento se explica más en 
+              <a href="jsf-custom008.html#BNAWD">Gestionando Eventos para Componentes Personalizados</a>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El atributo <code>action</code> de la etiqueta <code>bookstore:map</code> especifica un 
+              resultado lógico <code>String</code>, <code>"bookstore"</code>, que de forma implícita Las 
+              reglas de navegación envían la aplicación a la página <code>bookstore.xhtml</code>. Para obtener 
+              más información sobre la navegación, consulte 
+              <a href="jsf-configure010.html#BNAXF">Configurando Reglas de Navegación</a>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El atributo <code>immediate</code> de la etiqueta <code>bookstore:map</code> se establece en 
+              <code>true</code>, lo que indica que la  implementación predeterminado de 
+              <code>javax.faces.event.ActionListener</code> debe ejecutarse durante la fase Aplicar Valores de 
+              Solicitud del ciclo de vida de procesamiento de solicitudes, en lugar de esperar a la fase 
+              Invocar aplicación. Debido a que la solicitud resultante de hacer clic en el mapa no requiere 
+              ninguna validación, conversión de datos o actualizaciones de objetos del lado del servidor, 
+              tiene sentido pasar directamente a la fase Invocar aplicación.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El atributo <code>current</code> de la etiqueta <code>bookstore:map</code> se establece en el 
+              área predeterminada, que es <code>map1</code> (el libro My Early Years: Growing Up on Star7, de 
+              Duke).
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Observe que las etiquetas <code>bookstore:area</code> no contienen ninguno de los datos de 
+              JavaScript, coordenadas o formas que se muestran en la página HTML. El JavaScript es generado 
+              por la clase <code>dukesbookstore.renderers.AreaRenderer</code>. Los valores de los atributos 
+              <code>onmouseover</code> y <code>onmouseout</code> indican la imagen que se cargará cuando 
+              ocurran estos eventos. Cómo se genera el JavaScript se explica más en 
+              <a href="jsf-custom005.html#BNAVW">Realización de Codificación</a>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los datos de coordenadas, forma y texto alternativo se obtienen mediante el atributo 
+              <code>value</code>, cuyo valor se refiere a un atributo en el ámbito de la aplicación. El valor 
+              de este atributo es un bean, que almacena los datos de <code>coords</code>, <code>shape</code> y 
+              <code>alt</code>. Cómo se almacenan estos beans en el ámbito de la aplicación se explica con más 
+              detalle en la siguiente sección.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="GLPBO">
+          <h3 id="configuring-model-data">Configurando el Modelo de Datos</h3>
+          <div class="paragraph">
+            <p>
+              En una aplicación JavaServer Faces, los datos como las coordenadas de un punto de acceso de un 
+              mapa de imagen se recuperan del atributo <code>value</code> a través de un bean. Sin embargo, la 
+              forma y las coordenadas de un punto de acceso deben definirse juntas porque las coordenadas se 
+              interpretan de manera diferente según la forma del punto de acceso. Debido a que el valor de un 
+              componente solo se puede vincular a una propiedad, el atributo <code>value</code> no puede 
+              referirse tanto a la forma como a las coordenadas.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para resolver este problema, la aplicación encapsula toda esta información en un conjunto de 
+              objetos <code>ImageArea</code>. Estos objetos se inicializan en el alcance de la aplicación 
+              mediante la función de creación de beans administrados (consulte 
+              <a href="jsf-configure005.html#BNAWR">Usando el elemento bean gestionado</a>). Aquí está parte 
+              de la declaración del bean administrado para el bean <code>ImageArea</code> correspondiente al 
+              punto de acceso de Sudamérica:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;managed-bean eager="true"&gt;
+    ...
+    &lt;managed-bean-name&gt;Book201&lt;/managed-bean-name&gt;
+    &lt;managed-bean-class&gt;
+        javaeetutorial.dukesbookstore.model.ImageArea
+    &lt;/managed-bean-class&gt;
+    &lt;managed-bean-scope&gt;application&lt;/managed-bean-scope&gt;
+    &lt;managed-property&gt;
+        ...
+        &lt;property-name&gt;shape&lt;/property-name&gt;
+        &lt;value&gt;rect&lt;/value&gt;
+    &lt;/managed-property&gt;
+    &lt;managed-property&gt;
+        ...
+        &lt;property-name&gt;alt&lt;/property-name&gt;
+        &lt;value&gt;Duke&lt;/value&gt;
+    &lt;/managed-property&gt;
+    &lt;managed-property&gt;
+        ...
+        &lt;property-name&gt;coords&lt;/property-name&gt;
+        &lt;value&gt;67,23,212,268&lt;/value&gt;
+    &lt;/managed-property&gt;
+&lt;/managed-bean&gt;
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para obtener más información sobre la inicialización de beans gestionados con la función de 
+              creación de beans gestionados, consulte la sección 
+              <a href="jsf-configure003.html#BNAWP">Archivo de Recursos de Configuración de la Aplicación</a>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los atributos <code>value</code> de las etiquetas <code>bookstore:area</code> se refieren a los 
+              beans en el ámbito de la aplicación, como se muestra en esta etiqueta 
+              <code>bookstore:area</code> de <code>index.xhtml</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;bookstore:area id="map1" value="#{Book201}"
+                onmouseover="resources/images/book_201.jpg"
+                onmouseout="resources/images/book_all.jpg"
+                targetImage="mapImage" /&gt;
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para hacer referencia a los valores de bean de objeto modelo <code>ImageArea</code> de la clase 
+              de componente, implemente un método <code>getValue</code> en la clase de componente. Este método 
+              llama a <code>super.getValue</code>. La superclase de 
+              tut-install`/examples/case-studies/dukes-bookstore/src/java/dukesbookstore/components/
+              AreaComponent.java`, <code>UIOutput</code>, tiene un método <code>getValue</code> que hace el 
+              trabajo de encontrar el objeto <code>ImageArea</code> asociado con <code>AreaComponent</code>. 
+              La clase <code>AreaRenderer</code>, que necesita representar los valores <code>alt</code>, 
+              <code>shape</code> y <code>coords</code> de <code>ImageArea</code>, llama al método 
+              <code>getValue</code> de <code>AreaComponent</code> para recuperar el objeto 
+              <code>ImageArea</code>.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+ImageArea iarea = (ImageArea) area.getValue();
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              <code>ImageArea</code> es un bean simple, por lo que puede acceder a la forma, las coordenadas y 
+              los valores de texto alternativos llamando a los métodos de acceso adecuados de 
+              <code>ImageArea</code>. <a href="jsf-custom006.html#BNAWB">Creando la Clase del Renderizador</a> 
+              explica cómo hacer esto en la clase <code> AreaRenderer </code>.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="GLPEL">
+          <h3 id="summary-of-the-image-map-application-classes">
+            Resumen de las clases de la aplicación Image Map
+          </h3>
+          <div class="paragraph">
+            <p>
+              <a href="#GLPEK">Tabla 15-2</a> resume todas las clases necesarias para implementar el 
+              componente de mapa de imágenes.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p><a id="sthref77"></a><a id="GLPEK"></a></p>
+          </div>
+          <div class="paragraph">
+            <p><strong>Tabla 15-2 Clases de mapas de imágenes</strong></p>
+          </div>
+          <table class="tableblock frame-all grid-all" style="width: 60%;">
+            <colgroup>
+              <col style="width: 25%;">
+              <col style="width: 75%;">
+            </colgroup>
+            <tbody>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><strong>Clase</strong></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><strong>Función</strong></p></td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>AreaSelectedEvent</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    El <code>javax.faces.event.ActionEvent</code> que indica que se ha seleccionado un 
+                    <code>AreaComponent</code> del <code>MapComponent</code>.
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>AreaComponent</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    La clase que define <code>AreaComponent</code>, que corresponde a la etiqueta 
+                    personalizada <code>bookstore:area</code>.
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>MapComponent</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    La clase que define <code>MapComponent</code>, que corresponde a la etiqueta personalizada 
+                    <code>bookstore:map</code>.
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>AreaRenderer</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    Este <code>javax.faces.render.Renderer</code> realiza la representación delegada para 
+                    <code>AreaComponent</code>.
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>ImageArea</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">El bean que almacena la forma y las coordenadas de los hotspots.</p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>MapBookChangeListener</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">El oyente de acción para el <code>MapComponent</code>.</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="paragraph">
+            <p>
+              El directorio fuente de la librería de Duke, llamado bookstore-dir, es 
+              <code>tut-install`/examples/case-studies/dukes-bookstore/src/java/dukesbookstore/</code>. Las 
+              clases de evento y escucha se encuentran en bookstore-dir<code>/listeners/</code>. Las 
+              clases de componentes se encuentran en <code>bookstore-dir/components/</code>. Las clases de 
+              renderizado se encuentran en bookstore-dir<code>/renderers/</code><code>. `ImageArea</code> 
+              se encuentra en bookstore-dir`/model/`.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jsf-custom002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-custom004.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

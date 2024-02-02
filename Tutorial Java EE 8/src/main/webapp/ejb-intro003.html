@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>¿Qué Es un Bean Controlado por Mensajes?</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="ejb-intro002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="ejb-intro004.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GIPKO">
+      <h2 id="what-is-a-message-driven-bean">¿Qué Es un Bean Controlado por Mensajes?</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Un bean controlado por mensajes es un enterprise bean que permite que las aplicaciones Java EE 
+            procesen mensajes de forma asíncrona. Este tipo de bean normalmente actúa como un detector de 
+            mensajes JMS, que es similar a un detector de eventos pero recibe mensajes JMS en lugar de 
+            eventos. Los mensajes pueden ser enviados por cualquier componente Java EE (un cliente de 
+            aplicación, otro enterprise bean o un componente web) o por una aplicación o sistema JMS que no 
+            utilice la tecnología Java EE. Los beans controlados por mensajes pueden procesar mensajes JMS u 
+            otros tipos de mensajes.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>
+                <a href="#GIPMJ">
+                  ¿Qué Hace que los Beans Controlados por Mensajes Sean Diferentes de los Beans de Sesión?
+                </a>
+              </p>
+            </li>
+            <li>
+              <p><a href="#GIPJX">Cuándo Usar Beans Controlados por Mensajes</a></p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="GIPMJ">
+          <h3 id="what-makes-message-driven-beans-different-from-session-beans">
+            ¿Qué Hace que los Beans Controlados por Mensajes Sean Diferentes de los Beans de Sesión?
+          </h3>
+          <div class="paragraph">
+            <p>
+              La diferencia más visible entre los beans controlados por mensajes y los beans de sesión es que 
+              los clientes no acceden a los beans controlados por mensajes a través de las interfaces. Las 
+              interfaces se describen en la sección 
+              <a href="ejb-intro004.html#GIPJF">Accediendo a los Enterprise Beans</a>. A diferencia de un bean 
+              de sesión, un bean controlado por mensajes solo tiene una clase de bean.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              En varios aspectos, un bean controlado por mensajes se parece a un bean de sesión sin estado.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  Las instancias de un bean controlado por mensajes no retienen datos o estado conversacional 
+                  para un cliente específico.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Todas las instancias de un bean controlado por mensajes son equivalentes, lo que permite que 
+                  el contenedor EJB asigne un mensaje a cualquier instancia de bean controlado por mensajes. 
+                  El contenedor puede agrupar estas instancias para permitir que los flujos de mensajes se 
+                  procesen simultáneamente.
+                </p>
+              </li>
+              <li>
+                <p>Un único bean controlado por mensajes puede procesar mensajes de varios clientes.</p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las variables de instancia de la instancia de bean controlado por mensajes pueden contener algún 
+              estado en el manejo de mensajes de cliente, como una conexión de API JMS, una conexión de base 
+              de datos abierta o una referencia de objeto a un objeto de enterprise bean.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los componentes del cliente no localizan beans controlados por mensajes ni invocan métodos 
+              directamente en ellos. En su lugar, un cliente accede a un bean controlado por mensajes a través 
+              de, por ejemplo, JMS enviando mensajes al destino del mensaje para el cual la clase de bean 
+              controlado por mensajes es el <code>MessageListener</code>. El destino de un bean controlado por 
+              mensajes se asigna durante la implementación mediante los recursos del servidor GlassFish.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Los beans controlados por mensajes tienen las siguientes características.</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>Se ejecutan al recibir un solo mensaje de cliente.</p>
+              </li>
+              <li>
+                <p>Ellos se invocan asincrónicamente.</p>
+              </li>
+              <li>
+                <p>Ellos son relativamente de corta duración.</p>
+              </li>
+              <li>
+                <p>
+                  No representan datos compartidos directamente en la base de datos, pero pueden acceder y 
+                  actualizar estos datos.
+                </p>
+              </li>
+              <li>
+                <p>Ellos pueden ser conscientes de las transacciones.</p>
+              </li>
+              <li>
+                <p>No tienen estado.</p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Cuando llega un mensaje, el contenedor llama al método <code>onMessage</code> del bean 
+              controlado por mensajes para procesar el mensaje. El método <code>onMessage</code> normalmente 
+              envía el mensaje a uno de los cinco tipos de mensajes JMS y lo maneja de acuerdo con la lógica 
+              empresarial de la aplicación. El método <code>onMessage</code> puede llamar a métodos auxiliares 
+              o puede invocar un bean de sesión para procesar la información del mensaje o almacenarla en una 
+              base de datos.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Se puede entregar un mensaje a un bean controlado por mensajes dentro de un contexto de 
+              transacción, por lo que todas las operaciones dentro del método <code>onMessage</code> son parte 
+              de una sola transacción. Si se revierte el procesamiento de mensajes, el mensaje se volverá a 
+              enviar. Para obtener más información, consulte 
+              <a href="jms-examples007.html#BNBPK">
+                Recepción de Mensajes de Forma Asíncrona Mediante un Bean Controlado por Mensajes</a> y 
+              <a href="transactions.html#BNCIH">Capítulo 54, "Transacciones"</a>.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="GIPJX">
+          <h3 id="when-to-use-message-driven-beans">Cuándo Usar Beans Controlados por Mensajes</h3>
+          <div class="paragraph">
+            <p>
+              Los beans de sesión le permiten enviar mensajes JMS y recibirlos de forma síncrona pero no 
+              asíncrona. Para evitar ocupar los recursos del servidor, no utilice el bloqueo de recepciones 
+              sincrónicas en un componente del lado del servidor; en general, los mensajes JMS no deben 
+              enviarse ni recibirse sincrónicamente. Para recibir mensajes de forma asincrónica, utilice un 
+              bean controlado por mensajes.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="ejb-intro002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="ejb-intro004.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

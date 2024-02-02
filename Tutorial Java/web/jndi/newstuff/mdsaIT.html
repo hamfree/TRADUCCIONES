@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Gestionar Control de Referencia (Los Tutoriales de Java&trade; &gt; Nombrado en Java e Interfaz de Directorio &gt; 
+            Nuevas funcionalidades en KDJ 5.0 y KDJ 6)
+        </title>
+        <meta name="description" content="Este tutorial de Java JNDI describe la tecnología de Nombrado en Java e Interfaz de 
+              Directorio (JNDI), operaciones de nombre y directorio, y LDAP" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jndi, ldap, jndi service provider" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Nuevas funcionalidades en KDJ 5.0 y KDJ 6</a></div>
+                <div class="linkAHEAD"><a href="dn.html">Recuperando el Nombre Distinguido</a></div>
+                <div class="linkAHEAD"><a href="controls-std.html">Controles estándar de LDAP</a></div>
+                <div class="linkAHEAD"><a href="paged-results.html">Control de Resultados Paginados</a></div>
+                <div class="linkAHEAD"><a href="sort.html">Control de Ordenación</a></div>
+                <div class="nolinkAHEAD">Gestionar Control de Referencia</div>
+                <div class="linkAHEAD"><a href="ldapname.html">Manipulando LdapName (Nombre Distinguido)</a></div>
+                <div class="linkAHEAD"><a href="rdn.html">Manipulando Nombre Distinguido Relativo (RDN)</a></div>
+                <div class="linkAHEAD"><a href="readtimeout.html">Configuración de Tiempo de Espera para Operaciones LDAP</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Nombrado en Java e Interfaz de Directorio<br />
+                <b>Lección:</b> Nuevas funcionalidades en KDJ 5.0 y KDJ 6
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Nombrado en Java e Interfaz de Directorio</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Nuevas funcionalidades en KDJ 5.0 y KDJ 6</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="sort.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="ldapname.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Gestionar Control de Referencia</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    El control de Gestión de Referencia (
+                    <a class="OutsideLink" target="_blank" href="http://www.ietf.org/rfc/rfc3296.txt">RFC 3296</a>) habilita la 
+                    manipulación de las referencias y otros objetos especiales como objetos normales cuando se realiza una 
+                    operación LDAP. En otras palabras, el control de Gestión de Referencia le indica al servidor LDAP que devuelva 
+                    entradas de referencia como entradas ordinarias en vez de devolver respuestas de error &quot;referencia&quot; 
+                    o referencias de continuación. La nueva clase en el KDJ 5.0 de abajo le habilita a enviar el control de 
+                    Gestión de Referencia junto con una petición LDAP:
+                </p>
+                <p>
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/ldap/ManageReferralControl.html">
+                        <code>javax.naming.ldap.ManageReferralControl</code></a>
+                </p>
+                <p>
+                    El proveedor de servicio LDAP en el KDJ enviará este control automáticamente junto con cualquier petición. 
+                    Puede también habilitarlo explícitamente estableciendo la propiedad de entorno Context.REFERRAL a 
+                    &quot;ignore&quot;. Para más información sobre el manejo de referencias compruebe la sección 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/jndi/tutorial/ldap/referral/jndi.html">Referencias en JNDI</a> del 
+                    Tutorial JNDI.
+                </p>
+                <p>
+                    Aquí tiene un ejemplo que envía un control de Gestión de Referencias junto con una petición LDAP.
+                </p>
+                <div class="codeblock">
+                    <pre>
+         // Create initial context
+         LdapContext ctx = (LdapContext) new InitialDirContext(env);
+         ctx.setRequestControl(new Control[] new ManageReferralControl());
+
+         // Set controls for performing subtree search
+         SearchControls ctls = new SearchControls();
+         ctls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+
+         // Perform search
+         NamingEnumeration answer = ctx.search("", "(objectclass=*)", ctls);
+
+         // Print the answer
+         while (answer.hasMore()) {
+             System.out.println(">>>" + 
+                 ((SearchResult)answer.next()).getName());
+          }
+
+          // Close the context when we're done
+          ctx.close();
+                    </pre>
+                </div>
+                <p>
+                    El ejemplo completo puede ser encontrado 
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/ManageReferral.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/ManageReferral.java'); return false;">
+                        <code>aquí</code></a>.
+                </p>
+                <hr />
+                <p>
+                    <strong>Nota 1:</strong> El ejemplo de arriba requerirá que configure un segundo servidor usando el fichero 
+                    de configuración 
+                    <a class="SourceLink" target="_blank" 
+                       href="../software/config/refserver.ldif" 
+                       onclick="showCode('../../displayCode.html', '../software/config/refserver.ldif'); return false;">
+                        <code>refserver.ldif</code></a>. El servidor debe soportar LDAP v3 y la especificación RFC 3296. Si el 
+                    servidor no soporta referencias de esta forma, entonces el ejemplo no funcionará como se muestra. El 
+                    fichero de configuración contiene referencias que apuntan al servidor origina que usted ha configurado. Se 
+                    asume que el servidor original está en el puerto 389 en la máquina local. Si usted ha configurado el 
+                    servidor en otra máquina o puerto, entonces necesita editar las entradas &quot;ref&quot; en el fichero 
+                    refserver.ldif y reemplazar &quot;localhost:389&quot; con la configuración apropiada. El segundo servidor 
+                    va a ser configurado en el puerto 489 de la máquina local. Si configura el segundo servidor en otra máquina 
+                    o puerto, entonces necesita ajustar la configuración de la propiedad de entorno Context.PROVIDER_URL para 
+                    el contexto inicial en consecuencia.
+                </p>
+                <p>
+                    La configuración de un servidor de directorio normalmente la realiza el administrador del sistema o del 
+                    directorio. Vea la lección 
+                    <a class="TutorialLink" target="_top" href="../software/index.html">Configuración Software</a> para más 
+                    información.
+                </p>
+                <p>
+                    <strong>Nota 2:</strong> Directorio Activo de Windows: Ya que el Directorio Activo no soporta el control de 
+                    Gestión de Referencia, ninguno de los ejemplos en esta lección funcionará contra el Directorio Activo.
+                </p>
+                <hr />
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="sort.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="ldapname.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Control de Ordenación<br />
+            <b>Página siguiente:</b> Manipulando LdapName (Nombre Distinguido)
+        </div>
+    </body>
+</html> 

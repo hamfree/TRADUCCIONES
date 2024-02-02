@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Objetos DataSource y Agrupaciones de Connection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="resource-creation001.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="resource-creation003.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1">
+      <h2 id="datasource-objects-and-connection-pools">Objetos DataSource y Agrupaciones de Connection</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Para almacenar, organizar y recuperar datos, la mayoría de las aplicaciones utilizan una base de 
+            datos relacional. Los componentes Java EE pueden acceder a bases de datos relacionales a través de 
+            la IPA JDBC. Para obtener información sobre esta API, consulte
+            <a href="http://docs.oracle.com/javase/8/docs/technotes/guides/jdbc/">
+              <code>http://docs.oracle.com/javase/8/docs/technotes/guides/jdbc/</code>
+            </a>.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            En la IPA de JDBC, se accede a las bases de datos mediante objetos <code>DataSource</code>. Un 
+            <code>DataSource</code> tiene un conjunto de propiedades que identifican y describen la fuente de 
+            datos del mundo real que representa. Estas propiedades incluyen información como la ubicación del 
+            servidor de la base de datos, el nombre de la base de datos, el protocolo de red que se utilizará 
+            para comunicarse con el servidor, etc. En el Servidor GlassFish, una fuente de datos se denomina 
+            recurso JDBC.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Las aplicaciones acceden a una fuente de datos mediante una conexión, y un objeto 
+            <code>DataSource</code> puede considerarse una fábrica para las conexiones a la fuente de datos 
+            particular que representa la instancia de <code>DataSource</code>. En una implementación básica de 
+            <code>DataSource</code>, una llamada al método <code>getConnection</code> devuelve un objeto de 
+            conexión que es una conexión física a la fuente de datos.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Un objeto <code>DataSource</code> puede registrarse con un servicio de nombres JNDI. Si es así, 
+            una aplicación puede usar la IPA JNDI para acceder a ese objeto <code>DataSource</code>, que luego 
+            puede usarse para conectarse a la fuente de datos que representa.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Los objetos <code>DataSource</code> que implementan la agrupación de conexiones también producen 
+            una conexión a la fuente de datos particular que representa la clase <code>DataSource</code>. El 
+            objeto de conexión que devuelve el método <code>getConnection</code> es un identificador para un 
+            objeto <code>PooledConnection</code> en lugar de una conexión física. Una aplicación usa el 
+            objeto de conexión de la misma manera que usa una conexión. La agrupación de conexiones no tiene 
+            ningún efecto en el código de la aplicación, excepto que una conexión agrupada, como todas las 
+            conexiones, siempre debe cerrarse explícitamente. Cuando una aplicación cierra una conexión que se 
+            agrupa, la conexión se devuelve a un grupo de conexiones reutilizables. La próxima vez que se 
+            llame a <code>getConnection</code>, se devolverá un identificador para una de estas conexiones 
+            agrupadas, si hay alguna disponible. Debido a que la agrupación de conexiones evita la creación de 
+            una nueva conexión física cada vez que se solicita una, las aplicaciones pueden ejecutarse 
+            significativamente más rápido.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Un grupo de conexiones JDBC es un grupo de conexiones reutilizables para una base de datos en 
+            particular. Dado que la creación de cada nueva conexión física requiere mucho tiempo, el servidor 
+            mantiene un conjunto de conexiones disponibles para aumentar el rendimiento. Cuando solicita una 
+            conexión, una aplicación obtiene una del grupo. Cuando una aplicación cierra una conexión, la 
+            conexión se devuelve al grupo.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Las aplicaciones que usan la IPA de persistencia especifican el objeto <code>DataSource</code> que 
+            están usando en el elemento <code>jta-data-source</code> del archivo <code>persistence.xml</code>:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;jta-data-source&gt;jdbc/MyOrderDB&lt;/jta-data-source&gt;
+            </code></pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Esta suele ser la única referencia a un objeto JDBC para una unidad de persistencia. El código de 
+            la aplicación no hace referencia a ningún objeto JDBC.
+          </p>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="resource-creation001.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="resource-creation003.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

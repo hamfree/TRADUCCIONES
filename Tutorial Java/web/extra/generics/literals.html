@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Clases Literales como Objetos de Tipo en Tiempo de Ejecución (Los Tutoriales de Java&trade; &gt; Extras &gt; Genéricos)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe los genéricos, la IPA del modo de pantalla completo, y 
+              los recursos relacionados con la certificación de Java" />
+        <meta name="keywords" content="programación en java, aprender java, ejemplos de código java, genéricos de java, IPA del 
+              modo de pantalla completa, certificación" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Genéricos</a></div>
+                <div class="linkAHEAD"><a href="intro.html">Introducción</a></div>
+                <div class="linkAHEAD"><a href="simple.html">Definiendo Genéricos Simples</a></div>
+                <div class="linkAHEAD"><a href="subtype.html">Genéricos y Subtipado</a></div>
+                <div class="linkAHEAD"><a href="wildcards.html">Los Comodines</a></div>
+                <div class="linkAHEAD"><a href="methods.html">Métodos Genéricos</a></div>
+                <div class="linkAHEAD"><a href="legacy.html">Interoperando con Código Heredado</a></div>
+                <div class="linkAHEAD"><a href="fineprint.html">La Letra Pequeña</a></div>
+                <div class="nolinkAHEAD">Clases Literales como Objetos de Tipo en Tiempo de Ejecución</div>
+                <div class="linkAHEAD"><a href="morefun.html">Más Diversión con Comodines</a></div>
+                <div class="linkAHEAD"><a href="convert.html">Convirtiendo Código Heredado para Usar Genéricos</a></div>
+                <div class="linkAHEAD"><a href="acknowledgements.html">Agradecimientos</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Extras<br />
+                <b>Lección:</b> Genéricos
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Extras</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Genéricos</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="fineprint.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="morefun.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Clases Literales como Objetos de Tipo en Tiempo de Ejecución</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Uno de los cambios en el KDJ 5.0 es que la clase <code>java.lang.Class</code> es genérica. Es un ejemplo 
+                    interesante de usar la genericidad para algo que no sea una clase contenedor.
+                </p>
+                <p>
+                    Ahora que <code>Class</code> tiene un parámetro de tipo <code>T</code>, bien podría preguntarse, ¿qué significa 
+                    <code>T</code>? Representa el tipo que representa el objeto <code>Class</code>.
+                </p>
+                <p>
+                    Por ejemplo, el tipo de <code>String.class</code> es <code>Class&lt;String&gt;</code>, y el tipo de 
+                    <code>Serializable.class</code> es <code>Class&lt;Serializable&gt;</code>. Esto puede usarse para mejorar la 
+                    seguridad de tipos en su código de reflexión.
+                </p>
+                <p>
+                    En particular, dado que el método <code>newInstance()</code> en <code>Class</code> ahora 
+                    devuelve un <code>T</code>, puede obtener tipos más precisos al crear objetos reflexivamente.
+                </p>
+                <p>
+                    Por ejemplo, suponga que necesita escribir un método de utilidad que realiza una consulta a una base de datos, 
+                    dada como una cadena de SQL, y devuelve una colección de objetos en la base de datos que coinciden con esa 
+                    consulta.
+                </p>
+                <p>
+                    Una forma es pasarlo en un objeto factoría explícitamente, escribiendo código como:
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>interface</b> Factory&lt;T&gt; { T make();} 
+
+<b>public</b> &lt;T&gt; Collection&lt;T&gt; select(Factory&lt;T&gt; factory, String statement) { 
+    Collection&lt;T&gt; result = new ArrayList&lt;T&gt;(); 
+
+    /* <i>Ejecuta la consulta sql usando jdbc</i> */  
+    <b>for</b> (/* <i>Itera sobre los resultados de jdbc.</i> */) { 
+        T item = factory.make();
+        /* <i>Usa reflexión y establece todos los campos 
+         * a partir de los resultados sql.</i> 
+         */ 
+        result.add(item); 
+    } 
+    <b>return</b> result; 
+}
+                    </pre>
+                </div>
+                <p>
+                    Puedes llamar a esto como
+                </p>
+                <div class="codeblock">
+                    <pre>
+select(new Factory&lt;EmpInfo&gt;(){ 
+    <b>public</b> EmpInfo make() {
+        <b>return</b> new EmpInfo();
+    }}, "cadena sql de selección");
+                    </pre>
+                </div>
+                <p>
+                    o puede declarar una clase <code>EmpInfoFactory</code> para soportar el interfaz <code>Factory</code>
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>class</b> EmpInfoFactory <b>implements</b> Factory&lt;EmpInfo&gt; {
+    ...
+    <b>public</b> EmpInfo make() { 
+        <b>return</b> new EmpInfo();
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    y llamarla
+                </p>
+                <div class="codeblock">
+                    <pre>
+select(getMyEmpInfoFactory(), "cadena sql de selección");
+                    </pre>
+                </div>
+                <p>
+                    La desventaja de esta solución es que requiere:
+                </p>
+                <ul>
+                    <li>
+                        el uso de clases detalladas de clases factoría anónimas en el sitio de la llamada, o
+                    </li>
+                    <li>
+                        declarar una clase factoria para cada tipo usado y pasar una instancia de la factoria en el sitio de la 
+                        llamada, lo cual es poco natural.
+                    </li>
+                </ul>
+                <p>
+                    Es natural usar la clase literal como un objeto factoría, la cual puede entonces usarse por reflexión. Hoy 
+                    (sin genéricos) el código podría ser escrito:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Collection emps = sqlUtility.select(EmpInfo.class, "select * from emps");
+...
+<b>public static</b> Collection select(Class c, String sqlStatement) { 
+    Collection result = new ArrayList();
+    /* <i>Ejecuta la consulta sql usando jdbc.</i> */
+    <b>for</b> (/* <i>Itera sobre los resultados de jdbc.</i> */ ) { 
+        Object item = c.newInstance(); 
+        /* <i>Usa reflexión y establece todos los campos 
+         * a partir de los resultados sql.</i> 
+         */  
+        result.add(item); 
+    } 
+    <b>return</b> result; 
+}
+                    </pre>
+                </div>
+                <p>
+                    Sin embargo, esto no nos daría una colección del tipo preciso que necesitamos. Ahora que <code>Class</code> es 
+                    genérica, podemos en cambio escribir lo siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Collection&lt;EmpInfo&gt; 
+    emps = sqlUtility.select(EmpInfo.class, "select * from emps");
+...
+<b>public static</b> &lt;T&gt; Collection&lt;T&gt; select(Class&lt;T&gt; c, String sqlStatement) { 
+    Collection&lt;T&gt; result = new ArrayList&lt;T&gt;();
+    /* <i>Ejecuta la consulta sql usando jdbc.</i> */
+    <b>for</b> (/* <i>Itera sobre los resultados de jdbc.</i> */ ) { 
+        T item = c.newInstance(); 
+        /* <i>Usa reflexión y establece todos los campos 
+         * a partir de los resultados sql.</i> 
+         */  
+        result.add(item);
+    } 
+    <b>return</b> result; 
+} 
+                    </pre>
+                </div>
+                <p>
+                    El código de arriba nos da el tipo preciso de la colección de una forma segura.
+                </p>
+                <p>
+                    Esta técnica de usar clases literales como objetos tipo en tiempo de ejecución es un truco muy util de saber. 
+                    Es un idioma que se usa extensivamente en las nueva IPAs para manipular anotaciones, por ejemplo.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="fineprint.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="morefun.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos
+                            <a href="../../information/cpyr.html">avisos legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> La Letra Pequeña<br />
+            <b>Página siguiente:</b> Más Diversión con Comodines
+        </div>
+    </body>
+</html> 

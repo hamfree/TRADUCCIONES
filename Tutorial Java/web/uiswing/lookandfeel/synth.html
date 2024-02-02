@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            La Apariencia Synth (Los Tutoriales de Java&trade; &gt; Creando una IGU (Interfaz Gráfica de Usuario) con
+            JFC/Swing &gt; Modificando la Apariencia)
+        </title>
+        <meta name="description" content="Este tutorial de Swing Java describe el desarrollo de interfaces gráficas de usuario (GUI)
+              para aplicaciones y applets que utilizan componentes Swing" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java swing, java ui, java user interface,
+              swing components, swing events, swing layout  " />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Modificando la Apariencia</a></div>
+                <div class="linkAHEAD"><a href="plaf.html">Cómo Establecer la Apariencia</a></div>
+                <div class="nolinkAHEAD">La Apariencia Synth</div>
+                <div class="linkBHEAD"><a href="synthExample.html">Un Ejemplo de Synth</a></div>
+                <div class="linkAHEAD"><a href="nimbus.html">La Apariencia Nimbus</a></div>
+                <div class="linkBHEAD"><a href="custom.html">Cambiando la Apariencia de Nimbus</a></div>
+                <div class="linkBHEAD"><a href="size.html">Cambiando el Tamaño de un Componente</a></div>
+                <div class="linkBHEAD"><a href="color.html">Cambiando el Tema de Color</a></div>
+                <div class="linkBHEAD"><a href="info.html">Para Más Información</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing<br />
+                <b>Lección:</b> Modificando la Apariencia
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Modificando la Apariencia</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="plaf.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="synthExample.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>La Apariencia Synth</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Crear un Aspecto personalizado, o modificar uno existente, puede ser una tarea desalentadora. El paquete
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/swing/plaf/synth/package-summary.html">
+                        <code>javax.swing.plaf.synth</code>
+                    </a> puede ser uado para crear un aspecto personalizado con mucho menos esfuerzo. Puede crear una
+                    aspecto Synth o de forma programada o a través del uso de un fichero XML externo. El siguiente debate está
+                    dedicado a la creación de un estilo Synth utilizando un archivo XML externo. Crear un aspecto Synth de
+                    forma programada está desdcrito en la documentación de la IPA.
+                </p>
+                <p>
+                    Con el Aspecto Synth, proporcionas el &quot;aspecto&quot; y Synth proporciona la &quot;sensación&quot;.Así,
+                    puede pensar del Aspecto Synth como una &quot;piel.&quot;.
+                </p>
+                <h2>La Arquitectura Synth</h2>
+                <p> 
+                    Recuerde del tema anterior que es la responsabilidad de cada Aspecto suministrar una implementación concreta 
+                    de cada una de las muchas subclases <code>ComponentUI</code> definidas por Swing. El aspecto Synth se encarga
+                    de esto por tí. Para usar Synth, no necesita crear ningún <code>ComponentUI</code>s&mdash;más bien, solo
+                    necesita especificar cómo se pinta cada componente, junto con varias propiedades que afectan el diseño y el
+                    tamaño.
+                </p>
+                <p>
+                    Synth opera a un nivel más granular que un componente &mdash; este nivel granular se llama una
+                    &quot;region.&quot; Cada componente tiene una o más regiones. Muchso componentes tienen solo una región, tal
+                    como <code>JButton</code>. Otros tienen múltiples regiones, tales como <code>JScrollBar</code>. Cada uno de los
+                    <code>ComponentUIs</code> suministrados por Synth asocian un <code>SynthStyle</code> con cada una de las
+                    regiones definidas por el <code>ComponentUI</code>. Por ejemplo, Synth define tres regiones para
+                    <code>JScrollBar</code>: la pista, el selector y la barra de desplazamiento en sí. La implementación de
+                    <code>ScrollBarUI</code> (la subclase <code>ComponentUI</code> definida para <code>JScrollBar</code>) para 
+                    Synth asocia un <code>SynthStyle</code> con cada una de estas regiones.
+                </p>
+                <p style="text-align:center">
+                    <img src="../../figures/uiswing/lookandfeel/synthArch.gif" width="672" height="531" class="imgbottom"
+                         alt="Dibujo de la Arquitectura de Synth." />
+                </p>
+                <p>
+                    <code>SynthStyle</code> suministra la información de estilo usada por la implementación <code>ComponentUI</code>
+                    de Synth. Por ejemplo, <code>SynthStyle</code> define el color de primer plano y de fondo, la información de la
+                    fuente,
+
+
+                    defines the foreground and background color, font information, etcétera. Además, cada <code>SynthStyle</code>
+                    tiene un <code>SynthPainter</code> que se usa para pintar la región. Por ejemplo, <code>SynthPainter</code>
+                    define los dos métodos <code>paintScrollBarThumbBackground</code> y <code>paintScrollBarThumbBorder</code>, los
+                    cuales se usan para pintar las regiones de la barra de desplazamiento y el selector.
+                </p>
+                <p>
+                    Cada uno de los <code>ComponentUIs</code> en Synth obtienen un <code>SynthStyles</code> usando una
+                    <code>SynthStyleFactory</code>. Hay dos formas de definir una <code>SynthStyleFactory</code>: a través de un
+                    fichero de XML de Synth, entre bastidores esto crea una implementación de <code>SynthStyleFactory</code> que
+                    termina publicada con los <code>SynthStyles</code> del fichero XML:
+                </p>
+                <div class="codeblock">
+                    <pre>
+  SynthLookAndFeel laf = new SynthLookAndFeel();
+  laf.load(MyClass.class.getResourceAsStream("laf.xml"), MyClass.class);
+  UIManager.setLookAndFeel(laf);
+                    </pre>
+                </div>
+                <p>
+                    La ruta programática implica la creación de una implementación de <code>SynthStyleFactory</code> que devuelve
+                    <code>SynthStyles</code>. El código siguiente crea una <code>SynthStyleFactory</code> personalizada que devuelve
+                    <code>SynthStyles</code> distintos para los botones y los árboles:
+                </p>
+                <div class="codeblock">
+                    <pre>
+ class MyStyleFactory extends SynthStyleFactory {
+     public SynthStyle getStyle(JComponent c, Region id) {
+         if (id == Region.BUTTON) {
+             return buttonStyle;
+         }
+         else if (id == Region.TREE) {
+             return treeStyle;
+         }
+         return defaultStyle;
+     }
+ }
+ SynthLookAndFeel laf = new SynthLookAndFeel();
+ UIManager.setLookAndFeel(laf);
+ SynthLookAndFeel.setStyleFactory(new MyStyleFactory());
+                    </pre>
+                </div>
+                <h2>El Fichero XML</h2>
+                <p>
+                    Una explicación del DTD para el fichero XML de Synth puede encontrase en
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/swing/plaf/synth/doc-files/synthFileFormat.html">
+                        <code>javax.swing.plaf.synth/doc-files/synthFileFormat.html</code>.
+                    </a>
+                </p>
+                <p>
+                    Cuando cargas un Aspecto Synth, sólo aquellos componentes del IGU (o regiones) para los cuales hay una
+                    definición (un &quot;estilo&quot; enlazado a la región, como se describe dejabo) son renderizados. No hay
+                    comportamiento por defecto para cualquieer componente &mdash; sin definiciones de estilo en el fichero XML de
+                    Synth, el IGU es un lienzo en blanco.
+                </p>
+                <p>
+                    Para especificar el renderizado de un componente (o región). su fichero XML debe contener un elemento
+                    &lt;style&gt;, el cual es entonces <i>enganchado</i> a la región usando el elemento &lt;bind&gt;.
+                    Como un ejemplo, definimos un estilo que incluya la fuente, color de primer plano, y color de fondo, y entonces 
+                    enlace ese estilo a todos los componentes. Es una buena idea incluir dicho elemento en su archivo Synth XML 
+                    mientras lo está desarrollando &mdash; después, cualquier componente que no haya definido tendrá al menos colores
+                    y una fuente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;synth&gt;
+  &lt;style id="basicStyle"&gt;
+    &lt;font name="Verdana" size="16"/&gt;
+    &lt;state&gt;
+      &lt;color value="WHITE" type="BACKGROUND"/&gt;
+      &lt;color value="BLACK" type="FOREGROUND"/&gt;
+    &lt;/state&gt;
+  &lt;/style&gt;
+  &lt;bind style="basicStyle" type="region" key=".*"/&gt;
+&lt;/synth&gt;
+                    </pre>
+                </div>
+                <p>
+                    Analizemos esta definición de estilo:
+                </p>
+                <ol>
+                    <li>
+                        <p>
+                            El elemento &lt;style&gt; es el bloque básico de construcción del fichero XML de Synth. Contiene toda la
+                            información necesitada para describir el renderizado de una región. Un elemento &lt;style&gt; puede
+                            describir más de una región, como se ha hecho aquí. En general, sin embargo, es mejor crear un elemento 
+                            &lt;style&gt; para cada componente o región. Tenga en cuenta que al elemento &lt;style&gt; se le asigna
+                            un identificador, la cadena &quot;basicStyle&quot;. Este identificador se usará más adelante en el
+                            elemento &lt;bind&gt;.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            El elemento &lt;font&gt; del elemento &lt;style&gt; establece la fuenta a Verdana, tamaño 16.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            El elemento &lt;state&gt; del elemento &lt;style&gt; será descrito abajo. El elemento &lt;state&gt;
+                            de una región puede ser uno, o una mezca, de siete posibles valores. Cuando el valor no se especifica,
+                            la definición aplica a todos los estados, lo que es la intención aquí. Por lo tanto, los colores de
+                            fondo y primer plano &quot;para todos los estados&quot; se definen en este elemento.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Finalmente, el elemento &lt;style&gt; con el identificador &quot;basicStyle&quot; que acaba de ser
+                            definido está <i>ligado</i> a todas las regiones. El elemento &lt;bind&gt; enlaza &quot;basicStyle&quot;
+                            a los tipos &quot;region&quot;. A qué tipo de región se aplica la vinculación está dado por el atributo
+                            &quot;clave&quot;, que es &quot;.*&quot;. En este caso, la expresión regular para &quot;todas&quot;.
+                        </p>
+                    </li>
+                </ol>
+                <p>
+
+                    Miremos las piezas del archivo Synth XML antes de crear algunos ejemplos de trabajo. Empezaremos con el elemento
+                    &lt;bind&gt;, mostrando como un &lt;style&gt; dado se aplica a un componente o región.
+
+                </p>
+                <h2>El Elemento &lt;bind&gt;</h2>
+                <p>
+                    Cuando quiera que un elemento de &lt;style&gt; se define, debe estar ligado a uno o más componentes o regiones
+                    antes de qie este tenga un efecto. El elemento &lt;bind&gt; es usado para este propósito. Requiere tres
+                    atributos:
+                </p>
+                <ol>
+                    <li>
+                        <p>
+                            <code>style</code> es el único identificador de un estilo definido previamente.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>type</code> es otro &quot;name&quot; o &quot;region.&quot; Si <code>type</code> es un nombre,
+                            obtenga el nombre con el método <code>component.getName()</code>. Si <code>type</code> es una region,
+                            use la constantes apropiada definida en la clase <code>Region</code> en el paquete
+                            <code>javax.swing.plaf.synth</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>key</code> es una expresión regular usada para determinar a qué componentes o regiones está el
+                            estilo enlazado.
+                        </p>
+                    </li>
+                </ol>
+                <p>
+                    Una Region es una forma de identificar un componente o pate del componente. Las Regiones están basadas en las
+                    constantes de la clase
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/swing/plaf/synth/Region.html">
+                        <code>Region</code>
+                    </a>, modificadas al eliminar los guiones bajos:
+                </p>
+                <p>
+                    Por ejemplo, para identificar la región SPLIT_PANE, usará SPLITPANE, splitpane, o SplitPane (
+                    For example, to identify the SPLIT_PANE region you would use SPLITPANE, splitpane, or SplitPane (sin distinguir
+                    mayúsculas y minúsculas).
+                </p>
+                <p>
+                    Cuando enlaza un estilo a una región, ese estilo será aplicado a <i>todos</i> los componentes en esa región.
+                    Pude enlazar un estilo a más de una región, y puede enlazar más de un estilo a una región. Por ejemplo.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;style id="styleOne"&gt;
+   &lt;!-- La definición styleOne va aquí --&gt;
+&lt;/style&gt;
+
+&lt;style id="styleTwo"&gt;
+   &lt;!-- La definición styleTwo va aquí --&gt;
+&lt;/style&gt;
+
+&lt;bind style="styleOne" type="region" key="Button"/&gt;
+&lt;bind style="styleOne" type="region" key="RadioButton"/&gt;
+&lt;bind style="styleOne" type="region" key="ArrowButton"/&gt;
+
+&lt;bind style="styleTwo" type="region" key="ArrowButton"/&gt;
+
+
+                    </pre>
+                </div>
+                <p>
+                    Puede enlazar a componentes nombrados, individuales, ya sea que estén o no <i>también</i> enlazados como
+                    regiones.Por ejemplo, suponga que quiere que los botones &quot;OK&quot; y &quot;Cancelar&quot; en su IGU sean
+                    tratados de forma diferente que todos los otros botones. 
+
+                    Primero, debe de dar a los botones OK y Cancelar nombres, usando el método <code>component.setName()</code>.
+                    Entonces, definirá tres estilos: uno para botones en general (region = &quot;Button&quot;), uno para el botón
+                    OK (name = &quot;OK&quot;), y uno para el botón Cancelar (name = &quot;Cancelar&quot;). Finalmente, enlazaría
+                    estos estilos como aquí:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;bind style="styleButton" type="region" key="Button"&gt;
+&lt;bind style="styleOK" type="name" key="OK"&gt;
+&lt;bind style="styleCancel" type="name" key="Cancel"&gt;
+                    </pre>
+                </div>
+                <p>
+                    Como resultado, el botón &quot;Aceptar&quot; está destinado a <i>ambos </i> &quot;styleButton&quot; y
+                    &quot;styleOK&quot; mientras que el botón &quot;Cancelar&quot; está destinado a <i> ambos </i>
+                    &quot;styleButton &quot; y &quot;styleCancel.&quot;
+                </p>
+                <p>
+                    Cuando un componente o región se enlaza a más de un estilo, los estilos son mezclados.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Nota:</strong>&nbsp;
+                    <p>
+                        Del mismo modo que un estilo puede vincularse a múltiples regiones o nombres, se pueden vincular varios
+                        estilos a una región o nombre. Estos estilos múltiples se fusionan para la región o el nombre. La
+                        precedencia se da a los estilos definidos más adelante en el archivo.
+                    </p>
+                    <hr />
+                </div>
+                <h2>El Elemento &lt;state&gt;</h2>
+                <p>
+                    El elemento &lt;state&gt; le permite definir un aspecto para un región que depende de su &quot;estado&quot;.
+                    Por ejemplo, usted usualmente querrá un botón que ha sido <code>PRESIONADO</code>  que parezca diferente que
+                    el botón que está en estado <code>HABILITADO</code>. Hay siete posibles valores para &lt;state&gt; que están
+                    definidos en la DTD del XML de Synth. Estos son:
+                </p>
+                <ol>
+                    <li>ENABLED</li>
+                    <li>MOUSE_OVER</li>
+                    <li>PRESSED</li>
+                    <li>DISABLED</li>
+                    <li>FOCUSED</li>
+                    <li>SELECTED</li>
+                    <li>DEFAULT</li>
+                </ol>
+                <p>
+                    Puede también tener estados compuestos, separados por &#39; y &#39; &mdash; por ejemplo, ENABLED y FOCUSED. Si
+                    no especifica un valor, el aspecto definido se aplicará a todos los estados.
+                </p>
+                <p>
+                    Como un ejemplo, aquí hay un estilo que especifica pintadores por estado. Todos los botones son pintados de 
+                    cierta forma, a menos que el estado sea &quot;PRESIONADO,&quot; en cuyo caso son pintados de forma diferente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;style id="buttonStyle"&gt;
+  &lt;property key="Button.textShiftOffset" type="integer" value="1"/&gt;
+  &lt;insets top="10" left="10" right="10" bottom="10"/&gt;
+
+  &lt;state&gt;
+    &lt;imagePainter method="buttonBackground" path="images/button.png"
+                         sourceInsets="10 10 10 10"/&gt;
+  &lt;/state&gt;
+  &lt;state value="PRESSED"&gt;
+    &lt;color value="#9BC3B1" type="BACKGROUND"/&gt;
+    &lt;imagePainter method="buttonBackground" path="images/button2.png"
+                        sourceInsets="10 10 10 10"/&gt;
+  &lt;/state&gt;
+&lt;/style&gt;
+&lt;bind style="buttonStyle" type="region" key="Button"/&gt;
+
+                    </pre>
+                </div>
+                <p>
+                    Ignorando los elementos &lt;property&gt; y &lt;insets&gt; por el momento, puede ver que un botón presionado se
+                    pinta diferentemente que un botón no presionado.
+                </p>
+                <p>
+                    El valor &lt;state&gt; que se usa es el estado definido que más estrechamente coincide con el estado de la
+                    región. La coincidencia se determina por el número de valores que coinciden el estado de la región. Si ninguno
+                    de los valores de estado coinciden, entonces el estado sin valor es usado. Si hay coincidencias, el estado con
+                    las coincidencias más individuales. Por ejemplo, el código siguiente definie tres estados:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;state id="zero"&gt;
+  &lt;color value="RED" type="BACKGROUND"/&gt;
+&lt;/state&gt;
+&lt;state value="SELECTED and PRESSED" id="one"&gt;
+  &lt;color value="RED" type="BACKGROUND"/&gt;
+&lt;/state&gt;
+&lt;state value="SELECTED" id="two"&gt;
+  &lt;color value="BLUE" type="BACKGROUND"/&gt;
+&lt;/state&gt;
+                    </pre>
+                </div>
+                <p>
+                    Si el estado de la región contiene al menos SELECTED y PRESSED, será elegido el estado uno. Si el estado
+                    contiene SELECTED, pero no contiene PRESSED, será usado el estado dos. Si el estado no contiene ni SELECTED ni
+                    PRESSED, será usado el estado cero.
+                </p>
+                <p>
+                    Cuando el estado actual coincide con el mismo número de valores para las dos definiciones de estado, el que es
+                    usado es el primero definido en el estilo. Por ejemplo, el estado <code>MOUSE_OVER</code> es siempre verdadero
+                    en un botón <code>PRESSED</code> (no puede presionar un botón a menos que el ratón esté sobre él). Así, si el
+                    estado <code>MOUSE_OVER</code> es declarado primero, siemprer será elegido sobre <code>PRESSED</code>, y
+                    cualquier pintado definido para <code>PRESSED</code> no será hecho.
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;state value="PRESSED"&gt;
+   &lt;imagePainter method="buttonBackground" path="images/button_press.png"
+                          sourceInsets="9 10 9 10" /&gt;
+   &lt;color type="TEXT_FOREGROUND" value="#FFFFFF"/&gt;
+&lt;/state&gt;
+
+&lt;state value="MOUSE_OVER"&gt;
+   &lt;imagePainter method="buttonBackground" path="images/button_on.png"
+                          sourceInsets="10 10 10 10" /&gt;
+   &lt;color type="TEXT_FOREGROUND" value="#FFFFFF"/&gt;
+&lt;/state&gt;
+                    </pre>
+                </div>
+                <p>
+                    El código de arriba funcionará adecuadamente. Sin embargo, si invierte el orden de los estados 
+                    <code>MOUSE_OVER</code> y <code>PRESSED</code> en el fichero, el estado <code>PRESSED</code> nunca será usado.
+                    Esto es porque cualquier estado que sea el estado <code>PRESSED</code> es <i>también</i> un estado
+                    <code>MOUSE_OVER</code>. Ya que el estado <code>MOUSE_OVER</code> fue definido primero, es el que será usado.
+                </p>
+                <h2>Colores y Fuentes</h2>
+                <p>
+                    El elemento &lt;color&gt; requiere dos atributos:
+                </p>
+                <ol>
+                    <li>
+                        <p>
+                            <code>value</code> puede ser cualquiera de las constantes <code>java.awt.Color</code>, tales como RED,
+                            WHITE, BLACK, BLUE, etc. Puede también ser una representación hexadecimal de valores RGB, tales como
+                            #FF00FF o #326A3B.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>type</code> describe dónde se aplica el color &mdash; puede ser BACKGROUND, FOREGROUND, FOCUS,
+                            TEXT_BACKGROUND, o TEXT_FOREGROUND.
+                        </p>
+                    </li>
+                </ol>
+                <p>
+                    Por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+  &lt;style id="basicStyle"&gt;
+    &lt;state&gt;
+      &lt;color value="WHITE" type="BACKGROUND"/&gt;
+      &lt;color value="BLACK" type="FOREGROUND"/&gt;
+    &lt;/state&gt;
+  &lt;/style&gt;
+                    </pre>
+                </div>
+                <p>
+                    El elemento &lt;font&gt; tiene tres atributos:
+                </p>
+                <ol>
+                    <li>
+                        <p>
+                            <code>name</code> &mdash; el nombre de la fuente. Por ejemplo, Arial o Verdana.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>size</code> &mdash; el tamaño de la fuente en pixels.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>style</code> (opcional) &mdash; BOLD, ITALIC, o BOLD ITALIC. Si se omite, obtiene una fuente normal.
+                        </p>
+                    </li>
+                </ol>
+                <p>
+                    Por ejemplo:
+                </p>
+                <div class="codeblock">
+                    <pre>
+  &lt;style id="basicStyle"&gt;
+    &lt;font name="Verdana" size="16"/&gt;
+  &lt;/style&gt;
+                    </pre>
+                </div>
+                <p>
+                    Cada uno de los elementos &lt;color&gt; y el elemento &lt;font&gt; tiene un uso alternativo. Cada uno puede
+                    tener un atributo <code>id</code> o un atributo <code>idref</code>. Usando el atributo <code>id</code>, puede
+                    definir un color que puede reusar más tarde usando el atributo <code>idref</code>. Por ejemplo,
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;color id="backColor" value="WHITE" type="BACKGROUND"/&gt;
+&lt;font id="textFont" name="Verdana" size="16"/&gt;
+...
+...
+...
+&lt;color idref="backColor"/&gt;
+&lt;font idref="textFont"/&gt;
+                    </pre>
+                </div>
+                <h2>Inserciones</h2>
+                <p>
+                    Las <code>inserciones</code> se agregan al tamaño de un componente  mientras se dibujan. Por ejemplo, sin
+                    inserciones, un botón con un título de <code>Cancelar</code> será simplemente los bastante grande para
+                    contener el título en la fuente elegida. Con un elemento &lt;insets&gt; como este
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;insets top="15" left="20" right="20" bottom="15"/&gt;,
+                    </pre>
+                </div>
+                <p>
+                    el botón será hecho más grande en 15 pixels por encima y debajo del título y 20 pixels a la izquierda y
+                    derecha del título.
+                </p>
+                <h2>Pintar Con Imágenes</h2>
+                <p>
+                    El formato del fichero de Synth permite personalizar el pintado a través de imágenes. El pintor de imagen de
+                    Synth divide una imagen en nueve áreas distintas: arriba, arriba a la derecha, derecha, abajo a la derecha,
+                    abajo, abajo a la izquierda, izquierda, arriba a la izquierda, y centro. Cada una de estas áreas es pintada en
+                    el destino. Los bordes superior, izquierdo, inferior y derecho están embaldosados o estirados, mientras que
+                    las porciones de esquina (<code>sourceInsets</code>) permanecen fijas.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Nota:</strong>&nbsp;
+                    <p>
+                        No hay relación etre el elemento &lt;insets&gt; y el atributo <code>sourceInsets</code>. El elemento
+                        &lt;insets&gt; define el espacio ocupado por una región, mientras los atributos <code>sourceInsets</code>
+                        definen como pintar una imagen. Los &lt;insets&gt; y <code>sourceInsets</code> serán a menudo similares,
+                        pero no necesitan serlo.
+                    </p>
+                    <hr />
+                </div>
+                <p>
+                    Puede especificar si el área del centro será pintado con el atributo <code>paintCenter</code>. La siguiente
+                    imagen muestra las nueve áreas:
+                </p>
+                <p style="text-align:center">
+                    <img src="../../figures/uiswing/lookandfeel/regions.gif" width="223" height="222" class="imgbottom"
+                         alt="Las Nueve Áreas de Imagen." />
+                </p>
+                <p>
+                    Creemos un botón como un ejemplo. Para hacer esto podemos usar la siguiente imagen (mostrada más grande que su
+                    tamaño real):
+                </p>
+                <p style="text-align:center">
+                    <img src="../../figures/uiswing/lookandfeel/bigButton.png" width="500" height="200" class="imgbottom"
+                         alt="Imagen del Botón." />
+                </p>
+                <p>
+                    La caja roja en la esquina superior izquierda es un cuadrado de 10 pixeles (incluyendo el borde de la caja) 
+                    &mdash; muestra la región de la esquina que no debería estirarse cuando se pinte. Para conseguir esto, los
+                    <code>sourceInsets</code> de arriba y de la izquierda deberán ser establecidos a 10. Usaremos el siguiente
+                    estilo y asociación:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;style id="buttonStyle"&gt;
+   &lt;insets top="15" left="20" right="20" bottom="15"/&gt;
+   &lt;state&gt;
+      &lt;imagePainter method="buttonBackground" path="images/button.png"
+        sourceInsets="10 10 10 10"/&gt;
+   &lt;/state&gt;
+&lt;/style&gt;
+&lt;bind style="buttonStyle" type="region" key="button"/&gt;
+                    </pre>
+                </div>
+                <p>
+                    Las líneas dentro del elemento &lt;state&gt; especifican que los fondos de los botones deberán ser pintados
+                    usando la imagen <code>images/button.png</code>. Esa ruta es relativa a la Clase que es pasada al método load
+                    del aspecto SynthLookAndFeel. El atributo <code>sourceInsets</code> especifica las áreas de la imagen que no
+                    deben ser estiradas. En este caso las inserciones de arriba, izquierda, abajo, y derecha tienen cada una 10.
+                    Esto causará que el pintor no estire un área de 10x10 en cada esquina de la imagen.
+                </p>
+                <p>
+                    El &lt;bind&gt; asocia <code>buttonStyle</code> a todos los botones.
+                </p>
+                <p>
+                    El elemento &lt;imagePainter&gt; suministra toda la información necesitada para representar una parte de una
+                    región. Requiere sólo unos pocos atributos:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            method &mdash; este especifica cual de los métodos en la clase
+                            <code>javax.swing.plaf.synth.SynthPainter</code> va a ser usado para pintar. La clase
+                            <code>SynthPainter</code> contiene sobre 100 métodos que empiezan con <code>paint</code>. Cuando
+                            determine cual necesita, borre el prefijo <code>paint</code>, cambien la primera letra que quede a
+                            minúsculas, y use el resultado como el atributo de <code>method</code>. Por ejemplo, el método
+                            de <code>SynthPainter</code> <code>paintButtonBackground</code> se convierte en el atributo
+                            <code>buttonBackground</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            path &mdash; la ruta a la imagen que es utilizada, relativa a la Clase que es pasada en el método load
+                            de SynthLookAndFeel.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            sourceInsets &mdash; las inserciones en pixels, representando el ancho y alto de las áreas de las
+                            esquinas que no deben ser estiradas. Se asignan a arriba, izquierda, abajo, y derecha, en ese orden.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            paintCenter (opcional) : Este atributo le permite mantener el centro de una imagen o deshacerse de ella
+                            (en un campo de texto, por ejemplo, de forma que el texto pueda ser dibujado).
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    El listado de abajo muestra el código XML para cargar diferentes imágenes dependiendo del &lt;state&gt; del
+                    botón
+                </p>
+                <div class="codeblock">
+                    <pre>
+  &lt;style id="buttonStyle"&gt;
+    &lt;property key="Button.textShiftOffset" type="integer" value="1"/&gt;
+    &lt;insets top="15" left="20" right="20" bottom="15"/&gt;
+    &lt;state&gt;
+      &lt;imagePainter method="buttonBackground" path="images/button.png"
+                    sourceInsets="10 10 10 10"/&gt;
+    &lt;/state&gt;
+    &lt;state value="PRESSED"&gt;
+      &lt;imagePainter method="buttonBackground" path="images/button2.png"
+                    sourceInsets="10 10 10 10"/&gt;
+    &lt;/state&gt;
+  &lt;/style&gt;
+  &lt;bind style="buttonStyle" type="region" key="button"/&gt;
+                    </pre>
+                </div>
+                <p>
+                    button2.png muesra la versión pulsada de button.png, desplazado un pixel a la derecha. La línea
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;property key="Button.textShiftOffset" type="integer" value="1"/&gt;
+                    </pre>
+                </div>
+                <p>
+                    desplaza el texto del botón en consecuencia, como se describe en la siguiente sección.
+                </p>
+                <h2>El Elemento &lt;property&gt;</h2>
+                <p>
+                    Los elementos &lt;property&gt; son usados para añadir pares clave valor a un elemento &lt;style&gt;. Muchos
+                    componentes usan los pares clave valor para configurar su apariencia visual.
+                </p>
+                <p>
+                    El elemento &lt;property&gt; tiene tres atributos:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>key</code> &mdash; el nombre de la propiedad.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>type</code> &mdash; el tipo de dato de la propiedad.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>value</code> &mdash; el valor de la propiedad.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Hay una propiedad table(<code>componentProperties.html</code>) que lista las propiedades que cada componente
+                    soporta:
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/swing/plaf/synth/doc-files/componentProperties.html">
+                        <code>javax/swing/plaf/synth/doc-files/componentProperties.html</code>
+                    </a>.
+                </p>
+                <p>
+                    Ya que la imagen button2.png desplaza el botón visual un pixel cuando es pulsado, desplazaremos también el texto
+                    del botón. Hay una propiedad del botón que hace esto:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;property key="Button.textShiftOffset" type="integer" value="1"/&gt;
+                    </pre>
+                </div>
+                <h2>Un Ejemplo</h2>
+                <p>
+                    Aquí tiene un ejemplo, usando el estilo del botón definido arriba. El estilo del botón, mas un 
+                    &quot;estilo de fondo&quot; con definiciones de la fuente y colores que están asociadas a todas las regiones
+                    (similar al &quot;basicStyle&quot; mostrado en la sección titulada &quot;El Fichero XML,&quot; arriba) son
+                    combinados en
+                    <a class="SourceLink" target="_blank"
+                       href="../examples/lookandfeel/SynthApplicationProject/src/lookandfeel/buttonSkin.xml"
+                       onclick="showCode('../../displayCode.html',
+                                       '../examples/lookandfeel/SynthApplicationProject/src/lookandfeel/buttonSkin.xml');
+                               return false;">
+                        <code>buttonSkin.xml</code>
+                    </a> Aquí tiene un listado de <code>buttonSkin.xml</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;!-- piel de Synth que incluye una imagen para botones --&gt;
+&lt;synth&gt;
+  &lt;!-- Estilo que todas las regiones usarán --&gt;
+  &lt;style id="backingStyle"&gt;
+    &lt;!-- Hace que todas las regiones que usan esta piel opacas--&gt;
+    &lt;opaque value="TRUE"/&gt;
+    &lt;font name="Dialog" size="12"/&gt;
+    &lt;state&gt;
+      &lt;!-- Suministra colores por defecto --&gt;
+      &lt;color value="#9BC3B1" type="BACKGROUND"/&gt;
+      &lt;color value="RED" type="FOREGROUND"/&gt;
+    &lt;/state&gt;
+  &lt;/style&gt;
+  &lt;bind style="backingStyle" type="region" key=".*"/&gt;
+  &lt;style id="buttonStyle"&gt;
+    &lt;!-- Desplaza el texto un pixel cuando es presionado --&gt;
+    &lt;property key="Button.textShiftOffset" type="integer" value="1"/&gt;
+    &lt;insets top="15" left="20" right="20" bottom="15"/&gt;
+    &lt;state&gt;
+      &lt;imagePainter method="buttonBackground" path="images/button.png"
+                    sourceInsets="10 10 10 10"/&gt;
+    &lt;/state&gt;
+    &lt;state value="PRESSED"&gt;
+      &lt;imagePainter method="buttonBackground" path="images/button2.png"
+                    sourceInsets="10 10 10 10"/&gt;
+    &lt;/state&gt;
+  &lt;/style&gt;
+  &lt;!-- Asocia buttonStyle a todos los JButtons --&gt;
+  &lt;bind style="buttonStyle" type="region" key="button"/&gt;
+&lt;/synth&gt;
+                    </pre>
+                </div>
+                <p>
+                    Podemos cargar este fichero XML para usar el aspecto Synth para una aplicación simple llamada
+                    <code>SynthApplication.java</code>. El IGU para esta aplicación incluye un botón y una etiqueta. Cada vez que
+                    el botón es pulsado, la etiqueta se incrementa.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Nota:</strong>&nbsp;
+                    <p>
+                        La etiqueta se dibuja, incluso aunque <code>buttonSkin.xml</code> no contiene un estilo para ella. Esto es
+                        porque hay un &quot;backingStyle&quot; general que incluye una fuente y colores.
+                    </p>
+                    <hr />
+                </div>
+                <p>
+                    Aquí está el listado del fichero
+                    <a class="SourceLink" target="_blank"
+                       href="../examples/lookandfeel/SynthApplicationProject/src/lookandfeel/SynthApplication.java"
+                       onclick="showCode('../../displayCode.html',
+                                       '../examples/lookandfeel/SynthApplicationProject/src/lookandfeel/SynthApplication.java');
+                               return false;">
+                        <code>SynthApplication.java</code>
+                    </a>.
+                </p>
+                <div class="note">
+                    <hr />
+                    <strong>Intente esto:</strong>&nbsp;
+                    <p>
+                        Pulsa el botón Lanzar para ejecutar el ejemplo SynthApplication usando
+                        <a class="OutsideLink" target="_blank"
+                           href="http://www.oracle.com/technetwork/java/javase/javawebstart/index.html">
+                            Java&trade; Web Start
+                        </a> (
+                        <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">descargue el KDD 7 o posterior</a>).
+                        Alternativamente, para compilar y ejecutar el ejemplo usted mismo, consulte el
+                        <a href="../examples/lookandfeel/index.html#SynthApplication">índice de ejemplos</a>.
+                    </p>
+                    <a href="https://docs.oracle.com/javase/tutorialJWS/samples/uiswing/SynthApplicationProject/SynthApplication.jnlp">
+                        <img src="../../images/jws-launch-button.png" width="88" height="23" class="imgbottom"
+                             alt="Lanza el ejemplo SynthApplication" />
+                    </a>
+                    <br />
+                    <hr />
+                </div>
+                <h2>Pintar Con Iconos</h2>
+                <p>
+                    Los botones de radio y las casillas de verificación representan típicamente su estado con iconos de tamaño
+                    fijado. Para estos, puede crear un icono y asociarlo a la propiedad apropiada (refíerase a la tabla de
+                    propiedades,
+                    <a class="APILink" target="_blank"
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/swing/plaf/synth/doc-files/componentProperties.html">
+                        <code>javax/swing/plaf/synth/doc-files/componentProperties.html</code>
+                    </a>). Por ejemplo, para pintar botones de radio que son seleccionados o deseleccionados, use este código:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;style id="radioButton"&gt;
+   &lt;imageIcon id="radio_off" path="images/radio_button_off.png"/&gt;
+   &lt;imageIcon id="radio_on" path="images/radio_button_on.png"/&gt;
+   &lt;property key="RadioButton.icon" value="radio_off"/&gt;
+   &lt;state value="SELECTED"&gt;
+      &lt;property key="RadioButton.icon" value="radio_on"/&gt;
+   &lt;/state&gt;
+&lt;/style&gt;
+&lt;bind style="radioButton" type="region" key="RadioButton"/&gt;
+                    </pre>
+                </div>
+                <h2>Pintores Personalizados</h2>
+                <p>
+                    El formato de fichero de Synth permite embeber objetos arbitrarios a través de la
+                    <a class="SourceLink" target="_blank"
+                       href="http://www.oracle.com/technetwork/java/persistence3-139471.html"
+                       onclick="showCode('../../displayCode.html',
+                                       'http://www.oracle.com/technetwork/java/persistence3-139471.html');
+                               return false;">
+                        <code>persistencia a largo plazo de los componentes de JavaBeans</code>
+                    </a> . Esta capacidad es particularmente útil para proporcionar sus propios pintores más allá de los basados en 
+                    imágenes que Synth proporciona. Por ejemplo, el código XML siguiente  especifica que un gradiente debe ser
+                    representado en el fondo de los campos de texto:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;synth&gt;
+  &lt;object id="gradient" class="GradientPainter"/&gt;
+  &lt;style id="textfield"&gt;
+    &lt;painter method="textFieldBackground" idref="gradient"/&gt;
+  &lt;/style&gt;
+  &lt;bind style="textfield" type="region" key="textfield"/&gt;
+&lt;/synth&gt;
+                    </pre>
+                </div>
+                <p>
+                    Donde la clase GradientPainter se ve así:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public class GradientPainter extends SynthPainter {
+   public void paintTextFieldBackground(SynthContext context,
+                                        Graphics g, int x, int y,
+                                        int w, int h) {
+      // Por simplicidad esto siempre recrea el GradientPaint. En una
+      // aplicación real usted cacheará esto para evitar la basura.
+      Graphics2D g2 = (Graphics2D)g;
+      g2.setPaint(new GradientPaint((float)x, (float)y, Color.WHITE,
+                 (float)(x + w), (float)(y + h), Color.RED));
+      g2.fillRect(x, y, w, h);
+      g2.setPaint(null);
+   }
+}
+                    </pre>
+                </div>
+                <h2>Conclusión</h2>
+                <p>
+                    En esta lección, hemos cubierto el uso del paquete <code>javax.swing.plaf.synth</code> para crear un aspecto
+                    personalizado. El énfasis de esta lección ha sido el usar un fichero XML externo para definir el aspecto.
+                    La lección siguiente presenta una aplicación de ejemplo que crea un cuadro de diálogo de búsqueda usando el
+                    marco de trabajo Synth con un fichero XML.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="plaf.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="synthExample.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio &quot;
+                            Los Tutoriales de Java&quot; está sujeto a estos
+                            <a href="../../information/cpyr.html">avisos legales</a>.
+                        </p>
+                        <p class="footertext">Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.</p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Cómo Establecer la Apariencia<br />
+            <b>Página siguiente:</b> Un Ejemplo de Synth
+        </div>
+    </body>
+</html>

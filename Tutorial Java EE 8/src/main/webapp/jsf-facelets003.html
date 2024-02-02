@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>
+      Desarrollando una Aplicación Facelets Simple: La Aplicación de Ejemplo guessnumber-jsf
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jsf-facelets002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-facelets004.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="">
+      <h2 id="developing-a-simple-facelets-application-the-guessnumber-jsf-example-application">
+        Desarrollando una Aplicación Facelets Simple: La Aplicación de Ejemplo guessnumber-jsf
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Esta sección describe los pasos generales involucrados en el desarrollo de una aplicación 
+            JavaServer Faces. Por lo general, se requieren las siguientes tareas:
+          </p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>Desarrollando los beans gestionados</p>
+            </li>
+            <li>
+              <p>Creando las páginas usando las etiquetas de componentes</p>
+            </li>
+            <li>
+              <p>Definición de la navegación de la página</p>
+            </li>
+            <li>
+              <p>Asignación de la instancia de <code>FacesServlet</code></p>
+            </li>
+            <li>
+              <p>Agregar declaraciones de bean gestionados</p>
+            </li>
+          </ul>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p>
+                <a href="#creating-a-facelets-application">Crear una Aplicación Facelets</a>
+              </p>
+            </li>
+            <li>
+              <p>
+                <a href="#configuring-the-application">Configurar la Aplicación</a>
+              </p>
+            </li>
+            <li>
+              <p>
+                <a href="#running-the-guessnumber-jsf-facelets-example">
+                  Ejecutar el Ejemplo Facelets guessnumber-jsf
+                </a>
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="">
+          <h3 id="creating-a-facelets-application">Crear una Aplicación Facelets</h3>
+          <div class="paragraph">
+            <p>
+              El ejemplo usado en este tutorial es la aplicación <code> guessnumber-jsf </code>. La aplicación 
+              le presenta una página que le pide que adivine un número del 0 al 10, valida su entrada con un 
+              número aleatorio y responde con otra página que le informa si adivinó el número correctamente o 
+              incorrectamente.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El código fuente de esta aplicación se encuentra en el directorio 
+              tut-install`/examples/web/jsf/guessnumber-jsf/`.
+            </p>
+          </div>
+          <div class="sect3" id="">
+            <h4 id="developing-a-managed-bean">Desarrollar un Bean Gestionado</h4>
+            <div class="paragraph">
+              <p>
+                En una aplicación típica de JavaServer Faces, cada página de la aplicación se conecta a un 
+                bean administrado que sirve como bean de respaldo. El bean de respaldo define los métodos y 
+                propiedades que están asociados con los componentes. En este ejemplo, ambas páginas utilizan 
+                el mismo bean de respaldo.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                La siguiente clase de bean administrada, <code>UserNumberBean.java</code>, genera un número 
+                aleatorio de 0 a 10 inclusive:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+package javaeetutorial.guessnumber;
+
+import java.io.Serializable;
+import java.util.Random;
+import javax.enterprise.context.SessionScoped;
+import javax.inject.Named;
+
+@Named
+@SessionScoped
+public class UserNumberBean implements Serializable {
+
+    private static final long serialVersionUID = 5443351151396868724L;
+    Integer randomInt = null;
+    Integer userNumber = null;
+    String response = null;
+    private int maximum = 10;
+    private int minimum = 0;
+
+    public UserNumberBean() {
+        Random randomGR = new Random();
+        randomInt = new Integer(randomGR.nextInt(maximum + 1));
+        // Print number to server log
+        System.out.println("Duke's number: " + randomInt);
+    }
+
+    public void setUserNumber(Integer user_number) {
+        userNumber = user_number;
+    }
+
+    public Integer getUserNumber() {
+        return userNumber;
+    }
+
+    public String getResponse() {
+        if ((userNumber == null) || (userNumber.compareTo(randomInt) != 0)) {
+            return "Sorry, " + userNumber + " is incorrect.";
+        } else {
+            return "Yay! You got it!";
+        }
+    }
+
+    public int getMaximum() {
+        return (this.maximum);
+    }
+
+    public void setMaximum(int maximum) {
+        this.maximum = maximum;
+    }
+
+    public int getMinimum() {
+        return (this.minimum);
+    }
+
+    public void setMinimum(int minimum) {
+        this.minimum = minimum;
+    }
+}
+                </code></pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                Tenga en cuenta el uso de la anotación <code>@Named</code>, que hace que el bean administrado 
+                sea accesible a través del EL. La anotación <code>@SessionScoped</code> registra el alcance 
+                del bean como <code>session</code> para permitirle realizar varias conjeturas mientras ejecuta 
+                la aplicación.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="">
+            <h4 id="creating-facelets-views">Crear Vistas de Facelets</h4>
+            <div class="paragraph">
+              <p>
+                Para crear una página o vista, agregue componentes a las páginas, conecte los componentes a 
+                los valores y propiedades del bean de respaldo y registre convertidores, validadores u oyentes 
+                en los componentes.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Para la aplicación de ejemplo, las páginas web XHTML sirven como interfaz. La primera página 
+                de la aplicación de ejemplo es una página llamada <code>greeting.xhtml</code>. Una mirada más 
+                cercana a varias secciones de esta página web proporciona más información.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                La primera sección de la página web declara el tipo de contenido de la página, que es XHTML:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+                  </code></pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                La siguiente sección especifica el idioma de la página XHTML y luego declara el espacio de 
+                nombres XML para las bibliotecas de etiquetas que se utilizan en la página web:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;html lang="es"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"&gt;
+                  </code></pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                La siguiente sección utiliza varias etiquetas para insertar componentes en la página web:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+    &lt;h:head&gt;
+        &lt;h:outputStylesheet library="css" name="default.css"/&gt;
+        &lt;title&gt;Guess Number Facelets Application&lt;/title&gt;
+    &lt;/h:head&gt;
+    &lt;h:body&gt;
+        &lt;h:form&gt;
+            &lt;h:graphicImage value="#{resource['images:wave.med.gif']}"
+                            alt="Duke waving his hand"/&gt;
+            &lt;h2&gt;
+                Hi, my name is Duke. I am thinking of a number from
+                #{userNumberBean.minimum} to #{userNumberBean.maximum}.
+                Can you guess it?
+            &lt;/h2&gt;
+            &lt;p&gt;&lt;h:inputText id="userNo"
+                            title="Enter a number from 0 to 10:"
+                            value="#{userNumberBean.userNumber}"&gt;
+                   &lt;f:validateLongRange minimum="#{userNumberBean.minimum}"
+                                        maximum="#{userNumberBean.maximum}"/&gt;
+                &lt;/h:inputText&gt;
+                &lt;h:commandButton id="submit" value="Submit"
+                                 action="response"/&gt;
+            &lt;/p&gt;
+            &lt;h:message showSummary="true" showDetail="false"
+                       style="color: #d20005;
+                       font-family: 'New Century Schoolbook', serif;
+                       font-style: oblique;
+                       text-decoration: overline"
+                       id="errors1"
+                       for="userNo"/&gt;
+        &lt;/h:form&gt;
+    &lt;/h:body&gt;
+                  </code></pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>Tenga en cuenta el uso de las siguientes etiquetas:</p>
+            </div>
+            <div class="ulist">
+              <ul>
+                <li>
+                  <p>
+                    Etiquetas HTML de facelets (aquellas que comienzan con <code>h:</code>) para agregar 
+                    componentes
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    La etiqueta principal de Facelets <code>f:validateLongRange</code> para validar la entrada 
+                    del usuario
+                  </p>
+                </li>
+              </ul>
+            </div>
+            <div class="paragraph">
+              <p>
+                Una etiqueta <code>h:inputText</code> acepta la entrada del usuario y establece el valor de la 
+                propiedad del bean administrado <code>userNumber</code> a través de la expresión EL 
+                <code>#{userNumberBean.userNumber}</code>. El valor de entrada es validado para el rango de 
+                valores por la etiqueta de validación estándar de JavaServer Faces 
+                <code>f:validateLongRange</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                El archivo de imagen, <code>wave.med.gif</code>, se agrega a la página como recurso, al igual 
+                que la hoja de estilo. Para obtener más detalles sobre la función de recursos, consulte 
+                <a href="jsf-facelets006.html#GIRGM">Recursos web</a>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Una etiqueta <code>h:commandButton</code> con el ID <code>submit</code> inicia la validación 
+                de los datos de entrada cuando un usuario hace clic en el botón. Mediante la navegación 
+                implícita, la etiqueta redirige al cliente a otra página, <code>response.xhtml</code>, que 
+                muestra la respuesta a su entrada. La página especifica solo <code>response</code>, que de 
+                forma predeterminada hace que el servidor busque <code>response.xhtml</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Ahora puede crear la segunda página, <code>response.xhtml</code>, con el siguiente contenido:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+
+&lt;html lang="es"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"&gt;
+
+    &lt;h:head&gt;
+        &lt;h:outputStylesheet library="css" name="default.css"/&gt;
+        &lt;title&gt;Guess Number Facelets Application&lt;/title&gt;
+    &lt;/h:head&gt;
+    &lt;h:body&gt;
+        &lt;h:form&gt;
+            &lt;h:graphicImage value="#{resource['images:wave.med.gif']}"
+                            alt="Duke waving his hand"/&gt;
+            &lt;h2&gt;
+                &lt;h:outputText id="result" value="#{userNumberBean.response}"/&gt;
+            &lt;/h2&gt;
+            &lt;h:commandButton id="back" value="Back" action="greeting"/&gt;
+        &lt;/h:form&gt;
+    &lt;/h:body&gt;
+&lt;/html&gt;
+                  </code></pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                Esta página también utiliza navegación implícita, estableciendo el atributo 
+                <code>action</code> para el botón Atrás para enviar al usuario a la página 
+                <code>greeting.xhtml</code>.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="">
+          <h3 id="configuring-the-application">Configurar la Aplicación</h3>
+          <div class="paragraph">
+            <p>
+              La configuración de una aplicación JavaServer Faces implica mapear FacesServlet en el archivo 
+              descriptor de implementación web, como un archivo <code>web.xml</code>, y posiblemente agregar 
+              declaraciones de beans gestionados, reglas de navegación y declaraciones de paquetes de recursos 
+              al archivo de recursos de configuración de la aplicación, <code>faces-config.xml</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Si está utilizando el EID NetBeans, se crea automáticamente un archivo descriptor de 
+              implementación web. En un archivo <code>web.xml</code> creado por el EID, cambie la página de 
+              saludo predeterminada, que es <code>index.xhtml</code>, a <code>greeting.xhtml</code>. Aquí hay 
+              un archivo <code>web.xml</code> de ejemplo, que muestra este cambio en negrita.
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+  http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"&gt;
+    &lt;context-param&gt;
+        &lt;param-name&gt;javax.faces.PROJECT_STAGE&lt;/param-name&gt;
+        &lt;param-value&gt;Development&lt;/param-value&gt;
+    &lt;/context-param&gt;
+    &lt;servlet&gt;
+        &lt;servlet-name&gt;Faces Servlet&lt;/servlet-name&gt;
+        &lt;servlet-class&gt;javax.faces.webapp.FacesServlet&lt;/servlet-class&gt;
+        &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
+    &lt;/servlet&gt;
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;Faces Servlet&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;*.xhtml&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+    &lt;session-config&gt;
+        &lt;session-timeout&gt;
+            30
+        &lt;/session-timeout&gt;
+    &lt;/session-config&gt;
+    &lt;welcome-file-list&gt;
+        &lt;welcome-file&gt;greeting.xhtml&lt;/welcome-file&gt;
+    &lt;/welcome-file-list&gt;
+&lt;/web-app&gt;
+                </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Tenga en cuenta el uso del parámetro de contexto <code>PROJECT_STAGE</code>. Este parámetro 
+              identifica el estado de una aplicación JavaServer Faces en el ciclo de vida del software.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La etapa de una aplicación puede afectar el comportamiento de la aplicación. Por ejemplo, si la 
+              etapa del proyecto se define como <code>Development</code>, la información de depuración se 
+              genera automáticamente para el usuario. Si no lo define el usuario, la etapa predeterminada del 
+              proyecto es <code>Production</code>.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="">
+          <h3 id="running-the-guessnumber-jsf-facelets-example">
+            Ejecutar el Ejemplo Facelets guessnumber-jsf
+          </h3>
+          <div class="paragraph">
+            <p>
+              Puede usar el EID NetBeans o Maven para construir, empaquetar, implementar y ejecutar el ejemplo 
+              <code>guessnumber-jsf</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Aquí se tratan los siguientes temas:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  <a href="#GJQZL">
+                    Para Construir, Empaquetar, y Desplegar el  Ejemplo guessnumber-jsf Usando el EID NetBeans
+                  </a>
+                </p>
+              </li>
+              <li>
+                <p>
+                  <a href="#GJQYU">
+                    Para Construir, Empaquetar, y Desplegar el  Ejemplo guessnumber-jsf Usando Maven
+                  </a>
+                </p>
+              </li>
+              <li>
+                <p><a href="#GJQYX">Para Ejecutar el Ejemplo guessnumber-jsf</a></p>
+              </li>
+            </ul>
+          </div>
+          <div class="sect3" id="GJQZL">
+            <h4 id="to-build-package-and-deploy-the-guessnumber-jsf-example-using-netbeans-ide">
+              Para Construir, Empaquetar, y Desplegar el  Ejemplo guessnumber-jsf  Usando el EID NetBeans
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Asegúrese de que el Servidor GlassFish se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Inicio y detención del Servidor GlassFish</a>).
+                  </p>
+                </li>
+                <li>
+                  <p>En el menú Archivo, elija Abrir proyecto.</p>
+                </li>
+                <li>
+                  <p>En el cuadro de diálogo Abrir proyecto, navegue hasta:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/web/jsf
+                        </code></pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Seleccione la carpeta <code>guessnumber-jsf</code>.</p>
+                </li>
+                <li>
+                  <p>Haga clic en Abrir proyecto.</p>
+                </li>
+                <li>
+                  <p>
+                    En la pestaña Proyectos, haga clic con el botón derecho en el proyecto 
+                    <code>guessnumber-jsf</code> y seleccione Compilar.
+                  </p>
+                  <div class="paragraph">
+                    <p>
+                      Esta opción crea la aplicación de ejemplo y la implementa en su instancia del Servidor 
+                      GlassFish.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+          <div class="sect3" id="GJQYU">
+            <h4 id="to-build-package-and-deploy-the-guessnumber-jsf-example-using-maven">
+              Para Construir, Empaquetar, y Desplegar el  Ejemplo guessnumber-jsf  Usando Maven
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>
+                    Asegúrese de que el Servidor GlassFish se haya iniciado (consulte 
+                    <a href="usingexamples002.html#BNADI">Iniciar y detener el Servidor GlassFish</a>).
+                  </p>
+                </li>
+                <li>
+                  <p>En una ventana de terminal, vaya a:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+tut-install/examples/web/jsf/guessnumber-jsf/
+                        </code></pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>Ingrese el siguiente comando:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+mvn install
+                        </code></pre>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      Este comando compila y empaqueta la aplicación en un archivo WAR, 
+                      <code>guessnumber-jsf.war</code>, que se encuentra en el directorio <code>target</code>. 
+                      Luego lo implementa en el servidor.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+          <div class="sect3" id="GJQYX">
+            <h4 id="to-run-the-guessnumber-jsf-example">
+              Para Ejecutar el Ejemplo guessnumber-jsf
+            </h4>
+            <div class="olist arabic">
+              <ol class="arabic">
+                <li>
+                  <p>Abra un navegador web.</p>
+                </li>
+                <li>
+                  <p>Ingrese la siguiente URL en su navegador web:</p>
+                  <div class="listingblock">
+                    <div class="content">
+                      <pre class="prettyprint highlight">
+                        <code class="language-oac_no_warn" data-lang="oac_no_warn">
+http://localhost:8080/guessnumber-jsf
+                        </code></pre>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <p>En el campo, ingrese un número del 0 al 10 y haga clic en Enviar.</p>
+                  <div class="paragraph">
+                    <p>Aparece otra página, informando si su conjetura es correcta o incorrecta.</p>
+                  </div>
+                </li>
+                <li>
+                  <p>Si adivinó incorrectamente, haga clic en Atrás para volver a la página principal.</p>
+                  <div class="paragraph">
+                    <p>
+                      Puede continuar adivinando hasta que obtenga la respuesta correcta, o puede buscar en el 
+                      registro del servidor, donde el constructor <code>UserNumberBean</code> muestra la 
+                      respuesta correcta.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jsf-facelets002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-facelets004.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Crear Consultas Usando el Lenguaje de Consultas de la Persistencia de Java</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="persistence-querylanguage002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="persistence-querylanguage004.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BNBRG">
+      <h2 id="creating-queries-using-the-java-persistence-query-language">
+        Crear Consultas Usando el Lenguaje de Consultas de la Persistencia de Java
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Los métodos <code>EntityManager.createQuery</code> y 
+            <code>EntityManager.createNamedQuery</code> se utilizan para consultar el almacén de 
+            datos mediante consultas del lenguaje de consulta de persistencia de Java.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            El método <code>createQuery</code> se utiliza para crear consultas dinámicas, que son 
+            consultas definidas directamente dentro de la lógica de negocio de una aplicación:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public List findWithName(String name) {
+return em.createQuery(
+    "SELECT c FROM Customer c WHERE c.name LIKE :custName")
+    .setParameter("custName", name)
+    .setMaxResults(10)
+    .getResultList();
+}
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            El método <code>createNamedQuery</code> se utiliza para crear consultas estáticas o 
+            consultas definidas en metadatos mediante la anotación 
+            <code>javax.persistence.NamedQuery</code>. El elemento <code>name</code> de 
+            <code>@NamedQuery</code> especifica el nombre de la consulta que se usará con el método 
+            <code>createNamedQuery</code>. El elemento <code>query</code> de 
+            <code>@NamedQuery</code> es la consulta:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@NamedQuery(
+    name="findAllCustomersWithName",
+    query="SELECT c FROM Customer c WHERE c.name LIKE :custName"
+)
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Aquí hay un ejemplo de <code>createNamedQuery</code>, que usa <code>@NamedQuery</code>:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@PersistenceContext
+public EntityManager em;
+...
+customers = em.createNamedQuery("findAllCustomersWithName")
+    .setParameter("custName", "Smith")
+    .getResultList();
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="sect2" id="BNBRH">
+          <h3 id="named-parameters-in-queries">Parámetros Nombrados en Consultas</h3>
+          <div class="paragraph">
+            <p>
+              Los parámetros con nombre son parámetros de consulta que tienen el prefijo de dos 
+              puntos (<code>:</code>). Los parámetros con nombre en una consulta están vinculados a 
+              un argumento mediante el siguiente método:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+javax.persistence.Query.setParameter(String name, Object value)
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              En el siguiente ejemplo, el argumento <code>name</code> del método de negocio 
+              <code>findWithName</code> está vinculado al parámetro con nombre 
+              <code>:custName</code> en la consulta llamando a <code>Query.setParameter</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public List findWithName(String name) {
+    return em.createQuery(
+        "SELECT c FROM Customer c WHERE c.name LIKE :custName")
+        .setParameter("custName", name)
+        .getResultList();
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los parámetros con nombre distinguen entre mayúsculas y minúsculas y pueden ser 
+              utilizados tanto por consultas dinámicas como estáticas.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BNBRI">
+          <h3 id="positional-parameters-in-queries">Parámetros Posicionales en Consultas</h3>
+          <div class="paragraph">
+            <p>
+              Puede usar parámetros posicionales en lugar de parámetros con nombre en las consultas. 
+              Los parámetros posicionales tienen como prefijo un signo de interrogación 
+              (<code>?</code>) seguido de la posición numérica del parámetro en la consulta. El 
+              método <code>Query.setParameter(posición de número entero, valor del objeto)</code> se 
+              utiliza para establecer los valores de los parámetros.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              En el siguiente ejemplo, el método de negocio <code>findWithName</code> se reescribe 
+              para usar parámetros de entrada:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+public List findWithName(String name) {
+    return em.createQuery(
+        "SELECT c FROM Customer c WHERE c.name LIKE ?1")
+        .setParameter(1, name)
+        .getResultList();
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los parámetros de entrada se numeran a partir de 1. Los parámetros de entrada 
+              distinguen entre mayúsculas y minúsculas y se pueden usar tanto en consultas dinámicas 
+              como estáticas.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="persistence-querylanguage002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="persistence-querylanguage004.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

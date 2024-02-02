@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Descripción General del Bloqueo de Entidades y la Simultaneidad</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="persistence-locking.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="persistence-locking002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GKJHZ">
+      <h2 id="overview-of-entity-locking-and-concurrency">
+        Descripción General del Bloqueo de Entidades y la Simultaneidad
+      </h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Se accede simultáneamente a los datos de la entidad si varias aplicaciones acceden al mismo tiempo 
+            a los datos de un origen de datos. Asegúrese de que se conserve la integridad de los datos 
+            subyacentes cuando se accede a ellos simultáneamente.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Cuando los datos se actualizan en las tablas de la base de datos en una transacción, el proveedor 
+            de persistencia asume que el sistema de administración de la base de datos mantendrá bloqueos de 
+            lectura a corto plazo y bloqueos de escritura a largo plazo para mantener la integridad de los 
+            datos. La mayoría de los proveedores de persistencia retrasarán las escrituras de la base de datos 
+            hasta el final de la transacción, excepto cuando la aplicación solicite explícitamente un vaciado 
+            (es decir, la aplicación llama al método <code>EntityManager.flush</code> o ejecuta consultas con 
+            el modo de vaciado establecido a <code>AUTO</code>).
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            De forma predeterminada, los proveedores de persistencia utilizan el bloqueo optimista, en el que, 
+            antes de realizar cambios en los datos, el proveedor de persistencia comprueba que ninguna otra 
+            transacción haya modificado o eliminado los datos desde que se leyeron. Esto se logra mediante una 
+            columna de versión en la tabla de la base de datos, con un atributo de versión correspondiente en 
+            la clase de entidad. Cuando se modifica una fila, se incrementa el valor de la versión. La 
+            transacción original comprueba el atributo de versión y, si otra transacción ha modificado los 
+            datos, se generará una <code>javax.persistence.OptimisticLockException</code> y se revertirá la 
+            transacción original. Cuando la aplicación especifica modos de bloqueo optimistas, el proveedor de 
+            persistencia verifica que una entidad en particular no haya cambiado desde que se leyó de la base 
+            de datos, incluso si los datos de la entidad no se modificaron.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            El bloqueo pesimista va más allá que el bloqueo optimista. Con el bloqueo pesimista, el proveedor 
+            de persistencia crea una transacción que obtiene un bloqueo a largo plazo de los datos hasta que 
+            se completa la transacción, lo que evita que otras transacciones modifiquen o eliminen los datos 
+            hasta que se complete la transacción.
+          </p>
+        </div>
+        <table class="tableblock frame-all grid-all spread">
+          <colgroup>
+            <col style="width: 100%;">
+          </colgroup>
+          <tbody>
+            <tr>
+              <td class="tableblock halign-left valign-top">
+                <div>
+                  <div class="paragraph">
+                    <p>Nota:</p>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      El uso de bloqueos pesimistas en entidades que no están sujetas a modificaciones 
+                      frecuentes puede provocar una disminución del rendimiento de la aplicación.
+                    </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="sect2" id="GKJJC">
+          <h3 id="using-optimistic-locking">Uso de Bloqueo Optimista</h3>
+          <div class="paragraph">
+            <p>
+              Utilice la anotación <code>javax.persistence.Version</code> para marcar un campo o propiedad 
+              persistente como un atributo de versión de una entidad. El atributo de versión habilita a la 
+              entidad para el control de concurrencia optimista. El proveedor de persistencia lee y actualiza 
+              el atributo de versión cuando se modifica una instancia de entidad durante una transacción. La 
+              aplicación puede leer el atributo de versión, pero no debe modificar el valor.
+            </p>
+          </div>
+          <table class="tableblock frame-all grid-all spread">
+            <colgroup>
+              <col style="width: 100%;">
+            </colgroup>
+            <tbody>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <div>
+                    <div class="paragraph">
+                      <p>Nota:</p>
+                    </div>
+                    <div class="paragraph">
+                      <p>
+                        Aunque algunos proveedores de persistencia pueden admitir el bloqueo optimista para 
+                        entidades que no tienen atributos de versión, las aplicaciones portátiles siempre 
+                        deben usar entidades con atributos de versión al usar el bloqueo optimista. Si la 
+                        aplicación intenta bloquear una entidad que no tiene un atributo de versión y el 
+                        proveedor de persistencia no admite el bloqueo optimista para entidades sin versión, 
+                        se lanzará una <code>PersistenceException</code>.
+                      </p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="paragraph">
+            <p>
+              La anotación <code>@Version</code> tiene los siguientes requisitos.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  Solo se puede definir un único atributo <code>@Version</code> por entidad.
+                </p>
+              </li>
+              <li>
+                <p>
+                  El atributo <code>@Version</code> debe estar en la tabla principal para una entidad asignada a varias tablas.
+                </p>
+              </li>
+              <li>
+                <p>
+                  El tipo del atributo <code>@Version</code> debe ser uno de los siguientes: <code>int</code>, <code>Integer</code>, <code>long</code>, <code >Long</code>, <code>short</code>, <code>Short</code> o <code>java.sql.Timestamp</code>.
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              El siguiente fragmento de código muestra cómo definir un atributo de versión en una entidad con campos persistentes:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Version
+protected int version;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El siguiente fragmento de código muestra cómo definir un atributo de versión en una entidad con propiedades persistentes:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Version
+protected Short getVersion() { ... }
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="persistence-locking.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="persistence-locking002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Utilizando StAX (Los Tutoriales de Java&trade; &gt; IPA de Java para Procesado de XML (JAXP) &gt; 
+            IPA de Transmisión para XML)
+        </title>
+        <meta name="description" content="Este tutorial de Java JAXP describe la IPA de Java para el procesado de XML (jaxp), XSLT, 
+              SAX, y tópicos de XML relacionados" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jaxp, xml, xslt, sax" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">IPA de Transmisión para XML</a></div>
+                <div class="linkAHEAD"><a href="why.html">¿Porqué StAX?</a></div>
+                <div class="linkAHEAD"><a href="api.html">IPA de StAX</a></div>
+                <div class="nolinkAHEAD">Utilizando StAX</div>
+                <div class="linkAHEAD"><a href="parser.html">Implementación del Analizador de Flujos XML de Oracle</a></div>
+                <div class="linkAHEAD"><a href="example.html">Código de Ejemplo</a></div>
+                <div class="linkAHEAD"><a href="info.html">Información Adicional</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> IPA de Java para Procesado de XML (JAXP)<br />
+                <b>Lección:</b> IPA de Transmisión para XML
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">IPA de Java para Procesado de XML (JAXP)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">IPA de Transmisión para XML</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="api.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="parser.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Utilizando StAX</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    <a id="indexterm-22"></a>
+                </p>
+                <p>
+                    En general, los programadores de StAX crean lectores, escritores y eventos de flujo XML usando las clases 
+                    <code>XMLInputFactory</code>, <code>XMLOutputFactory</code>, and <code>XMLEventFactory</code>. La configuración 
+                    se realiza estableciendo propiedades en las factorías, por lo que la configuración específica de la 
+                    implementación se puede pasar a la implementación subyacente utilizando el método <code>setProperty</code> en 
+                    las factorías. Del mismo modo, las configuraciones específicas de la implementación se pueden consultar usando 
+                    el método <code>getProperty</code> de la factoría.
+                </p>
+                <p>
+                    Las clases <code>XMLInputFactory</code>, <code>XMLOutputFactory</code>, y <code>XMLEventFactory</code> se 
+                    describen debajo, seguido de descripciones sobre la asignación de recursos, el espacio de nombres y la gestión 
+                    de atributos, el manejo de errores y luego finalmente leer y escribir flujos usando las IPAs de cursor e 
+                    iterador.
+                </p>
+                <p>
+                    <a id="bnben"></a>
+                </p>
+                <h2>
+                    Clases Factoría de StAX
+                </h2>
+                <p>
+                    <a id="indexterm-23"></a><a id="indexterm-24"></a>
+                </p>
+                <p>
+                    Las clases de factoría de StAX. <code>XMLInputFactory</code>, <code>XMLOutputFactory</code> y
+                    <code>XMLEventFactory</code>, le permiten definir y configurar instancias de implementación de lector y 
+                    escritor de flujo XML, y clases de eventos.
+                </p>
+                <p>
+                    <a id="bnbeo"></a>
+                </p>
+                <h3>
+                    XMLInputFactory
+                </h3>
+                <p>
+                    <a id="indexterm-25"></a><a id="indexterm-26"></a>
+                </p>
+                <p>
+                    La clase <code>XMLInputFactory</code> le permite configurar instancias de implementación de procesadores de 
+                    lectura de flujo XML creados por la factoría. Las nuevas instancias de la clase abstracta 
+                    <code>XMLInputFactory</code> se crean llamando al método <code>newInstance</code> de la clase. A continuación 
+                    se usa el método estático <code>XMLInputFactory.newInstance</code> para crear una nueva instacia de factoría.
+                </p>
+                <p>
+                    Derivado de JAXP, el método <code>XMLInputFactory.newInstance</code> determina la clase de implementación 
+                    <code>XMLInputFactory</code> específica a cargar usando el siguiente procedimiento de búsqueda:
+                </p>
+                <ol>
+                    <li>
+                        <p>
+                            Usa la propiedad del sistema <code>javax.xml.stream.XMLInputFactory</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Use el fichero <code>lib/xml.stream.properties</code> en el directorio del Entorno de Ejecución Java 
+                            (EEJ) de la Plataforma de Java SE.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Usa la IPA de Servicios, si está disponible, para determinar el nombre de la clase buscando en los 
+                            ficheros <code>META-INF/services/javax.xml.stream.XMLInputFactory</code> en los ficheros JAR 
+                            disponibles al EEJ.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Usa la insntancia predeterminada <code>XMLInputFactory</code> de la plataforma.
+                        </p>
+                    </li>
+                </ol>
+                <p>
+                    Después de obtener una referencia a una <code>XMLInputFactory</code> apropiada, una aplicación puede usar la 
+                    factoría para configurar y crear instancias de flujo. La tabla siguiente lista las propiedades admitidas por 
+                    <code>XMLInputFactory</code>. Vea la especificación StAX para un listado más detallado.
+                </p>
+                <p>
+                    <a id="bnbep"></a>
+                </p>
+                <table class="celda">
+                    <caption>
+                        Propiedades <code>javax.xml.stream.XMLInputFactory</code>
+                    </caption>
+                    <col style="width:35%" />
+                    <col style="width:64%" />
+                    <tr>
+                        <th id="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Propiedad 
+                            </p>
+                        </th>
+                        <th id="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Descripción
+                            </p>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p><code>isValidating</code></p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Activa la validación específica de la implementación
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>isCoalescing</code>
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <b>(Requerida)</b> Requiere que el procesador combine datos de caracteres adyacentes.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>isNamespaceAware</code>
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                Desactiva el soporte de espacios de nombre. Todas las implementaciones deben admitir espacios de 
+                                nombre. La compatibilidad para documentos que no son compatibles con espacios de nombres es 
+                                opcional.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>isReplacingEntityReferences</code>
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <b>(Requerida)</b> Requiere que el procesador reemplaze las referencias de identidad intenas con 
+                                sus valores de reemplazo y las informe como caracteres o el conjunto de eventos que describe la 
+                                entidad.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>isSupportingExternalEntities</code>
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <b>(Requerida)</b> Requiere que el procesador resuelva entidades analizadas externas.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>reporter</code>
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <b>(Requerida)</b> Establece y obtiene la implementación de la interfaz <code>XMLReporter</code>.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>resolver</code>
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <b>(Requerida)</b> Establece y obtiene la implementación de la interfaz <code>XMLResolver</code>.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td headers="h1" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <code>allocator</code>
+                            </p>
+                        </td>
+                        <td headers="h2" class="celda" style="text-align:left;vertical-align:top">
+                            <p>
+                                <b>(Requerida)</b> Establece y obtiene la implementación 
+                                de la interfaz <code>XMLEventAllocator</code>.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    <a id="bnbeq"></a>
+                </p>
+                <h3>
+                    XMLOutputFactory
+                </h3>
+                <p>
+                    <a id="indexterm-27"></a><a id="indexterm-28"></a>
+                </p>
+                <p>
+                    Se crean las nuevas instancias de la clase abstracta <code>XMLOutputFactory</code> llamando al método 
+                    <code>newInstance</code> de la clase. Luego se usa el método estático <code>XMLOutputFactory.newInstance</code> 
+                    para crar una nueva instancia de factoría. El algoritmo usado para obtener la instancia es el mismo que para 
+                    <code>XMLInputFactory</code> pero referencia la propiedad del sistema 
+                    <code>javax.xml.stream.XMLOutputFactory</code>.
+                </p>
+                <p>
+                    <code>XMLOutputFactory</code> admite sólo una propiedad, <code>javax.xml.stream.isRepairingNamespaces</code>. 
+                    Esta propiedad es obligatoria, y su propósito es crear prefijos predeterminados y asociarlos con las URIs de 
+                    Nombres de Espacio. Vea la especificacón StAX para obtener más información.
+                </p>
+                <p>
+                    <a id="bnber"></a>
+                </p>
+                <h3>
+                    XMLEventFactory
+                </h3>
+                <p>
+                    <a id="indexterm-29"></a><a id="indexterm-30"></a>
+                </p>
+                <p>
+                    Se crean las nuevas instancias de la clase abstracta <code>XMLEventFactory</code> llamando al método 
+                    <code>newInstance</code> de la clase. Se usa el método estático <code>XMLEventFactory.newInstance</code> 
+                    después para crear una nueva instancia de la factoría. Esta factoría hace referencia a la propiedad 
+                    <code>javax.xml.stream.XMLEventFactory</code> para instanciar la factoría. El algoritmo usado para obtener la 
+                    instancia es la misma que para <code>XMLInputFactory</code> y <code>XMLOutputFactory</code> pero hace 
+                    referencia a la propiedad del sistema <code>javax.xml.stream.XMLEventFactory</code>.
+                </p>
+                <p>
+                    No hay propiedades predeterminadas para <code>XMLEventFactory</code>.
+                </p>
+                <p>
+                    <a id="bnbes"></a>
+                </p>
+                <h2>
+                    Recursos, Espacios de nombres, y Errores
+                </h2>
+                <p>
+                    <a id="indexterm-31"></a>
+                </p>
+                <p>
+                    La especificacón StAX maneja la resolución de recursos, atributos y espacios de nombre, y los errores y 
+                    excepciones como se describe debajo.
+                </p>
+                <p>
+                    <a id="bnbet"></a>
+                </p>
+                <h3>
+                    Resolución de Recursos
+                </h3>
+                <p>
+                    La interfaz <code>XMLResolver</code> proporciona un medio para establecer el método que resuelve los recursos 
+                    durante el procesamiento de XML. Una aplicación establece la interfaz <code>XMLInputFactory</code>, que después 
+                    establece la interfaz en todos los procesadores creados por esa instancia de factoría.
+                </p>
+                <p>
+                    <a id="bnbeu"></a>
+                </p>
+                <h3>
+                    Atributos y Espacios de Nombres
+                </h3>
+                <p>
+                    Se informan los atributos por un procesador StAX usando métodos de búsqueda y cadenas en la interfaz de cursor, 
+                    y eventos <code>Attribute</code> y <code>Namespace</code> en la interfaz de iterador. Tenga en cuenta que los 
+                    espacios de nombres son tratados como atributos, aunque los espacios de nombres se informan separadamente de 
+                    los atributos en las IPAs de cursor e iterador. Tenga en cuenta también que el procesado de espacios de nombre 
+                    es opcional para los procesadores StAX. Vea la especificación StAX para obtener una información completa 
+                    sobre el enlazado de espacios de nombre y el procesado opcional de espacios de nombre.
+                </p>
+                <p>
+                    <a id="bnbev"></a>
+                </p>
+                <h3>
+                    Informe de Errores y Manejo de Excepciones
+                </h3>
+                <p>
+                    Todos los errores fatales se informan mediante la interfaz <code>javax.xml.stream.XMLStreamException</code>. 
+                    Todos los errores no fatales y advertencias se informan usando la interfaz 
+                    <code>javax.xml.stream.XMLReporter</code>.
+                </p>
+                <p>
+                    <a id="bnbew"></a>
+                </p>
+                <h2>
+                    Leer Flujos XML
+                </h2>
+                <p>
+                    <a id="indexterm-32"></a><a id="indexterm-33"></a>
+                </p>
+                <p>
+                    Como se describió anteriormente en esta lección, la forma en la que lee flujos XML con un procesador StAX 
+                    &mdash; y lo que es más importante, lo que obtiene de vuelta &mdash; varía significativamente dependiendo de 
+                    si está utilizando la IPA de cursor o la IPA de iterador de eventos de StAX. Las dos secciones siguientes 
+                    describen cómo leer flujos XML con cada una de estas IPAs.
+                </p>
+                <p>
+                    <a id="bnbex"></a>
+                </p>
+                <h3>
+                    Usar XMLStreamReader
+                </h3>
+                <p>
+                    <a id="indexterm-34"></a><a id="indexterm-35"></a>
+                </p>
+                <p>
+                    La interfaz <code>XMLStreamReader</code> en la IPA de cursor de StAX le permite leer flujos XML o documentos 
+                    en una dirección de avance solamente, un elemento en el conjunto de información a la vez. Los métodos siguientes 
+                    están disponibles para extraer datos del flujo u omitir eventos no deseados:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Obtener el valor de un atributo
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Leer contenido XML
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Determinar si un elemento tiene contenido o está vacío
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Obtener acceso indexado a una colección de atributos
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Obtener acceso indexado a una colección de espacios de nombres
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Obtener el nombre del evento actual (si es aplicable)
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Obtener el contenido del evento actual (si es aplicable)
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Las instancias de <code>XMLStreamReader</code> tienen en cualquier momento un único evento actual en el que 
+                    operan sus métodos. Cuando crae una instancia de <code>XMLStreamReader</code> sobre un flujo, el evento inicial 
+                    actual es el estado <code>START_DOCUMENT</code>. El método <code>XMLStreamReader.next</code> puede luego ser 
+                    usado para pasar al siguiente evento en el flujo.
+                </p>
+                <p>
+                    <a id="bnbey"></a>
+                </p>
+                <h3>
+                    Leer Propiedades, Atributos, y Nombres de Espacios
+                </h3>
+                <p>
+                    El método <code>XMLStreamReader.next</code> carga las propiedades del siguiente evento en el flujo. Puede 
+                    después acceder a esas propiedades llamando a los métodos <code>XMLStreamReader.getLocalName</code> y 
+                    <code>XMLStreamReader.getText</code>.
+                </p>
+                <p>
+                    Cuando el cursor de <code>XMLStreamReader</code> está sobre un evento <code>StartElement</code>, lee el nombre 
+                    y cualquier atributo del evento, incluyendo el espacio de nombres. Se puede acceder a todos los atributos de un 
+                    evento usando un valor de índice, y también se puede buscar por URI del espacio de nombres y el nombre local. 
+                    Tenga en cuenta, sin embargo, que sólo los espacios de nombres declarados en el <code>StartEvent</code> actual 
+                    están disponibles; los espacios de nombres declarados anteriormente no se mantienen, y los espacios de nombres 
+                    redeclarados no son eliminados.
+                </p>
+                <p>
+                    <a id="bnbez"></a>
+                </p>
+                <h3>
+                    Métodos XMLStreamReader
+                </h3>
+                <p>
+                    <code>XMLStreamReader</code> proporciona los métodos siguientes para recuperar información sobre espacios de 
+                    nombres y atributos:
+                </p>
+                <div class="codeblock">
+                    <pre>
+int getAttributeCount();
+String getAttributeNamespace(int index);
+String getAttributeLocalName(int index);
+String getAttributePrefix(int index);
+String getAttributeType(int index);
+String getAttributeValue(int index);
+String getAttributeValue(String namespaceUri, String localName);
+boolean isAttributeSpecified(int index);
+                    </pre>
+                </div>
+                <p>
+                    Se puede acceder también a los espacios de nombres usando tres métodos adicionales:
+                </p>
+                <div class="codeblock">
+                    <pre>
+int getNamespaceCount();
+String getNamespacePrefix(int index);
+String getNamespaceURI(int index);
+                    </pre>
+                </div>
+                <p>
+                    <a id="bnbfa"></a>
+                </p>
+                <h3>
+                    Instanciar un XMLStreamReader
+                </h3>
+                <p>
+                    Este ejemplo, tomado de la especificación StAX, muestra cómo instanciar una factoría de entrada, crear un 
+                    lector, y recorrer los elementos de un flujo XML:
+                </p>
+                <div class="codeblock">
+                    <pre>
+XMLInputFactory f = XMLInputFactory.newInstance();
+XMLStreamReader r = f.createXMLStreamReader( ... );
+while(r.hasNext()) {
+    r.next();
+}
+                    </pre>
+                </div>
+                <p>
+                    <a id="bnbfb"></a>
+                </p>
+                <h3>
+                    Usar XMLEventReader
+                </h3>
+                <p>
+                    <a id="indexterm-36"></a><a id="indexterm-37"></a>
+                </p>
+                <p>
+                    La IPA de <code>XMLEventReader</code> en la IPA de iterador de eventos de StAX proporciona la forma de asignar 
+                    eventos en un flujo XML a objetos de eventos asignados que se pueden reutilizar libremente, y la propia IPA se 
+                    puede extender para manejar eventos personalizados.
+                </p>
+                <p>
+                    <code>XMLEventReader</code> proporciona cuatro métodos para analizar iterativamente flujos XML:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>next</code>: Devuelve el siguiente evento en el flujo
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>nextEvent</code>: Devuelve el siguiente XMLEvent escrito
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>hasNext</code>: Devuelve verdadero si hay más eventos por procesar en el flujo
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>peek</code>: Devuelve el evento pero no itera al evento siguiente
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Por ejemplo, el siguiente trozo de código ilustra las declaraciones de método de <code>XMLEventReader</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+package javax.xml.stream;
+import java.util.Iterator;
+
+public interface XMLEventReader extends Iterator {
+    public Object next();
+    public XMLEvent nextEvent() throws XMLStreamException;
+    public boolean hasNext();
+    public XMLEvent peek() throws XMLStreamException;
+    // ...
+}
+                    </pre>
+                </div>
+                <p>
+                    Para leer todos los eventos de un flujo y después imprimirlos, podría usar lo siguiente:
+                </p>
+                <div class="codeblock">
+                    <pre>
+while(stream.hasNext()) {
+    XMLEvent event = stream.nextEvent();
+    System.out.print(event);
+}
+                    </pre>
+                </div>
+                <p>
+                    <a id="bnbfc"></a>
+                </p>
+                <h3>
+                    Leer Atributos
+                </h3>
+                <p>
+                    Puede acceder a los atributos desde su <code>javax.xml.stream.StartElement</code> asociado, como sigue:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public interface StartElement extends XMLEvent {
+    public Attribute getAttributeByName(QName name);
+    public Iterator getAttributes();
+}
+                    </pre>
+                </div>
+                <p>
+                    Puede usar el método <code>getAttributes</code> de la interfaz <code>StartElement</code> para usar un  
+                    <code>Iterator</code> sobre todos los atributos declarados en ese <code>StartElement</code>.
+                </p>
+                <p>
+                    <a id="bnbfd"></a>
+                </p>
+                <h3>
+                    Leer Espacios de Nombres
+                </h3>
+                <p>
+                    De forma similar a leer atributos, los espacios de nombres se leen usando un <code>Iterator</code> creado al 
+                    llamar al método <code>getNamespaces</code> en la interfaz <code>StartElement</code>. Sólo se devuelve el 
+                    espacio de nombre para el <code>StartElement</code> actual, y un aplicación puede obtener el contexto del 
+                    espacio de nombres actual usando <code>StartElement.getNamespaceContext</code>.
+                </p>
+                <p>
+                    <a id="bnbfe"></a>
+                </p>
+                <h2>
+                    Escribir Flujos XML
+                </h2>
+                <p>
+                    <a id="indexterm-38"></a><a id="indexterm-39"></a>
+                </p>
+                <p>
+                    StAX es una IPA bidireccional, y tanto las IPAs de cursor como la de iterador de eventos tienen sus propios 
+                    conjuntos de interfaces para escribir flujos XML. Como con las interfaces para leer flujos, hay diferencias 
+                    significativas entre los escritores de las IPAs de cursor e iterador de eventos. Las secciones siguientes 
+                    describen cómo escribir flujos XML usando cada una de estas IPAs.
+                </p>
+                <p>
+                    <a id="bnbff"></a>
+                </p>
+                <h3>
+                    Usar XMLStreamWriter
+                </h3>
+                <p>
+                    <a id="indexterm-40"></a><a id="indexterm-41"></a>
+                </p>
+                <p>
+                    La interfaz <code>XMLStreamWriter</code> en la IPA de cursor de StAX permite a las aplicaciones escribir de 
+                    vuelta a un flujo XML o crear flujos completamente nuevos. XMLStreamWriter tiene métodos que le permiten:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Escribir XML bien formado
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Vaciar o cerrar la salida
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Escribir nombres cualificados
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Tenga en cuenta que no se requiere que las implementaciones de <code>XMLStreamWriter</code> realizen 
+                    comprobaciones de validez o de forma correcta en la entrada. Mientras algunas implementaciones pueden realizar 
+                    una comprobación de errores estricta, otras puede que no. Las reglas que implmente se aplican a las propiedades 
+                    definidas en la clase <code>XMLOutputFactory</code>.
+                </p>
+                <p>
+                    El método <code>writeCharacters</code> se usa para escapar caracteres tales como <code>&amp;</code>, 
+                    <code>&lt;</code>, <code>&gt;</code>, y <code>&quot;</code>. Los prefijos de enlace se pueden manejar pasando 
+                    el valor real del prefijo, usando el método <code>setPrefix</code>, o estableciendo la propiedad para las 
+                    declaraciones de nombres de espacio predeterminados. 
+                </p>
+                <p>
+                    El ejemplo siguiente, tomado de la especificación StAX, muestra cómo instanciar una factoría de salida, crear 
+                    un escritor, y escribir XML de salida:
+                </p>
+                <div class="codeblock">
+                    <pre>
+XMLOutputFactory output = XMLOutputFactory.newInstance();
+XMLStreamWriter writer = output.createXMLStreamWriter( ... );
+
+writer.writeStartDocument();
+writer.setPrefix("c","http://c");
+writer.setDefaultNamespace("http://c");
+
+writer.writeStartElement("http://c","a");
+writer.writeAttribute("b","blah");
+writer.writeNamespace("c","http://c");
+writer.writeDefaultNamespace("http://c");
+
+writer.setPrefix("d","http://c");
+writer.writeEmptyElement("http://c","d");
+writer.writeAttribute("http://c", "chris","fry");
+writer.writeNamespace("d","http://c");
+writer.writeCharacters("Jean Arp");
+writer.writeEndElement();
+
+writer.flush();
+                    </pre>
+                </div>
+                <p>
+                    Este código genera el XML siguiente (las nuevas línes no son normativas):
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;?xml version=&rsquo;1.0&rsquo; encoding=&rsquo;utf-8&rsquo;?>
+&lt;a b="blah" xmlns:c="http://c" xmlns="http://c">
+&lt;d:d d:chris="fry" xmlns:d="http://c"/>Jean Arp&lt;/a>
+                    </pre>
+                </div>
+                <p>
+                    <a id="bnbfg"></a>
+                </p>
+                <h3>
+                    Usar XMLEventWriter
+                </h3>
+                <p>
+                    <a id="indexterm-42"></a><a id="indexterm-43"></a>
+                </p>
+                <p>
+                    La interfaz <code>XMLEventWriter</code> en la IPA de iterador de eventos de StAX permite a las aplicaciones 
+                    escribir de vuelta a un flujo XML o crearflujos completamente nuevos. Esta IPA puede ser extendida, pero la IPA 
+                    principal es como sigue:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public interface XMLEventWriter {
+    public void flush() throws XMLStreamException;
+    public void close() throws XMLStreamException;
+    public void add(XMLEvent e) throws XMLStreamException;
+    // ... no se muestran otros metodos.
+}
+                    </pre>
+                </div>
+                <p>
+                    Las instancias de <code>XMLEventWriter</code> se crean por una instancia de <code>XMLOutputFactory</code>. Los 
+                    eventos de flujo se agregan iterativamente, y un evento no puede ser modificado después de que ha sido agregado 
+                    a una instancia de escritor de eventos.
+                </p>
+                <p>
+                    <a id="bnbfh"></a>
+                </p>
+                <h3>
+                    Atributos, Caracteres de Escape, Prefijos de Enlace
+                </h3>
+                <p>
+                    Se requiere que las implementaciones de StAX almacenen el último <code>StartElement</code> hasta que un evento 
+                    distinto de <code>Attribute</code> o <code>Namespace</code> se agregue o se encuentre en el flujo. Esto 
+                    significa que cuando agrega un <code>Attribute</code> o un <code>Namespace</code> a un flujo, se agrega al 
+                    evento <code>StartElement</code> actual.
+                </p>
+                <p>
+                    Puede usar el método <code>Characters</code> para escapar caracteres como <code>&amp;</code>, 
+                    <code>&lt;</code>, <code>&gt;</code>, y <code>&quot;</code>.
+                </p>
+                <p>
+                    El método <code>setPrefix(...)</code> puede usarse para enlazar explícitamente un prefijo para usarlo durante 
+                    la salida, y el método <code>getPrefix(...)</code> se puede usar para obtener el prefijo actual. Tenga en 
+                    cuenta que de forma predeterminada, <code>XMLEventWriter</code> agrega enlaces de espacios de nombres a su mapa 
+                    interno de espacios de nombres. Los prefijos quedan fuera de alcance después del <code>EndElement</code>
+                    correspondiente para el evento al que están vinculados.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="api.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="parser.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> IPA de StAX<br />
+            <b>Página siguiente:</b> Implementación del Analizador de Flujos XML de Oracle
+        </div>
+    </body>
+</html> 

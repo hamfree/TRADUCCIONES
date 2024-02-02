@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Analizar un archivo XML Mediante SAX (Los Tutoriales de Java&trade; &gt; IPA de Java para Procesado de XML (JAXP) &gt; 
+            IPA Simple para las IPAs de XML)
+        </title>
+        <meta name="description" content="Este tutorial de Java JAXP describe la IPA de Java para el procesado de XML (jaxp), XSLT, 
+              SAX, y tópicos de XML relacionados" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jaxp, xml, xslt, sax" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">IPA Simple para XML</a></div>
+                <div class="linkAHEAD"><a href="when.html">Cuando usar SAX</a></div>
+                <div class="nolinkAHEAD">Analizar un archivo XML Mediante SAX</div>
+                <div class="linkAHEAD"><a href="validation.html">Implementando la Validación en SAX</a></div>
+                <div class="linkAHEAD"><a href="events.html">Manejando Eventos Léxicos</a></div>
+                <div class="linkAHEAD"><a href="using.html">Utilizando <code>DTDHandler</code> y <code>EntityResolver</code></a></div>
+                <div class="linkAHEAD"><a href="info.html">Información Adicional</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> IPA de Java para Procesado de XML (JAXP)<br />
+                <b>Lección:</b> IPA Simple para XML
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">IPA de Java para Procesado de XML (JAXP)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">IPA Simple para XML</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="when.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="validation.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Analizar un archivo XML Mediante SAX</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    En las aplicaciones de la vida real, querrá usar el analizador de SAX para procesar datos XML y hacer algo útil 
+                    con ellos. Esta sección examina un ejemplo de programa JAXP, <code>SAXLocalNameCount</code>, que cuenta el 
+                    número de elementos usando sólo el componente <code>localName</code> del elemento, en un documento XML. Los 
+                    nombres del espacio de nombre se ignoran por simplicidad. Este ejemplo también muestra como usar un 
+                    <code>ErrorHandler</code> de SAX.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota</b> &mdash; Después de que ha descargado e instalado los fuentes de la IPA De JAXP del 
+                    <a class="OutsideLink" target="_blank" 
+                       href="http://jaxp.java.net/downloads.html">área de descarga de JAXP</a>, el programa de ejemplo para este 
+                    ejemplo se encuentra en el directorio 
+                    <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples/sax</code>. Los ficheros XML 
+                    con los que see interactúa se encuentran en 
+                    <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples/data</code>.
+                </p>
+                <hr />
+                <p>
+                    <a id="gcljn"></a>
+                </p>
+                <h2>
+                    Crear el Esqueleto
+                </h2>
+                <p>
+                    El programa <code>SAXLocalNameCount</code> se crea en un fichero llamado <code>SAXLocalNameCount.java</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+public class SAXLocalNameCount {
+    static public void main(String[] args) {
+        // ...
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Ya que lo ejecutará de forma independiente, necesita un método <code>main()</code>. Y necesita argumentos de 
+                    línea de comandos de forma que pueda indicarle a la aplicación qué fichero procesar.
+                </p>
+                <p>
+                    <a id="gcljh"></a>
+                </p>
+                <h2>
+                    Importar Clases
+                </h2>
+                <p>
+                    Las sentencias de importación para las clases que la aplicación usará son las siguientes.
+                </p>
+                <div class="codeblock">
+                    <pre>
+package sax;
+import javax.xml.parsers.*;
+import org.xml.sax.*;
+import org.xml.sax.helpers.*;
+
+import java.util.*;
+import java.io.*;
+
+public class SAXLocalNameCount {
+    // ...
+}
+                    </pre>
+                </div>
+                <p>
+                    El paquete <code>javax.xml.parsers</code> contiene la clase <code>SAXParserFactory</code> que crea la instancia 
+                    del analizador utilizada. Lanza una <code>ParserConfigurationException</code> si no puede producir un 
+                    analizador que coincida con las opciones de configuración especificadas. (Más tarde, verá más sobre las opciones 
+                    de configuración). El paquete <code>javax.xml.parsers</code> también contiene la clase <code>SAXParser</code>, 
+                    el cual es el que la factoría devuelve para analizar. El paquete <code>org.xml.sax</code> define todas las 
+                    interfaces usadas por el analizador de SAX. El paquete <code>org.xml.sax.helpers</code> contiene 
+                    <code>DefaultHandler</code>, el cual define la clase que gestionará los eventos SAX que el analizador genera. 
+                    Las clases en <code>java.util</code> y <code>java.io</code>, se necesitan para proporicionar las tablas hash 
+                    y la salida.
+                </p>
+                <p>
+                    <a id="gcnsk"></a>
+                </p>
+                <h2>
+                    Configurando E/S
+                </h2>
+                <p>
+                    La primera orden del día es procesar los argumentos de la línea de comandos, que en esta etapa sólo sirven para 
+                    obtener el nombre del archivo a procesar. El siguiente código en el método <code>main</code> le indica a la 
+                    aplicación qué fichero quiere que <code>SAXLocalNameCountMethod</code> procese.
+                </p>
+                <div class="codeblock">
+                    <pre>
+static public void main(String[] args) throws Exception {
+    String filename = null;
+
+    for (int i = 0; i &lt; args.length; i++) {
+        filename = args[i];
+        if (i != args.length - 1) {
+            usage();
+        }
+    }
+
+    if (filename == null) {
+        usage();
+    } 
+}
+                    </pre>
+                </div>
+                <p>
+                    Este código establece que el método main lanze una <code>Exception</code> cuando encuentre problemas, y define 
+                    las opciones de línea de comandos que se requieren para indicar a la aplicación el nombre del fichero XML a 
+                    ser procesado. Otros argumentos de línea de comandos en esta parte del código serán examinados más tarde en 
+                    esta lección, cuando empezemos a ver la validación.
+                </p>
+                <p>
+                    La cadena <code>filename</code> que da cuando ejecuta la aplicación será convertida en una URL 
+                    <code>java.io.File</code> por un método interno, <code>convertToFileURL()</code>. Esto se hace por el código 
+                    siguiente en <code>SAXLocalNameCountMethod</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+public class SAXLocalNameCount {
+    private static String convertToFileURL(String filename) {
+        String path = new File(filename).getAbsolutePath();
+        if (File.separatorChar != '/') {
+            path = path.replace(File.separatorChar, '/');
+        }
+
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+        return "file:" + path;
+    }
+
+    // ...
+}
+                    </pre>
+                </div>
+                <p>
+                    Si se especifican argumentos incorrectos de línea de comandos cuando el programa se ejecuta, entonces se invoca 
+                    el método <code>usage()</code> de la aplicación <code>SAXLocalNameCount</code>, para imprimir las opciones 
+                    correctas en pantalla.
+                </p>
+                <div class="codeblock">
+                    <pre>
+private static void usage() {
+    System.err.println("Usage: SAXLocalNameCount &lt;file.xml>");
+    System.err.println("       -usage or -help = this message");
+    System.exit(1);
+}
+                    </pre>
+                </div>
+                <p>
+                    Más adelante en esta lección, se examinarán más opciones de <code>usage()</code>, cuando se aborde la 
+                    validación.
+                </p>
+                <p>
+                    <a id="gclmw"></a>
+                </p>
+                <h2>
+                    Implementar la Interfaz <code>ContentHandler</code>
+                </h2>
+                <p>
+                    La interfaz más importante en <code>SAXLocalNameCount</code> es <code>ContentHandler</code>. Esta interfaz 
+                    requiere un número de métodos que el analizador de SAX invoca en respuesta a varios eventos de análisis. Los 
+                    principales métodos de manejo de eventos son: <code>startDocument</code>, <code>endDocument</code>, 
+                    <code>startElement</code>, y <code>endElement</code>.
+                </p>
+                <p>
+                    La forma más fácil de implementar esta interfaz es extender la clase <code>DefaultHandler</code>, definida en 
+                    el paquete <code>org.xml.sax.helpers</code>. Esa clase proporciona métodos que no hacen nada para todos los 
+                    eventos de <code>ContentHandler</code>. El programa de ejemplo extiende esa clase.
+                </p>
+                <div class="codeblock">
+                    <pre>
+public class SAXLocalNameCount <b>extends DefaultHandler</b> {
+    // ...
+} 
+                    </pre>
+                </div>
+                <hr />
+                <p>
+                    <b>Nota</b> &mdash; <code>DefaultHandler</code> también define métodos que no hacen nada para los otros 
+                    eventos principales, definidos en las interfaces <code>DTDHandler</code>, <code>EntityResolver</code>, y 
+                    <code>ErrorHandler</code>. Aprenderá más sobre esos métodos más tarde en esta lección.
+                </p>
+                <hr />
+                <p>
+                    La interfaz requiere cada uno de estos métodos para lanzar una <code>SAXException</code>. Una excepción 
+                    lanzada aquí se envía de vuelta al analizador, que la envía al código que invocó al analizador.
+                </p>
+                <p>
+                    <a id="gclnc"></a>
+                </p>
+                <h2>
+                    Gestionar Eventos de Contenido
+                </h2>
+                <p>
+                    Esta sección muestra el código que procesa los eventos de <code>ContentHandler</code>.
+                </p>
+                <p>
+                    Cuando se encuentra una etiqueta de inicio o una etiqueta de final, el nombre de la etiqueta se pasa como una 
+                    cadena al método <code>startElement</code> o al método <code>endElement</code>, según corresponda. Cuando se 
+                    encuentra una etiqueta de inicio, cualquier atributo que defina también se pasa en una lista de 
+                    <code>Attributes</code>. Los caracteres encontrados dentro del elemento son pasados como una matriz de 
+                    caracteres, junto con el número de caracteres (longitud) y un desplazamiento en la matriz que apunta al 
+                    primer carácter.
+                </p>
+                <p>
+                    <a id="gclmb"></a>
+                </p>
+                <h3>
+                    Eventos del Documento
+                </h3>
+                <p>
+                    El siguiente código gestiona los eventos de inicio-de-documento y final-de-documento:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public class SAXLocalNameCount extends DefaultHandler {
+    
+    private Hashtable tags;
+
+    public void startDocument() throws SAXException {
+        tags = new Hashtable();
+    }
+
+    public void endDocument() throws SAXException {
+        Enumeration e = tags.keys();
+        while (e.hasMoreElements()) {
+            String tag = (String)e.nextElement();
+            int count = ((Integer)tags.get(tag)).intValue();
+            System.out.println("Local Name \"" + tag + "\" occurs " 
+                               + count + " times");
+        }    
+    }
+ 
+    private static String convertToFileURL(String filename) {
+        // ...
+    }
+
+    // ...
+}
+                    </pre>
+                </div>
+                <p>
+                    Este código define lo que la aplicación hace cuando el analizador encuentra los puntos de inicio y final del 
+                    documento que está siendo analizado. El método <code>startDocument()</code> de la interfaz 
+                    <code>ContentHandler</code> crea una instancia de <code>java.util.Hashtable</code>, la cual en 
+                    <a href="#gclmm">Eventos de Elementos</a> será llenada con los elementos XML que el analizador encuentra en el 
+                    documento. Cuando el analizador alcanza el final del documento, se invoca el método <code>endDocument()</code>, 
+                    para obtener los nombres y contadores de los elementos contenidos en la tabla hash, e imprime un mensaje en 
+                    pantalla para indicar al usuario cuantas incidencias de cada elemento se han encontrado.
+                </p>
+                <p>
+                    Todos los métodos de <code>ContentHandler</code> lanzan <code>SAXException</code>s. Aprenderá más sobre las 
+                    excepciones SAX en <a href="#gcnsr">Configuración de la Gestión de Errores</a>.
+                </p>
+                <p>
+                    <a id="gclmm"></a>
+                </p>
+                <h3>
+                    Eventos de Elementos
+                </h3>
+                <p>
+                    Como se mencionó en <a href="#gclmb">Eventos del Documento</a>, la tabla hash creada por el método 
+                    <code>startDocument</code> necesita ser llenada con los diversos elementos que el analizador encuentra en el 
+                    documento. El código siguiente procesa los eventos de inicio-de-elemento y final-de-elemento:
+                </p>
+                <div class="codeblock">
+                    <pre>
+public void startDocument() throws SAXException {
+    tags = new Hashtable();
+}
+
+public void startElement(String namespaceURI,
+                         String localName,
+                         String qName, 
+                         Attributes atts)
+    throws SAXException {
+
+    String key = localName;
+    Object value = tags.get(key);
+
+    if (value == null) {
+        tags.put(key, new Integer(1));
+    } 
+    else {
+        int count = ((Integer)value).intValue();
+        count++;
+        tags.put(key, new Integer(count));
+    }
+}
+ 
+public void endDocument() throws SAXException {
+    // ...
+}
+                    </pre>
+                </div>
+                <p>
+                    Este código procesa las etiquetas de elemento, incluyendo los atributos definidos en la etiqueta de inicio, 
+                    para obtener el identificador de recurso universal (URI) del espacio de nombres, el nombre local y el nombre 
+                    cualificado de ese elemento. El método <code>startElement()</code> entonces llena el hash map creado por 
+                    <code>startDocument()</code> con los nombres locales y los recuentos de los mismos, para cada tipo de 
+                    elementos. Dese cuenta de que cuando se invoca el método <code>startElement()</code>, si el procesado del 
+                    espacio de nombres no está habilitado, entonces el nombre local de los elementos y atributos podría resultar 
+                    ser una cadena vacía. El código gestiona ese caso usando el nombre cualificado siempre que el nombre simple es 
+                    una cadena vacía.
+                </p>
+                <p>
+                    <a id="gclmx"></a>
+                </p>
+                <h3>
+                    Eventos de Carácter
+                </h3>
+                <p>
+                    La IPA de SAX JAXP también le permite gestionar los caracteres que el analizador entrega a su aplicación, 
+                    usando el método <code>ContentHandler.characters()</code>.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota</b> &mdash; Los eventos de carácter no se demuestran en el ejemplo <code>SAXLocalNameCount</code>, pero 
+                    se incluye una breve descripción en esta sección, por completitud.
+                </p>
+                <hr />
+                <p>
+                    No se requiere que los analizadores devuelva ningún número de caracteres en particular a la vez. Un analizador 
+                    puede devolver cualquier cosa desde un carácter único a la vez hasta varios miles y aún ser una implementación 
+                    conforme al estándar. Así que si su aplicación necesita procesar los caracteres que ve, es aconsejable que el 
+                    método <code>characters()</code> acumule los carácteres en un <code>java.lang.StringBuffer</code> y opere sobre 
+                    ellos solo cuando esté seguro de que se han encontrado todos.
+                </p>
+                <p>
+                    Usted finaliza el análisis de texto cuando un elemento termina, así que normalmente realiza su procesado de 
+                    carácter en ese punto. Pero podría también querer procesar texto cuando el elemento empieza. Esto es necesario 
+                    para los datos de estilo-documento, el cual contiene elementos XML que están intermezclados con texto. Por 
+                    ejemplo, considere este fragmento del documento:
+                </p>
+                <p>
+                    <code><b>&lt;para&gt;</b>This paragraph contains <b>&lt;bold&gt;</b>important<b>&lt;/bold&gt;</b> ideas.
+                        <b>&lt;/para&gt;</b></code>
+                </p>
+                <p>
+                    El texto inicial, <code>This paragraph contains</code>, se termina por el inicio del elemento 
+                    <code>&lt;bold&gt;</code>. El texto <code>important</code> se termina por la etiqueta final, 
+                    <code>&lt;/bold&gt;</code>, y el texto final, <code>ideas.</code>, se termina por la etiqueta final, 
+                    <code>&lt;/para&gt;</code>.
+                </p>
+                <p>
+                    Para ser estrictamente preciso, el manejador de carácter debe comprobar los caracteres ampersand (&amp;) y los 
+                    caracteres de corchete de ángulo izquierdo (&lt;)  y reemplazarlos con las cadenas <code>&amp;amp;</code> o 
+                    <code>&amp;lt;</code>, según corresponda. Esto se explica en la siguiente sección.
+                </p>
+                <p>
+                    <a id="gcwqt"></a>
+                </p>
+                <h3>
+                    Gestionar Caracteres Especiales
+                </h3>
+                <p>
+                    En XML, una entidad es una estructura XML (o texto plano) que tiene un nombre. Referenciar la entidad por 
+                    nombre causa que sea insertada en el documento en lugar de la referencia de la entidad. Para crear una 
+                    referencia de entidad, envuelva el nombre de la entidad con un ampersand y un punto y coma:
+                </p>
+                <p>
+                    <code>&amp;entityName;</code>
+                </p>
+                <p>
+                    Cuando está gestionando grandes bloques de XML o HTML que incluyen muchos caracteres especiales, puede usar una 
+                    sección CDATA. Una sección CDATA trabaja como <code>&lt;code&gt;...&lt;/code&gt;</code> en HTML, solo que más: 
+                    todo el espacio en blanco en una sección CDATA es significativo, y los caracteres en ella no se interpretan 
+                    como XML. Una sección CDATA empieza con <code>&lt;![[CDATA[</code> y termina con <code>]]&gt;</code>.
+                </p>
+                <p>
+                    Un ejemplo de sección CDATA, tomada desde el fichero de ejemplo XML <i>install-dir</i>
+                    <code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples/data/REC-xml-19980210.xml</code>, se muestra abajo.
+                </p>
+                <p>
+                    <code>&lt;p&gt;&lt;termdef id=&quot;dt-cdsection&quot; term=&quot;CDATA Section&quot;&lt;
+                        &lt;term&gt;CDATA sections&lt;/term&gt; may occur anywhere character data may occur; they are used to 
+                        escape blocks of text containing characters which would otherwise be recognized as markup. CDATA sections 
+                        begin with the string &quot;&lt;code&gt;&amp;lt;![CDATA[&lt;/code&gt;&quot; and end with the string 
+                        &quot;&lt;code&gt;]]&amp;gt;&lt;/code&gt;&quot;</code>
+                </p>
+                <p>
+                    Una vez analizada, este texto sería visualizado como sigue:
+                </p>
+                <p>
+                    CDATA sections may occur anywhere character data may occur; they are used to escape blocks of text containing 
+                    characters which would otherwise be recognized as markup. CDATA sections begin with the string 
+                    &quot;<code>&lt;![CDATA[</code>&quot; and end with the string &quot;<code>]]&gt;</code>&quot;.
+                </p>
+                <p>
+                    La existencia de CDATA hace que el eco apropiado de XML sea un poco complicado. Si el texto que se va a generar 
+                    no está en una sección CDATA, los corchetes angulares, los símbolos y otros caracteres especiales del texto 
+                    deben reemplazarse con la referencia de entidad adecuada. (Reemplazar los corchetes de ángulo izquierdo y los 
+                    ampersands es lo más importante, otros caracteres serán interpretados apropiadamente sin engañar al 
+                    analizador). Pero si el texto a generar está en una sección CDATA, entonces no ocurrirían las substituciones, 
+                    resultando en un texto como el del ejemplo anterior. En un programa simple como nuestra aplicación 
+                    <code>SAXLocalNameCount</code>, esto no es particularmente serio. Pero muchas aplicaciones que filtran XML 
+                    querrán realizar un seguimiento de si el texto aparece en una sección CDATA, de modo que puedan tratar los 
+                    caracteres especiales correctamente.
+                </p>
+                <p>
+                    <a id="gclmt"></a>
+                </p>
+                <h2>
+                    Configurar el Analizador
+                </h2>
+                <p>
+                    El siguiente código configura el analizador y lo pone en marcha:
+                </p>
+                <div class="codeblock">
+                    <pre>
+static public void main(String[] args) throws Exception {
+
+    // Code to parse command-line arguments 
+    //(shown above)
+    // ...
+
+    SAXParserFactory spf = SAXParserFactory.newInstance();
+    spf.setNamespaceAware(true);
+    SAXParser saxParser = spf.newSAXParser();
+}
+                    </pre>
+                </div>
+                <p>
+                    Estas líneas de código crean una instancia <code>SAXParserFactory</code>, como determina la configuración de la 
+                    propiedad del sistema <code>javax.xml.parsers.SAXParserFactory</code>. La factoría que se crea se configura 
+                    para admitir espacios de nombres XML estableciendo <code>setNamespaceAware</code> a verdadero, y entonces se 
+                    obtiene una instancia <code>SAXParser</code> desde la factoría invocando su método <code>newSAXParser()</code>.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota</b> &mdash; La clase <code>javax.xml.parsers.SAXParser</code> es un envoltorio que define un número de 
+                    métodos de conveniencia. Envuelve el (de alguna forma menos amistoso) objeto <code>org.xml.sax.Parser</code>. 
+                    Si es necesario, puede obtener ese analizador utilizando el método <code>getParser()</code> de la clase 
+                    <code>SAXParser</code>.
+                </p>
+                <hr />
+                <p>
+                    Ahora necesita implementar el <code>XMLReader</code> que todos los analizadores deben implementar. El 
+                    <code>XMLReader</code> se usa por la aplicación para decirle al analizador SAX qué procesamiento debe realizar 
+                    en el documento en cuestión. Se implementa el <code>XMLReader</code> por el código siguiente en el método 
+                    <code>main</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+// ...
+SAXParser saxParser = spf.newSAXParser();
+XMLReader xmlReader = saxParser.getXMLReader();
+xmlReader.setContentHandler(new SAXLocalNameCount());
+xmlReader.parse(convertToFileURL(filename));
+                    </pre>
+                </div>
+                <p>
+                    Aquí, obtiene una instancia de <code>XMLReader</code> para su analizador invocando el método 
+                    <code>getXMLReader()</code> de su instancia de <code>SAXParser</code>. El <code>XMLReader</code> entonces 
+                    registra la clase <code>SAXLocalNameCount</code> con su manejador de contenido, así que la acciones realizadas 
+                    por el analizador serán aquellas de los métodos <code>startDocument()</code>, <code>startElement()</code>, y 
+                    <code>endDocument()</code> mostrados en <a href="#gclnc">Gestionar Eventos de Contenido</a>. Finalmente, el 
+                    <code>XMLReader</code> le indica a analizador qué documento analizar pasándole la ubicación del fichero XML 
+                    en cuestión, en la forma de una URL <code>File</code> generada por el método <code>convertToFileURL()</code> 
+                    definido en <a href="#gcnsk">Configurando E/S</a>.
+                </p>
+                <p>
+                    <a id="gcnsr"></a>
+                </p>
+                <h2>
+                    Configurar la Gestión de Errores
+                </h2>
+                <p>
+                    Podría empezar a usar su analizador ahora, pero es más seguro implementar alguna gestión de errores. El 
+                    analizador puede generar tres clases de errores: un error fatal, un error, y una advertencia. Cuando ocurre un 
+                    error fatal, el analizador no puede continuar. Así si la aplicación no genera una excepción, entonces el gestor 
+                    de errores de evento predeterminado genera una. Para los errores no fatales y las advertencias, el gestor de 
+                    errores predeterminado nunca genera excepciones y no se muestra ningún mensaje.
+                </p>
+                <p>
+                    Como se muestra en <a href="#gclmb">Eventos de Documento</a>, los métodos que manejan los eventos de la 
+                    aplicación lanzan <code>SAXException</code>. Por ejemplo, la firma del método <code>startDocument()</code> en 
+                    la interfaz <code>ContentHandler</code> se define como la devolución de una <code>SAXException</code>.
+                </p>
+                <p>
+                    <code>public void startDocument() throws SAXException { /* ... */ }</code>
+                </p>
+                <p>
+                    Una <code>SAXException</code> puede ser construída usando un mensaje, otra excepción, o ambas.
+                </p>
+                <p>
+                    Ya que el analizador predeterminado sólo genera excepciones para los errores fatales, y porque la información 
+                    sobre los errores proporcionados por el analizador predeterminado es de alguna forma limitada, el programa 
+                    <code>SAXLocalNameCount</code> define su propia gestión de errores, a través de la clase 
+                    <code>MyErrorHandler</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+xmlReader.setErrorHandler(new MyErrorHandler(System.err));
+
+// ...
+
+private static class MyErrorHandler implements ErrorHandler {
+    private PrintStream out;
+
+    MyErrorHandler(PrintStream out) {
+        this.out = out;
+    }
+
+    private String getParseExceptionInfo(SAXParseException spe) {
+        String systemId = spe.getSystemId();
+
+        if (systemId == null) {
+            systemId = "null";
+        }
+
+        String info = "URI=" + systemId + " Line=" 
+            + spe.getLineNumber() + ": " + spe.getMessage();
+
+        return info;
+    }
+
+    public void warning(SAXParseException spe) throws SAXException {
+        out.println("Warning: " + getParseExceptionInfo(spe));
+    }
+        
+    public void error(SAXParseException spe) throws SAXException {
+        String message = "Error: " + getParseExceptionInfo(spe);
+        throw new SAXException(message);
+    }
+
+    public void fatalError(SAXParseException spe) throws SAXException {
+        String message = "Fatal Error: " + getParseExceptionInfo(spe);
+        throw new SAXException(message);
+    }
+}
+                    </pre></div>
+                <p>
+                    En la misma forma como en <a href="#gclmt">Configurando el Analizador</a>, que mostraba que el 
+                    <code>XMLReader</code> apuntaba al manejador de contenido correcto, aquí el <code>XMLReader</code> apunta al 
+                    nuevo controlador de errores llamando a su método <code>setErrorHandler()</code>.
+                </p>
+                <p>
+                    La clase <code>MyErrorHandler</code> implementa la interfaz estándar <code>org.xml.sax.ErrorHandler</code>, y 
+                    define un método para obtener la información de la excepción que se proporciona por cualquier instancia de 
+                    <code>SAXParseException</code> generada por el analizador. Este método, <code>getParseExceptionInfo()</code>, 
+                    simplemente obtiene el número de línea en el que ocurre el error en el documento XML y el identificador del 
+                    sistema en el que se está ejecutando llamando a los métodos estándar <code>getLineNumber()</code> y 
+                    <code>getSystemId()</code> de <code>SAXParseException</code>. Esta información de excepción es después 
+                    alimentada en implementaciones de los métodos básicos de manejo de errores SAX <code>error()</code>, 
+                    <code>warning()</code>, y <code>fatalError()</code>, que se actualizan para enviar los mensajes apropiados 
+                    sobre la naturaleza y ubicación de los errores en el documento.
+                </p>
+                <p>
+                    <a id="gcvww"></a>
+                </p>
+                <h3>
+                    Gestionar Errores No Fatales
+                </h3>
+                <p>
+                    Un error no fatal ocurre cuando un documento XML no cumple una restricción de validez. Si el analizador 
+                    encuentra que el documento no es válido, entonces se genera un evento de error. Tales errores son generados 
+                    por un analizador validando, dados un tipo de definición de documento (DTD) o esquema, cuando un documento 
+                    tiene una etiqueta no válida, cuando una etiqueta se encuentra donde no se le permite, o (en el caso de un 
+                    esquema) cuando el elemento contiene datos no válidos.
+                </p>
+                <p>
+                    El principio más importante a entender sobre los errores no fatales es que son ignorados de 
+                    forma predeterminada. Pero si ocurre un error de validación en un documento, probablemente no quiera continuar 
+                    procesándolo. Probablemente quiera tratar estos errores como fatales.
+                </p>
+                <p>
+                    Para hacerse cargo del manejo de errores, anula los métodos <code>DefaultHandler</code> que manejan errores 
+                    fatales, errores no fatales, y advertencias como parte de la interfaz <code>ErrorHandler</code>. Como se 
+                    mostró en el extracto de código en la sección previa, el analizador SAX entrega una 
+                    <code>SAXParseException</code> a cada uno de estos métodos, por lo que generar una excepción cuando ocurre un 
+                    error es tan simple como devolverlo.
+                </p>
+                <hr />
+                <p>
+                    <b>Nota</b> &mdash; Puede ser instructivo examinar los métodos de gestión de errores definidos en 
+                    <code>org.xml.sax.helpers.DefaultHandler</code>. Verá que los métodos <code>error()</code> y 
+                    <code>warning()</code> no hacen nada, mientras que <code>fatalError()</code> lanza una excepción. Por supuesto, 
+                    podría siempre sobreeescribir el método <code>fatalError()</code> para lanzar una excepción diferente. Pero si 
+                    su código no lanza una excepción cuando ocurre un error fatal, entonces lo hará el analizador SAX. La 
+                    especificación XML lo requiere.
+                </p>
+                <hr />
+                <p>
+                    <a id="gcvwp"></a>
+                </p>
+                <h3>
+                    Manejar Advertencias
+                </h3>
+                <p>
+                    Las advertencias, a menudo, son ignoradas de forma predeterminada. Las advertencias son informativas y pueden 
+                    ser solo generadas en la presencia de un DTD o esquema. Por ejemplo, si un elemento se define dos veces en un 
+                    DTD, se genera una advertencia. No es ilegal, y no causa problemas, pero es algo que podría gustarle saber 
+                    porque podría no haber sido intencional. Validar un documento XML contra un DTD se mostrará en la sección.
+                </p>
+                <p>
+                    <a id="gcnrx"></a>
+                </p>
+                <h2>
+                    Ejecutar el Ejemplo del Analizador SAX sin Validación
+                </h2>
+                <p>
+                    Como se indicó al comienzo de esta lección, después de que ha descargado e instalado los fuentes de la IPA de 
+                    JAXP desde el <a href="http://jaxp.java.net/downloads.html">área de descarga de fuentes de JAXP</a>, el 
+                    programa de ejemplo y los ficheros asociados necesarios para ejecutarlo se encuentran en las siguientes 
+                    ubicaciones.
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Los diferentes ficheros de archivo Java (JAR) para el ejemplo se ubican en el directorio 
+                            <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/lib</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            El fichero <code>SAXLocalNameCount.java</code> se encuentra en 
+                            <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples/sax</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Los ficheros XML con los que interactúa <code>SAXLocalNameCount</code> se encuentran en 
+                            <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples/data</code>.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Los pasos siguientes explican cómo ejecutar el ejemplo del analizador SAX sin validación.
+                </p>
+                <p>
+                    <a id="gcvwx"></a>
+                </p>
+                <h3>
+                    Para Ejecutar el Ejemplo <code>SAXLocalNameCount</code> sin Validación
+                </h3>
+                <ol>
+                    <li>
+                        <b>Navegue al directorio <code>samples</code>.</b>
+                        <code>% cd <i>install-dir</i><code>/jaxp-1_4_2-</code><i>release-date</i><code>/samples</code>.</code>
+                    </li>
+                    <li>
+                        <b>Compile la clase del ejemplo.</b><code>% javac sax/*</code>
+                    </li>
+                    <li>
+                        <b>Ejecute el programa <code>SAXLocalNameCount</code> sobre un fichero XML.</b>
+                        <p>
+                            Elija uno de los ficheros XML en el directorio <code>data</code> y ejecute el programa 
+                            <code>SAXLocalNameCount</code> sobre este. Aquí, hemos elegido ejecutar el programa sobre el fichero 
+                            <code>rich_iii.xml</code>.
+                        </p>
+                        <code>% java sax/SAXLocalNameCount data/rich_iii.xml</code>
+                        <p>
+                            El fichero XML <code>rich_iii.xml</code> contiene una versión XML de la obra de William Shakespeare 
+                            <i>Richard III</i>. Cuando ejecuta el <code>SAXLocalNameCount</code> sobre este, debe ver la salida 
+                            siguiente.
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+Local Name "STAGEDIR" occurs 230 times
+Local Name "PERSONA" occurs 39 times
+Local Name "SPEECH" occurs 1089 times
+Local Name "SCENE" occurs 25 times
+Local Name "ACT" occurs 5 times
+Local Name "PGROUP" occurs 4 times
+Local Name "PLAY" occurs 1 times
+Local Name "PLAYSUBT" occurs 1 times
+Local Name "FM" occurs 1 times
+Local Name "SPEAKER" occurs 1091 times
+Local Name "TITLE" occurs 32 times
+Local Name "GRPDESCR" occurs 4 times
+Local Name "P" occurs 4 times
+Local Name "SCNDESCR" occurs 1 times
+Local Name "PERSONAE" occurs 1 times
+Local Name "LINE" occurs 3696 times
+                            </pre>
+                        </div>
+                        <p>
+                            El programa <code>SAXLocalNameCount</code> analiza el fichero XML, y proporciona un contador del número 
+                            de instancias de cada tipo de etiqueta XML que contiene.
+                        </p>
+                    </li>
+                    <li>
+                        <b>Abra el fichero <code>data/rich_iii.xml</code> en un editor de texto.</b>
+                        <p>
+                            Para comprobar que el manejo de errores está funcionando, borra la etiqueta de cierre de una entrada en 
+                            el fichero XML, por ejemplo la etiqueta de cierre <code>&lt;/PERSONA&gt;</code>, de la línea 30, 
+                            mostrada abajo.
+                        </p>
+                        <code>30 &lt;PERSONA&gt;EDWARD, Prince of Wales, afterwards King Edward V.&lt;/PERSONA&gt;</code>
+                    </li>
+                    <li>
+                        <b>Ejecute <code>SAXLocalNameCount</code> de nuevo.</b>
+                        <p>
+                            Esta vez, debe ver el siguiente mensaje de error fatal.
+                        </p>
+                        <code>
+                            % java sax/SAXLocalNameCount data/rich_iii.xml Exception in thread &quot;main&quot; 
+                            org.xml.sax.SAXException: Fatal Error: URI=file:    
+                            <i>install-dir</i> /JAXP_sources/jaxp-1_4_2-<i>release-date</i>/samples/data/rich_iii.xml Line=30: The 
+                            element type &quot;PERSONA&quot; must be terminated by the matching end-tag 
+                            &quot;&lt;/PERSONA&gt;&quot;.
+                        </code>
+                        <p>
+                            Como puede ver, cuando fue encontrado el error, el analizador generó una <code>SAXParseException</code>, 
+                            una subclase de <code>SAXException</code> que identifica el fichero y la ubicación donde el error 
+                            ocurrió.
+                        </p>
+                    </li>
+                </ol>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="when.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="validation.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Cuando usar SAX<br />
+            <b>Página siguiente:</b> Implementando la Validación en SAX
+        </div>
+    </body>
+</html> 

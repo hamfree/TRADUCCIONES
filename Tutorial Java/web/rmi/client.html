@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Creando un Programa Cliente (Los Tutoriales de Java&trade; &gt; RMI)
+        </title>
+        <meta name="description" content="Este tutorial del RMI de Java describe el sistema RMI de Java. Recorre un ejemplo completo
+              de cliente/servidor" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java rmi, java client server" />
+        <link rel="stylesheet" href="../indice.css" type="text/css"/>
+        <script src="../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkAHEAD"><a href="overview.html">Una descripción de las Aplicaciones RMI (Remote Method Interface)</a></div>
+                <div class="linkAHEAD"><a href="server.html">Escribiendo un Servidor RMI</a></div>
+                <div class="linkBHEAD"><a href="designing.html">Diseñando un Interfaz Remoto</a></div>
+                <div class="linkBHEAD"><a href="implementing.html">Implementando un Intefaz Remoto</a></div>
+                <div class="nolinkAHEAD">Creando un Programa Cliente</div>
+                <div class="linkAHEAD"><a href="example.html">Compilando y Ejecutando el Ejemplo</a></div>
+                <div class="linkBHEAD"><a href="compiling.html">Compilando los Programas de Ejemplo</a></div>
+                <div class="linkBHEAD"><a href="running.html">Ejecutando los Programas de Ejemplo</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> RMI
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="./index.html" target="_top">RMI</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="implementing.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="example.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Creando un Programa Cliente</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    El motor de cálculo es un programa relativamente simple: ejecuta tareas que se le asignan. Los clientes para el 
+                    motor de cálculo son más complejos. Un cliente necesita llamar al motoro de cálculo, pero también tiene que 
+                    definir la tarea a realizar por el motor de cálculo.
+                </p>
+                <p>
+                    Dos clases separadas componen el cliente en nuestro ejemplo. La primera clase, <code>ComputePi</code>, busca e 
+                    invoca un objeto <code>Compute</code>. La segunda clase, <code>Pi</code>, implementa la interfaz 
+                    <code>Task</code> y define el trabajo a realizar por el motor de cálculo. El trabajo de la clase 
+                    <code>Pi</code> es calcular el valor de 
+                    <img src="../figures/rmi/pi.gif" width="9" height="9" alt="el símbolo de pi" /> hasta cierto número de lugares 
+                    decimales.
+                </p>
+                <p>
+                    La interfaz no remota 
+                    <a class="SourceLink" target="_blank"
+                       href="examples/compute/Task.java"
+                       onclick="showCode('../displayCode.html','examples/compute/Task.java'); return false;">
+                        <code>Task</code></a> se define como sigue:
+                </p>
+                <div class="codeblock">
+                    <pre>
+package compute;
+
+public interface Task&lt;T&gt; {
+    T execute();
+}
+                    </pre>
+                </div>
+                <p>
+                    El código que invoca los métodos de un objeto <code>Compute</code> debe obtener una referencia a ese objeto, 
+                    crear un objeto <code>Task</code>, y después pedir que la tarea sea ejecutada. La definición de la clase de 
+                    tarea <code>Pi</code> se muestra más tarde. Un objeto <code>Pi</code> se construye con un argumento único, la 
+                    deseada precisión del resultado. El resultado de la ejecución de la tarea es un 
+                    <code>java.math.BigDecimal</code> representando a 
+                    <img src="../figures/rmi/pi.gif" width="9" height="9" alt="el símbolo de pi" /> calculado para la precisión 
+                    especificada.
+                </p>
+                <p>
+                    Aquí está el codigo fuente para 
+                    <a class="SourceLink" target="_blank" href="examples/client/ComputePi.java"
+                       onclick="showCode('../displayCode.html', 'examples/client/ComputePi.java'); return false;">
+                        <code>client.ComputePi</code></a>, la clase cliente principal:
+                </p>
+                <div class="codeblock">
+                    <pre>
+package client;
+
+import java.rmi.registry.LocateRegistry;
+            import java.rmi.registry.Registry;
+import java.math.BigDecimal;
+import compute.Compute;
+
+public class ComputePi {
+    public static void main(String args[]) {
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new SecurityManager());
+        }
+        try {
+            String name = "Compute";
+            Registry registry = LocateRegistry.getRegistry(args[0]);
+            Compute comp = (Compute) registry.lookup(name);
+            Pi task = new Pi(Integer.parseInt(args[1]));
+            BigDecimal pi = comp.executeTask(task);
+            System.out.println(pi);
+        } catch (Exception e) {
+            System.err.println("ComputePi exception:");
+            e.printStackTrace();
+        }
+    }    
+}
+                    </pre>
+                </div>
+                
+                <p>
+                    Como el servidor <code>ComputeEngine</code>, el cliente empieza instalando un gestor de seguridad. Esta paso es 
+                    necesario porque el proceso de recibir los esbozos de los objetos remotos del servidor podría requerir 
+                    descargar definiciones de clase desde el servidor. Para que RMI descargue clases, debe haber un gestor de 
+                    seguridad en vigor.
+                </p>
+                <p>
+                    Después de instalar un gestor de seguridad, el cliente construye un nombre a usar para buscar el objeto remoto 
+                    <code>Compute</code>, usando el mismo nombre utilizado por <code>ComputeEngine</code> para vincular su objeto 
+                    remoto. Además, el cliente usa la IPA <code>LocateRegistry.getRegistry</code> para sintetizar una referencia 
+                    remota al registro en la máquina del servidor. El valor del primer argumento de línea de comandos, 
+                    <code>args[0]</code>, es el nombre de la máquina remota en la que el objeto <code>Compute</code> se ejecuta. El 
+                    cliente después invoca el método <code>lookup</code> en el registro para buscar el objeto remoto por nombre 
+                    en el registro de la máquina del servidor. Se usa la particular sobrrescritura de 
+                    <code>LocateRegistry.getRegistry</code>, que tiene un parámetro único de <code>String</code>. Devuelve una 
+                    referencia a un registro en la máquina nombrada y el puerto del registro por defecto, 1099. Debe usar una 
+                    sobreescritura que tenga un parámetro <code>int</code>  si el registro se creó en otro puerto distinto del 1099.
+                </p>
+                <p>
+                    A continuación, el cliente crea un nuevo objeto <code>Pi</code>, pasándole al constructor <code>Pi</code> el 
+                    valor del argumento de línea de comandos, <code>args[1]</code>,  representado como un entero. Este argumento 
+                    indica el número de lugares decimales a usar en el cálculo. Finalmente, el cliente invoca el método 
+                    <code>executeTask</code> del objeto remoto <code>Compute</code>. El objeto pasado dentro de la invocación 
+                    <code>executeTask</code> devuelve un objeto del tipo <code>BigDecimal</code>, que el programa almacena en la 
+                    variable <code>result</code>. Finalmente, el programa imprime el resultado. La figura siguiente muestra el 
+                    flujo de los mensajes entre el cliente <code>ComputePi</code>, el <code>rmiregistry</code>, y el 
+                    <code>ComputeEngine</code>.
+                    
+                </p>
+                <div class="centrado">
+                    <img src="../figures/rmi/rmi-4.gif" width="329" height="117"
+                         alt="El flujo de mensajes entre el motor de cálculo, el registro y el cliente." />
+                </div>
+                <p>
+                    La clase <code>Pi</code> implementa la interfaz <code>Task</code> y calcula el valor de 
+                    <img src="../figures/rmi/pi.gif " width="9" height="9" alt="el símbolo pi" /> con un número especificado de 
+                    lugares decimales. Para este ejemplo, el algoritmo real no es importante. Lo que es importante es que el 
+                    algoritmo es computacionalmente costoso, lo que significa que querrá ejecutarlo en un servidor capaz.
+                </p>
+                <p>
+                    Aquí tiene el código fuente para el 
+                    <a class="SourceLink" target="_blank" href="examples/client/Pi.java"
+                       onclick="showCode('../displayCode.html', 'examples/client/Pi.java'); return false;">
+                        <code>client.Pi</code></a>, la clase que implementa <code>Task</code> interface:
+                </p>
+                <div class="codeblock">
+                    <pre>
+package client;
+
+import compute.Task;
+import java.io.Serializable;
+import java.math.BigDecimal;
+
+public class Pi implements Task&lt;BigDecimal&gt;, Serializable {
+
+    private static final long serialVersionUID = 227L;
+
+    /** constants used in pi computation */
+    private static final BigDecimal FOUR =
+        BigDecimal.valueOf(4);
+
+    /** rounding mode to use during pi computation */
+    private static final int roundingMode = 
+        BigDecimal.ROUND_HALF_EVEN;
+
+    /** digits of precision after the decimal point */
+    private final int digits;
+    
+    /**
+     * Construct a task to calculate pi to the specified
+     * precision.
+     */
+    public Pi(int digits) {
+        this.digits = digits;
+    }
+
+    /**
+     * Calculate pi.
+     */
+    public BigDecimal execute() {
+        return computePi(digits);
+    }
+
+    /**
+     * Compute the value of pi to the specified number of 
+     * digits after the decimal point.  The value is 
+     * computed using Machin's formula:
+     *
+     *          pi/4 = 4*arctan(1/5) - arctan(1/239)
+     *
+     * and a power series expansion of arctan(x) to 
+     * sufficient precision.
+     */
+    public static BigDecimal computePi(int digits) {
+        int scale = digits + 5;
+        BigDecimal arctan1_5 = arctan(5, scale);
+        BigDecimal arctan1_239 = arctan(239, scale);
+        BigDecimal pi = arctan1_5.multiply(FOUR).subtract(
+                                  arctan1_239).multiply(FOUR);
+        return pi.setScale(digits, 
+                           BigDecimal.ROUND_HALF_UP);
+    }
+    /**
+     * Compute the value, in radians, of the arctangent of 
+     * the inverse of the supplied integer to the specified
+     * number of digits after the decimal point.  The value
+     * is computed using the power series expansion for the
+     * arc tangent:
+     *
+     * arctan(x) = x - (x^3)/3 + (x^5)/5 - (x^7)/7 + 
+     *     (x^9)/9 ...
+     */   
+    public static BigDecimal arctan(int inverseX, 
+                                    int scale) 
+    {
+        BigDecimal result, numer, term;
+        BigDecimal invX = BigDecimal.valueOf(inverseX);
+        BigDecimal invX2 = 
+            BigDecimal.valueOf(inverseX * inverseX);
+
+        numer = BigDecimal.ONE.divide(invX,
+                                      scale, roundingMode);
+
+        result = numer;
+        int i = 1;
+        do {
+            numer = 
+                numer.divide(invX2, scale, roundingMode);
+            int denom = 2 * i + 1;
+            term = 
+                numer.divide(BigDecimal.valueOf(denom),
+                             scale, roundingMode);
+            if ((i % 2) != 0) {
+                result = result.subtract(term);
+            } else {
+                result = result.add(term);
+            }
+            i++;
+        } while (term.compareTo(BigDecimal.ZERO) != 0);
+        return result;
+    }
+}
+                    </pre>
+                </div>
+                <p>
+                    Tenga en cuenta que todas las clases serializables, ya sea que implementen la interfaz <code>Serializable</code> 
+                    directa o indirectamente, deben declarar un campo <code>private</code> <code>static</code> <code>final</code> 
+                    llamado <code> serialVersionUID</code> para garantizar la compatibilidad de serialización entre versiones. Si 
+                    no se ha publicado una versión anteror de la clase, entonces el valor de este campo puede ser cualquier valor 
+                    <code>long</code>, similar al <code>227L</code> utilizador por <code>Pi</code>, siempre que el valor se 
+                    utilize de forma coherente en versiones futuras. Si una versión previa de la clase ha sido publicada sin una 
+                    declaración explícita <code>serialVersionUID</code>, pero la compatibilidad de serialización con la versión es 
+                    importante, entonces el valor predeterminado calculado implícitamente para la versión anterior debe usarse para 
+                    el valor de la declaración explícita de las nuevss versiones. La herramienta <code>serialver</code> se 
+                    puede ejecutar con la versión previa para determinar el valor predeterminado calculado para ella.
+                </p>
+                <p>
+                    La característica más interesante de este ejemplo es que la implementación del objeto <code>Compute</code> 
+                    nunca necesita la definición de la clase <code>Pi</code> hasta que se pase un objeto <code>Pi</code> como un 
+                    argumento al método <code>executeTask</code>. En este punto, el código para la clase es cargado por RMI en la 
+                    máquina virtual de Java del objeto <code>Compute</code>, se invoca el método <code>execute</code>, y el código 
+                    de la tarea se ejecuta. El resultado, que en el caso de la tarea <code>Pi</code> es un objeto 
+                    <code>BigDecimal</code>, se devuelve al cliente que llama, donde se utiliza para imprimir el resultado del 
+                    cálculo.
+                </p>
+                <p>
+                    El hecho de que el objeto <code>Task</code> suministrado calcule el valor de <code>Pi</code> es irrelevante 
+                    para el objeto <code>ComputeEngine</code>. Podría además implementar una tarea que, por ejemplo, genere un 
+                    número primo aleatorio usando un algorimo probabilístico. Esa tarea sería también computacionalmente intensiva 
+                    y, por lo tanto, un buen candidato para pasar al <code>ComputeEngine</code>, pero requeriría código muy 
+                    diferente. Este código podría también ser descargado cuando el objeto <code>Task</code> se pasa a un objeto 
+                    <code>Compute</code>. De la misma forma en que el algoritmo de computación
+                    <img src="../figures/rmi/pi.gif " width="9" height="9" alt="el símbolo pi" /> se introduce cuando se necesita, 
+                    el código que genera el número primo aleatorio sería traído cuando se necesitase. El objeto <code>Compute</code> 
+                    sólo sabe que cada objeto que recibe implementa el método <code>execute</code>. El objeto <code>Compute</code>
+                    no sabe, y no necesita saber, lo que hace la implementación.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="implementing.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="./TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="example.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Implementando un Intefaz Remoto<br />
+            <b>Página siguiente:</b> Compilando y Ejecutando el Ejemplo
+        </div>
+    </body>
+</html> 

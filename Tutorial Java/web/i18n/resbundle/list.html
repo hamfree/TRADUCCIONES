@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Usando un ListResourceBundle (Los Tutoriales de Java&trade; &gt; Internacionalización &gt; 
+            Aislando Datos de una Localización Específica)
+        </title>
+        <meta name="description" content="Este tutorial de internacionalización de Java describe la configuración regional, 
+              aislando datos específicos de la configuración regional, formateando datos, nombre de dominio internacionalizado e 
+              identificador de recursos" />
+        <meta name="keywords" content="java programming, learn java, java sample code, i18n, internationalization, locale, text
+              formatting" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Aislando Datos de una Localización Específica</a></div>
+                <div class="linkAHEAD"><a href="concept.html">Sobre la Clase ResourceBundle</a></div>
+                <div class="linkAHEAD"><a href="prepare.html">Preparándose para Utilizar un ResourceBundle</a></div>
+                <div class="linkAHEAD"><a href="propfile.html">Respaldando un ResourceBundle con Ficheros de Propiedades</a></div>
+                <div class="nolinkAHEAD">Usando un ListResourceBundle</div>
+                <div class="linkAHEAD"><a href="control.html">Personalizando la Carga de un Resource Bundle</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Internacionalización<br />
+                <b>Lección:</b> Aislando Datos de una Localización Específica
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Internacionalización</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Aislando Datos de una Localización Específica</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="propfile.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="control.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Usando un ListResourceBundle</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Esta sección ilustra el uso de un objeto <code>ListResourceBundle</code> con un programa de ejemplo llamado 
+                    <a class="SourceLink" target="_blank" href="examples/ListDemo.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/ListDemo.java'); return false;">
+                        <code>ListDemo</code></a>. El texto que sigue explica cada paso involucrado en la creación del programa 
+                    <code>ListDemo</code>, junto con las subclases <code>ListResourceBundle</code> que lo soportan.
+                </p>
+                <h2>
+                    1. Crear las Subclases ListResourceBundle
+                </h2>
+                <p>
+                    Una <code>ListResourceBundle</code> está respaldada por un fichero class. Por lo tanto el primer paso es crear 
+                    un fichero classs para cada <code>Locale</code> admitido. En el programa <code>ListDemo</code> el nombre base 
+                    de <code>ListResourceBundle</code> es is <code>StatsBundle</code>. Ya que <code>ListDemo</code> adminte tres 
+                    objetos <code>Locale</code>, requiere los tres ficheros class siguientes:
+                </p>
+                <div class="codeblock">
+                    <pre>
+StatsBundle_en_CA.class
+StatsBundle_fr_FR.class
+StatsBundle_ja_JP.class
+                    </pre>
+                </div>
+                <p>
+                    La clase <code>StatsBundle</code> para Japón se define en el código fuente que sigue. Dese cuenta de que el 
+                    nombre de la clase se construye agragando el código de idioma y país al nombre base de la 
+                    <code>ListResourceBundle</code>. Dentro de la clase la matriz bidimensional <code>contents</code> es 
+                    inicializada con los pares clave-valor. Las claves son el primer elemento en cada par: <code>GDP</code>, 
+                    <code>Population</code>, y <code>Literacy</code>. La claves deben ser objetos <code>String</code> y deben ser 
+                    los mismos en cada clase del conjunto <code>StatsBundle</code>. Los valores pueden ser cualquier tipo de 
+                    objeto. En este ejemplo los valores son dos objetos <code>Integer</code> y un objeto <code>Double</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+import java.util.*;
+public class StatsBundle_ja_JP extends ListResourceBundle {
+    public Object[][] getContents() {
+        return contents;
+    }
+
+    private Object[][] contents = {
+        { &quot;GDP&quot;, new Integer(21300) },
+        { &quot;Population&quot;, new Integer(125449703) },
+        { &quot;Literacy&quot;, new Double(0.99) },
+    };
+}
+                    </pre>
+                </div>
+                <h2>
+                    2. Especificar el Locale
+                </h2>
+                <p>
+                    El programa <code>ListDemo</code> define los objetos <code>Locale</code> como sigue:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Locale[] supportedLocales = {
+    new Locale(&quot;en&quot;, &quot;CA&quot;),
+    new Locale(&quot;ja&quot;, &quot;JP&quot;),
+    new Locale(&quot;fr&quot;, &quot;FR&quot;)
+};
+                    </pre>
+                </div>
+                <p>
+                    Cada objeto <code>Locale</code> se corresponde con una de las clases <code>StatsBundle</code>. Por ejemplo, el 
+                    <code>Locale</code> japonés, el cual está definido con los códigos <code>ja</code> y <code>JP</code>, coincide 
+                    con <code>StatsBundle_ja_JP.class</code>.
+                </p>
+                <h2>
+                    3. Crear el ResourceBundle
+                </h2>
+                <p>
+                    Para crear la <code>ListResourceBundle</code>, invoque el método <code>getBundle</code>. La línea siguietne de 
+                    código especifica el nombre base de la clase (<code>StatsBundle</code>) y el <code>Locale</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+ResourceBundle stats = ResourceBundle.getBundle(&quot;StatsBundle&quot;, currentLocale);
+                    </pre>
+                </div>
+                <p>
+                    El método <code>getBundle</code> busca una clase cuyo nombre empieza con <code>StatsBundle</code> y va seguida 
+                    de los códigos de idioma y país del <code>Locale</code> especificado. Si <code>currentLocale</code> se crea 
+                    con los códigos <code>ja</code> y <code>JP</code>, <code>getBundle</code> devuelve una 
+                    <code>ListResourceBundle</code> correspondiente con la clase <code>StatsBundle_ja_JP</code>, por ejemplo.
+                </p>
+                <h2>
+                    4. Obtener los Objetos Localizados
+                </h2>
+                <p>
+                    Ahora que el programa tiene una <code>ListResourceBundle</code> para el <code>Locale</code> adecuado, puede 
+                    obtener los objetos traducidos por sus claves. La siguiente línea de código recupera la tasa de alfabetización 
+                    invocando a <code>getObject</code> con el parámetro clave <code>Literacy</code>. Ya que <code>getObject</code> 
+                    devuelve un objeto, lo moldeamos a un <code>Double</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Double lit = (Double)stats.getObject(&quot;Literacy&quot;);
+                    </pre>
+                </div>
+                <h2>
+                    5. Ejecutar el Programa Demostración
+                </h2>
+                <p>
+                    El programa <code>ListDemo</code> imprime los datos que recuperó con el método <code>getBundle</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Locale = en_CA
+GDP = 24400
+Population = 28802671
+Literacy = 0.97
+
+Locale = ja_JP
+GDP = 21300
+Population = 125449703
+Literacy = 0.99
+
+Locale = fr_FR
+GDP = 20200
+Population = 58317450
+Literacy = 0.99
+                    </pre>
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="propfile.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="control.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Respaldando un ResourceBundle con Ficheros de Propiedades<br />
+            <b>Página siguiente:</b> Personalizando la Carga de un Resource Bundle
+        </div>
+    </body>
+</html> 

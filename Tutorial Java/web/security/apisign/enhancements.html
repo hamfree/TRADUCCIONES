@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Debilidades y Alternativas (Los Tutoriales de Java&trade; &gt; Características de Seguridad en Java SE &gt; 
+            Generando y Verificando Firmas)
+        </title>
+        <meta name="description" content="Este tutorial de seguridad de Java describe el uso de firmas digitales, claves y servicios 
+              de criptografía" />
+        <meta name="keywords" content="programación java, aprender java, código ejemplo java, seguridad java, criptografía, firma 
+              digital, verificación firma, código de firma" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Generando y Verificando Firmas</a></div>
+                <div class="linkAHEAD"><a href="gensig.html">Generando una Firma Digital</a></div>
+                <div class="linkBHEAD"><a href="step1.html">Preparar la Estructura Inicial del Programa</a></div>
+                <div class="linkBHEAD"><a href="step2.html">Generar las Claves Públicas y Privadas</a></div>
+                <div class="linkBHEAD"><a href="step3.html">Firmando los Datos</a></div>
+                <div class="linkBHEAD"><a href="step4.html">Salvar la Firma y la Clave Pública en los Ficheros</a></div>
+                <div class="linkBHEAD"><a href="step5.html">Compilar y Ejecutar el Programa</a></div>
+                <div class="linkAHEAD"><a href="versig.html">Verificando una Signatura Digital</a></div>
+                <div class="linkBHEAD"><a href="vstep1.html">Preparar la Estructura Inicial del Programa</a></div>
+                <div class="linkBHEAD"><a href="vstep2.html">Introducir y Convertir los Bytes Codificados de la Clave Pública</a></div>
+                <div class="linkBHEAD"><a href="vstep3.html">Introducir los Bytes de la Firma</a></div>
+                <div class="linkBHEAD"><a href="vstep4.html">Verificar la Firma</a></div>
+                <div class="linkBHEAD"><a href="vstep5.html">Compilar y Ejecutar el Programa</a></div>
+                <div class="nolinkAHEAD">Debilidades y Alternativas</div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Características de Seguridad en Java SE<br />
+                <b>Lección:</b> Generando y Verificando Firmas
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Características de Seguridad en Java SE</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Generando y Verificando Firmas</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="vstep5.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../userperm/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Debilidades y Alternativas</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Los programas <code>GenSig</code> y <code>VerSig</code> en esta lección ilustran el uso de la IPA de Seguridad 
+                    del KDJ para generar una firma digital de unos datos y para verificar que esa firma es auténtica. Sin embargo, 
+                    el escenario real representado por esos programas, en el que un remitente utiliza la IPA de seguridad de KDJ 
+                    para generar un nuevo par de claves pública/privada, el remitente almacena los bytes de la clave pública 
+                    codificada en un archivo y el receptor lee los bytes de la clave, no es necesariamente realista y tiene una 
+                    falla importante potencial.
+                </p>
+                <p>
+                    En muchos casos no se necesita que se generen las claves; ya existen, como claves codificadas en archivos o 
+                    como entradas en un almacén de claves.
+                </p>
+                <p>
+                    La falla importante potencial es que nada garantiza la autenticidad de la clave pública que el destinatario 
+                    recibe, ¡y el programa <code>VerSig</code> correctamente verifica la autenticidad de una firma solo si la clave 
+                    pública que se proporciona es <i>en sí misma</i> auténtica!
+                </p>
+                <h2>
+                    Trabajando con Bytes de Clave Codificados
+                </h2>
+                <p>
+                    Algunas veces los bytes de clave codificados ya existen en archivos para el par de claves a usar para firma y 
+                    verificación. Si ese es el caso el programa <code>GenSig</code> puede importar los bytes codificados de la clave 
+                    privada y convertirlos en un <code>PrivateKey</code> necesitado par firmar,  a través de lo siguiente, asumiendo 
+                    que el nombre del archivo que contiene los bytes de la clave privada están en la <code>String</code> 
+                    <code>privkeyfile</code> y que los bytes representan una clava DSA que ha sido codificada usando el estándar 
+                    PKCS #8.
+                </p>
+                <div class="codeblock">
+                    <pre>
+FileInputStream keyfis = new FileInputStream(privkeyfile);
+byte[] encKey = new byte[keyfis.available()];
+keyfis.read(encKey);
+keyfis.close();
+
+PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(encKey);
+
+KeyFactory keyFactory = KeyFactory.getInstance("DSA");
+PrivateKey privKey = keyFactory.generatePrivate(privKeySpec);
+                    </pre>
+                </div>
+                <p>
+                    <code>GenSig</code> ya no necesita más salvar los bytes de clave pública en un archivo, ya tienen una.
+                </p>
+                <p>
+                    En este caso el remitente envia al destinatario
+                </p>
+                <ul>
+                    <li>
+                        el archivo aún existente que contiene los bytes codificados de la clave pública (a menos que el destinatario 
+                        ya tenga ésta) y 
+                    </li>
+                    <li>el archivo de datos y el archivo de firma exportados por <code>GenSig</code>.</li>
+                </ul>
+                <p>
+                    El programa <code>VerSig</code> permanece sin cambios, ya que espera bytes de clave pública codificados en un 
+                    archivo.
+                </p>
+                <p>
+                    Pero, ¿qué pasa con el problema potencial de que un usuario malintencionado intercepte los archivos y los 
+                    reemplace todos de tal manera que no se pueda detectar su cambio? En algunos casos esto no es un problema, 
+                    porque la gente ya ha intercambiado las claves públicas cara a cara o a través de una tercera parte de 
+                    confianza que hace el intercambio cara a cara. Después de eso, se pueden realizar múltiples intercambios 
+                    subsiguientes de archivos y firmas de forma remota (es decir, entre dos personas en diferentes ubicaciones), y 
+                    las claves públicas pueden usarse para verificar su autenticidad. Si un usuario malicioso intenta cambiar los 
+                    datos o la firma, esto es detectado por <code>VerSig</code>.
+                </p>
+                <p>
+                    Si un intercambio de claves cara a cara no es posible, puede intentar otros métodos de aumentar la probabilidad 
+                    de una recepción adecuada. Por ejemplo, puede enviar su clave pública a través del método más seguro posible 
+                    de forma previa a los subsecuentes intercambios de datos y ficheros de firmas, quizás usando medios menos 
+                    seguros.
+                </p>
+                <p>
+                    En general, enviar los datos y la firma separadamente de su clave pública reduce enormemente la probabilidad de 
+                    un ataque. A menos que se cambien los tres archivos, y en cierta manera descrita en el siguiente párrafo, 
+                    <code>VerSig</code> no detectará cualquier manipulación.
+                </p>
+                <p>
+                    Si los tres archivos (el documento de datos, la clave pública, y la firma) fueran interceptados por un usuario 
+                    malicioso, esa persona podrían reemplazar el documento con otra cosa, firmarla con una clave privada, y 
+                    reenviar en tu nombre el documento reemplazado, la nueva firma, y la clave pública correspondiente a la clave 
+                    privada usada para generar la nueva firma. Después <code>VerSig</code> informaría de una verificación exitosa, 
+                    y pensará que el documento provino del remitente original. Por lo tanto, debe tomar medidas para asegurarse de 
+                    que al menos la clave pública se reciba intacta (<code>VerSig</code> detecta cualquier manipulación de los otros 
+                    archivos), o puede usar certificados para facilitar la autenticación de la clave pública, como se describe en la 
+                    siguiente sección.
+                </p>
+                <h2>
+                    Trabajando con Certificados
+                </h2>
+                <p>
+                    Es más común en criptografía intercambiar <i>certificados</i> que contienen claves públicas en lugar de las 
+                    claves en sí mismas.
+                </p>
+                <p>
+                    Un beneficio es que un certificado está firmado por una entidad (el <i>emisor</i>) para verificar que la clave 
+                    pública adjunta es la clave pública real de otra entidad (el <i>sujeto</i> o <i>propietario</i>), Habitualmente 
+                    una <i>autoridad de certificación</i> (AC) de terceros de confianza verifica la identidad del sujeto y después 
+                    garantiza que es el propietario de la clave pública mediante la firma del certificado.
+                </p>
+                <p>
+                    Otro beneficio de usar certificados es que puede verificar la validez de un certificado que recibió verificando 
+                    su firma digital, utilizando la clave pública de su emisor (firmante), que a su vez puede almacenarse en un 
+                    certificado, cuya firma se puede verificar utilizando la clave pública de ese emisor de certificado; esa clave 
+                    pública en sí misma puede almacenarse en un certificado, y así sucesivamente, hasta que llegue a una clave 
+                    pública en la que ya confíe.
+                    
+                </p>
+                <p>
+                    Si no puede establecer una cadena de confianza (quizás porque los certificados requeridos del emisor no están 
+                    disponibles), la <b>huella digital</b> del certificado puede ser calculada. Cada huella digital es un número 
+                    relativamente corto que identifica el certificado de manera única y confiable. (Técnicamente es un valor resumen
+                    de la información del certificado, usando un resumen de mensaje, también conocido como función hash 
+                    unidireccional). Puede llamar al propietario del certificado y comparar las huellas digitales del certificado 
+                    que recibió con las enviadas. Si son las mismas, los certificados son los mismos.
+                </p>
+                <p>
+                    Sería más seguro para <code>GenSig</code> crear un certificado que contenga la clave pública y para 
+                    <code>VerSig</code> para entonces importar el certificado y extraer la clave pública. Sin embargo, el KDJ no 
+                    tiene una IPA de certificado público que le permita crear un certificado desde una clave pública, así que el 
+                    programa <code>GenSig</code> no puede crear un certificado desde la clave pública que generó (Sin embargo, 
+                    <i>hay</i> una IPA pública para extraer una clave pública de un certificado).
+                </p>
+                <p>
+                    Si quiere, puede usar diversar herramientas de seguridad, no la IPA, para firmar sus documentos importantes y 
+                    trabajar con certificados en un almacén de claves, como se hizo en la lección 
+                    <a class="TutorialLink" target="_top" href="../toolfilex/index.html">Intercambiando Archivos</a>.
+                </p>
+                <p>
+                    Alternativamente puede usar la IPA y modificar sus programas para que trabajen con una clave privada ya 
+                    existente y su correspondiente clave pública (en un certificado) de su almacén de claves. Para empezar, 
+                    modifique el programa <code>GenSig</code> para extraer una clave privada de un almacén de claves en vez de 
+                    generar nuevas claves. Primero, asumamos lo siguiente:
+                </p>
+                <ul>
+                    <li>El nombre del almacén de claves está en la <code>String</code> <code>ksName</code></li>
+                    <li>El tipo del almacén de claves es &quot;JKS&quot;, el tipo propietario de Oracle.</li>
+                    <li>La contraseña del almacén de claves está en la matriz de caracteres <code>spass</code></li>
+                    <li>
+                        El alias a la entrada del almacén de claves que contiene la clave privada, y el certificado de la clave 
+                        pública está en la <code>String</code> <code>alias</code>
+                    </li>
+                    <li>La contraseña de la clave privada está en la matriz de caracteres <code>kpass</code></li>
+                </ul>
+                <p>
+                    Luego puede extraer la clave privada del almacén de claves con lo siguiente.
+                </p>
+                <div class="codeblock">
+                    <pre>
+KeyStore ks = KeyStore.getInstance("JKS");
+FileInputStream ksfis = new FileInputStream(ksName); 
+BufferedInputStream ksbufin = new BufferedInputStream(ksfis);
+
+ks.load(ksbufin, spass);
+PrivateKey priv = (PrivateKey) ks.getKey(alias, kpass);
+                    </pre>
+                </div>
+                <p>
+                    Puede extraer el certificado de la clave pública del almacén de clave y salvar sus bytes codificados a un 
+                    archivo llamado <code>suecert</code>, con lo siguiente.
+                </p>
+                <div class="codeblock">
+                    <pre>
+java.security.cert.Certificate cert = ks.getCertificate(alias);
+byte[] encodedCert = cert.getEncoded();
+
+// Salva el certificado en un archivo llamado "suecert" 
+
+FileOutputStream certfos = new FileOutputStream("suecert");
+certfos.write(encodedCert);
+certfos.close();
+                    </pre>
+                </div>
+                <p>
+                    Después envía el archivo de datos, la firma, y el certificado al destinatario. El destinatario verifica la 
+                    autenticidad del certificado obteniendo primero las huellas digitales del certificado, a través del comando 
+                    <code>keytool -printcert</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+<b>keytool -printcert -file suecert</b>
+Owner: CN=Susan Jones, OU=Purchasing, O=ABC, L=Cupertino, ST=CA, C=US
+Issuer: CN=Susan Jones, OU=Purchasing, O=ABC, L=Cupertino, ST=CA, C=US
+Serial number: 35aaed17
+Valid from: Mon Jul 13 22:31:03 PDT 1998 until:
+Sun Oct 11 22:31:03 PDT 1998
+Certificate fingerprints:
+MD5:  1E:B8:04:59:86:7A:78:6B:40:AC:64:89:2C:0F:DD:13
+SHA1: 1C:79:BD:26:A1:34:C0:0A:30:63:11:6A:F2:B9:67:DF:E5:8D:7B:5E
+                    </pre>
+                </div>
+                <p>
+                    Después el receptor verifica las huellas digitales, quizás llamando al remitente y comparándolas con las del 
+                    certificado del remitente o buscándolas en un repositorio público.
+                </p>
+                <p>
+                    El programa de verificación del destinatario (un <code>VerSig</code> modificado) puede después importar el 
+                    certificado y extraer la clave pública de este a través de lo siguiente, asumiendo que el nombre del archivo 
+                    de certificado (por ejemplo, <code>suecert</code>) está en la <code>String</code> <code>certName</code>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+FileInputStream certfis = new FileInputStream(certName);
+java.security.cert.CertificateFactory cf =
+    java.security.cert.CertificateFactory.getInstance("X.509");
+java.security.cert.Certificate cert =  cf.generateCertificate(certfis);
+PublicKey pub = cert.getPublicKey();
+                    </pre>
+                </div>
+                <h2>
+                    Asegurar la Confidencialidad de los Datos
+                </h2>
+                <p>
+                    Suponga que quiere mantener los contenidos de los datos confidenciales de forma que la gente que intente 
+                    accidentalmente o maliciosamente verla durante el transporte (o en su propia máquina o disco) no pueda hacerlo. 
+                    Para mantener los datos confidenciales, debe cifrarlos y almacenarlos y enviar solo el resultado del cifrado 
+                    (conocido como <i>texto cifrado</i>). El destinatario puede descifrar el texto cifrado para obtener una copia 
+                    de los datos originales.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="vstep5.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../userperm/index.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Compilar y Ejecutar el Programa<br />
+            <b>Página siguiente:</b> Implementing Your Own Permission
+        </div>
+    </body>
+</html> 

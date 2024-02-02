@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Peticiones HTTP Condicionales</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jaxrs-advanced004.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jaxrs-advanced006.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="GKQDA">
+      <h2 id="conditional-http-requests">Peticiones HTTP Condicionales</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            JAX-RS proporciona soporte para solicitudes HTTP condicionales <code>GET</code> y 
+            <code>PUT</code>. Las solicitudes <code>GET</code> condicionales ayudan a ahorrar ancho de banda 
+            al mejorar la eficiencia del procesamiento del cliente.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Una solicitud <code>GET</code> puede devolver una respuesta No modificada (304) si la 
+            representación no ha cambiado desde la solicitud anterior. Por ejemplo, un sitio web puede 
+            devolver respuestas 304 para todas sus imágenes estáticas que no han cambiado desde la solicitud 
+            anterior.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Una solicitud <code>PUT</code> puede devolver una respuesta de condición previa fallida (412) si 
+            la representación se ha modificado desde la última solicitud. El condicional <code>PUT</code> 
+            puede ayudar a evitar el problema de actualización perdida.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Las solicitudes HTTP condicionales se pueden usar con los encabezados <code>Last-Modified</code> y 
+            <code>ETag</code>. El encabezado <code>Last-Modified</code> puede representar fechas con una 
+            granularidad de un segundo.
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="prettyprint highlight">
+              <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Path("/employee/{joiningdate}")
+public class Employee {
+    Date joiningdate;
+    @GET
+    @Produces("application/xml")
+    public Employee(@PathParam("joiningdate") Date joiningdate,
+                    @Context Request req,
+                    @Context UriInfo ui) {
+        this.joiningdate = joiningdate;
+        ...
+        this.tag = computeEntityTag(ui.getRequestUri());
+        if (req.getMethod().equals("GET")) {
+            Response.ResponseBuilder rb = req.evaluatePreconditions(tag);
+            if (rb != null) {
+                throw new WebApplicationException(rb.build());
+            }
+        }
+    }
+}
+              </code>
+            </pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            En este fragmento de código, el constructor de la clase <code>Employee</code> calcula la etiqueta 
+            de entidad a partir del URI de solicitud y llama al método 
+            <code>request.evaluatePreconditions</code> con esa etiqueta. Si la solicitud de un cliente 
+            devuelve un encabezado <code>If-none-match</code> con un valor que tiene la misma etiqueta de 
+            entidad que se calculó, <code>evaluate.Preconditions</code> devuelve una respuesta precompletada 
+            con un código de estado 304 y un conjunto de etiquetas de entidad que se pueden generar y 
+            devolver.
+          </p>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jaxrs-advanced004.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jaxrs-advanced006.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

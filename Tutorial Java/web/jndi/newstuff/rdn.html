@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Manipulando Nombre Distinguido Relativo (RDN) (Los Tutoriales de Java&trade; &gt; 
+            Java Naming and Directory Interface &gt; Nuevas funcionalidades en KDJ 5.0 y KDJ 6)
+        </title>
+        <meta name="description" content="Este tutorial de Java JNDI describe la tecnología de Nombrado en Java e Interfaz de 
+              Directorio (JNDI), operaciones de nombre y directorio, y LDAP" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jndi, ldap, jndi service provider" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Nuevas funcionalidades en KDJ 5.0 y KDJ 6</a></div>
+                <div class="linkAHEAD"><a href="dn.html">Recuperando el Nombre Distinguido</a></div>
+                <div class="linkAHEAD"><a href="controls-std.html">Controles estándar de LDAP</a></div>
+                <div class="linkAHEAD"><a href="paged-results.html">Control de Resultados Paginados</a></div>
+                <div class="linkAHEAD"><a href="sort.html">Control de Ordenación</a></div>
+                <div class="linkAHEAD"><a href="mdsaIT.html">Gestionar Control de Referencia</a></div>
+                <div class="linkAHEAD"><a href="ldapname.html">Manipulando LdapName (Nombre Distinguido)</a></div>
+                <div class="nolinkAHEAD">Manipulando Nombre Distinguido Relativo (RDN)</div>
+                <div class="linkAHEAD"><a href="readtimeout.html">Configuración de Tiempo de Espera para Operaciones LDAP</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Nombrado en Java e Interfaz de Directorio<br />
+                <b>Lección:</b> Nuevas funcionalidades en KDJ 5.0 y KDJ 6
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Nombrado en Java e Interfaz de Directorio</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Nuevas funcionalidades en KDJ 5.0 y KDJ 6</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="ldapname.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="readtimeout.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Manipulando Nombre Distinguido Relativo (RDN)</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    La clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/ldap/Rdn.html">
+                        <code>javax.naming.ldap.Rdn</code></a> representa un nombre Distinguido Relativo (RDN) como se especifica en 
+                    <a class="OutsideLink" target="_blank" 
+                       href="http://www.ietf.org/rfc/rfc2253.txt">RFC 2253</a>. Un RDN representa un componente de un DN como se 
+                    explica en la lección 
+                    <a class="TutorialLink" target="_top" href="ldapname.html">ManipularLdapName</a>. Un RDN está compuesto de 
+                    par(es) de tipo y valor. Ejemplos de RDNs son:
+                </p>
+                <ul>
+                    <li>
+                        <code>OU=Sun</code>
+                    </li>
+                    <li>
+                        <code>OU=Sales+CN=J.Smith</code>.<br />
+                        El ejemplo de arriba muestra una representación de un RDN multivalor.
+                    </li>
+                </ul>
+                <p>
+                    La clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/ldap/Rdn.html">
+                        <code>Rdn</code></a> proporciona métodos para acceder a los pares nombre/valor de un RDN, obtener su 
+                    representación de cadena, recuperar una vista de 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/directory/Attributes.html">
+                        <code>Attributes</code></a>, compara y determinar igualdades de RDNs y métodos para escapar y dejar de 
+                    escapar la parte de valor del RDN.
+                </p>
+                <p>
+                    La clase <code>Rdn</code> es inmutable.
+                </p>
+                <h2>
+                    Construir un Rdn
+                </h2>
+                <p>
+                    Un Rdn puede ser construído con el par nombre y valor especificado, si es un RDN de un único par nombre/valor.
+                    Para un RDN multi-valor, debe crear un conjunto de atributos que consiste de todos los pares nombre/valor y 
+                    usar un constructor que toma <code>Attributes</code> como un argumento. Puede también crear un Rdn desde su 
+                    representación de cadena especificada en 
+                    <a class="OutsideLink" target="_blank" 
+                       href="http://www.ietf.org/rfc/rfc2253.txt">RFC 2253</a>. Finalmente, puede clonar un Rdn usando su 
+                    constructor de copia. Aquí tiene un 
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/RdnConstructors.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/RdnConstructors.java'); return false;">
+                        <code>ejemplo</code></a> que crea RDNs usando diferentes tipos de constructores.
+                </p>
+                <div class="codeblock">
+                    <pre>
+        Rdn rdn1 = new Rdn("ou= Juicy\\, Fruit");
+        System.out.println("rdn1:" + rdn1.toString());
+
+        Rdn rdn2 = new Rdn(rdn1);
+        System.out.println("rdn2:" + rdn2.toString());
+
+        Attributes attrs = new BasicAttributes();
+        attrs.put("ou", "Juicy, Fruit");
+        attrs.put("cn", "Mango");
+        Rdn rdn3 = new Rdn(attrs);
+        System.out.println("rdn3:" + rdn3.toString());
+
+        Rdn rdn4 = new Rdn("ou", "Juicy, Fruit");
+        System.out.println("rdn4:" + rdn4.toString());
+                    </pre>
+                </div>
+                <h2>
+                    Acceder a pares de tipo/valor de un RDN
+                </h2>
+                <p>
+                    Los tipos/valores de un RDN pueden obtenerse usando los métodos de abajo:
+                </p>
+                <p>
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/ldap/Rdn.html#getType--">
+                        <code>getType()</code></a><br />
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/ldap/Rdn.html#getValue--">
+                        <code>getValue()</code></a><br />
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/ldap/Rdn.html#toAttributes--">
+                        <code>toAttributes()</code></a>
+                </p>
+                <p>
+                    Para un RDN compuesto de un único par tipo/valor, el método 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/ldap/Rdn.html#getType--">
+                        <code>getType()</code></a> devuelve el tipo y el método 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/ldap/Rdn.html#getValue--">
+                        <code>getValue()</code></a> devuelve el valor del RDN. El método 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/ldap/Rdn.html#toAttributes--">
+                        <code>toAttributes()</code></a> devuelve la vista de atributo de los pares tipo/valor. 
+                    El 
+                    <a class="SourceLink" target="_blank" href="examples/RdnGetters.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/RdnGetters.java'); return false;">
+                        <code>ejemplo</code></a> de abajo imprime los pares tipo/valor de los RDNs.
+                </p>
+                <div class="codeblock">
+                    <pre>
+        Attributes attrs = new BasicAttributes();
+        attrs.put("o", "Yellow");
+        attrs.put("cn", "Mango");
+
+        // create a binary value for the RDN
+        byte[] mangoJuice = new byte[6];
+        for (int i = 0; i &lt; mangoJuice.length; i++) {
+            mangoJuice[i] = (byte) i;
+        }
+        attrs.put("ou", mangoJuice);
+        Rdn rdn = new Rdn(attrs);
+        
+        System.out.println();
+        System.out.println("size:" + rdn.size());
+        System.out.println("getType(): " + rdn.getType());
+        System.out.println("getValue(): " + rdn.getValue());
+        
+        // test toAttributes
+        System.out.println();
+        System.out.println("toAttributes(): " + rdn.toAttributes());
+                    </pre>
+                </div>
+                <h2>
+                    Obtener la Representación de Cadena
+                </h2>
+                <p>
+                    Para obtener la representación de cadena de un RDN formateado de acuerdo a la sintaxis especificada en 
+                    <a class="OutsideLink" target="_blank" 
+                       href="http://www.ietf.org/rfc/rfc2253.txt">RFC 2253</a>, puede usar:
+                </p>
+                <p>
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/ldap/Rdn.html#toString--">
+                        <code>toString()</code></a>
+                </p>
+                <p>
+                    Cuando use el constructor Rdn que toma un argumento <code>String</code>, puede proporcionar la representación 
+                    de cadena de un RDN, y obtiene de vuelta una instancia Rdn. Para hacer lo inverso, esto es, para obtener la 
+                    representación de cadena de una instancia Rdn, use toString(). El resultado de toString() se puede 
+                    retroalimentar al constructor de Rdn para producir una instancia Rdn que es igual a la instancia original Rdn.
+                </p>
+                <p>
+                    Aquí tiene un 
+                    <a class="SourceLink" target="_blank" href="examples/RdntoString.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/RdntoString.java'); return false;">
+                        <code>ejemplo</code></a>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Rdn rdn = new Rdn("cn=Juicy\\,Fruit");
+String str = rdn.toString();
+System.out.println(str);
+Rdn rdn2 = new Rdn(str);
+System.out.println(rdn.equals(rdn2));    // true
+                    </pre>
+                </div>
+                <h2>
+                    Comparar RDNs
+                </h2>
+                <p>
+                    Los métodos de abajo permiten la comparación de RDNs:
+                </p>
+                <p>
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/ldap/Rdn.html#equals-Object-">
+                        <code>equals(Object Rdn)</code></a><br />
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/ldap/Rdn.html#compareTo-Object-">
+                        <code>compareTo(Object Rdn)</code></a>
+                </p>
+                <p>
+                    Puede usar compareTo()  para ordenar una lista de instancias Rdn. equals()  le permite determinar si dos Rdns 
+                    son sintáticamente iguales. Dos Rdns son iguales si ambos tienen los mismos pares tipo/valor (coincidencia 
+                    exacta de mayúsculas y minúsculas). El orden de los compoentes en los RDNs multivalor no es significante.
+                </p>
+                <p>
+                    Aquí tieene un 
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/CompareRdns.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/CompareRdns.java'); return false;">
+                        <code>ejemplo</code></a>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+        Rdn one = new Rdn("ou=Sales+cn=Bob");
+        Rdn two = new Rdn("cn=Bob+ou=Sales");
+        Rdn three = new Rdn("ou=Sales+cn=Bob+c=US");
+        Rdn four = new Rdn("cn=lowercase");
+        Rdn five = new Rdn("cn=LowerCASE");
+        System.out.println(one.equals(two));    // true
+        System.out.println(two.equals(three));  // false
+        System.out.println(one.equals(three));  // false
+        System.out.println(four.equals(five));  // true
+                    </pre>
+                </div>
+                <h2>
+                    Escapar y Dejar de Escapar Caracteres Especiales
+                </h2>
+                <p>
+                    Uno de los mejores usos de la clase Rdn es cuando uno tiene que lidiar con DNs que constan de caracteres 
+                    especiales. Automáticamente se encarga de escapar y eliminar los caracteres especiales. Los caracteres como 
+                    &#39;\&#39; (barra invertida), &#39;,&#39;(coma), + (más) etc tienen una semántica específica de acuerdo al 
+                    <a class="OutsideLink" target="_blank" href="http://www.ietf.org/rfc/rfc2253.txt">RFC 2253</a>. Puede encontrar 
+                    la lista de todos los caracteres especiales en RFC2253. Cuando estos caracteres se usan como literales en un 
+                    DN, deben ser escapados con un &#39;\&#39; (barra invertida).
+                </p>
+                <p>
+                    Por ejemplo, considere un RDN: <code>cn=Juicy, Fruit</code>. el carácter , (coma) aparece entre Juicy y 
+                    Fruit es un carácter especial que necesita ser escapado por un &#39;\&#39; (barra invertida). El RDN 
+                    resultante formateado sintácticamente se ve a continuación: <code>cn=Juicy\, Fruit</code>. Sin embargo, el 
+                    carácter &#39;\&#39; (barra invertida) en sí misma es un carácter especial de acuerdo a la sintaxis de Cadena 
+                    del lenguaje Java, y necesita ser escapado con un &#39;\&#39; (barra invertida) de nuevo. El formato de Cadena 
+                    del Lenguaje de Java y la especificación 
+                    <a class="OutsideLink" target="_blank" href="http://www.ietf.org/rfc/rfc2253.txt">RFC 2253</a> usan ambas 
+                    &#39;\&#39; (barra invertida) para escapar los caracteres especiales. Y por lo tanto, la Cadena RDn con 
+                    formato Java se ve a continuación: <code>cn=Juicy\\, Fruit</code>. Dese cuenta que, las reglas de formato 
+                    mencionadas anteriormente se aplican solo al componente de valor de un Rdn. La clase <code>Rdn</code> 
+                    proporciona dos métodos <code>static</code> para gestionar automáticamente el marcado y desmarcado de los 
+                    valores RDN:
+                </p>
+                <p>
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/ldap/Rdn.html#escapeValue--">
+                        <code>escapeValue()</code></a><br />
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/naming/ldap/Rdn.html#unescapeValue--">
+                        <code>unescapeValue()</code></a>
+                </p>
+                <p>
+                    El 
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/EscapingDNs.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/EscapingDNs.java'); return false;">
+                        <code>ejemplo</code></a> de abajo muestra como obtener la representación de cadena de un DN sin tener que 
+                    tratar con la sintaxis de gestionar caracteres especiales definidos en 
+                    <a class="OutsideLink" target="_blank" href="http://www.ietf.org/rfc/rfc2253.txt">RFC 2253</a>.
+                </p>
+                <div class="codeblock">
+                    <pre>
+    // DN with ',' (comma)
+    String unformatted = "Juicy, Fruit";
+    String formatted = Rdn.escapeValue(unformatted);
+    LdapName dn = new LdapName("cn=" + formatted);
+    System.out.println("dn:" + dn);
+
+
+    unformatted = "true+false";
+    formatted = Rdn.escapeValue(unformatted); 
+    dn = new LdapName("cn=" + formatted);
+    System.out.println("dn:" + dn);
+
+    // DN with a binary value as one one of its attribute value
+    byte[] bytes = new byte[] {1, 2, 3, 4};
+    formatted = Rdn.escapeValue(bytes);
+    System.out.println("Orig val: " + bytes + "Escaped val: " + formatted);
+                    </pre>
+                </div>
+                <p>
+                    De forma similar el uso del método estático <code>unescapeValue()</code> se puede obtener la cadena original 
+                    del valor formateado.
+                    <a class="SourceLink" target="_blank" 
+                       href="examples/UnescapingValues.java" 
+                       onclick="showCode('../../displayCode.html', 'examples/UnescapingValues.java'); return false;">
+                        <code>Aquí</code></a> tiene un ejemplo para recuperar el valor original.
+                </p>
+                <div class="codeblock">
+                    <pre>
+    // DN with ',' (comma)
+    String unformatted = "Juicy, Fruit";
+    String formatted = Rdn.escapeValue(unformatted);
+    System.out.println("Formatted:" + formatted);
+    Object original = Rdn.unescapeValue(formatted);
+    System.out.println("Original:" +  original);  
+
+    // DN with a '+' (plus)
+    unformatted = "true+false";
+    formatted = Rdn.escapeValue(unformatted); 
+    System.out.println("Formatted:" + formatted);
+    original = Rdn.unescapeValue(formatted);
+    System.out.println("Original:" +  original);  
+
+    // DN with a binary value as one one of its attribute value
+    byte[] bytes = new byte[] {1, 2, 3, 4};
+    formatted = Rdn.escapeValue(bytes);
+    System.out.println("Formatted:" + formatted);
+    original = Rdn.unescapeValue(formatted);
+    System.out.println("Original:" +  original);  
+                    </pre>
+                </div>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="ldapname.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="readtimeout.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Manipulando LdapName (Nombre Distinguido)<br />
+            <b>Página siguiente:</b> Configuración de Tiempo de Espera para Operaciones LDAP
+        </div>
+    </body>
+</html> 

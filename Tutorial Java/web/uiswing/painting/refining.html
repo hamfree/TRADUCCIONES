@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Refinando el Diseño (Los Tutoriales de Java&trade; &gt; Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing &gt;
+            Realización de Pintado Personalizado)
+        </title>
+        <meta name="description" content="Este tutorial de Swing Java describe el desarrollo de interfaces gráficas de usuario (GUI)
+              para aplicaciones y applets que utilizan componentes Swing" />
+        <meta name="keywords" content="java programming, learn java, java sample code, java swing, java ui, java user interface,
+              swing components, swing events, swing layout  " />
+        <link rel="stylesheet" href="../../indice.css" type="text/css" />
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Realización de Pintado Personalizado</a></div>
+                <div class="linkAHEAD"><a href="step1.html">Creando la Aplicación Demo (Paso 1)</a></div>
+                <div class="linkAHEAD"><a href="step2.html">Creando la Aplicación Demo (Paso 2)</a></div>
+                <div class="linkAHEAD"><a href="step3.html">Creando la Aplicación Demo (Paso 3)</a></div>
+                <div class="nolinkAHEAD">Refinando el Diseño</div>
+                <div class="linkAHEAD"><a href="closer.html">Una Mirada más Cercana al Mecanismo de Pintado</a></div>
+                <div class="linkAHEAD"><a href="summary.html">Sumario</a></div>
+                <div class="linkAHEAD"><a href="problems.html">Resolviendo Problemas Comunes de Pintado</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing<br />
+                <b>Lección:</b> Realización de Pintado Personalizado
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Creando una IGU (Interfaz Gráfica de Usuario) con JFC/Swing</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Realización de Pintado Personalizado</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="step3.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="closer.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>Refinando el Diseño</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Para propósitos de demostración tiene sentido mantener la lógica de pintado contenida enteramente dentro de la 
+                    clase <code>MyPanel</code>. Pero si su aplicación necesita rastrear múltiples instancias, un patrón que podría 
+                    usar es factorizar ese código en una clase separada para que cada cuadrado puede tratarse como un objeto 
+                    individual. Esta técnica es común en la programación de juegos en 2D y, a veces, se la denomina como 
+                    &quot;animación de sprites&quot;.
+                </p>
+                <p>
+                     Pulse el botón Lanzar para ejecutar SwingPaintDemo4 usando 
+                    <a class="OutsideLink" target="_blank" 
+                       href="http://www.oracle.com/technetwork/java/javase/javawebstart/index.html">Java&trade; Web Start</a> (
+                    <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">descargue KDJ 7 o posterior</a>). 
+                    Alternativamente, para compilar y ejecutar el ejemplo por sí mismo, consulte el 
+                    <a href="../examples/painting/index.html#SwingPaintDemo4">índice de ejemplos</a>.
+                </p>
+                <a href="https://docs.oracle.com/javase/tutorialJWS/samples/uiswing/SwingPaintDemo4Project/SwingPaintDemo4.jnlp">
+                    <img src="../../images/jws-launch-button.png" width="88" height="23" class="imgbottom"
+                         alt="Lanza el ejemplo SwingPaintDemo4" /></a>
+                <br />
+                <div class="codeblock">
+                    <pre>
+package painting;
+
+import javax.swing.SwingUtilities;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.BorderFactory;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics; 
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseMotionAdapter;
+
+public class SwingPaintDemo4 {
+    
+    public static void main(String[] args) {
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                createAndShowGUI(); 
+            }
+        });
+    }
+
+    private static void createAndShowGUI() {
+        System.out.println("Created GUI on EDT? "+
+        SwingUtilities.isEventDispatchThread());
+        JFrame f = new JFrame("Swing Paint Demo");
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        f.add(new MyPanel());
+        f.setSize(250,250);
+        f.setVisible(true);
+    } 
+
+}
+
+class MyPanel extends JPanel {
+
+    <b>RedSquare redSquare = new RedSquare();</b>
+
+    public MyPanel() {
+
+        setBorder(BorderFactory.createLineBorder(Color.black));
+
+        addMouseListener(new MouseAdapter(){
+            public void mousePressed(MouseEvent e){
+                moveSquare(e.getX(),e.getY());
+            }
+        });
+
+        addMouseMotionListener(new MouseAdapter(){
+            public void mouseDragged(MouseEvent e){
+                moveSquare(e.getX(),e.getY());
+            }
+        });
+
+    }
+
+    private void moveSquare(int x, int y){
+
+        <b>// Current square state, stored as final variables 
+        // to avoid repeat invocations of the same methods.
+        final int CURR_X = redSquare.getX();
+        final int CURR_Y = redSquare.getY();
+        final int CURR_W = redSquare.getWidth();
+        final int CURR_H = redSquare.getHeight();
+        final int OFFSET = 1;
+
+        if ((CURR_X!=x) || (CURR_Y!=y)) {
+
+            // The square is moving, repaint background 
+            // over the old square location. 
+            repaint(CURR_X,CURR_Y,CURR_W+OFFSET,CURR_H+OFFSET);
+
+            // Update coordinates.
+            redSquare.setX(x);
+            redSquare.setY(y);
+
+            // Repaint the square at the new location.
+            repaint(redSquare.getX(), redSquare.getY(), 
+                    redSquare.getWidth()+OFFSET, 
+                    redSquare.getHeight()+OFFSET);
+        }</b>
+    }
+
+    public Dimension getPreferredSize() {
+        return new Dimension(250,200);
+    }
+    
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);       
+        g.drawString("This is my custom Panel!",10,20);
+
+        <b>redSquare.paintSquare(g);</b>
+    }  
+}
+
+<b>class RedSquare{
+
+    private int xPos = 50;
+    private int yPos = 50;
+    private int width = 20;
+    private int height = 20;
+
+    public void setX(int xPos){ 
+        this.xPos = xPos;
+    }
+
+    public int getX(){
+        return xPos;
+    }
+
+    public void setY(int yPos){
+        this.yPos = yPos;
+    }
+
+    public int getY(){
+        return yPos;
+    }
+
+    public int getWidth(){
+        return width;
+    } 
+
+    public int getHeight(){
+        return height;
+    }
+
+    public void paintSquare(Graphics g){
+        g.setColor(Color.RED);
+        g.fillRect(xPos,yPos,width,height);
+        g.setColor(Color.BLACK);
+        g.drawRect(xPos,yPos,width,height);  
+    }
+}</b>
+                    </pre>
+                </div>
+                <p>
+                    En esta implementación en particular hemos creado una clase <code>RedSquare</code> enteramente desde cero. 
+                    Otra aproximación sería reutilizar la funcionalidad de <code>java.awt.Rectangle</code> haciendo que 
+                    <code>RedSquare</code> sea su subclase. Independientemente de cómo se implemente <code>RedSquare</code>, el 
+                    punto importante es que le hemos dado a la clase un método que acepta un objeto <code>Graphics</code>, y ese 
+                    método se invoca desde el método <code>paintComponent</code> del panel. Esta separación mantiene su código 
+                    limpio porque esencialmente le dice a cada cuadro rojo que se pinte a sí mismo.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="step3.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="closer.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales </a>.
+                        </p>
+                        <p class="footertext">Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.</p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Creando la Aplicación Demo (Paso 3)<br />
+            <b>Página siguiente:</b> Una Mirada más Cercana al Mecanismo de Pintado
+        </div>
+    </body>
+</html>

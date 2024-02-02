@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Uso de la IPA de JMS en Aplicaciones de Java EE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jms-concepts004.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jms-concepts006.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BNCGL">
+      <h2 id="using-the-jms-api-in-java-ee-applications">Uso de la IPA de JMS en Aplicaciones de Java EE</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Esta sección describe cómo el uso de JMS IPA en aplicaciones de enterprise beans o aplicaciones 
+            web difiere de su uso en clientes de aplicaciones.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p><a href="#CHDGICJB">Descripción General del Uso de la IPA de JMS</a></p>
+            </li>
+            <li>
+              <p><a href="#BABHFBDH">Creación de Recursos para Aplicaciones de Java EE</a></p>
+            </li>
+            <li>
+              <p><a href="#BNCGM">Uso de Inyección de Recursos en Enterprise Bean o Componentes Web</a></p>
+            </li>
+            <li>
+              <p>
+                <a href="#BNCGN">
+                  Usando Componentes de Java EE para Producir y Recibir Mensajes Sincrónicamente
+                </a>
+              </p>
+            </li>
+            <li>
+              <p>
+                <a href="#BNCGQ">
+                  Uso de Beans Controlados por Mensajes para Recibir Mensajes de Forma Asíncrona
+                </a>
+              </p>
+            </li>
+            <li>
+              <p><a href="#BNCGS">Gestión de Transacciones JTA</a></p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="CHDGICJB">
+          <h3 id="overview-of-using-the-jms-api">Descripción General del Uso de la IPA de JMS</h3>
+          <div class="paragraph">
+            <p>
+              Una regla general en la especificación de la plataforma Java EE se aplica a todos los 
+              componentes Java EE que usan la IPA JMS dentro de EJB o contenedores web: los componentes de 
+              aplicación en los contenedores web y EJB no deben intentar crear más de un  objeto 
+              <code>Session</code> activo (no cerrado) por conexión. Sin embargo, se permiten múltiples 
+              objetos <code>JMSContext</code>, ya que combinan una sola conexión y una sola sesión.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Esta regla no se aplica a los clientes de aplicaciones. El contenedor del cliente de la 
+              aplicación admite la creación de varias sesiones para cada conexión.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BABHFBDH">
+          <h3 id="creating-resources-for-java-ee-applications">
+            Creación de Recursos para Aplicaciones de Java EE
+          </h3>
+          <div class="paragraph">
+            <p>
+              Puede utilizar anotaciones para crear destinos y fábricas de conexiones específicas de la 
+              aplicación para componentes web o beans empresariales Java EE. Los recursos que crea de esta 
+              manera solo son visibles para la aplicación para la que los crea.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              También puede usar elementos del descriptor de implementación para crear estos recursos. Los 
+              elementos especificados en el descriptor de implementación anulan los elementos especificados en 
+              las anotaciones. Consulte <a href="packaging001.html#BCGDJDFB">Aplicaciones de empaquetado</a> 
+              para obtener información básica sobre los descriptores de implementación. Debe utilizar un 
+              descriptor de implementación para crear recursos específicos de aplicaciones para clientes de 
+              aplicaciones.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para crear un destino, use una anotación <code>@JMSDestinationDefinition</code> como la 
+              siguiente en una clase:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@JMSDestinationDefinition(
+    name = "java:app/jms/myappTopic",
+    interfaceName = "javax.jms.Topic",
+    destinationName = "MyPhysicalAppTopic"
+  )
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los elementos <code>name</code>, <code>interfaceName</code> y <code>destinationName</code> son 
+              obligatorios. Opcionalmente, puede especificar un elemento <code>description</code>. Para crear 
+              varios destinos, enciérrelos en una anotación <code>@JMSDestinationDefinitions</code>, separados 
+              por comas.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para crear una fábrica de conexiones, use una anotación 
+              <code>@JMSConnectionFactoryDefinition</code> como la siguiente en una clase:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@JMSConnectionFactoryDefinition(
+    name="java:app/jms/MyConnectionFactory"
+)
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El elemento <code>name</code> es obligatorio. Opcionalmente, puede especificar una serie de 
+              otros elementos, como <code>clientId</code> si desea utilizar la fábrica de conexiones para 
+              suscripciones duraderas, o <code>description</code>. Si no especifica el elemento 
+              <code>interfaceName</code>, la interfaz predeterminada es 
+              <code>javax.jms.ConnectionFactory</code>. Para crear varias fábricas de conexiones, enciérrelas 
+              en una anotación <code>@JMSConnectionFactoryDefinitions</code>, separadas por comas.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Debe especificar la anotación solo una vez para una aplicación determinada, en cualquiera de los 
+              componentes.
+            </p>
+          </div>
+          <table class="tableblock frame-all grid-all spread">
+            <colgroup>
+              <col style="width: 100%;">
+            </colgroup>
+            <tbody>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <div>
+                    <div class="paragraph">
+                      <p><strong>Nota</strong>:</p>
+                    </div>
+                    <div class="paragraph">
+                      <p>
+                        Si su aplicación contiene uno o más beans controlados por mensajes, es posible que 
+                        desee colocar la anotación en uno de los beans controlados por mensajes. Si coloca la 
+                        anotación en un componente de envío, como una aplicación cliente, debe especificar el 
+                        elemento <code>mappedName</code> para buscar el tema, en lugar de usar la propiedad 
+                        <code>destinationLookup</code> de la especificación de configuración de activación.
+                      </p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="paragraph">
+            <p>
+              Cuando inyecte el recurso en un componente, use el valor del elemento <code>name</code> en la 
+              anotación de definición como el valor del elemento <code>lookup</code> en la anotación 
+              <code>@Resource</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Resource(lookup = "java:app/jms/myappTopic")
+private Topic topic;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Los siguientes espacios de nombres JNDI portables están disponibles. Cuáles puede usar depende 
+              de cómo esté empaquetada su aplicación.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  <code>java:global</code>: hace que el recurso esté disponible para todas las aplicaciones 
+                  implementadas
+                </p>
+              </li>
+              <li>
+                <p>
+                  <code>java:app</code>: Hace que el recurso esté disponible para todos los componentes en 
+                  todos los módulos en una sola aplicación
+                </p>
+              </li>
+              <li>
+                <p>
+                  <code>java:module</code>: Hace que el recurso esté disponible para todos los componentes 
+                  dentro de un módulo dado (por ejemplo, todos los beans empresariales dentro de un módulo 
+                  EJB)
+                </p>
+              </li>
+              <li>
+                <p>
+                  <code>java:comp</code>: hace que el recurso esté disponible para un solo componente (excepto 
+                  en una aplicación web, donde es equivalente a <code>java:module</code>)
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Consulte la documentación de la IPA para obtener detalles sobre estas anotaciones. Los ejemplos 
+              en <a href="jms-examples006.html#BABBABFC">
+                Enviar y Recibir Mensajes usando una Aplicación Web Simple</a>, 
+              <a href="jms-examples008.html#BNCGW">Envío de Mensajes Desde un Bean de Sesión a un MDB</a>, y 
+              <a href="jms-examples009.html#BNCHF">Uso de una Entidad para Unir Mensajes de Dos MDB</a> usan 
+              la anotación <code>@JMSDestinationDefinition</code>. Los otros ejemplos de JMS no utilizan 
+              estas anotaciones. Los ejemplos que consisten únicamente en clientes de aplicaciones no se 
+              implementan en el servidor de aplicaciones y, por lo tanto, deben comunicarse entre sí 
+              utilizando recursos creados administrativamente que existen fuera de las aplicaciones 
+              individuales.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BNCGM">
+          <h3 id="using-resource-injection-in-enterprise-bean-or-web-components">
+            Uso de la Inyección de Recursos en Enterprise Bean o Componentes Web
+          </h3>
+          <div class="paragraph">
+            <p>
+              Puede utilizar la inyección de recursos para inyectar tanto objetos administrados como objetos 
+              <code>JMSContext</code> en aplicaciones Java EE.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>Aquí se tratan los siguientes temas:</p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p><a href="#CHDCHDIJ">Inyectar una ConnectionFactory, Queue o Topic</a></p>
+              </li>
+              <li>
+                <p><a href="#BABCJBEE">Inyectar un Objeto JMSContext</a></p>
+              </li>
+            </ul>
+          </div>
+          <div class="sect3" id="CHDCHDIJ">
+            <h4 id="injecting-a-connectionfactory-queue-or-topic">
+              Inyectar una ConnectionFactory, Queue o Topic
+            </h4>
+            <div class="paragraph">
+              <p>
+                Normalmente, utiliza la anotación <code>@Resource</code> para inyectar una 
+                <code>ConnectionFactory</code>, <code>Queue</code> o <code>Topic</code> en su aplicación Java 
+                EE. Estos objetos deben crearse administrativamente antes de implementar su aplicación. Es 
+                posible que desee utilizar la fábrica de conexiones predeterminada, cuyo nombre JNDI es 
+                <code>java:comp/DefaultJMSConnectionFactory</code>.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Cuando utiliza la inyección de recursos en un componente de cliente de aplicación, normalmente 
+                declara el recurso JMS como estático:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Resource(lookup = "java:comp/DefaultJMSConnectionFactory")
+private static ConnectionFactory connectionFactory;
+@Resource(lookup = "jms/MyQueue")
+private static Queue queue;
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                Sin embargo, cuando utilice esta anotación en un bean de sesión, un bean controlado por 
+                mensajes o un componente web, no declare el recurso como estático:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Resource(lookup = "java:comp/DefaultJMSConnectionFactory")
+private ConnectionFactory connectionFactory;
+@Resource(lookup = "jms/MyTopic")
+private Topic topic;
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                Si declara el recurso estático en estos componentes, se producirán errores de tiempo de 
+                ejecución.
+              </p>
+            </div>
+          </div>
+          <div class="sect3" id="BABCJBEE">
+            <h4 id="injecting-a-jmscontext-object">Inyectar un Objeto JMSContext</h4>
+            <div class="paragraph">
+              <p>
+                Para acceder a un objeto <code>JMSContext</code> en un enterprise bean o componente web, en 
+                lugar de inyectar el recurso <code>ConnectionFactory</code> y luego crear un 
+                <code>JMSContext</code>, puede usar las anotaciones <code>@Inject</code> y 
+                <code>@JMSConnectionFactory</code> para inyectar un <code>JMSContext</code>. Para usar la 
+                fábrica de conexiones predeterminada, use un código como el siguiente:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Inject
+private JMSContext context1;
+                  </code>
+                </pre>
+              </div>
+            </div>
+            <div class="paragraph">
+              <p>
+                Para usar su propia fábrica de conexiones, use un código como el siguiente:
+              </p>
+            </div>
+            <div class="listingblock">
+              <div class="content">
+                <pre class="prettyprint highlight">
+                  <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@Inject
+@JMSConnectionFactory("jms/MyConnectionFactory")
+private JMSContext context2;
+                  </code>
+                </pre>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="BNCGN">
+          <h3 id="using-java-ee-components-to-produce-and-to-synchronously-receive-messages">
+            Uso de Componentes Java EE para Producir y Recibir Mensajes Sincrónicamente
+          </h3>
+          <div class="paragraph">
+            <p>
+              Una aplicación que produce mensajes o los recibe sincrónicamente puede utilizar un componente 
+              EJB o web Java EE, como un bean administrado, un servlet o un bean de sesión, para realizar 
+              estas operaciones. El ejemplo en 
+              <a href="jms-examples008.html#BNCGW">Envío de Mensajes Desde un Bean de Sesión a un MDB</a> usa 
+              un bean de sesión sin estado para enviar mensajes a un tema. El ejemplo en 
+              <a href="jms-examples006.html#BABBABFC">
+                Enviar y Recibir Mensajes Usando una Aplicación Web Simple</a> usa beans administrados para 
+              producir y consumir mensajes.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Debido a que una recepción síncrona sin un tiempo de espera especificado ocupa los recursos del 
+              servidor, este mecanismo no suele ser el mejor diseño de aplicación para un componente web o 
+              EJB. En su lugar, utilice una recepción síncrona que especifique un valor de tiempo de espera, o 
+              utilice un bean controlado por mensajes para recibir mensajes de forma asíncrona. Para obtener 
+              detalles sobre las recepciones síncronas, consulte 
+              <a href="jms-concepts003.html#BNCEP">Consumidores de Mensajes de JMS</a>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Usar la IPA de JMS en un componente Java EE es similar en muchos aspectos a usarlo en un cliente 
+              de aplicación. Las principales diferencias son las áreas de gestión de recursos y transacciones.
+            </p>
+          </div>
+          <div class="sect3">
+            <h4 id="managing-jms-resources-in-web-and-ejb-components">
+              Gestión de Recursos JMS en Componentes Web y EJB
+            </h4>
+            <div class="paragraph">
+              <p>
+                Los recursos JMS son una conexión y una sesión, normalmente combinados en un objeto 
+                <code>JMSContext</code>. En general, es importante liberar los recursos JMS cuando ya no se 
+                utilizan. Aquí hay algunas prácticas útiles a seguir.
+              </p>
+            </div>
+            <div class="ulist">
+              <ul>
+                <li>
+                  <p>
+                    Si desea mantener un recurso JMS solo durante la vida útil de un método de negocio, use 
+                    una declaración <code>try</code>-with-resources para crear el <code>JMSContext</code> para 
+                    que se cierre automáticamente al final del bloque <code>try</code>.
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Para mantener un recurso JMS durante la duración de una transacción o solicitud, inyecte 
+                    el <code>JMSContext</code> como se describe en 
+                    <a href="#BABCJBEE">Inyectar un objeto JMSContext</a>. Esto también hará que el recurso se 
+                    libere cuando ya no sea necesario.
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Si desea mantener un recurso JMS durante la vida útil de una instancia de enterprise bean, 
+                    puede utilizar un método de devolución de llamada <code>@PostConstruct</code> para crear 
+                    el recurso y una devolución de llamada al método <code>@PreDestroy</code> para cerrar el 
+                    recurso. Sin embargo, normalmente no hay necesidad de hacer esto, ya que los servidores de 
+                    aplicaciones suelen mantener un grupo de conexiones. Si utiliza un bean de sesión con 
+                    estado y desea mantener el recurso JMS en un estado de caché, debe cerrar el recurso en un 
+                    método de devolución de llamada <code>@PrePassivate</code> y establecer su valor en 
+                    <code>null</code >, y debe volver a crearlo en un método de devolución de llamada 
+                    <code>@PostActivate</code>.
+                  </p>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="sect3">
+            <h4 id="managing-transactions-in-session-beans">Gestión de Transacciones en Beans de Sesión</h4>
+            <div class="paragraph">
+              <p>
+                En lugar de usar transacciones locales, use transacciones JTA. Puede usar transacciones 
+                administradas por contenedores o transacciones administradas por beans. Normalmente, utiliza
+                transacciones administradas por contenedor para métodos de bean que realizan envíos o 
+                recepciones, lo que permite que el contenedor EJB maneje la demarcación de transacciones. 
+                Debido a que las transacciones administradas por contenedor son las predeterminadas, no es 
+                necesario que las especifique.
+              </p>
+            </div>
+            <div class="paragraph">
+              <p>
+                Puede usar transacciones administradas por beans y los métodos de demarcación de transacciones 
+                de la interfaz <code>javax.transaction.UserTransaction</code>, pero debe hacerlo solo si su 
+                aplicación tiene requisitos especiales y es un experto en el uso de transacciones. Por lo 
+                general, las transacciones administradas por contenedores producen el comportamiento más 
+                eficiente y correcto. Este tutorial no proporciona ningún ejemplo de transacciones gestionadas 
+                por beans.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="sect2" id="BNCGQ">
+          <h3 id="using-message-driven-beans-to-receive-messages-asynchronously">
+            Uso de Beans Controlados por Mensajes para Recibir Mensajes de Forma Asíncrona
+          </h3>
+          <div class="paragraph">
+            <p>
+              Las secciones <a href="ejb-intro003.html#GIPKO">¿Qué Es un Bean Controlado por Mensajes?</a> y 
+              <a href="jms-concepts001.html#BNCDW">¿Cómo funciona la IPA de JMS con la plataforma Java EE?</a> 
+              describe cómo la plataforma Java EE admite un tipo especial de bean empresarial, el bean 
+              controlado por mensajes, que permite que las aplicaciones Java EE procesen mensajes JMS de forma 
+              asíncrona. Otros componentes web y EJB de Java EE le permiten enviar mensajes y recibirlos de 
+              forma síncrona pero no asíncrona.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Un bean controlado por mensajes es un detector de mensajes al que se pueden enviar mensajes 
+              desde una cola o un tema. Los mensajes pueden ser enviados por cualquier componente Java EE 
+              (desde un cliente de aplicación, otro enterprise bean o un componente web) o desde una 
+              aplicación o un sistema que no utilice la tecnología Java EE.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Una clase de bean controlada por mensajes tiene los siguientes requisitos.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  Debe anotarse con la anotación <code>@MessageDriven</code> si no utiliza un descriptor de 
+                  implementación.
+                </p>
+              </li>
+              <li>
+                <p>
+                  La clase debe definirse como <code>public</code>, pero no como <code>abstract</code> o 
+                  <code>final</code>.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Debe contener un constructor público sin argumentos.
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Se recomienda, pero no es obligatorio, que una clase de bean controlada por mensajes implemente 
+              la interfaz de escucha de mensajes para el tipo de mensaje que admite. Un bean que admite la IPA 
+              de JMS implementa la interfaz <code>javax.jms.MessageListener</code>, lo que significa que debe 
+              proporcionar un método <code>onMessage</code> con la siguiente firma:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+void onMessage(Message inMessage)
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              El contenedor del bean llama al método <code>onMessage</code> cuando llega un mensaje para que 
+              el bean dé servicio. Este método contiene la lógica de negocio que maneja el procesamiento del 
+              mensaje. Es responsabilidad del bean controlado por mensajes analizar el mensaje y realizar la 
+              lógica de negocio necesaria.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Un bean controlado por mensajes se diferencia de la escucha de mensajes de una aplicación 
+              cliente en los siguientes aspectos.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  En una aplicación cliente, debe crear un <code>JMSContext</code>, luego crear un 
+                  <code>JMSConsumer</code> y luego llamar a <code>setMessageListener</code> para activar el 
+                  oyente. Para un bean controlado por mensajes, solo necesita definir la clase y anotarla, y 
+                  el contenedor EJB la crea por usted.
+                </p>
+              </li>
+              <li>
+                <p>
+                  La clase de bean utiliza la anotación <code>@MessageDriven</code>, que normalmente contiene 
+                  un elemento <code>activationConfig</code> que contiene anotaciones 
+                  <code>@ActivationConfigProperty</code> que especifican las propiedades utilizadas por el 
+                  bean o la factoría de conexiones. Estas propiedades pueden incluir la fábrica de conexiones, 
+                  un tipo de destino, una suscripción duradera, un selector de mensajes o un modo de 
+                  reconocimiento. Algunos de los ejemplos en 
+                  <a href="jms-examples.html#BNCGV">
+                    Capítulo 49, "Ejemplos del Servicio de Mensajería de Java"</a> establecen estas 
+                  propiedades. También puede establecer las propiedades en el descriptor de implementación.
+                </p>
+              </li>
+              <li>
+                <p>
+                  El contenedor del cliente de la aplicación tiene solo una instancia de un 
+                  <code>MessageListener</code>, que se llama en un solo subproceso a la vez. Sin embargo, un 
+                  bean controlado por mensajes puede tener múltiples instancias, configuradas por el 
+                  contenedor, que pueden ser llamadas simultáneamente por múltiples hilos (aunque cada 
+                  instancia es llamada por solo un hilo a la vez). Por lo tanto, los beans controlados por 
+                  mensajes pueden permitir un procesamiento de mensajes mucho más rápido que los oyentes de 
+                  mensajes.
+                </p>
+              </li>
+              <li>
+                <p>
+                  No necesita especificar un modo de confirmación de mensaje a menos que use transacciones 
+                  administradas por beans. El mensaje se consume en la transacción en la que se invoca el 
+                  método <code>onMessage</code>.
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              La <a href="#GJKOH">Tabla 48-3</a> enumera las propiedades de configuración de activación 
+              definidas por la especificación JMS.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p><a id="sthref199"></a><a id="GJKOH"></a></p>
+          </div>
+          <div class="paragraph">
+            <p>
+              <strong>
+                Tabla 48-3 Configuración de @ActivationConfigProperty para Beans Controlados por Mensajes
+              </strong>
+            </p>
+          </div>
+          <table class="tableblock frame-all grid-all" style="width: 80%;">
+            <colgroup>
+              <col style="width: 25%;">
+              <col style="width: 75%;">
+            </colgroup>
+            <tbody>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><strong>Nombre de la Propiedad</strong></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><strong>Descripción</strong></p></td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>acknowledgeMode</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    Modo de acuse de recibo, utilizado solo para transacciones administradas por beans; el 
+                    valor predeterminado es <code>Auto-acknowledge</code> (<code>Dups-ok-acknowledge</code> 
+                    también está permitido)
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>destinationLookup</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    El nombre de búsqueda de la cola o tema desde el cual el bean recibirá mensajes
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>destinationType</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    O <code>javax.jms.Queue</code> o <code>javax.jms.Topic</code>
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>subscriptionDurability</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    Para suscripciones duraderas, establezca el valor en <code>Durable</code>; ver 
+                    <a href="jms-concepts003.html#BNCGD">Creación de Suscripciones Duraderas</a> para más 
+                    información
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>clientId</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    Para suscripciones duraderas, el ID de cliente para la conexión (opcional)
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>subscriptionName</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">Para suscripciones duraderas, el nombre de la suscripción</p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>messageSelector</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    Una cadena que filtra mensajes; consulte 
+                    <a href="jms-concepts003.html#BNCER">Selectores de Mensajes de JMS</a> para obtener 
+                    información
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock"><code>connectionFactoryLookup</code></p></td>
+                <td class="tableblock halign-left valign-top">
+                  <p class="tableblock">
+                    El nombre de búsqueda de la fábrica de conexiones que se usará para conectarse al 
+                    proveedor JMS desde el cual el bean recibirá mensajes
+                  </p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="paragraph">
+            <p>
+              Por ejemplo, este es el bean controlado por mensajes utilizado en 
+              <a href="jms-examples007.html#BNBPK">
+                Recepción de Mensajes de Forma Asíncrona Mediante un Bean Controlado por Mensajes</a>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+@MessageDriven(activationConfig = {
+    @ActivationConfigProperty(propertyName = "destinationLookup",
+            propertyValue = "jms/MyQueue"),
+    @ActivationConfigProperty(propertyName = "destinationType",
+            propertyValue = "javax.jms.Queue")
+})
+public class SimpleMessageBean implements MessageListener {
+    @Resource
+    private MessageDrivenContext mdc;
+    static final Logger logger = Logger.getLogger("SimpleMessageBean");
+    public SimpleMessageBean() {
+    }
+    @Override
+    public void onMessage(Message inMessage) {
+        try {
+            if (inMessage instanceof TextMessage) {
+                logger.log(Level.INFO,
+                        "MESSAGE BEAN: Message received: {0}",
+                        inMessage.getBody(String.class));
+            } else {
+                logger.log(Level.WARNING,
+                        "Message of wrong type: {0}",
+                        inMessage.getClass().getName());
+            }
+        } catch (JMSException e) {
+            logger.log(Level.SEVERE,
+                    "SimpleMessageBean.onMessage: JMSException: {0}",
+                    e.toString());
+            mdc.setRollbackOnly();
+        }
+    }
+}
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Si JMS está integrado con el servidor de aplicaciones utilizando un adaptador de recursos, el 
+              adaptador de recursos JMS maneja estas tareas para el contenedor EJB.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              La clase de bean comúnmente inyecta un recurso <code>MessageDrivenContext</code>, que 
+              proporciona algunos métodos adicionales que puede usar para la gestión de transacciones 
+              (<code>setRollbackOnly</code>, por ejemplo):
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight">
+                <code class="language-oac_no_warn" data-lang="oac_no_warn">
+    @Resource
+    private MessageDrivenContext mdc;
+                </code>
+              </pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Un bean controlado por mensajes nunca tiene una interfaz local o remota. En cambio, solo tiene 
+              una clase bean.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Un bean controlado por mensajes es similar en algunos aspectos a un bean de sesión sin estado: 
+              sus instancias tienen una vida relativamente corta y no retienen ningún estado para un cliente 
+              específico. Las variables de instancia de la instancia de beans controlados por mensajes pueden 
+              contener algún estado en el manejo de mensajes de clientes: por ejemplo, una conexión de base de 
+              datos abierta o una referencia de objeto a un objeto de enterprise bean.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Al igual que un bean de sesión sin estado, un bean controlado por mensajes puede tener muchas 
+              instancias intercambiables ejecutándose al mismo tiempo. El contenedor puede agrupar estas 
+              instancias para permitir que los flujos de mensajes se procesen simultáneamente. El contenedor 
+              intenta entregar mensajes en orden cronológico cuando eso no afectaría la concurrencia del 
+              procesamiento de mensajes, pero no se garantiza el orden exacto en que los mensajes se entregan 
+              a las instancias de la clase de bean controlado por mensajes. Si el orden de los mensajes es 
+              esencial para su aplicación, es posible que desee configurar su servidor de aplicaciones para 
+              usar solo una instancia del bean controlado por mensajes.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para obtener detalles sobre el ciclo de vida de un bean controlado por mensajes, consulte 
+              <a href="ejb-intro007.html#GIPKW">El Ciclo de Vida de un Bean Controlado por Mensajes</a>.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BNCGS">
+          <h3 id="managing-jta-transactions">Gestión de Transacciones JTA</h3>
+          <div class="paragraph">
+            <p>
+              Los clientes de aplicaciones Java EE y Java SE utilizan transacciones locales JMS (descritas en 
+              <a href="jms-concepts004.html#BNCGH">Uso de Transacciones Locales de JMS</a>), que permiten 
+              agrupar envíos y recepciones dentro de una sesión JMS específica. Las aplicaciones Java EE que 
+              se ejecutan en la web o en un contenedor EJB suelen utilizar transacciones JTA para garantizar 
+              la integridad de los accesos a recursos externos. La diferencia clave entre una transacción JTA 
+              y una transacción local JMS es que una transacción JTA está controlada por los administradores 
+              de transacciones del servidor de aplicaciones. Las transacciones JTA se pueden distribuir, lo 
+              que significa que pueden abarcar varios recursos en la misma transacción, como un proveedor JMS 
+              y una base de datos.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Por ejemplo, las transacciones distribuidas permiten que varias aplicaciones realicen 
+              actualizaciones atómicas en la misma base de datos y permiten que una sola aplicación realice 
+              actualizaciones atómicas en varias bases de datos.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              En una aplicación Java EE que utiliza la IPA de JMS, puede utilizar transacciones para combinar 
+              envíos o recepciones de mensajes con actualizaciones de bases de datos y otras operaciones del 
+              administrador de recursos. Puede acceder a los recursos de múltiples componentes de la 
+              aplicación dentro de una sola transacción. Por ejemplo, un servlet puede iniciar una 
+              transacción, acceder a varias bases de datos, invocar un enterprise bean que envía un mensaje 
+              JMS, invocar otro enterprise bean que modifica un sistema EIS mediante la arquitectura del 
+              conector y finalmente confirmar la transacción. Sin embargo, su aplicación no puede enviar un 
+              mensaje JMS y recibir una respuesta dentro de la misma transacción.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las transacciones JTA dentro de los contenedores EJB y web pueden ser de dos tipos.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  Transacciones administradas por contenedor: el contenedor controla la integridad de sus 
+                  transacciones sin que tenga que llamar a <code>commit</code> o <code>rollback</code>. Las 
+                  transacciones gestionadas por contenedores son más fáciles de usar que las transacciones 
+                  gestionadas por beans. Puede especificar los atributos de transacción apropiados para sus 
+                  métodos de enterprise bean.
+                </p>
+                <div class="paragraph">
+                  <p>
+                    Utilice el atributo de transacción <code>Required</code> (predeterminado) para asegurarse 
+                    de que un método siempre sea parte de una transacción. Si una transacción está en progreso 
+                    cuando se llama al método, el método será parte de esa transacción; de lo contrario, se 
+                    iniciará una nueva transacción antes de que se llame al método y se confirmará cuando el 
+                    método regrese. Consulte <a href="transactions004.html#BNCIK">Atributos de Transacción</a> 
+                    para obtener más información.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <p>
+                  Transacciones gestionadas por beans: puede usarlas junto con la interfaz 
+                  <code>javax.transaction.UserTransaction</code>, que proporciona sus propios métodos 
+                  <code>commit</code> y <code>rollback</code> y puede usar para delimitar los límites de la 
+                  transacción. Las transacciones administradas por Bean se recomiendan solo para aquellos que 
+                  tienen experiencia en la programación de transacciones.
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Puede usar transacciones administradas por contenedor o transacciones administradas por beans 
+              con beans controlados por mensajes. Para garantizar que todos los mensajes se reciban y manejen 
+              dentro del contexto de una transacción, use transacciones administradas por contenedor y use el 
+              atributo de transacción <code>Required</code> (el valor predeterminado) para el método 
+              <code>onMessage</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Cuando usa transacciones administradas por contenedor, puede llamar a los siguientes métodos 
+              <code>MessageDrivenContext</code>.
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>
+                  <code>setRollbackOnly</code>: use este método para el manejo de errores. Si ocurre una 
+                  excepción, <code>setRollbackOnly</code> marca la transacción actual para que el único 
+                  resultado posible de la transacción sea una reversión.
+                </p>
+              </li>
+              <li>
+                <p>
+                  <code>getRollbackOnly</code>: use este método para probar si la transacción actual se ha 
+                  marcado para reversión.
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Si usa transacciones administradas por beans, la entrega de un mensaje al método 
+              <code>onMessage</code> se lleva a cabo fuera del contexto de la transacción JTA. La transacción 
+              comienza cuando llama al método <code>UserTransaction.begin</code> dentro del método 
+              <code>onMessage</code> y finaliza cuando llama a <code>UserTransaction.commit</code> o 
+              <code>UserTransaction.rollback</code>. Cualquier llamada al método 
+              <code>Connection.createSession</code> debe realizarse dentro de la transacción.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              El uso de transacciones administradas por beans le permite procesar el mensaje utilizando más de 
+              una transacción o hacer que algunas partes del procesamiento del mensaje se lleven a cabo fuera 
+              del contexto de la transacción. Sin embargo, si usa transacciones administradas por contenedor, 
+              el MDB recibe el mensaje y lo procesa el método <code>onMessage</code> dentro de la misma 
+              transacción. No es posible lograr este comportamiento con transacciones gestionadas por beans.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Cuando crea un <code>JMSContext</code> en una transacción JTA (en el contenedor web o EJB), el 
+              contenedor ignora cualquier argumento que especifique, porque administra todas las propiedades 
+              transaccionales. Cuando crea un <code>JMSContext</code> en el contenedor web o EJB y no hay una 
+              transacción JTA, el valor (si lo hay) pasado al método <code>createContext</code> debe ser 
+              <code>JMSContext.AUTO_ACKNOWLEDGE</code> o <code>JMSContext.DUPS_OK_ACKNOWLEDGE</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Cuando usa transacciones administradas por contenedor, normalmente usa el atributo de 
+              transacción <code>Required</code> (el valor predeterminado) para los métodos de negocio de su 
+              enterprise bean.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              No especifica la propiedad de configuración de activación <code>acknowledgeMode</code> cuando 
+              crea un bean controlado por mensajes que usa transacciones administradas por contenedor. El 
+              contenedor reconoce el mensaje automáticamente cuando confirma la transacción.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Si un bean controlado por mensajes utiliza transacciones gestionadas por beans, la recepción del 
+              mensaje no puede formar parte de la transacción gestionada por beans. Puede establecer la 
+              propiedad de configuración de activación <code>acknowledgeMode</code> en 
+              <code>Auto-acknowledge</code> o <code>Dups-ok-acknowledge</code> para especificar cómo desea que 
+              el mensaje que recibe el bean gestionado por mensajes sea reconocido.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Si el método <code>onMessage</code> arroja una <code>RuntimeException</code>, el contenedor no 
+              reconoce el procesamiento del mensaje. En ese caso, el proveedor de JMS volverá a enviar el 
+              mensaje no reconocido en el futuro.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jms-concepts004.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jms-concepts006.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>

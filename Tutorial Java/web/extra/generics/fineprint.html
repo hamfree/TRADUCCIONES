@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            La Letra Pequeña (Los Tutoriales de Java&trade; &gt; Extras &gt; Genéricos)
+        </title>
+        <meta name="description" content="Este tutorial de Java describe los genéricos, la IPA del modo de pantalla completo, y 
+              los recursos relacionados con la certificación de Java" />
+        <meta name="keywords" content="programación en java, aprender java, ejemplos de código java, genéricos de java, IPA del 
+              modo de pantalla completa, certificación" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Genéricos</a></div>
+                <div class="linkAHEAD"><a href="intro.html">Introducción</a></div>
+                <div class="linkAHEAD"><a href="simple.html">Definiendo Genéricos Simples</a></div>
+                <div class="linkAHEAD"><a href="subtype.html">Genéricos y Subtipado</a></div>
+                <div class="linkAHEAD"><a href="wildcards.html">Los Comodines</a></div>
+                <div class="linkAHEAD"><a href="methods.html">Métodos Genéricos</a></div>
+                <div class="linkAHEAD"><a href="legacy.html">Interoperando con Código Heredado</a></div>
+                <div class="nolinkAHEAD">La Letra Pequeña</div>
+                <div class="linkAHEAD"><a href="literals.html">Clases Literales como Objetos de Tipo en Tiempo de Ejecución</a></div>
+                <div class="linkAHEAD"><a href="morefun.html">Más Diversión con Comodines</a></div>
+                <div class="linkAHEAD"><a href="convert.html">Convirtiendo Código Heredado para Usar Genéricos</a></div>
+                <div class="linkAHEAD"><a href="acknowledgements.html">Agradecimientos</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Extras<br />
+                <b>Lección:</b> Genéricos
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Extras</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Genéricos</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="legacy.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="literals.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>La Letra Pequeña</h1>
+            </div>
+            <div id="PageContent">
+                <h2>
+                    Una clase genérica es compartida por todas sus invocaciones
+                </h2>
+                <p>
+                    ¿Qué imprime el siguiente fragmento de código?
+                </p>
+                <div class="codeblock">
+                    <pre>
+List &lt;String&gt; l1 = new ArrayList&lt;String&gt;();
+List&lt;Integer&gt; l2 = new ArrayList&lt;Integer&gt;();
+System.out.println(l1.getClass() == l2.getClass());
+                    </pre>
+                </div>
+                <p>
+                    Podría estar tentado a decir <code>false</code>, pero estaría equivocado. Imprime <code>true</code>, porque 
+                    todas las instancias de una clase genérica tienen la misma clase en tiempo de ejecución, independientemente de 
+                    sus parámetros de tipo reales.
+                </p>
+                <p>
+                    En efecto, lo que hace a una clase genérica es el hecho de que tiene el mismo comportamiento para todos sus 
+                    parámetros de tipo posibles; se puede ver que la misma clase tiene muchos tipos diferentes.
+                </p>
+                <p>
+                    Como consecuencia, las variables estáticas y los métodos de una clase también se comparten entre todas las 
+                    instancias. Es por eso que es ilegal referirse a los parámetros de tipo de una declaración de tipo en un método 
+                    estático o inicializador, o en la declaración o inicializador de una variable estática.
+                </p>
+                <h2>
+                    Moldeos (Conversiones de tipo) e InstanceOf
+                </h2>
+                <p>
+                    Otra implicación del hecho de que una clase genérica es compartida entre todas sus instancias, es que no tiene 
+                    sentido generalmente preguntar a una instancia si es una instancia de un invocación particular de un tipo 
+                    genérico:
+                </p>
+                <div class="codeblock">
+                    <pre>
+Collection cs = new ArrayList&lt;String&gt;();
+// <i>Ilegal.</i>
+if (cs <b>instanceof</b> Collection&lt;String&gt;) { ... }
+                    </pre>
+                </div>
+                <p>
+                    Del mismo modo, un moldeo tal como 
+                </p>
+                <div class="codeblock">
+                    <pre>
+// <i>Advertencia no comprobada,</i>
+Collection&lt;String&gt; cstr = (Collection&lt;String&gt;) cs;
+                    </pre>
+                </div>
+                <p>
+                    da una advertencia no comprobada, ya que esto no es algo que el sistema en tiempo de ejecución va a comprobar 
+                    por usted.
+                </p>
+                <p>
+                    Lo mismo es verdad para las variables de tipo
+                </p>
+                <div class="codeblock">
+                    <pre>
+// <i>Advertencia no comprobada.</i> 
+&lt;T&gt; T badCast(T t, Object o) {
+    <b>return</b> (T) o;
+}
+                    </pre>
+                </div>
+                <p>
+                    Las variables de tipo no existen en tiempo de ejecución. Esto significa que no implican una sobrecarga de 
+                    rendimiento ni en tiempo ni en espacio, lo cual es bueno. Desafortunadamente, también significa que no puede 
+                    usarlas de manera confiable.
+                </p>
+                <h2>
+                    Matrices
+                </h2>
+                <p>
+                    El tipo de componente de un objeto de matriz puede no ser una variable de tipo o un tipo parametrizado, a menos 
+                    que sea un tipo comodín (sin límites). Puede declarar <i>tipos</i> de matriz cuyo tipo de elemento es una 
+                    variable tipo o un tipo parametrizado, pero no una matriz de <i>objetos</i>.
+                </p>
+                <p>
+                    Esto es molesto, por cierto. Esta restricción es necesaria para evitar situaciones como:
+                </p>
+                <div class="codeblock">
+                    <pre>
+// <i>Realmente no permitido.</i>
+List&lt;String&gt;[] lsa = new List&lt;String&gt;[10];
+Object o = lsa;
+Object[] oa = (Object[]) o;
+List&lt;Integer&gt; li = new ArrayList&lt;Integer&gt;();
+li.add(new Integer(3));
+// <i>Defectuoso, pero pasa la comprobación de almacenamiento del tiempo de ejecución</i>
+oa[1] = li;
+
+// <i>Error en tiempo de ejecución: ClassCastException.</i>
+String s = lsa[1].get(0);
+                    </pre>
+                </div>
+                <p>
+                    Si las matrices de tipos parametrizados fueran permitidas, el ejemplo previo compilaría sin ninguna advertencia 
+                    no comprobada, y aún fallaría en tiempo de ejecución. Hemos tenido la seguridad de tipos como objetivo 
+                    principal de diseño de los genéricos. En particular, el lenguaje se diseñó para garantizar que <b>si su 
+                        aplicación entera ha sido compilada sin advertencias no comprobadas usando <code>javac -source 1.5</code>, 
+                    es segura en cuanto a tipos</b>.
+                </p>
+                <p>
+                    Sin embargo, aún puede usar matrices con comodines. La siguiente variación del código anterior renuncia al uso 
+                    de objetos de matriz y tipos de matriz cuyo tipo de elemento está parametrizado. Como resultado, tenemos que 
+                    moldear (convertir el tipo) explícitamente para obtener una <code>String</code> de la matriz.
+                </p>
+                <div class="codeblock">
+                    <pre>
+// <i>OK, matriz de un tipo comodín no limitado.</i>
+List&lt;?&gt;[] lsa = new List&lt;?&gt;[10];
+Object o = lsa;
+Object[] oa = (Object[]) o;
+List&lt;Integer&gt; li = new ArrayList&lt;Integer&gt;();
+li.add(new Integer(3));
+// <i>Correcto.</i>
+oa[1] = li;
+// <i>Erro en tiempo de ejecución, pero el moldeo es explícito.</i>
+String s = (String) lsa[1].get(0);
+                    </pre>
+                </div>
+                <p>
+                    En la siguiente variación, la cual causa un error en tiempo de compilación, nos abstenemos de crear un objeto 
+                    de matriz cuyo tipo de elemento esté parametrizado, pero aún utilizamos un tipo de matriz con un tipo de 
+                    elemento parametrizado.
+                </p>
+                <div class="codeblock">
+                    <pre>
+// <i>Error.</i>
+List&lt;String&gt;[] lsa = new List&lt;?&gt;[10];
+                    </pre>
+                </div>
+                <p>
+                   Del mismo modo, intentar crear un objeto de matriz cuyo tipo de elemento es una variable de tipo provoca un error 
+                   en tiempo de compilación:
+                </p>
+                <div class="codeblock">
+                    <pre>
+&lt;T&gt; T[] makeArray(T t) {
+    <b>return</b> new T[100]; // <i>Error.</i>
+}
+                    </pre>
+                </div>
+                <p>
+                    Ya que las variables de tipo no existen en tiempo de ejecución, no hay forma de determinar cual sería el tipo 
+                    de matriz real.
+                </p>
+                <p>
+                    La forma de evitar este tipo de limitaciones es usar literales de clase como muestras (tokens) de tipo en
+                    tiempo de ejecución, como se describe en la siguiente sección,
+                    <a class="TutorialLink" target="_top" href="literals.html">
+                        Clases Literales como Objetos de Tipo en Tiempo de Ejecución </a>.
+                </p>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="legacy.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="literals.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos
+                            <a href="../../information/cpyr.html">avisos legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente <a target="_blank" href="../../information/run-examples.html">
+                                Compilando y Ejecutando los Ejemplos: PFs</a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias?
+                            <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Interoperando con Código Heredado<br />
+            <b>Página siguiente:</b> Clases Literales como Objetos de Tipo en Tiempo de Ejecución
+        </div>
+    </body>
+</html> 

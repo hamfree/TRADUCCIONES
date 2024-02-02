@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            MBeans estándar (Los Tutoriales de Java&trade; &gt; Extensiones de Gestión de Java (JMX) &gt; Presentación de MBeans)
+        </title>
+        <meta name="description" content="Este tutorial de JMX Java describe la tecnología de Extensiones de Gestión de Java (JMX): 
+              mbeans, notificaciones y gestión remota" />
+        <meta name="keywords" content="java programming, learn java, java sample code, jmx, java management extension, mbeans,
+              mxbeans" />
+        <link rel="stylesheet" href="../../indice.css" type="text/css"/>
+        <script src="../../navegacion.js"></script>
+    </head>
+    <body onload="load()">
+        <noscript>Se requiere un navegador con JavaScript habilitado para que esta página opere apropiadamente.</noscript>
+        <div class="header-container">
+            <div class="bookwrapper clearfix">
+                <div id="brandProdName">
+                    <div id="logocover"></div>
+                    <div id="productName">Documentación</div>
+                </div>
+                <br class="clearfloat" />
+            </div>
+        </div>
+        <div id="TopBar">
+            <div id="TopBar_tr">
+                <div id="TopBar_tl">
+                    <div id="TopBar_br">
+                        <div id="TopBar_bl">
+                            <div id="TopBar_left">Los Tutoriales de Java&trade;</div>
+                            <div id="TopBar_right">
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-7-tutorial-2012-02-28-1536013.html">
+                                    Descargar Libros Electrónicos</a><br />
+                                <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">
+                                    Descargar KDJ</a><br />
+                                <a href="javascript:toggleLeft()" id="ToggleLeft">
+                                    Ocultar TdC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="LeftBar" class="LeftBar_shown">
+            <div id="Contents">
+                <div class="linkLESSON"><a href="index.html">Presentación de MBeans</a></div>
+                <div class="nolinkAHEAD">MBeans estándar</div>
+                <div class="linkAHEAD"><a href="mxbeans.html">MXBeans</a></div>
+            </div>
+        </div>
+        <div id="MainFlow" class="MainFlow_indented">
+            <div class="PrintHeaders">
+                <b>Recorrido:</b> Extensiones de Gestión de Java (JMX)<br />
+                <b>Lección:</b> Presentación de MBeans
+            </div>
+            <div id="BreadCrumbs">
+                <a href="../../index.html" target="_top">Página de Inicio</a>&nbsp;&gt;&nbsp;
+                <a href="../index.html" target="_top">Extensiones de Gestión de Java (JMX)</a>&nbsp;&gt;&nbsp;
+                <a href="index.html" target="_top">Presentación de MBeans</a>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="mxbeans.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+            <div id="PageTitle">
+                <h1>MBeans estándar</h1>
+            </div>
+            <div id="PageContent">
+                <p>
+                    Esta sección presenta un ejemplo de un MBean estándar sencillo.
+                </p>
+                <p>
+                    Un MBean estándar se define escribiendo una interfaz de Java llamada <code>AlgoMBean</code> y una clase Java 
+                    llamada <code>Algo</code> que implementa esa interfaz. Cada método en la interfaz define un atributo o una 
+                    operación en el MBean. De forma predeterminada, cada método define una operación. Los atributos y operaciones 
+                    son métodos que siguen ciertos patrones de diseño. Un MBean estándar está compuesto de una interfaz MBean y 
+                    una clase. La interfaz del MBean lista los métodos para todos los atributos y operaciones expuestos. La clase 
+                    implementa esta interfaz y proporciona la funcionalidad del recurso instrumentado.
+                </p>
+                <p>
+                    Las secciones siguientes examinan un ejemplo de un MBean estándar y un agente simple habilitado con tecnología 
+                    JMX (agente JMX) que gestiona el MBean.
+                </p>
+                <h2>
+                    Interfaz del MBean
+                </h2>
+                <p>
+                    Un ejemplo de una interfaz básica de MBean, 
+                    <a class="SourceLink" target="_blank" href="../examples/HelloMBean.java" 
+                       onclick="showCode('../../displayCode.html', '../examples/HelloMBean.java'); return false;">
+                        <code>HelloMBean</code></a>
+                    , a continuación:
+                </p>
+                <div class="codeblock">
+                    <pre>
+
+package com.example; 
+ 
+public interface HelloMBean { 
+ 
+    public void sayHello(); 
+    public int add(int x, int y); 
+    
+    public String getName(); 
+     
+    public int getCacheSize(); 
+    public void setCacheSize(int size); 
+} 
+
+                    </pre>
+                </div>
+                <p>
+                    Por convención, una interfaz MBean toma el nombre de la clase Java que la implementa, con el sufijo 
+                    <i><code>MBean</code></i> agregado. En este caso, la interfaz se llama <code>HelloMBean</code>. La clase 
+                    <code>Hello</code> que implementa esta interfaz se describe en la siguiente sección.
+                </p>
+                <p>
+                    De acuerdo a la especificación JMX, una interfaz MBean consiste de de atributos nombrados y tipados que se 
+                    pueden leer y posiblemente se pueden escribir, además de las operaciones nombradas y tipadas que pueden ser 
+                    invocadas por las aplicaciones que son gestionadas por el MBean. La interfaz <code>HelloMBean</code> declara 
+                    dos operaciones: Los métodos Java <code>add()</code> y <code>sayHello()</code>.
+                </p>
+                <p>
+                    <code>HelloMBean</code> declara dos atributos: <code>Name</code> es una cadena de sólo lectura, y 
+                    <code>CacheSize</code> es un entero que ser tanto leído como escrito. Los métodos obtenedores y establecedores 
+                    se declaran para permitir que la aplicación gestionada acceda y posiblemente cambie los valores del atributo. 
+                    Como se define en la especificación JMX, un <i>getter</i> (<b>Nota del Traductor:</b> un obtenedor, en español) 
+                    es cualquier método público que no devuelve nulo y cuyo nombre empieza con <code>get</code>. Un getter habilita 
+                    a un gestor a leer el valor del atributo, cuyo tipo es el del objeto devuelto. Un <i>setter</i> 
+                    (<b>Nota del Traductor:</b> un establecedor, en español) es cualquier método público que toma un único 
+                    parámetro y cuyo nombre empieza con <code>set</code>. Un setter capacita a un gestor a escribir un nuevo valor 
+                    en el atributo, cuyo tipo es el mismo que el del parámetro.
+                </p>
+                <p>
+                    La implementación de estas operaciones y atributos se muestran en la siguiente sección.
+                </p>
+                <h2>
+                    Implementación del MBean
+                </h2>
+                <p>
+                    La clase de Java 
+                    <a class="SourceLink" target="_blank" href="../examples/Hello.java" 
+                       onclick="showCode('../../displayCode.html', '../examples/Hello.java'); return false;"><code>Hello</code></a>
+                    que sigue implementa la interfaz de MBean <code>HelloMBean</code>:
+                </p>
+                <div class="codeblock">
+                    <pre>
+package com.example; 
+ 
+public class Hello ... 
+    implements HelloMBean { 
+    public void sayHello() { 
+        System.out.println("hello, world"); 
+    } 
+     
+    public int add(int x, int y) { 
+        return x + y; 
+    } 
+     
+    public String getName() { 
+        return this.name; 
+    }  
+     
+    public int getCacheSize() { 
+        return this.cacheSize; 
+    } 
+     
+    public synchronized void setCacheSize(int size) {
+        ...
+    
+        this.cacheSize = size; 
+        System.out.println("Cache size now " + this.cacheSize); 
+    } 
+    ...
+     
+    private final String name = "Reginald"; 
+    private int cacheSize = DEFAULT_CACHE_SIZE; 
+    private static final int 
+        DEFAULT_CACHE_SIZE = 200; 
+}
+                    </pre>
+                </div>
+                <p>
+                    La clase simple <code>Hello</code> proporciona las definiciones de las operaciones y atributos que se 
+                    declararon  en <code>HelloMBean</code>. Las operaciones <code>sayHello()</code> y <code>add()</code> son 
+                    extremadamente simples, pero las operaciones de la vida real pueden ser tan simples o sofisticadas como sea
+                    necesario.
+                </p>
+                <p>
+                    Los métodos para obtener el atributo <code>Name</code> y para obtener y establecer el atributo 
+                    <code>CacheSize</code> también están definidas. En este ejemplo, el valor del atributo <code>Name</code> nunca 
+                    cambia. Sin embargo, en un escenario real esta atributo podría cambiar mientras se ejecuta el recurso 
+                    gestionado. Por ejemplo, el atributo podría representar estadísticas tales como el tiempo de actividad o el 
+                    uso de memoria. Aquí, el atributo es simplemente el nombre <code>Reginald</code>.
+                </p>
+                <p>
+                    Llamar al método <code>setCacheSize</code> le habilita a alterar el atributo <code>CacheSize</code> de su valor 
+                    predeterminado de 200. En un escenario real, cambiar el atributo <code>CacheSize</code> podría requerir que se 
+                    realizaran otras operaciones, tales como descartar entradas o asignar nuevas entradas. Este ejemplo simplemente 
+                    imprime un mensaje para confirmar que el tamaño de la caché ha cambiado. Sin embargo, se podrían definir 
+                    operaciones más sofisticadas en vez de una simple llamada a <code>println()</code>.
+                </p>
+                <p>
+                    Con el MBean <code>Hello</code> y su interfaz así definida, pueden ser ahora utilizadas para gestionar el 
+                    recurso que representan, como se muestra en la sección siguiente.
+                </p>
+                <h2>
+                    Crear un Agente JMX para Gestionar un Recurso
+                </h2>
+                <p>
+                    Una vez un recurso ha sido instrumentado por MBeans, la gestión de ese recurso se realiza por un agente JMX.
+                </p>
+                <p>
+                    El componente principal de un agente JMX es el servidor MBean. Un servidor MBean es un servidor de objetos 
+                    gestionado en el cual se registran los MBeans. Un agente JMX también incluye un conjunto de servicios para 
+                    gestionar MBeans. Vea la documentaicón de la IPA para la interfaz de 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/MBeanServer.html">
+                        <code>MBeanServer</code></a> para detalles de la implementación del servidor MBean.
+                </p>
+                <p>
+                    La clase 
+                    <a class="SourceLink" target="_blank" href="../examples/Main.java" 
+                       onclick="showCode('../../displayCode.html', '../examples/Main.java'); return false;">
+                        <code>Main</code></a> que sigue representa un agente JMX básico:
+                </p>
+                <div class="codeblock">
+                    <pre>
+package com.example; 
+ 
+import java.lang.management.*; 
+import javax.management.*; 
+ 
+public class Main { 
+ 
+    public static void main(String[] args) 
+        throws Exception { 
+     
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer(); 
+        ObjectName name = new ObjectName("com.example:type=Hello"); 
+        Hello mbean = new Hello(); 
+        mbs.registerMBean(mbean, name); 
+          
+        ...
+     
+        System.out.println("Waiting forever..."); 
+        Thread.sleep(Long.MAX_VALUE); 
+    } 
+} 
+                    </pre>
+                </div>
+                <p>
+                    El agente JMX <code>Main</code> empieza obteniendo un servidor MBean que ha sido creado e inicializado por la 
+                    plataforma, llamando al método <code>getPlatformMBeanServer()</code> de la clase 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/java/lang/management/ManagementFactory.html">
+                        <code>java.lang.management.ManagementFactory</code></a>. Si no ha sido creado ya un servidor MBean por la 
+                        plataforma, entonces <code>getPlatformMBeanServer()</code> crea un servidor MBean automáticamente llamando 
+                        al método JMX 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/MBeanServerFactory.html#createMBeanServer--">
+                        <code>MBeanServerFactory.createMBeanServer()</code></a>. La instancia <code>MBeanServer</code> obtenida por 
+                    <code>Main</code> se llama <code>mbs</code>.
+                </p>
+                <p>
+                    A continuación, <code>Main</code> define un objeto de nombre para la instancia de MBean que creará. Cada MBean 
+                    JMX debe tener un objeto de nombre. El objeto de nombre es una instancia de la clase JMX 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/ObjectName.html">
+                        <code>ObjectName</code></a> y debe ser conforme a la sintaxis definida por la especificación JMX. Es decir, 
+                        el objeto de nombre debe contener un dominio y una lista de propiedades clave. En el objeto de nombre 
+                        definido por <code>Main</code>, el dominio es <code>com.example</code> (el paquete en el cual el ejemplo 
+                        MBean está contenido). Además, la propiedad-clave declara que este objeto es del tipo <code>Hello</code>.
+                </p>
+                <p>
+                    Una instancia de un objeto <code>Hello</code>, llamada <code>mbean</code>, se crea. El objeto 
+                    <code>Hello</code> llamado <code>mbean</code> es después registrado como un MBean en el servidor MBean 
+                    <code>mbs</code> con el objeto de nombre <code>name</code>, pasando el objeto y el objeto de nombre dentro de 
+                    una llamada al método JMX 
+                    <a class="APILink" target="_blank" 
+                       href="https://docs.oracle.com/javase/8/docs/api/javax/management/MBeanServer.html#registerMBean-java.lang.Object-javax.management.ObjectName-">
+                        <code>MBeanServer.registerMBean()</code></a>.
+                </p>
+                <p>
+                    Con el MBean <code>Hello</code> registrado en el servidor MBean, <code>Main</code> simplemente espera para que 
+                    las operaciones de gestión sean realizadas por <code>Hello</code>. En este ejemplo, estas operacioens de 
+                    gestión son invocar a <code>sayHello()</code> y <code>add()</code>, y obtener y establecer los valores de 
+                    atributo.
+                </p>
+                <h2>
+                    Ejecutar el Ejemplo del MBean Estándar
+                </h2>
+                <p>
+                    Habiendo examinado las clases del ejemplo, puede ahora ejecutar el ejemplo. En este ejemplo, se usa JConsole 
+                    para interactuar con el MBean.
+                </p>
+                <p>
+                    Para ejecutar el ejemplo, siga estos pasos:
+                </p>
+                <ol>
+                    <li>
+                        Guarde el paquete de clases del ejemplo de la IPA de JMX, 
+                        <a class="SourceLink" target="_blank" 
+                           href="../examples/jmx_examples.zip" 
+                           onclick="showCode('../../displayCode.html', '../examples/jmx_examples.zip'); return false;">
+                            <code>jmx_examples.zip</code></a>, en su directorio de trabajo, 
+                            <code style="font-style: italic">work_dir</code>.
+                    </li>
+                    <li>
+                        Descomprima el paquete de clases de ejemplo usando el comando siguiente en una ventana de terminal.
+                        <div class="codeblock">
+                            <pre>
+unzip jmx_examples.zip
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        Compile las clases de Java del ejemplo desde dentro del directorio 
+                        <code style="font-style: italic">work_dir</code>.
+                        <div class="codeblock">
+                            <pre>
+javac com/example/*.java
+                            </pre>
+                        </div>
+                    </li>
+                    <li>
+                        Si está ejecutando la versión del Kit de Desarrollo de Java (KDJ), inicie la aplicación <code>Main</code> 
+                        con el comando siguiente.
+                        <div class="codeblock">
+                            <pre>
+java com.example.Main
+                            </pre>
+                        </div>
+                        <p>
+                            Si está ejecutando una versión del KDJ que es más vieja que la versión 6, necesitará ejecutar la 
+                            aplicación <code>Main</code> con la siguiente opción especificada, para exponer la aplicación para 
+                            seguimiento y gestión.
+                        </p>
+                        <div class="codeblock">
+                            <pre>
+java -Dcom.sun.management.jmxremote example.Main
+                            </pre>
+                        </div>
+                        <p>
+                            Se muestra una confirmación de que <code>Main</code> está esperando para que ocurra algo.
+                        </p>
+                    </li>
+                    <li>
+                        Inicie JConsole enuna ventana terminal diferente en la misma máquina.
+                        <div class="codeblock">
+                            <pre>
+jconsole
+                            </pre>
+                        </div>
+                        <p>
+                            Se visualiza el cuadro de diálogo Nueva Conexión, presentando una lista de los agentes JMX en ejecución 
+                            a los que puede conectarse.
+                        </p>
+                    </li>
+                    <li>
+                        En el cuadro de diálogo Nueva Conexión, seleccione <code>com.example.Main</code> de la lisat y pulse 
+                        Conectar. 
+                        <p>
+                            Se muestra un resumen de la actividad actual de sus plataforma.
+                        </p>
+                    </li>
+                    <li>
+                        Pulse la pestaña MBeans.
+                        <p>
+                            Este panel muestra todos los MBeans que están actualmente registrados en el servidor MBean.
+                        </p>
+                    </li>
+                    <li>
+                        En el marco izquierdo, expanda el nodo <code>com.example</code> en el árbol MBean.
+                        <p>
+                            Ve el ejemplo MBean <code>Hello</code> que fue creado y registrado por <code>Main</code>. Si pulsa 
+                            <code>Hello</code>, ve sus nodos de Atributos y Operaciones asociados en el árbol MBean.
+                        </p>
+                    </li>
+                    <li>
+                        Expanda el nodo de Atributos del MBean <code>Hello</code> en el árbol MBean.
+                        <p>
+                            Se visualizan los atributos MBean que fueron definidos por la clase <code>Hello</code>.
+                        </p>
+                    </li>
+                    <li>
+                        Cambie el valor del atributo <code>CacheSize</code> a 150.
+                        <p>
+                            En la ventana termina en la cual inició <code>Main</code>,  se genera una confirmación del cambio de 
+                            este atributo.
+                        </p>
+                    </li>
+                    <li>
+                        Expanda el nodo de Operaciones del MBean <code>Hello</code> en el árbol MBean.
+                        <p>
+                            Las dos operaciones declaradas por el MBean <code>Hello</code>, <code>sayHello()</code> y
+                            <code>add()</code>, son visibles.
+                        </p>
+                    </li>
+                    <li>
+                        Invoque la operación <code>sayHello()</code> pulsando el botón <code>sayHello</code>.
+                        <p>
+                            Un cuadro de diálogo de JConsole le informa que el método se invocó correctamnte. El mensaje 
+                            <i>&quot;hello, world&quot;</i> se genera en la ventana terminal en la cual está ejecutándose 
+                            <code>Main</code>.
+                        </p>
+                    </li>
+                    <li>
+                        Proporciona dos enteros para la operación <code>add()</code> para agregar y haga clic en el botón 
+                        <code>add</code>.
+                        <p>
+                            La respuesta se muestra en un cuadro de diálogo de JConsole.
+                        </p>
+                    </li>
+                    <li>
+                        Para cerrar JConsole, seleccione Conexión -&gt; Salir.
+                    </li>
+                </ol>
+            </div>
+            <div class="NavBit">
+                <a target="_top" href="index.html">&laquo;&nbsp;Anterior</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="../TOC.html">TdC</a>&nbsp;&bull;&nbsp;
+                <a target="_top" href="mxbeans.html">Siguiente&nbsp;&raquo;</a>
+            </div>
+        </div>
+        <hr class="clearfloat"/>
+        <div id="Footer">
+            <table style="width: 100%;padding: 5px">
+                <tr>
+                    <td>
+                        <p class="footertext">
+                            <a id="license_info">Su uso de ésta</a> página y todo el material en las páginas bajo el anuncio
+                            &quot;Los Tutoriales de Java&quot; está sujeto a estos <a href="../../information/cpyr.html">avisos
+                                legales</a>.
+                        </p>
+                        <p class="footertext">
+                            Copyright &copy; 1995, 2015 Oracle y/o sus afiliados. Todos los derechos reservados.
+                        </p>
+                    </td>
+                    <td style="text-align: right">
+                        <p class="footertext">
+                            ¿Problemas con estos ejemplos? Intente
+                            <a target="_blank" href="../../information/run-examples.html">Compilando y Ejecutando los Ejemplos: PFs
+                            </a>.
+                        </p>
+                        <p class="footertext">
+                            ¿Quejas? ¿Elogios? ¿Sugerencias? <a target="_blank" href="https://docs.oracle.com/javase/feedback.html">
+                                Denos su opinión</a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="PrintHeaders">
+            <b>Página anterior:</b> Presentación de MBeans<br />
+            <b>Página siguiente:</b> MXBeans
+        </div>
+    </body>
+</html> 

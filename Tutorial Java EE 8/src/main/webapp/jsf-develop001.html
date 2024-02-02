@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Beans Gestionados en la Tecnología JavaServer Faces</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/96c4d89611.js"></script>
+  </head>
+  <body>
+    <table id="doc-title" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top">
+          <b>Plataforma Java, Edición Empresarial (Java EE) 8</b><br />
+          <b>El Tutorial de Java EE</b>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <table width="90%" id="top-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>
+        <td align="left">
+          <a href="jsf-develop.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-develop002.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class=" vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <div class="sect1" id="BNAQM">
+      <h2 id="managed-beans-in-javaserver-faces-technology">Beans Gestionados en la Tecnología JavaServer Faces</h2>
+      <div class="sectionbody">
+        <div class="paragraph">
+          <p>
+            Una aplicación típica de JavaServer Faces incluye uno o más beans gestionados, cada uno de los 
+            cuales puede asociarse con los componentes utilizados en una página en particular. Esta sección 
+            presenta los conceptos básicos de creación, configuración y uso de beans gestionados en una 
+            aplicación.
+          </p>
+        </div>
+        <table class="tableblock frame-all grid-all spread">
+          <colgroup>
+            <col style="width: 100%;">
+          </colgroup>
+          <tbody>
+            <tr>
+              <td class="tableblock halign-left valign-top">
+                <div>
+                  <div class="paragraph">
+                    <p><strong>Note</strong>:</p>
+                  </div>
+                  <div class="paragraph">
+                    <p>
+                      El <a href="jsf-page.html#BNAQZ">
+                        Capítulo 10, "Uso de Tecnología JavaServer Faces en páginas web"
+                      </a> y el 
+                      <a href="jsf-page-core.html#GJCUT">
+                        Capítulo 11, "Uso de convertidores, oyentes y validadores"
+                      </a> muestran cómo agregar 
+                      componentes a una página y conectarlos a objetos del lado del servidor mediante 
+                      etiquetas de componentes y etiquetas principales. Estos capítulos también muestran 
+                      cómo proporcionar funcionalidad adicional a los componentes a través de convertidores, 
+                      oyentes y validadores. El desarrollo de una aplicación JavaServer Faces también 
+                      implica la tarea de programar los objetos del lado del servidor: beans gestionados, 
+                      convertidores, controladores de eventos y validadores.
+                    </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="paragraph">
+          <p>Aquí se tratan los siguientes temas:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p><a href="#BNAQN">Creando un Bean Gestionado</a></p>
+            </li>
+            <li>
+              <p><a href="#BNAQP">Usando el EL para Referenciar Beans Gestionados</a></p>
+            </li>
+          </ul>
+        </div>
+        <div class="sect2" id="BNAQN">
+          <h3 id="creating-a-managed-bean">Creando un Bean Gestionado</h3>
+          <div class="paragraph">
+            <p>
+              Un bean gestionado se crea con un constructor sin argumentos, un conjunto de propiedades y un 
+              conjunto de métodos que realizan funciones para un componente. Cada una de las propiedades del 
+              bean gestionado se puede vincular a una de las siguientes:
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>Un valor de componente</p>
+              </li>
+              <li>
+                <p>Una instancia de componente</p>
+              </li>
+              <li>
+                <p>Una instancia de convertidor</p>
+              </li>
+              <li>
+                <p>Una instancia de oyente</p>
+              </li>
+              <li>
+                <p>Una instancia de validador</p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Las funciones más comunes que realizan los métodos de los beans gestionados incluyen las 
+              siguientes:
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>Validar los datos de un componente</p>
+              </li>
+              <li>
+                <p>Manejo de un evento desencadenado por un componente</p>
+              </li>
+              <li>
+                <p>
+                  Realizar el procesamiento para determinar la siguiente página a la que debe navegar la 
+                  aplicación
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              Al igual que con todos los componentes de JavaBeans, una propiedad consta de un campo de datos 
+              privados y un conjunto de métodos de acceso, como se muestra en este código:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+private Integer userNumber = null;
+...
+public void setUserNumber(Integer user_number) {
+    userNumber = user_number;
+}
+public Integer getUserNumber() {
+    return userNumber;
+}
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Cuando está vinculada al valor de un componente, una propiedad de bean puede ser cualquiera de 
+              los tipos primitivos y numéricos básicos o cualquier tipo de objeto Java para el cual la 
+              aplicación tiene acceso a un convertidor apropiado. Por ejemplo, una propiedad puede ser de tipo 
+              <code>java.util.Date</code> si la aplicación tiene acceso a un convertidor que puede convertir 
+              el tipo <code>Date</code> en una <code>String</code> y viceversa. Consulte 
+              <a href="jsf-develop002.html#BNATY">Escribiendo Propiedades del Bean</a> para obtener 
+              información sobre qué tipos son aceptados por qué etiquetas de componentes.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Cuando una propiedad de bean está vinculada a una instancia de componente, el tipo de propiedad 
+              debe ser el mismo que el objeto del componente. Por ejemplo, si un componente 
+              <code>javax.faces.component.UISelectBoolean</code> está vinculado a la propiedad, la propiedad 
+              debe aceptar y devolver un objeto <code>UISelectBoolean</code>. Del mismo modo, si la propiedad 
+              está vinculada a una instancia de conversor, validador o escucha, la propiedad debe ser del tipo 
+              de conversor, validador u oyente apropiado.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para obtener más información sobre cómo escribir beans y sus propiedades, consulte 
+              <a href="jsf-develop002.html#BNATY">Escribiendo Propiedades del Bean</a>.
+            </p>
+          </div>
+        </div>
+        <div class="sect2" id="BNAQP">
+          <h3 id="using-the-el-to-reference-managed-beans">Usando el EL para Referenciar Beans Gestionados</h3>
+          <div class="paragraph">
+            <p>
+              Para vincular valores de componentes y objetos a propiedades de bean gestionado o para hacer 
+              referencia a métodos de bean gestionado desde etiquetas de componente, los autores de páginas 
+              utilizan la sintaxis del lenguaje de expresión. Como se explica en 
+              <a href="jsf-el001.html#BNAHQ">Descripción general del EL</a>, las siguientes son algunas de las 
+              características que ofrece el EL:
+            </p>
+          </div>
+          <div class="ulist">
+            <ul>
+              <li>
+                <p>Evaluación diferida de expresiones</p>
+              </li>
+              <li>
+                <p>La capacidad de usar una expresión de valor para leer y escribir datos.</p>
+              </li>
+              <li>
+                <p>Expresiones de método</p>
+              </li>
+            </ul>
+          </div>
+          <div class="paragraph">
+            <p>
+              La evaluación diferida de expresiones es importante porque el ciclo de vida de JavaServer Faces 
+              se divide en varias fases en las que el manejo de eventos de componentes, la conversión y 
+              validación de datos y la propagación de datos a objetos externos se realizan de manera ordenada. 
+              La implementación debe poder retrasar la evaluación de expresiones hasta que se haya alcanzado 
+              la fase adecuada del ciclo de vida. Por lo tanto, los atributos de etiqueta de la implementación 
+              siempre usan la sintaxis de evaluación diferida, que se distingue por el delimitador 
+              <code>#{}</code>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para almacenar datos en objetos externos, casi todos los atributos de etiquetas de JavaServer 
+              Faces usan expresiones lvalue, que son expresiones que permiten obtener y configurar datos en 
+              objetos externos.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Finalmente, algunos atributos de etiqueta de componente aceptan expresiones de método que hacen 
+              referencia a métodos que manejan eventos de componentes o validan o convierten datos de 
+              componentes.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para ilustrar una etiqueta JavaServer Faces usando EL, la siguiente etiqueta hace referencia a 
+              un método que valida la entrada del usuario:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;h:inputText id="inputGuess"
+    value="#{userNumberBean.userNumber}"
+    required="true" size="3"
+    disabled="#{userNumberBean.number eq userNumberBean.userNumber ...}"
+    validator="#{userNumberBean.validateNumberRange}"&gt;
+&lt;/h:inputText&gt;
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Esta etiqueta vincula el valor del componente <code>inputGuess</code> a la propiedad de bean 
+              gestionada <code>UserNumberBean.userNumber</code> mediante el uso de una expresión lvalue. La 
+              etiqueta usa una expresión de método para referirse al método 
+              <code>UserNumberBean.validateNumberRange</code>, que realiza la validación del valor local del 
+              componente. El valor local es lo que el usuario escriba en el campo correspondiente a esta 
+              etiqueta. Este método se invoca cuando se evalúa la expresión.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Casi todos los atributos de etiqueta de JavaServer Faces aceptan expresiones de valor. Además de 
+              hacer referencia a las propiedades del bean, las expresiones de valor pueden hacer referencia a 
+              listas, mapas, matrices, objetos implícitos y paquetes de recursos.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Otro uso de las expresiones de valor es vincular una instancia de componente a una propiedad de 
+              bean gestionado. El autor de una página hace esto haciendo referencia a la propiedad del 
+              atributo <code>binding</code>:
+            </p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="prettyprint highlight"><code class="language-oac_no_warn" data-lang="oac_no_warn">
+&lt;h:outputLabel for="fanClub"
+               rendered="false"
+               binding="#{cashierBean.specialOfferText}"&gt;
+               value="#{bundle.DukeFanClub}"/&gt;
+&lt;/h:outputLabel&gt;
+              </code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>
+              Además de utilizar expresiones con las etiquetas de componentes estándar, puede configurar las 
+              propiedades de sus componentes personalizados para aceptar expresiones creando instancias de 
+              <code>javax.el.ValueExpression</code> o <code>javax.el.MethodExpression</code> para ellos.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para obtener información sobre EL, consulte el 
+              <a href="jsf-el.html#GJDDD">Capítulo 9, "Lenguaje de Expresión"</a>.
+            </p>
+          </div>
+          <div class="paragraph">
+            <p>
+              Para obtener información sobre cómo hacer referencia a métodos de bean gestionados desde 
+              etiquetas de componentes, consulte
+              <a href="jsf-page-core004.html#BNATN">Referenciando un Método de un Bean Gestionado</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <table width="90%" id="bottom-nav" cellspacing="0" cellpadding="0">
+      <colgroup>
+        <col width="12%"/>
+        <col width="12%"/>
+        <col width="*"/>
+      </colgroup>
+      <tr>		
+        <td align="left">
+          <a href="jsf-develop.html">
+            <span class=" vector-font"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Anterior</span>
+          </a>
+        </td>
+        <td align="left">
+          <a href="jsf-develop002.html">
+            <span class="vector-font"><i class="fa fa-arrow-circle-right vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Siguiente</span>
+          </a>
+        </td>
+        <td align="right">
+          <a href="toc.html">
+            <span class="vector-font"><i class="fa fa-list vector-font" aria-hidden="true"></i></span>
+            <span style="position:relative;top:-2px;">Contenidos</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <span id="copyright">
+      <a href="img/cpyr.adoc">
+        <img src="img/oracle.gif" height="10" alt="Logo de Oracle" />&nbsp;			
+        <span>
+          Copyright&nbsp;&copy;&nbsp;2017,&nbsp;Oracle&nbsp;y/o&nbsp;sus&nbsp;afiliados.&nbsp;Todos&nbsp;los&nbsp;
+          derechos&nbsp;reservados.
+        </span>
+      </a>
+    </span>
+  </body>
+</html>
