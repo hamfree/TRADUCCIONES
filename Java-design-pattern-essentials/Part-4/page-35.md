@@ -1,20 +1,20 @@
 # 24. Visitante (Visitor)
 
-Type: Behavioural
+Tipo: conductual
 
-Purpose: Represent a method to be performed on the elements of an object structure. Visitor lets you define a new method without changing the classes of the elements on which it operates.
+Objetivo: Representa un método a realizar sobre los elementos de una estructura de objeto. Visitor te permite definir un nuevo método sin cambiar las clases de los elementos sobre los que opera.
 
-Sometimes a class hierarchy and its code become substantive, and yet it is known that future requirements will be inevitable. An example for the Foobar Motor Company is the Engine hierarchy which looks like this:
+A veces una jerarquía de clases y su código se vuelven sustanciales y, sin embargo, se sabe que los requisitos futuros serán inevitables. Un ejemplo para la Compañía de Motores Foobar es la jerarquía de motores que se ve así:
 
 ![Jerarquía de la clase Engine](../images/000049.jpg)
 
 Figure 24.1 : Jerarquía de la clase Engine
 
-In reality, the code within the AbstractEngine class is likely to be composed of a multitude of individual components, such as a camshaft, piston, some spark plugs, etc. If we need to add some functionality that traverses these components then the natural way is to just add a method to AbstractEngine. But maybe we know there are potentially many such new requirements and we would rather not have to keep adding methods directly into the hierarchy?
+En realidad, es probable que el código dentro de la clase AbstractEngine esté compuesto por una multitud de componentes individuales, como un árbol de levas, un pistón, algunas bujías, etc. Si necesitamos agregar alguna funcionalidad que atraviese estos componentes, entonces la forma natural es simplemente agregar un método a AbstractEngine. Pero, ¿tal vez sabemos que existen potencialmente muchos requisitos nuevos y preferiríamos no tener que seguir agregando métodos directamente a la jerarquía?
 
-The Visitor pattern enables us to define just one additional method to add into the class hierarchy in such a way that lots of different types of new functionality can be added without any further changes. This is accomplished by means of a technique known as "double-despatch", whereby the invoked method issues a call-back to the invoking object.
+El patrón Visitante nos permite definir solo un método adicional para agregar a la jerarquía de clases de tal manera que se puedan agregar muchos tipos diferentes de nuevas funciones sin realizar más cambios. Esto se logra mediante una técnica conocida como "doble envío", mediante la cual el método invocado emite una devolución de llamada al objeto que lo invoca.
 
-The technique requires first the definition of an interface we shall call EngineVisitor:
+La técnica requiere primero la definición de una interfaz que llamaremos EngineVisitor:
 
 ```java
 public interface EngineVisitor {
@@ -25,7 +25,7 @@ public interface EngineVisitor {
 }
 ```
 
-We will also define an interface called Visitable with an acceptEngineVisitor() method:
+También definiremos una interfaz llamada Visitable con un método acceptEngineVisitor():
 
 ```java
 public interface Visitable {
@@ -33,7 +33,7 @@ public interface Visitable {
 }
 ```
 
-The Engine interface you have met in previous chapters (although we will modify it slightly for this chapter). The Camshaft, Piston and SparkPlug classes are each very simple, as follows:
+La interfaz Engine la has conocido en capítulos anteriores (aunque la modificaremos ligeramente para este capítulo). Las clases Camshaft, Piston y SparkPlug son muy simples, como se muestra a continuación:
 
 ```java
 public class Camshaft implements Visitable {
@@ -57,9 +57,9 @@ public class SparkPlug implements Visitable {
 }
 ```
 
-As you can see, each of these classes defines a method called acceptEngineVisitor() that takes a reference to an EngineVisitor object as its argument. All the method does is invoke the visit() method of the passed-in EngineVisitor, passing back the object instance.
+Como puede ver, cada una de estas clases define un método llamado acceptEngineVisitor() que toma una referencia a un objeto EngineVisitor como argumento. Todo lo que hace el método es invocar el método visit() del EngineVisitor pasado, devolviendo la instancia del objeto.
 
-Our modified Engine interface also now defines the acceptEngineVisitor() method:
+Nuestra interfaz Engine modificada ahora también define el método acceptEngineVisitor():
 
 ```java
 public interface Engine extends Visitable {
@@ -68,7 +68,7 @@ public interface Engine extends Visitable {
 }
 ```
 
-The AbstractEngine class therefore needs to implement this new method, which in this case traverses the individual components (camshaft, piston, spark plugs) invoking acceptEngineVisitor() on each:
+Por lo tanto, la clase AbstractEngine necesita implementar este nuevo método, que en este caso recorre los componentes individuales (camshaft, piston, spark plugs) invocando acceptEngineVisitor() en cada uno:
 
 ```java
 public abstract class AbstractEngine implements Engine {
@@ -83,7 +83,7 @@ public abstract class AbstractEngine implements Engine {
         this.size = size;
         this.turbo = turbo;
  
-        // Create a camshaft, piston and 4 spark plugs...
+        // Crea un árbol de levas, un pistón y 4 bujías...
         camshaft = new Camshaft();
         piston = new Piston();
         sparkPlugs = new SparkPlug[]{new SparkPlug(), new SparkPlug(), new SparkPlug(), new SparkPlug()};
@@ -98,14 +98,14 @@ public abstract class AbstractEngine implements Engine {
     }
  
     public void acceptEngineVisitor(EngineVisitor visitor) {
-        // Visit each component first...
+        // Visite cada componente primero...
         camshaft.acceptEngineVisitor(visitor);
         piston.acceptEngineVisitor(visitor);
         for (SparkPlug eachSparkPlug : sparkPlugs) {
             eachSparkPlug.acceptEngineVisitor(visitor);
         }
  
-        // Now visit the receiver...
+        // Ahora visita al receptor...
         visitor.visit(this);
     }
  
@@ -115,29 +115,29 @@ public abstract class AbstractEngine implements Engine {
 }
 ```
 
-Now we shall create an actual implementation of EngineVisitor so you can see how we can easily add additional functionality to engines without any further changes to any engine hierarchy class. The first thing we shall do is to define some clever electronic gizmo that can be attached to an engine that will automatically check each component and diagnose any faults. We therefore define the EngineDiagnostics class:
+Ahora crearemos una implementación real de EngineVisitor para que pueda ver cómo podemos agregar fácilmente funcionalidades adicionales a los motores sin realizar más cambios en ninguna clase de jerarquía del motor. Lo primero que haremos es definir algún artilugio electrónico inteligente que se pueda conectar a un motor y que comprobará automáticamente cada componente y diagnosticará cualquier fallo. Por tanto definimos la clase EngineDiagnostics:
 
 ```java
 public class EngineDiagnostics implements EngineVisitor {
     public void visit(Camshaft camshaft) {
-        System.out.println("Diagnosing the camshaft");
+        System.out.println("Diagnóstico del árbol de levas");
     }
  
     public void visit(Engine engine) {
-        System.out.println("Diagnosing the unit engine");
+        System.out.println("Diagnóstico del motor de la unidad.");
     }
  
     public void visit(Piston piston) {
-        System.out.println("Diagnosing the piston");
+        System.out.println("Diagnóstico del pistón");
     }
     
     public void visit(SparkPlug sparkPlug) {
-        System.out.println("Diagnosing a single spark plug");
+        System.out.println("Diagnóstico de una sola bujía");
     }
 }
 ```
 
-We also want to print an inventory of how many of each type of component there is within an engine, so we also have an EngineInventory class:
+También queremos imprimir un inventario de cuántos componentes de cada tipo hay dentro de un motor, por lo que también tenemos una clase EngineInventory:
 
 ```java
 public class EngineInventory implements EngineVisitor {
@@ -156,7 +156,7 @@ public class EngineInventory implements EngineVisitor {
     }
  
     public void visit(Engine e) {
-        System.out.println("The engine has: " + camshaftCount + " camshaft(s), " + pistonCount + " piston(s), and " + sparkPlugCount + " spark plug(s)");
+        System.out.println("El motor tiene: " + camshaftCount + " árbol(s) de levas, " + pistonCount + " pistón(s) y " + sparkPlugCount + " bujía(s)");
     }
  
     public void visit(Piston p) {
@@ -169,43 +169,43 @@ public class EngineInventory implements EngineVisitor {
 }
 ```
 
-The following diagram summarises how all of these classes interact:
+El siguiente diagrama resume cómo interactúan todas estas clases:
 
 ![Patrón Visitante](../images/000015.jpg)
 
 Figura 24.2 : Patrón Visitante
 
-Client programs now only need to invoke the acceptEngineVisitor() method on an instance of Engine, passing in the appropriate EngineVisitor object:
+Los programas cliente ahora solo necesitan invocar el método acceptEngineVisitor() en una instancia de Engine, pasando el objeto EngineVisitor apropiado:
 
 ```java
-// Create an engine...
+// Crea un motor...
 Engine engine = new StandardEngine(1300);
 
-// Run diagnostics on the engine...
+// Ejecuta diagnóstico en el motor...
 engine.acceptEngineVisitor(new EngineDiagnostics());
 ```
 
-The above will result in the following output:
+Lo anterior dará como resultado la siguiente salida:
 
 ```text
-Diagnosing the camshaft
-Diagnosing the piston
-Diagnosing a single spark plug
-Diagnosing a single spark plug
-Diagnosing a single spark plug
-Diagnosing a single spark plug
-Diagnosing the unit engine
+Diagnóstico del árbol de levas
+Diagnóstico del pistón
+Diagnóstico de una sola bujía
+Diagnóstico de una sola bujía
+Diagnóstico de una sola bujía
+Diagnóstico de una sola bujía
+Diagnóstico del motor de la unidad.
 ```
 
-And to obtain the inventory (using the same Engine instance):
+Y para obtener el inventario (usando la misma instancia de Engine):
 
 ```java
-// Run inventory on the engine...
+// Realiza inventario en el motor...
 engine.acceptEngineVisitor(new EngineInventory());
 ```
 
-The output should show:
+El resultado debería mostrar:
 
 ```text
-The engine has: 1 camshaft(s), 1 piston(s), and 4 spark plug(s)
+TEl motor tiene: 1 árbol(es) de levas, 1 pistón(es) y 4 bujías.
 ```

@@ -1,12 +1,12 @@
 # 17. Iterador (Iterator)
 
-Type: Behavioural
+Type: Conductual
 
-Purpose: Provide a way to access the elements of an aggregate object sequentially without exposing its underlying representation.
+Objetivo: Proporciona una forma de acceder a los elementos de un objeto agregado de forma secuencial sin exponer su representación subyacente.
 
-The Foobar Motor Company wanted to produce a brochure listing their range of vehicles for sale and allocated the task to two separate programmers, one to provide the range of cars and the other to provide the range of vans.
+La Compañía de Motores Foobar quería producir un folleto que enumerara su gama de vehículos a la venta y asignó la tarea a dos programadores separados, uno para proporcionar la gama de automóviles y el otro para proporcionar la gama de furgonetas.
 
-The programmer that coded the CarRange class decided to internally store the range using a List object from the Java collections (specifically an ArrayList):
+El programador que codificó la clase `CarRange` decidió almacenar internamente el rango usando un objeto `List` de las colecciones de Java (específicamente un `ArrayList`):
 
 ```java
 public class CarRange {
@@ -27,9 +27,9 @@ public class CarRange {
 }
 ```
 
-You can see from the above that the programmer provided a getRange() method that returns the List collection object.
+Puede ver en lo anterior que el programador proporcionó un método `getRange()` que devuelve el objeto de la colección `List`.
 
-The other programmer decided to store the vans in an array when writing the VanRange class, and therefore his version of getRange() returns an array of vehicles:
+El otro programador decidió almacenar las camionetas en una matriz al escribir la clase `VanRange` y, por lo tanto, su versión de `getRange()` devuelve una matriz de vehículos:
 
 ```java
 public class VanRange {
@@ -49,9 +49,9 @@ public class VanRange {
 }
 ```
 
-The problem with this is that the internal representation in both of these classes has been exposed to outside objects. A better approach would be for each of the CarRange and VanRange classes to provide an Iterator object so that as well as being consistent, the internal representation would not need to be exposed.
+El problema con esto es que la representación interna en ambas clases ha estado expuesta a objetos externos. Un mejor enfoque sería que cada una de las clases `CarRange` y `VanRange` proporcionara un objeto `Iterator` para que, además de ser coherente, no fuera necesario exponer la representación interna.
 
-The Java Iterator interface is an implementation of the Iterator pattern, and looks like this (it is in the java.util package):
+La interfaz de Java `Iterator` es una implementación del patrón _Iterator_ y tiene este aspecto (está en el paquete `java.util`):
 
 ```java
 public interface Iterator<E> {
@@ -61,13 +61,13 @@ public interface Iterator<E> {
 }
 ```
 
-The hasNext() method returns true if another item exists;
-The next() method returns the next item;
-The remove() method removes the last returned item.
+* El método _hasNext()_ devuelve verdadero si existe otro elemento
+* El método _next()_ devuelve el siguiente elemento
+* El método _remove()_ elimina el último elmento devuelto.
 
-For lists, a subclass of Iterator called ListIterator provides some additional methods.
+Para las listas, una subclase de `Iterator` llamada `ListIterator` proporciona algunos métodos adicionales.
 
-Another Java interface called Iterable (which is in java.lang) can be implemented by classes that define a method called iterator() that returns an Iterator object:
+Otra interfaz Java llamada `Iterable` (que está en `java.lang`) se puede implementar mediante clases que definen un método llamado `iterator()` que devuelve un objeto `Iterator`:
 
 ```java
 public interface Iterable<T> {
@@ -75,7 +75,7 @@ public interface Iterable<T> {
 }
 ```
 
-Armed with this knowledge we can now modify our CarRange class to implement the Iterable interface and provide the new required method (code changes in bold):
+Armados con este conocimiento, ahora podemos modificar nuestra clase `CarRange` para implementar la interfaz `Iterable` y proporcionar el nuevo método requerido (los cambios de código están en negrita):
 
 ```java
 public class CarRange implements Iterable<Vehicle> {
@@ -100,7 +100,7 @@ public class CarRange implements Iterable<Vehicle> {
 }
 ```
 
-The VanRange class can also be changed along similar lines, this time converting the internal array into an Iterator:
+La clase `VanRange` también se puede cambiar de manera similar, esta vez convirtiendo la matriz interna en un `Iterator`:
 
 ```java
 public class VanRange implements Iterable<Vehicle> {
@@ -127,7 +127,7 @@ public class VanRange implements Iterable<Vehicle> {
 }
 ```
 
-Now we can process both cars and vans in a consistent manner:
+Ahora podemos procesar tanto coches como furgonetas de forma coherente:
 
 ```java
 System.out.println("=== Our Cars ===");
@@ -146,16 +146,16 @@ public void printIterator(Iterator iter) {
 
 ## El bucle 'for-each'{#h2-8}
 
-Several of the other chapters in this book have made use of the for-each construct introduced with Java 5. By implementing the Iterable interface your own classes can make use of this, providing a clean alternative to the above, as follows:
+Varios de los otros capítulos de este libro han hecho uso de la construcción _for-each_ introducida con Java 5. Al implementar la interfaz `Iterable`, sus propias clases pueden hacer uso de esto, proporcionando una alternativa limpia a lo anterior, de la siguiente manera:
 
 ```java
-System.out.println("=== Our Cars ===");
+System.out.println("=== Nuestros Coches ===");
 CarRange carRange = new CarRange();
 for (Vehicle currentVehicle : carRange.getRange()) {
     System.out.println(currentVehicle);
 }
 
-System.out.println("=== Our Vans ===");
+System.out.println("=== Nuestras Furgonetas ===");
 VanRange vanRange = new VanRange();
 for (Vehicle currentVehicle : vanRange.getRange()) {
     System.out.println(currentVehicle);

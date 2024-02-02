@@ -1,22 +1,22 @@
 # 20. Observador (Observer)
 
-Type: Behavioural
+Tipo: Conductual
 
-Purpose: Define a one-to-many dependency between objects so that when one object changes its state, all its dependants are notified and updated automatically.
+Objetivo: Define una dependencia de uno a muchos entre objetos para que cuando un objeto cambie su estado, todos sus dependientes sean notificados y actualizados automáticamente.
 
-The Foobar Motor Company has decided that an alert should sound to the driver whenever a certain speed is exceeded. They also envisage that other things may need to happen depending upon the current speed (such as an automatic gearbox selecting the appropriate gear to match the speed). But they realise the need to keep objects loosely-coupled, so naturally don't wish the Speedometer class to have any direct knowledge of speed monitors or automatic gearboxes (or any other future class that might be interested in the speed a vehicle is travelling).
+La Compañía de Motores Foobar ha decidido que debe sonar una alerta al conductor cada vez que se supere una determinada velocidad. También prevén que es posible que deban suceder otras cosas dependiendo de la velocidad actual (como que una caja de cambios automática seleccione la marcha adecuada para adaptarse a la velocidad). Pero se dan cuenta de la necesidad de mantener los objetos débilmente acoplados, por lo que, naturalmente, no desean que la clase Speedometer tenga ningún conocimiento directo de los monitores de velocidad o las cajas de cambios automáticas (o cualquier otra clase futura que pueda estar interesada en la velocidad a la que viaja un vehículo). 
 
-The Observer pattern enables a loose-coupling to be established between a 'subject' (the object that is of interest; Speedometer on our example) and its 'observers' (any other class that needs to be kept informed when interesting stuff happens).
+El patrón Observador permite establecer un acoplamiento flexible entre un 'sujeto' (el objeto que es de interés; Speedometer en nuestro ejemplo) y sus 'observadores' (cualquier otra clase que deba mantenerse informada cuando suceden cosas interesantes).
 
-Because this is a very common need in object-oriented systems, the Java libraries already contains mechanisms that enable the pattern to be implemented. One of these is by utilising the Observable class and the Observer interface:
+Debido a que esta es una necesidad muy común en los sistemas orientados a objetos, las bibliotecas de Java ya contienen mecanismos que permiten implementar el patrón. Uno de ellos es utilizar la clase Observable y la interfaz Observer:
 
 ![Patrón Observador](../images/000051.jpg)
 
 Figura 20.1 : Patrón Observador
 
-The 'subject' (Speedometer) can have multiple observers (which can in fact be any class that implements the Observer interface, not just SpeedMonitor objects).
+El 'sujeto' (Speedometer) puede tener múltiples observadores (que de hecho pueden ser cualquier clase que implemente la interfaz Observer, no solo objetos SpeedMonitor).
 
-The Speedometer class looks like this:
+La clase Speedometer se ve así:
 
 ```java
 public class Speedometer extends Observable {
@@ -29,7 +29,7 @@ public class Speedometer extends Observable {
     public void setCurrentSpeed(int speed) {
         currentSpeed = speed;
  
-        // Tell all observers so they know speed has changed...
+        // Avisa a todos los observadores para que sepan que la velocidad ha cambiado...
         setChanged();
         notifyObservers();
     }
@@ -40,9 +40,9 @@ public class Speedometer extends Observable {
 }
 ```
 
-The Speedometer class extends java.util.Observable and thus inherits for our convenience its methods concerned with the registration and notification of observers. For our example, whenever the speed has changed we invoke the inherited setChanged() and notifyObservers() methods which takes care of the notifications for us.
+La clase Speedometer extiende java.util.Observable y, por tanto, hereda para nuestra comodidad sus métodos relacionados con el registro y notificación de los observadores. Para nuestro ejemplo, cada vez que la velocidad cambia, invocamos los métodos heredados setChanged() y notifyObservers() que se encargan de las notificaciones por nosotros.
 
-The SpeedMonitor class implements the java.util.Observer interface and has the appropriate code for its required method update():
+La clase SpeedMonitor implementa la interfaz java.util.Observer y tiene el código apropiado para su método requerido update():
 
 ```java
 public class SpeedMonitor implements Observer {
@@ -51,25 +51,25 @@ public class SpeedMonitor implements Observer {
     public void update(Observable obs, Object obj) {
         Speedometer speedo = (Speedometer) obs;
         if (speedo.getCurrentSpeed() > SPEED_TO_ALERT) {
-            System.out.println("** ALERT ** Driving too fast! (" + speedo.getCurrentSpeed() + ")");
+            System.out.println("** ALERTA ** ¡Conduce demasiado rápido! (" + speedo.getCurrentSpeed() + ")");
         } else {
-            System.out.println("... nice and steady ... (" + speedo.getCurrentSpeed() + ")");
+            System.out.println("... agradable y estable ... (" + speedo.getCurrentSpeed() + ")");
         }
     }
 }
 ```
 
-Client programs simply pass a SpeedMonitor reference to an instance of Speedometer:
+Los programas cliente simplemente pasan una referencia de SpeedMonitor a una instancia de Speedometer:
 
 ```java
-// Create a monitor...
+// Crea un monitor...
 SpeedMonitor monitor = new SpeedMonitor();
 
-// Create a speedometer and register the monitor to it...
+// Crea un velocímetro y registra el monitor en él...
 Speedometer speedo = new Speedometer();
 speedo.addObserver(monitor);
 
-// Drive at different speeds...
+// Conducir a diferentes velocidades...
 speedo.setCurrentSpeed(50);
 speedo.setCurrentSpeed(70);
 speedo.setCurrentSpeed(40);
@@ -77,17 +77,17 @@ speedo.setCurrentSpeed(100);
 speedo.setCurrentSpeed(69);
 ```
 
-Running the above will result in the following output:
+La ejecución de lo anterior dará como resultado el siguiente resultado:
 
 ```text
-... nice and steady ... (50)
-... nice and steady ... (70)
-... nice and steady ... (40)
-** ALERT ** Driving too fast! (100)
-... nice and steady ... (69)
+... agradable y estable ... (50)
+... agradable y estable ... (70)
+... agradable y estable ... (40)
+** ALERTA ** ¡Conduce demasiado rápido! (100)
+... agradable y estable ... (69)
 ```
 
-The real power behind the Observer pattern is that any type of class can now become a monitor provided they implement the Observer interface, and without requiring any changes to be made to Speedometer. Let's create a simulation of an automatic gearbox:
+El verdadero poder detrás del patrón Observer es que cualquier tipo de clase ahora puede convertirse en un monitor siempre que implementen la interfaz Observer y sin necesidad de realizar ningún cambio en el Speedometer. Creemos una simulación de una caja de cambios automática:
 
 ```java
 public class AutomaticGearbox implements Observer {
@@ -95,22 +95,22 @@ public class AutomaticGearbox implements Observer {
         Speedometer speedo = (Speedometer) obs;
  
         if (speedo.getCurrentSpeed() <= 10) {
-            System.out.println("Now in first gear");
+            System.out.println("Ahora en primera marcha");
        
         } else if (speedo.getCurrentSpeed() <= 20) {
-            System.out.println("Now in second gear");
+            System.out.println("Ahora en segunda marcha");
        
         } else if (speedo.getCurrentSpeed() <= 30) {
-            System.out.println("Now in third gear");
+            System.out.println("Ahora en tercera marcha");
        
         } else {
-            System.out.println("Now in fourth gear");
+            System.out.println("Ahora en cuarta marcha");
         }
     }
 }
 ```
 
-Our client program can now just add this as an additional observer and get notifications of speed changes as well:
+Nuestro programa cliente ahora puede agregarlo como observador adicional y también recibir notificaciones de cambios de velocidad:
 
 ```java
 speedo.addObserver(new AutomaticGearbox());
@@ -118,11 +118,9 @@ speedo.addObserver(new AutomaticGearbox());
 
 ## Un enfoque alternativo utilizando eventos y oyentes{#h2-12}
 
-An alternative approach using events & listeners
+El código heredado que hace que las clases Observables funcionen tiene una desventaja obvia; Si su clase temática ya extiende otra clase, entonces no puede extenderla también, ya que Java solo admite herencia única (de clases). Sin embargo, proporcionar su propia implementación es bastante sencillo y aquí utilizaremos un enfoque alternativo proporcionado por las bibliotecas de Java utilizando 'eventos' y 'oyentes'.
 
-The inherited code that makes Observable classes work does have an obvious downside; if your subject class already extends another class then you can't extend it as well, since Java only supports single inheritance (of classes). However, providing your own implementation is fairly straightforward, and here we will make use of an alternative approach provided by the Java libraries using 'events' and 'listeners'.
-
-The first thing we shall do is separate out the events that can occur into a class called SpeedometerEvent that extends java.util.EventObject:
+Lo primero que haremos es separar los eventos que pueden ocurrir en una clase llamada SpeedometerEvent que extiende java.util.EventObject:
 
 ```java
 public class SpeedometerEvent extends EventObject {
@@ -139,9 +137,9 @@ public class SpeedometerEvent extends EventObject {
 }
 ```
 
-The only event of interest is when the speed changes. The inherited EventObject class provides a getSource() method so listeners will be able to tell the exact object that gave rise to the event, if they need to know it for some reason.
+El único evento de interés es cuando cambia la velocidad. La clase EventObject heredada proporciona un método getSource() para que los oyentes puedan identificar el objeto exacto que dio origen al evento, si necesitan conocerlo por algún motivo.
 
-Going hand-in-hand with SpeedometerEvent is an interface we shall define called SpeedometerListener, which extends the java.util.EventListener interface:
+De la mano de SpeedometerEvent hay una interfaz que definiremos llamada SpeedometerListener, que extiende la interfaz java.util.EventListener:
 
 ```java
 public interface SpeedometerListener extends EventListener {
@@ -149,9 +147,9 @@ public interface SpeedometerListener extends EventListener {
 }
 ```
 
-All classes that implement SpeedometerListener will need to provide appropriate code for the speedChanged() method. They can get any required data through the SpeedometerEvent reference passed in the argument. Note that our simple example only defines the one method, but it is common to have several methods that each notify a different piece of state that has changed.
+Todas las clases que implementen SpeedometerListener deberán proporcionar el código apropiado para el método speedChanged(). Pueden obtener cualquier dato requerido a través de la referencia SpeedometerEvent pasada en el argumento. Tenga en cuenta que nuestro ejemplo simple solo define un método, pero es común tener varios métodos, cada uno de los cuales notifica un estado diferente que ha cambiado.
 
-The Speedometer class will now be modified to no longer extend java.util.Obervable and to instead handle listener registration and notification internally:
+La clase Speedometer ahora se modificará para ya no extender java.util.Observable y, en su lugar, manejar el registro y la notificación del oyente internamente:
 
 ```java
 public class Speedometer {
@@ -166,7 +164,7 @@ public class Speedometer {
     public void setCurrentSpeed(int speed) {
         currentSpeed = speed;
  
-        // Tell all observers so they know speed has changed...
+        // Avisamos a todos los observadores para que sepan que la velocidad ha cambiado...
         fireSpeedChanged();
     }
  
@@ -192,9 +190,9 @@ public class Speedometer {
 }
 ```
 
-Note the use of an ArrayList to maintain the list of listeners, along with methods to add and remove them and loop through them when an SpeedometerEvent needs to be sent.
+Tenga en cuenta el uso de ArrayList para mantener la lista de oyentes, junto con métodos para agregarlos y eliminarlos y recorrerlos cuando sea necesario enviar un SpeedometerEvent.
 
-The SpeedMonitor class is our listener and now needs to implement the SpeedometerListener interface instead of java.util.Observable:
+La clase SpeedMonitor es nuestro oyente y ahora necesita implementar la interfaz SpeedometerListener en lugar de java.util.Observable:
 
 ```java
 public class SpeedMonitor implements SpeedometerListener {
@@ -202,26 +200,26 @@ public class SpeedMonitor implements SpeedometerListener {
  
     public void speedChanged(SpeedometerEvent event) {
         if (event.getSpeed() > SPEED_TO_ALERT) {
-            System.out.println("** ALERT ** Driving too fast! (" + event.getSpeed() + ")");
+            System.out.println("** ALERTA ** ¡Conduce demasiado rápido! (" + event.getSpeed() + ")");
         } else {
-            System.out.println("... nice and steady ... (" + event.getSpeed() + ")");
+            System.out.println("... agradable y estable ... (" + event.getSpeed() + ")");
         }
     }
 }
 ```
 
-Our client program is almost identical to before, the only change being a different method name when registering the listener:
+Nuestro programa cliente es casi idéntico al anterior, el único cambio es un nombre de método diferente al registrar el oyente:
 
 ```java
-// Create a listener
+// Crea un oyente
 SpeedMonitor monitor = new SpeedMonitor();
 
-// Create a speedometer and register the monitor to it...
+// Crea un Speedometer y registre el monitor en él...
 Speedometer speedo = new Speedometer();
 
 speedo.addSpeedometerListener(monitor);
 
-// Drive at different speeds...
+// Conduce a diferentes velocidades...
 speedo.setCurrentSpeed(50);
 speedo.setCurrentSpeed(70);
 speedo.setCurrentSpeed(40);
@@ -229,4 +227,4 @@ speedo.setCurrentSpeed(100);
 speedo.setCurrentSpeed(69);
 ```
 
-If your classes are JavaBeans then the Java libraries also supply a PropertyChangeEvent class and PropertyChangeListener interface that follow a similar approach.
+Si sus clases son JavaBeans, las bibliotecas de Java también proporcionan una clase PropertyChangeEvent y una interfaz PropertyChangeListener que siguen un enfoque similar.

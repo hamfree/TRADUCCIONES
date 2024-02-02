@@ -1,11 +1,11 @@
 # Parte V. Otros patrones útiles
 
-This part describes four additional patterns you should find useful in practical applications.
+Esta parte describe cuatro patrones adicionales que le resultarán útiles en aplicaciones prácticas.
 
-_Null Object_: Define a class that enables the processing of null values;
+_Objeto Nulo_: Defina una clase que permita el procesamiento de valores nulos;
 
-_Simple Factory_: Delegate the instantiation of objects;
+_Factoria Simple_: Delegar la creación de instancias de objetos;
 
-_Model View Controller_: Separate a user interface component’s screen representation from its underlying data and functionality;
+_Controlador de vista de modelo_: Separe la representación de pantalla de un componente de la interfaz de usuario de sus datos y funcionalidad subyacentes;
 
-_Layers_: Partition an application into separate modular levels that communicate hierarchically
+_Capas_: particiona una aplicación en niveles modulares separados que se comunican jerárquicamente
