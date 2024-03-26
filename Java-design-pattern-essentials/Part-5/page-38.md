@@ -1,55 +1,55 @@
-# 27. Modelo Vista Controlador  
+# 27. Modelo Vista Controlador
 
-The Foobar Motor Company's satellite-navigation system includes a visual display of the current location, the direction of travel and an indication of the current speed. There is also an input device; controls where you set the destination, etc. A fully fledged simulation is far beyond the scope of this book, so instead we will use a very simplified interface that merely lets you set the direction of travel (North, South, West and East) and the current speed (up to 30mph), without regard to any roads, etc..
+El sistema de navegación por satélite de Foobar Motor Company incluye una visualización de la ubicación actual, la dirección de viaje y una indicación de la velocidad actual. También hay un dispositivo de entrada; controla dónde estableces el destino, etc. Una simulación completa está mucho más allá del alcance de este libro, por lo que usaremos una interfaz muy simplificada que simplemente te permite establecer la dirección de viaje (Norte, Sur, Oeste y Este) y la velocidad actual (hasta 30 mph), sin tener en cuenta las carreteras, etc.
 
-The user interface will look like this:
+La interfaz de usuario se verá así:
 
 ![Interfaz de usuario de navegación por satélite](../images/000027.jpg)
 
 Figura 27.1 : Interfaz de usuario de navegación por satélite
 
-As you can see from the above, there are buttons to change direction and a slider to adjust the speed. The 'Feedback' section at the bottom of the screen automatically adjusts itself to your selections. Note that each time you click one of the direction buttons that button is disabled, and the previously selected button is re-enabled. The program initially starts by pointing North but with a speed of zero.
+Como puede ver en lo anterior, hay botones para cambiar de dirección y un control deslizante para ajustar la velocidad. La sección "Comentarios" en la parte inferior de la pantalla se ajusta automáticamente a sus selecciones. Tenga en cuenta que cada vez que hace clic en uno de los botones de dirección, ese botón se desactiva y el botón seleccionado anteriormente se vuelve a activar. El programa inicialmente comienza apuntando al Norte pero con una velocidad cero.
 
-This is a straightforward program that would be entirely possible to code within a single class. But as graphical applications become more complex, it greatly simplifies development and maintenance if you separate the major parts of the program.
+Este es un programa sencillo que sería completamente posible codificar dentro de una sola clase. Pero a medida que las aplicaciones gráficas se vuelven más complejas, se simplifica enormemente el desarrollo y el mantenimiento si se separan las partes principales del programa.
 
-The Model View Controller pattern (often abbreviated to MVC) is a way of achieving a looser coupling between the constituent parts, and is a tried-and-tested approach to graphical applications. There are typically three parts at play in GUI applications:
+El patrón Modelo Vista Controlador (a menudo abreviado como MVC) es una forma de lograr un acoplamiento más flexible entre las partes constituyentes y es un enfoque probado para aplicaciones gráficas. Normalmente hay tres partes en juego en las aplicaciones GUI:
 
-1. The "Model". This is the 'data' (i.e. state) and associated application or 'business' logic. In our example, this comprises the values of the current direction of travel and the current speed together with methods to update and return them.
+1. El "Modelo". Estos son los 'datos' (es decir, el estado) y la aplicación asociada o la lógica 'comercial'. En nuestro ejemplo, esto comprende los valores de la dirección de viaje actual y la velocidad actual junto con métodos para actualizarlos y devolverlos.
 
-2. The "View". This is the graphical display, as shown in Figura 27.1, automatically updating itself as necessary whenever the Model changes its state in some way.
+2. La "Vista". Esta es la pantalla gráfica, como se muestra en la Figura 27.1, actualizándose automáticamente según sea necesario cada vez que el Modelo cambia su estado de alguna manera.
 
-3. The "Controller". This is the part that responds to all user input (button clicks, moving the slider, etc.) and liaises with both the Model and the View.
+3. El "Controlador". Esta es la parte que responde a todas las entradas del usuario (clics en botones, movimiento del control deslizante, etc.) y sirve de enlace tanto con el Modelo como con la Vista.
 
-Each of the above three parts will be in a separate class, which can be visualised as follows:
+Cada una de las tres partes anteriores estará en una clase separada, que se puede visualizar de la siguiente manera:
 
 ![Patrón Modelo Vista Controlador](../images/000011.jpg)
 
 Figura 27.2 : Patrón Modelo Vista Controlador
 
-These classes interrelate in the following way:
+Estas clases se interrelacionan de la siguiente manera:
 
-* _SatNavModel_ contains methods to set and get both the direction and speed. It is 'observable' (see Chapter 20) and will notify interested observers whenever either the direction or the speed has changed, but has no direct knowledge of any other class;
-* _SatNavView_ defines the graphical frame and user-interface display. It holds a reference to SatNavModel so it can listen to state changes in the Model and query its state as needed to keep the display up-to-date automatically;
-* _SatNavController_ holds a reference to both SatNavModel and SatNavView. It handles button clicks and movement of the speed slider, updating the Model and liaising with the View as needed.
+* _SatNavModel_ contiene métodos para establecer y obtener tanto la dirección como la velocidad. Es "observable" (ver Capítulo 20) y notificará a los observadores interesados siempre que la dirección o la velocidad hayan cambiado, pero no tiene conocimiento directo de ninguna otra clase;
+* _SatNavView_ define el marco gráfico y la visualización de la interfaz de usuario. Contiene una referencia a SatNavModel para que pueda escuchar los cambios de estado en el modelo y consultar su estado según sea necesario para mantener la pantalla actualizada automáticamente;
+* _SatNavController_ contiene una referencia tanto a SatNavModel como a SatNavView. Maneja los clics de los botones y el movimiento del control deslizante de velocidad, actualizando el Modelo y interactuando con la Vista según sea necesario.
 
-Just as with the other patterns described in this book, there are variations in how MVC can be structured, and the above might be described as the 'classical' approach. Java components (including the Swing components) often use a modified version of MVC in which the View and Controller are combined into a single class, but for the purposes of this book we will use the full three-class separation to present the pattern.
+Al igual que con los otros patrones descritos en este libro, existen variaciones en cómo se puede estructurar MVC, y lo anterior podría describirse como el enfoque "clásico". Los componentes Java (incluidos los componentes Swing) a menudo usan una versión modificada de MVC en la que la Vista y el Controlador se combinan en una sola clase, pero para los propósitos de este libro usaremos la separación completa de tres clases para presentar el patrón.
 
-We shall start with the Model, which in our case is the class SatNavModel. This has been implemented so that it could easily become a JavaBean, although that is not a requirement of MVC. The important point is that it has direct knowledge of neither the View nor the Controller, and could therefore be plugged into all sorts of other applications without any changes being required.
+Empezaremos por el Modelo, que en nuestro caso es la clase SatNavModel. Esto se ha implementado para que pueda convertirse fácilmente en un JavaBean, aunque ese no es un requisito de MVC. El punto importante es que no tiene conocimiento directo de la Vista ni del Controlador y, por lo tanto, podría conectarse a todo tipo de otras aplicaciones sin que sea necesario realizar ningún cambio.
 
 ```java
 public class SatNavModel implements Serializable {
-    // Used when notifying listeners so they know what has changed
+    // Se utiliza para notificar a los oyentes para que sepan qué ha cambiado.
     public static final String DIRECTION_CHANGE = "direction";
     public static final String SPEED_CHANGE = "speed";
  
-    // The directions we can travel
+    // Las direcciones en las que podemos viajar
     public enum Direction {NORTH, SOUTH, EAST, WEST};
  
-    // The current direction and speed
+    // La dirección y velocidad actual.
     private Direction currentDirection;
     private int currentSpeed;
  
-    // This class is observable
+    // Esta clase es observable.
     private PropertyChangeSupport changeSupport;
  
  
@@ -93,23 +93,23 @@ public class SatNavModel implements Serializable {
 }
 ```
 
-As you can see, the only link with other classes is through its observers (we are using the PropertyChangeSupport class in the java.beans package to facilitate this). Each time the direction or speed is modified its observers (also known as listeners) are notified.
+Como puede ver, el único vínculo con otras clases es a través de sus observadores (estamos usando la clase PropertyChangeSupport en el paquete java.beans para facilitar esto). Cada vez que se modifica la dirección o la velocidad se notifica a sus observadores (también conocidos como oyentes).
 
-The graphical display is performed by the SatNavView class using standard Swing components. It takes a reference to the SatNavModel in its constructor, to register itself as an observer of the model (so it needs to implement the PropertyChangeListener interface). Whenever it detects a model change the propertyChange() method is called, enabling the View to update its display accordingly. There are also methods to allow the UI controls to be observed (by, for example, the Controller).
+La visualización gráfica la realiza la clase SatNavView utilizando componentes estándar de Swing. Toma una referencia al SatNavModel en su constructor para registrarse como observador del modelo (por lo que necesita implementar la interfaz PropertyChangeListener). Siempre que detecta un cambio de modelo, se llama al método propertyChange(), lo que permite que la Vista actualice su visualización en consecuencia. También existen métodos para permitir que se observen los controles de la interfaz de usuario (por ejemplo, mediante el Controlador).
 
 ```java
 public class SatNavView implements PropertyChangeListener {
-    // The view needs a reference to the model
+    // La vista necesita una referencia al modelo.
     private SatNavModel model;
  
-    // The view uses a JFrame
+    // La vista usa un JFrame
     private JFrame viewingFrame;
  
-    // UI controls to change direction and speed
+    // controles de IU para cambiar la dirección y la velocidad
     private JButton northButton, southButton, westButton, eastButton;
     private JSlider speedSlider;
  
-    // UI feedback to show current direction and speed
+    // Comentarios de la interfaz de usuario para mostrar la dirección y velocidad actuales
     private String directionString, speedString;
     private JLabel feedbackLabel;
  
@@ -117,19 +117,19 @@ public class SatNavView implements PropertyChangeListener {
     public SatNavView(SatNavModel model) {
         this.model = model;
        
-        // The view listens for changes to the model
+        // La vista escucha los cambios en el modelo.
         model.addPropertyChangeListener(this);
  
-        // Initialise the UI
-        viewingFrame = new JFrame("Satellite Navigation");
+        // Inicializa la interfaz de usuario
+        viewingFrame = new JFrame("Navegación por Satélite");
         viewingFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  
-        northButton = new JButton("North");
-        disableNorthButton(); // Default direction
+        northButton = new JButton("Norte");
+        disableNorthButton(); // Dirección predeterminada
  
-        southButton = new JButton("South");
-        westButton = new JButton("West");
-        eastButton = new JButton("East");
+        southButton = new JButton("Sur");
+        westButton = new JButton("Oeste");
+        eastButton = new JButton("Este");
  
         speedSlider = new JSlider(JSlider.VERTICAL, 0, 30, 0);
         speedSlider.setMajorTickSpacing(10);
@@ -137,13 +137,13 @@ public class SatNavView implements PropertyChangeListener {
         speedSlider.setPaintTicks(true);
         speedSlider.setPaintLabels(true);
  
-        directionString = "You are pointing " + model.getDirection();
-        speedString = "but not yet moving. Use buttons & slider.";
+        directionString = "estas apuntando " + model.getDirection();
+        speedString = "pero aún no se mueve. Utilice botones y control deslizante.";
         feedbackLabel = new JLabel(directionString + ", " + speedString);
  
-        // Layout the direction buttons
+        // Diseño de los botones de dirección.
         JPanel directionPanel = new JPanel(new GridLayout(3, 3));
-        directionPanel.setBorder(new TitledBorder("Direction"));
+        directionPanel.setBorder(new TitledBorder("Dirección"));
         directionPanel.add(new JLabel(""));
         directionPanel.add(northButton);
         directionPanel.add(new JLabel(""));
@@ -153,17 +153,17 @@ public class SatNavView implements PropertyChangeListener {
         directionPanel.add(new JLabel(""));
         directionPanel.add(southButton);
         directionPanel.add(new JLabel(""));
-        // Layout the slider
+        // Diseño del control deslizante
         JPanel speedPanel = new JPanel();
-        speedPanel.setBorder(new TitledBorder("Speed"));
+        speedPanel.setBorder(new TitledBorder("Velocidad"));
         speedPanel.add(speedSlider);
  
-        // Layout the feedback
+        // Diseño de los comentarios
         JPanel feedbackPanel = new JPanel();
-        feedbackPanel.setBorder(new TitledBorder("Feedback"));
+        feedbackPanel.setBorder(new TitledBorder("Comentarios"));
         feedbackPanel.add(feedbackLabel);
  
-        // Position the panels onto the frame
+        // Colocación de los paneles en el marco
         JPanel framePanel = new JPanel(new BorderLayout());
         framePanel.add(directionPanel, BorderLayout.CENTER);
         framePanel.add(speedPanel, BorderLayout.EAST);
@@ -173,13 +173,13 @@ public class SatNavView implements PropertyChangeListener {
     }
  
     public void show() {
-        // Show the view sized and centered
+        // Mostrar la vista dimensionada y centrada
         viewingFrame.pack();
         viewingFrame.setLocationRelativeTo(null);
         viewingFrame.setVisible(true);
     }
  
-    // The controller will register as a listener using these methods
+    // El controlador se registrará como oyente utilizando estos métodos
     public void addNorthButtonListener(ActionListener al) {
         northButton.addActionListener(al);
     }
@@ -200,7 +200,7 @@ public class SatNavView implements PropertyChangeListener {
         speedSlider.addChangeListener(cl);
     }
  
-    // The controller will call these methods to enable UI controls
+    // El controlador llamará a estos métodos para habilitar los controles de la interfaz de usuario.
     public void enableNorthButton() {
         northButton.setEnabled(true);
     }
@@ -233,25 +233,25 @@ public class SatNavView implements PropertyChangeListener {
         eastButton.setEnabled(false);
     }
  
-    // Called by the model when its state changes
+    // Llamado por el modelo cuando cambia su estado.
     public void propertyChange(PropertyChangeEvent pce) {
         if (model.getSpeed() == 0) {
-            directionString = "You are pointing " + model.getDirection();
-            speedString = "but are not currently moving.";
+            directionString = "está apuntando a " + model.getDirection();
+            speedString = "pero actualmente no se están moviendo.";
  
         } else if (pce.getPropertyName().equals(SatNavModel.DIRECTION_CHANGE)) {
             SatNavModel.Direction newDirection = (SatNavModel.Direction) pce.getNewValue();
-            directionString = "Now travelling " + newDirection;
-            speedString = "travelling at " + model.getSpeed();
+            directionString = "Ahora viajando " + newDirection;
+            speedString = "viajando a " + model.getSpeed();
  
         } else if (pce.getPropertyName().equals(SatNavModel.SPEED_CHANGE)) {
             int oldSpeed = (Integer) pce.getOldValue();
             int newSpeed = (Integer) pce.getNewValue();
             if (oldSpeed < newSpeed) {
-                speedString = "and you have sped up to " + model.getSpeed();
+                speedString = "y has acelerado hasta" + model.getSpeed();
  
             } else {
-                speedString = "and you have slowed down to " + model.getSpeed();
+                speedString = "y has disminuido la velocidad hasta " + model.getSpeed();
             }
         }
  
@@ -260,11 +260,11 @@ public class SatNavView implements PropertyChangeListener {
 }
 ```
 
-The SatNavController class is responsible for handling the user input, which in this case can be either clicking one of the direction buttons or moving the speed slider. In response to the user input the Model state needs to be updated, and there is therefore a reference to both SatNavView and SatNavModel in the constructor. The class sets itself up to listen out for user input and reacts accordingly:
+La clase SatNavController es responsable de manejar la entrada del usuario, que en este caso puede ser hacer clic en uno de los botones de dirección o mover el control deslizante de velocidad. En respuesta a la entrada del usuario, es necesario actualizar el estado del modelo y, por lo tanto, hay una referencia tanto a SatNavView como a SatNavModel en el constructor. La clase se configura para escuchar las entradas del usuario y reacciona en consecuencia:
 
 ```java
 public class SatNavController {
-    // Need a reference to both the model and the view
+    // Necesita una referencia tanto para el modelo como para la vista.
     private SatNavModel model;
     private SatNavView view;
  
@@ -272,7 +272,7 @@ public class SatNavController {
         this.model = model;
         this.view = view;
  
-        // The controller needs to listen to the view
+        // El controlador necesita escuchar la vista.
         view.addNorthButtonListener(new NorthButtonListener());
         view.addSouthButtonListener(new SouthButtonListener());
          view.addWestButtonListener(new WestButtonListener());
@@ -281,7 +281,7 @@ public class SatNavController {
     }
  
  
-    // Inner classes which serve as view listeners
+    // Clases internas que sirven como oyentes de vistas.
     private class NorthButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent event) {
             view.disableNorthButton();
@@ -331,13 +331,13 @@ public class SatNavController {
 }
 ```
 
-Running the application is now as simple as instantiating the above classes and invoking the show() command defined in the View:
+Ejecutar la aplicación ahora es tan simple como crear una instancia de las clases anteriores e invocar el comando show() definido en la Vista:
 
 ```java
-// Create the MVC classes
+// Crear las clases MVC
 SatNavModel model = new SatNavModel();
 SatNavView view = new SatNavView(model);
 SatNavController controller = new SatNavController(model, view);
-// Show the view
+// Mostrar la vista
 view.show();
 ```

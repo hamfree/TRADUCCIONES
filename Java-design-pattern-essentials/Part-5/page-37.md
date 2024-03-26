@@ -1,8 +1,8 @@
 # 26. Factoría simple
 
-In the main section of this book we looked at both the Factory Method pattern and the Abstract Factory pattern. The Simple Factory pattern is a commonly used simplified means of delegating the instantiation of objects to a specific class (the 'factory').
+En la sección principal de este libro vimos tanto el patrón de Método de Factoría como el patrón de Factoría Abstracta. El patrón de Factoría Simple es utilizado comúnmente para delegar la creación de instancias de objetos a una clase específica (la 'factoría').
 
-We shall assume here that the Foobar Motor Company manufactures two types of gearbox; an automatic gearbox and a manual gearbox. Client programs might need to create one or the other based upon a condition, as illustrated by the following code fragment (assuming the classes are defined within a class hierarchy):
+Asumiremos aquí que la Compañía Foobar Motor manufactura dos tipos de cajas de cambios; una caja de cambios automática y una caja de cambios manual. Los programas cliente podrían necesitar crear una u otroa dependiendo de una condición, como ilustra el siguiente fragmento de código (asumiendo que las clases están definidas dentro de una jerarquía de clases):
 
 ```java
 Gearbox selectedGearbox = null;
@@ -14,18 +14,18 @@ if (typeWanted = "automatic") {
 }
 
 
-// Do something with selectedGearbox...
+// Hacer algo con selectedGearbox...
 ```
 
-While the above code will of course work, what happens if more than one client program needs to perform a similar selection? We would have to repeat the if...else... statements in each client program, and if a new type of gearbox is subsequently manufactured we would have to track down every place the if...else... block is used.
+Mientras el código de arriba por supuesto que funcionará, ¿qué ocurre si mas de un programa cliente necesita realizar una selección similar? Tendríamos que repetir las sentencias if...else... en cada programa cliente, y si posteriormente se fabrica un nuevo tipo de caja de cambios, tendríamos que rastrear cada lugar en el que se utiliza el bloque if...else...
 
-Remembering the principle of encapsulating the concept that varies, we can instead delegate the selection and instantiation process to a specific class, known as the 'factory', just for that purpose. Client programs then only make use of the create() method of the factory, as illustrated in the diagram below:
+Recordando el principio de encapsular el concepto que varía, podemos delegar el proceso de selección y creación de instancias a una clase específica, conocida como 'factoría', solo para ese propósito. Los programas cliente entonces solo hacen uso del método create() de la factoría, como se ilustra en el siguiente diagrama:
 
 ![Patrón de Factoría Simple](../images/000048.jpg)
 
 Figura 26.1 : Patrón de Factoría Simple
 
-The abstract Gearbox class in our simple example merely defines a no-argument constructor:
+La clase abstracta Gearbox en nuestro ejemplo simple meramente define un constructor sin argumentos:
 
 ```java
 public abstract class Gearbox {
@@ -33,24 +33,24 @@ public abstract class Gearbox {
 }
 ```
 
-The AutomaticGearbox and ManualGearbox classes each extend Gearbox for their respective types:
+Ambas clases AutomaticGearbox y ManualGearbox extienden Gearbox para sus tipos respectivos:
 
 ```java
 public class AutomaticGearbox extends Gearbox {
     public AutomaticGearbox() {
-        System.out.println("New automatic gearbox created");
+        System.out.println("Nueva caja de cambios automática creada");
     }
 }
 
 
 public class ManualGearbox extends Gearbox {
     public ManualGearbox() {
-        System.out.println("New manual gearbox created");
+        System.out.println("Nueva caja de cambios manual creada");
     }
 }
 ```
 
-We now need to create our GearboxFactory class that is capable of instantiating the appropriate Gearbox:
+Ahora necesitamos crear nuestra clase GearboxFactory que es capaz de instanciar la Gearbox apropiada:
 
 ```java
 public class GearboxFactory {
@@ -67,14 +67,14 @@ public class GearboxFactory {
 }
 ```
 
-The create() method takes care of the selection and instantiation, and thus isolates each client program from repeating code. We have made the method static purely for convenience; it is not a requirement of the pattern.
+El método create() se encarga de la selección y creación de instancias y, por lo tanto, aísla cada programa cliente del código repetido. Hemos hecho el método estático simplemente por conveniencia; no es un requisito del patrón.
 
-Client programs now obtain the type of gearbox by means of the factory:
+Los programas cliente ahora obtienen el tipo de caja de cambios mediante la factoría:
 
 ```java
-// Create an automatic gearbox
+// Crea una caja de cambios automática
 Gearbox auto = GearboxFactory.create(GearboxFactory.Type.AUTOMATIC);
 
-// Create a manual gearbox
+// Crea una caja de cambios manual
 Gearbox manual = GearboxFactory.create(GearboxFactory.Type.MANUAL);
 ```

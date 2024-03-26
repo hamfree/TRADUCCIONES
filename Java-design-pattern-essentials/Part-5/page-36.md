@@ -1,15 +1,15 @@
 # 25. Objeto nulo
 
-As any Java programmer soon discovers, software testing often throws up NullPointerException messages. Sometimes, the only way around this is to specifically test for null before performing an operation, which puts an extra onus on the programmer.
+Como cualquier programador de Java pronto descubre, las pruebas de software a menudo lanzan mensajes de NullPointerException. Algunas veces, la única forma de evitar esto es comprobar específicamente por null antes de realizar una operación, lo que supone una responsabilidad adicional para el programador.
 
-Suppose a vehicle's instrument panel contains three slots for warning lights (such as for low oil level or low brake fluid level). A particular vehicle might only use these two lights, with the third slot empty, represented by null within Java. Looping through the slots would require a specific test to prevent a NullPointerException being thrown:
+Suponga que el panel de instrumentos de un vehículo contiene tres huecos para las luces de advertencia (tales como el bajo nivel de aceite o bajo nivel del líquido de frenos). Un vehículo en particular podría usar solo estas dos luces, con el tercer hueco vacío, representando por null en Java. Iterar a través de los huecos requiere una prueba específica para prevenir que se lanze una NullPointerException:
 
 ```java
-OilLevelLight &  BrakeFluidLight are each types of WarningLight
+OilLevelLight &  BrakeFluidLight son tipos de WarningLight
 WarningLight[] lights = new WarningLight[3];
 lights[0] = new OilLevelLight();
 lights[1] = new BrakeFluidLight();
-lights[2] = null; //  empty slot
+lights[2] = null; //  hueco vacío
 
 for (WarningLight currentLight : lights) {
     if (currentLight != null) {
@@ -19,14 +19,13 @@ for (WarningLight currentLight : lights) {
     }
 }
 ```
-
-An approach that can help prevent the need to test for null is to create a 'null object' class as part of the class hierarchy. This class will implement the same interface but perform no actual function, as illustrated in the following figure:
+Un enfoque que puede ayudar a prevenir la necesidad de realizar pruebas para null es crear una clase de 'objeto nulo' como parte de la jerarquía de clases. Esta clase implementará la misma interfaz pero no realizará ninguna función real, como se ilustra en la siguiente figura:
 
 ![Patrón de Objeto Nulo](../images/000029.jpg)
 
 Figura 25.1 : Patrón de Objeto Nulo
 
-The WarningLight interface defines the methods turnOn(), turnOff() and isOn():
+La interfaz WarningLight define los métodos turnOn(), turnOff() y isOn():
 
 ```java
 public interface WarningLight {
@@ -36,7 +35,7 @@ public interface WarningLight {
 }
 ```
 
-The OilLightLevel and BrakeFluidLevel classes each implement the WarningLight interface and provide the appropriate code to switch the light on or off:
+Las clases OilLightLevel y BrakeFluidLevel implementan cada una la interfaz WarningLight y proporcionan el código apropiado para encender y apagar la luz:
 
 ```java
 public class OilLevelLight implements WarningLight {
@@ -44,12 +43,12 @@ public class OilLevelLight implements WarningLight {
  
     public void turnOn() {
         on = true;
-    System.out.println("Oil level light ON");
+    System.out.println("Oil level light ENCENDIDO");
     }
  
     public void turnOff() {
         on = false;
-        System.out.println("Oil level light OFF");
+        System.out.println("Oil level light APAGADO");
     }
    
     public boolean isOn() {
@@ -63,12 +62,12 @@ public class BrakeFluidLight implements WarningLight {
  
     public void turnOn() {
         on = true;
-        System.out.println("Brake fluid light ON");
+        System.out.println("Brake fluid light ENCENDIDO");
     }
  
     public void turnOff() {
         on = false;
-        System.out.println("Brake fluid light OFF");
+        System.out.println("Brake fluid light APAGADO");
     }
    
     public boolean isOn() {
@@ -77,16 +76,16 @@ public class BrakeFluidLight implements WarningLight {
 }
 ```
 
-For the Null Object pattern we also create a NullObjectLight class that implements the WarningLight interface but performs no actual processing:
+Para el patrón de Objeto Nulo también creamos una clase NullObjectLight que implementa la interfaz WarningLight pero no realiza ninguna función:
 
 ```java
 public class NullObjectLight implements WarningLight {
     public void turnOn() {
-        // Do nothing...
+        // No hace nada...
     }
  
     public void turnOff() {
-        // Do nothing...
+        // No hace nada...
     }
    
     public boolean isOn() {
@@ -95,15 +94,15 @@ public class NullObjectLight implements WarningLight {
 }
 ```
 
-Now our client code can be simplified since we no longer need to test if a slot is null, provided we make use of the null object:
+Ahora nuestro código cliente puede simplificarse ya que no necesitamos comprobar si un hueco es nulo, siempre que hagamos uso del objeto nulo:
 
 ```java
 WarningLight[] lights = new WarningLight[3];
 lights[0] = new OilLevelLight();
 lights[1] = new BrakeFluidLight();
-lights[2] = new NullObjectLight(); // empty slot
+lights[2] = new NullObjectLight(); // hueco vacío
 
-// No need to test for null...
+// No necesitamos comprobar null...
 for (WarningLight currentLight : lights) {
     currentLight.turnOn();
     currentLight.turnOff();
@@ -111,4 +110,4 @@ for (WarningLight currentLight : lights) {
 }
 ```
 
-Note that for Null Object getter methods you will need to return whatever seems sensible as a default; hence above the isOn() method returns false since it represents a non-extentent light.
+Tenga en cuenta que para los métodos de obtención de objetos nulos deberá devolver lo que parezca sensato como valor predeterminado; por lo tanto, el método isOn() anterior devuelve falso ya que representa una luz sin extensión.
